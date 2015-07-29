@@ -1,7 +1,7 @@
-# CMakeLists for Katydid/KTCore/Executables/Validation
+# CMakeLists for Nymph/Executables/Validation
 # Author: N. Oblath
 
-if (Katydid_ENABLE_TESTING)
+if (Nymph_ENABLE_TESTING)
 
     # Config files
     set (VALIDATION_CONFIGFILES
@@ -64,4 +64,4 @@ if (Katydid_ENABLE_TESTING)
                      TestThroughputProfiler
     )
         
-endif (Katydid_ENABLE_TESTING) 
+endif (Nymph_ENABLE_TESTING) 

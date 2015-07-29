@@ -22,7 +22,7 @@ using std::string;
 
 
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER( plog, "KTParam" );
 
@@ -849,4 +849,4 @@ namespace Katydid
         return out << aValue.ToString();
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */

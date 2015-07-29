@@ -15,7 +15,7 @@
 
 
 
-namespace Katydid
+namespace Nymph
 {
     // Forward declare whatever classes you can
     // input data type . . .
@@ -81,5 +81,5 @@ namespace Katydid
 
     };
 }
- /* namespace Katydid */
+ /* namespace Nymph */
 #endif /* KTPROCESSORTEMPLATE_HH_ */

@@ -15,7 +15,7 @@
 
 #include "KTLogger.hh"
 
-using namespace Katydid;
+using namespace Nymph;
 
 KTLOGGER(testlog, "TestCacheDirectory");
 

@@ -12,7 +12,7 @@
 
 using std::string;
 
-namespace Katydid
+namespace Nymph
 {
     static KTCommandLineOption< int > sTestConfigStringCLO("Test Configurable", "Command-line option for testing", "int-data", 'i');
 
@@ -66,4 +66,4 @@ namespace Katydid
     }
 
 
-} /* namespace Katydid */
+} /* namespace Nymph */

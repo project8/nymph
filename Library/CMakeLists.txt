@@ -1,4 +1,4 @@
-# CMakeLists for KTCore
+# CMakeLists for Nymph/Library
 # Author: N. Oblath
 
 set (UTIL_DIR Utility)
@@ -7,7 +7,7 @@ set (PROC_DIR Processor)
 set (IO_DIR IO)
 set (APPL_DIR Application)
 
-set (KTCORE_HEADERFILES
+set (NYMPH_HEADERFILES
     ${UTIL_DIR}/KTCacheDirectory.hh
     ${UTIL_DIR}/KTConcurrentQueue.hh
     ${UTIL_DIR}/KTConfigurable.hh
@@ -50,7 +50,7 @@ set (KTCORE_HEADERFILES
     ${APPL_DIR}/KTThroughputProfiler.hh
 )
 
-set (KTCORE_SOURCEFILES
+set (NYMPH_SOURCEFILES
     ${UTIL_DIR}/KTCacheDirectory.cc
     ${UTIL_DIR}/KTConfigurable.cc
     ${UTIL_DIR}/KTDirectory.cc
@@ -82,9 +82,9 @@ set (KTCORE_SOURCEFILES
 
 ##################################################
 
-add_library (KTCore ${KTCORE_SOURCEFILES})
-target_link_libraries (KTCore ${EXTERNAL_LIBRARIES})
+add_library (Nymph ${NYMPH_SOURCEFILES})
+target_link_libraries (Nymph ${EXTERNAL_LIBRARIES})
 
-pbuilder_install_headers (${KTCORE_HEADERFILES})
-pbuilder_install_libraries (KTCore)
+pbuilder_install_headers (${NYMPH_HEADERFILES})
+pbuilder_install_libraries (Nymph)
 

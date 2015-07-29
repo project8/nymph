@@ -14,7 +14,7 @@
 #include "KTSlot.hh"
 
 
-namespace Katydid
+namespace Nymph
 {
     class KTParamNode;
 
@@ -79,5 +79,5 @@ namespace Katydid
 
     };
 }
- /* namespace Katydid */
+ /* namespace Nymph */
 #endif /* KTPRINTDATASTRUCTURE_HH_ */

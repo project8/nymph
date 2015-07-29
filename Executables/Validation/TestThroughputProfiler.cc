@@ -8,7 +8,7 @@
 #include "KTLogger.hh"
 #include "KTThroughputProfiler.hh"
 
-using namespace Katydid;
+using namespace Nymph;
 
 KTLOGGER(testlog, "TestThroughputProfiler");
 

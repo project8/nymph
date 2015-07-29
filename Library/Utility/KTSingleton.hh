@@ -5,7 +5,7 @@
 
 #include <cstddef>
 
-namespace Katydid
+namespace Nymph
 {
 
     template< class XType >

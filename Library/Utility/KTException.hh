@@ -12,7 +12,7 @@
 #include <sstream>
 #include <exception>
 
-namespace Katydid
+namespace Nymph
 {
 
     class KTException :

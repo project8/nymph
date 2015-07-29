@@ -14,7 +14,7 @@
 #include <boost/function.hpp>
 #include <boost/signals2.hpp>
 
-namespace Katydid
+namespace Nymph
 {
     class SlotException : public std::logic_error
     {
@@ -114,5 +114,5 @@ namespace Katydid
         return;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTSLOTWRAPPER_HH_ */

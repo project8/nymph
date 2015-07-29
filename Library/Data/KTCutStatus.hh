@@ -16,7 +16,7 @@
 
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     /*!
      @class KTCutStatus
@@ -227,6 +227,6 @@ namespace Katydid
     {
         return IsCut(bitset_type(mask));
     }
-} /* namespace Katydid */
+} /* namespace Nymph */
 
 #endif /* KTCUTSTATUS_HH_ */

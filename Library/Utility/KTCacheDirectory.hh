@@ -12,7 +12,7 @@
 #include "KTDirectory.hh"
 #include "KTSingleton.hh"
 
-namespace Katydid
+namespace Nymph
 {
     class KTParamNode;
 
@@ -38,5 +38,5 @@ namespace Katydid
         return fPathExists && fAccess == eReadWrite;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTCACHEDIRECTORY_HH_ */

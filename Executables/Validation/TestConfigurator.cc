@@ -15,7 +15,7 @@
 
 #include <string>
 
-using namespace Katydid;
+using namespace Nymph;
 using namespace std;
 
 KTLOGGER(conflog, "TestConfigurator");

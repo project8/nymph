@@ -26,7 +26,7 @@ using boost::phoenix::ref;
 
 using std::string;
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(fnplog, "KTFilenameParsers");
 

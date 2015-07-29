@@ -10,7 +10,7 @@
 
 #include "KTProcessor.hh"
 
-namespace Katydid
+namespace Nymph
 {
 
     class KTTestProcessorA : public KTProcessor
@@ -44,5 +44,5 @@ namespace Katydid
     };
 
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTTESTPROCESSOR_HH_ */

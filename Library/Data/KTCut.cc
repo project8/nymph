@@ -7,7 +7,7 @@
 
 #include "KTCut.hh"
 
-namespace Katydid
+namespace Nymph
 {
     KTCut::KTCut(const std::string& name) :
             KTConfigurable(name)
@@ -18,4 +18,4 @@ namespace Katydid
     {
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */

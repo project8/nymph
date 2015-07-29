@@ -10,7 +10,7 @@
 #include <exception>
 #include <iostream>
 
-using namespace Katydid;
+using namespace Nymph;
 
 KTLOGGER(logger, "TestLogger")
 
@@ -18,12 +18,12 @@ int main()
 {
     try
     {
-        KTDEBUG(logger, "This is a DEBUG message from Katydid");
-        KTINFO(logger, "This is an INFO message from Katydid");
-        KTPROG(logger, "This is a PROG message from Katydid");
-        KTWARN(logger, "This is a WARN message from Katydid");
-        KTERROR(logger, "This is an ERROR message from Katydid");
-        KTFATAL(logger, "This is a FATAL message from Katydid");
+        KTDEBUG(logger, "This is a DEBUG message from Nymph");
+        KTINFO(logger, "This is an INFO message from Nymph");
+        KTPROG(logger, "This is a PROG message from Nymph");
+        KTWARN(logger, "This is a WARN message from Nymph");
+        KTERROR(logger, "This is an ERROR message from Nymph");
+        KTFATAL(logger, "This is a FATAL message from Nymph");
     }
     catch (std::exception& e)
     {

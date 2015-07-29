@@ -10,7 +10,7 @@
 
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     class KTCommandLineHandler;
     class KTParamNode;
@@ -89,5 +89,5 @@ namespace Katydid
         return fIsConfigured;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTCONFIGURABLE_HH_ */

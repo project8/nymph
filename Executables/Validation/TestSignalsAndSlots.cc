@@ -9,7 +9,7 @@
 #include "KTTestProcessor.hh"
 #include "KTLogger.hh"
 
-using namespace Katydid;
+using namespace Nymph;
 
 KTLOGGER(testsiglog, "TestSignalsAndSlots")
 

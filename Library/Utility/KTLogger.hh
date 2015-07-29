@@ -71,13 +71,13 @@
 // CLASS DEFINITIONS
 
 /**
- * The standard Katydid namespace.
+ * The standard Nymph namespace.
  */
-namespace Katydid
+namespace Nymph
 {
 
     /**
-     * The Katydid logger.
+     * The Nymph logger.
      *
      * The usage and syntax is inspired by log4j. logger itself uses the log4cxx library if it
      * was available on the system during compiling, otherwise it falls back to std::stream.
@@ -90,7 +90,7 @@ namespace Katydid
      * <pre>LOGGER(myLogger, "loggerName");</pre>
      *
      * This is equivalent to:
-     * <pre>static Katydid::logger myLogger("loggerName");</pre>
+     * <pre>static Nymph::logger myLogger("loggerName");</pre>
      *
      * For logging the following macros can be used. The source code location will then automatically
      * included in the output:
@@ -258,18 +258,18 @@ namespace Katydid
 
 // PRIVATE MACROS
 
-#define __KTDEFAULT_LOGGER        ::Katydid::KTLogger::GetRootLogger()
+#define __KTDEFAULT_LOGGER        ::Nymph::KTLogger::GetRootLogger()
 
-#define __KTLOG_LOCATION         ::Katydid::KTLogger::Location(__FILE__, __FUNC__, __LINE__)
+#define __KTLOG_LOCATION         ::Nymph::KTLogger::Location(__FILE__, __FUNC__, __LINE__)
 
 #define __KTLOG_LOG_4(I,L,M,O) \
         { \
-    if (I.IsLevelEnabled(::Katydid::KTLogger::e##L)) { \
+    if (I.IsLevelEnabled(::Nymph::KTLogger::e##L)) { \
         static bool _sLoggerMarker = false; \
         if (!O || !_sLoggerMarker) { \
             _sLoggerMarker = true; \
             ::std::ostringstream stream; stream << M; \
-            I.Log(::Katydid::KTLogger::e##L, stream.str(), __KTLOG_LOCATION); \
+            I.Log(::Nymph::KTLogger::e##L, stream.str(), __KTLOG_LOCATION); \
         } \
     } \
         }
@@ -336,7 +336,7 @@ namespace Katydid
 
 // PUBLIC MACROS
 
-#define KTLOGGER(I,K)      static ::Katydid::KTLogger I(K);
+#define KTLOGGER(I,K)      static ::Nymph::KTLogger I(K);
 
 #define KTLOG(...)         macro_dispatcher(__KTLOG_LOG_, __VA_ARGS__)(__VA_ARGS__)
 #define KTTRACE(...)       macro_dispatcher(__KTLOG_TRACE_, __VA_ARGS__)(__VA_ARGS__)

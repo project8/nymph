@@ -9,9 +9,9 @@
 #include "KTApplication.hh"
 #include "KTLogger.hh"
 
-using namespace Katydid;
+using namespace Nymph;
 
-KTLOGGER(katydidlog, "ConfigCheck");
+KTLOGGER(cclog, "ConfigCheck");
 
 int main(int argc, char** argv)
 {
@@ -21,7 +21,7 @@ int main(int argc, char** argv)
     }
     catch( std::exception& e )
     {
-        KTERROR( katydidlog, "Something went wrong while processing the command line:\n" << e.what() );
+        KTERROR( cclog, "Something went wrong while processing the command line:\n" << e.what() );
         return -1;
     }
 

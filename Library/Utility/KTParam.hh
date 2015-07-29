@@ -15,7 +15,7 @@
 #include <sstream>
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     class KTParamValue;
     class KTParamArray;
@@ -406,6 +406,6 @@ namespace Katydid
     std::ostream& operator<<(std::ostream& out, const KTParamArray& value);
     std::ostream& operator<<(std::ostream& out, const KTParamNode& value);
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 
 #endif /* KTPARAM_HH_ */

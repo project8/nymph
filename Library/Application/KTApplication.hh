@@ -20,7 +20,7 @@
 #include <set>
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     class KTEventLoop;
     class KTParamNode;
@@ -116,5 +116,5 @@ namespace Katydid
     }
 #endif
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTAPPLICATION_HH_ */

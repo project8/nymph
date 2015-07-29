@@ -16,7 +16,7 @@
 #include "KTCommandLineOption.hh"
 #include "KTParam.hh"
 
-using namespace Katydid;
+using namespace Nymph;
 using namespace std;
 
 KTLOGGER(testapplog, "TestApplication");

@@ -16,7 +16,7 @@ using std::string;
 using std::stringstream;
 using std::vector;
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(proflog, "KTThroughputProfiler");
 
@@ -165,4 +165,4 @@ namespace Katydid
         return;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */

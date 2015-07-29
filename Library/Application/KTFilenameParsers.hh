@@ -10,7 +10,7 @@
 
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     struct KTLocustMCFilename
     {
@@ -22,6 +22,6 @@ namespace Katydid
     };
 
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 
 #endif /* KTFILENAMEPARSERS_HH_*/

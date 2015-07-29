@@ -1,5 +1,5 @@
-# KatydidCore.cmake
-# Macros for building a project using Katydid Core
+# Nymph.cmake
+# Macros for building a project using Nymph
 # Author: N. Oblath
 
 # Set CMAKE_MODULE_PATH to include this directory
@@ -8,13 +8,13 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR})
 # Include the build script
 include (PackageBuilder)
 
-# Main directory for Katydid Core
-set (KATYDID_CORE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
+# Main directory for Nymph
+set (NYMPH_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
 
 # Version
-set (KATYDID_CORE_VERSION_MAJOR 1)
-set (KATYDID_CORE_VERSION_MINOR 0)
-set (KATYDID_CORE_REVISION 0)
+set (NYMPH_VERSION_MAJOR 1)
+set (NYMPH_VERSION_MINOR 0)
+set (NYMPH_REVISION 0)
 
 
 ##########
@@ -22,7 +22,7 @@ set (KATYDID_CORE_REVISION 0)
 ##########
 
 # This should be called immediately after setting the project name
-macro (katydid_prepare_project)
+macro (nymph_prepare_project)
 	pbuilder_prepare_project ()
 
     # Add a "Standard" build type
@@ -35,12 +35,12 @@ macro (katydid_prepare_project)
 	mark_as_advanced(CMAKE_CXX_FLAGS_STANDARD CMAKE_C_FLAGS_STANDARD CMAKE_EXE_LINKER_FLAGS_STANDARD CMAKE_MODULE_LINKER_FLAGS_STANDARD CMAKE_SHARED_LINKER_FLAGS_STANDARD)
 
 	# Single-threading option
-	set (Katydid_SINGLETHREADED FALSE CACHE BOOL "Flag for running in single-threaded mode")
-	if (Katydid_SINGLETHREADED)
+	set (Nymph_SINGLETHREADED FALSE CACHE BOOL "Flag for running in single-threaded mode")
+	if (Nymph_SINGLETHREADED)
 	    add_definitions(-DSINGLETHREADED)
-	else (Katydid_SINGLETHREADED)
+	else (Nymph_SINGLETHREADED)
 	    remove_definitions(-DSINGLETHREADED)
-	endif(Katydid_SINGLETHREADED)
+	endif(Nymph_SINGLETHREADED)
 
 	# Optional compiler flags
 	set (FLAG_WARNINGS "" CACHE STRING "Extra warning and error related flags")
@@ -80,25 +80,25 @@ macro (katydid_prepare_project)
 	endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 	# External packages
-	include_directories (BEFORE ${KATYDID_CORE_DIR}/External/RapidJSON)
-	include_directories (BEFORE ${KATYDID_CORE_DIR}/External/RapidXML)
+	include_directories (BEFORE ${NYMPH_DIR}/External/RapidJSON)
+	include_directories (BEFORE ${NYMPH_DIR}/External/RapidXML)
 
-	# Katydid core directories
+	# Nymph directories
 	include_directories (BEFORE 
-	    ${KATYDID_CORE_DIR}/Library/Utility
-	    ${KATYDID_CORE_DIR}/Library/Data
-	    ${KATYDID_CORE_DIR}/Library/Processor
-	    ${KATYDID_CORE_DIR}/Library/IO
-	    ${KATYDID_CORE_DIR}/Library/Application
+	    ${NYMPH_DIR}/Library/Utility
+	    ${NYMPH_DIR}/Library/Data
+	    ${NYMPH_DIR}/Library/Processor
+	    ${NYMPH_DIR}/Library/IO
+	    ${NYMPH_DIR}/Library/Application
     )
 endmacro ()
 
-macro (katydid_build_core_library)
-	add_subdirectory (${KATYDID_CORE_DIR}/Library)
+macro (nymph_build_core_library)
+	add_subdirectory (${NYMPH_DIR}/Library)
 endmacro ()
 
-macro (katydid_build_core_executables)
-	add_subdirectory (${KATYDID_CORE_DIR}/Executables/Main)
-	add_subdirectory (${KATYDID_CORE_DIR}/Executables/Validation)
+macro (nymph_build_core_executables)
+	add_subdirectory (${NYMPH_DIR}/Executables/Main)
+	add_subdirectory (${NYMPH_DIR}/Executables/Validation)
 endmacro ()
 

@@ -10,7 +10,7 @@
 
 #include "KTPrimaryProcessor.hh"
 
-namespace Katydid
+namespace Nymph
 {
     class KTReader : public KTPrimaryProcessor
     {
@@ -23,5 +23,5 @@ namespace Katydid
 #define KT_REGISTER_READER(reader_class, reader_name) \
         static KTNORegistrar< KTReader, reader_class > s##reader_class##ReaderRegistrar(reader_name);
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTREADER_HH_ */

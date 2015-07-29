@@ -1,4 +1,4 @@
-# CMakeLists for Katydid/KTCore/Executables/Main
+# CMakeLists for Nymph/Executables/Main
 # Author: N. Oblath
 
 # Executables

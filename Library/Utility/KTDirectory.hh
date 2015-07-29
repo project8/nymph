@@ -12,7 +12,7 @@
 
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
 
     class KTDirectory
@@ -43,5 +43,5 @@ namespace Katydid
 
     };
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTDIRECTORY_HH_ */

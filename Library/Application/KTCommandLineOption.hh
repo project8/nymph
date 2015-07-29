@@ -12,7 +12,7 @@
 
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     //class KTCommandLineHandler;
 
@@ -84,6 +84,6 @@ namespace Katydid
 
     };
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 
 #endif /* KTCOMMANDLINEOPTION_H_ */

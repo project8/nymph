@@ -13,7 +13,7 @@
 
 #include <iostream>
 
-namespace Katydid
+namespace Nymph
 {
     template< typename Signature >
     struct KTSignalConcept
@@ -84,5 +84,5 @@ namespace Katydid
         return fSignalWrapper;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTSIGNALWRAPPER_HH_ */

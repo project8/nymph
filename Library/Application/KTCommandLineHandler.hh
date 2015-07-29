@@ -22,7 +22,7 @@ namespace po = boost::program_options;
 #include <string>
 #include <vector>
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(utillog_clh, "KTCommandLineHandler.hh");
 
@@ -342,5 +342,5 @@ namespace Katydid
         return &fConfigOverrideValues;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTCOMMANDLINEHANDLER_H_ */

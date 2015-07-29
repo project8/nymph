@@ -7,7 +7,7 @@
 
 #include "KTException.hh"
 
-namespace Katydid
+namespace Nymph
 {
 
     KTException::KTException() :
