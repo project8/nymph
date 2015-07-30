@@ -9,7 +9,7 @@
 
 //using std::list;
 
-namespace Katydid
+namespace Nymph
 {
     KT_REGISTER_PROCESSOR(KTDataQueueProcessor, "data-queue");
 

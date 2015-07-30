@@ -12,7 +12,7 @@
 
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     class KTParam;
     class KTParamNode;
@@ -31,6 +31,6 @@ namespace Katydid
             static bool IsNameComment( const std::string& name );
     };
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 
 #endif /* KTPARAMINPUTJSON_HH_ */

@@ -7,15 +7,14 @@
 
 #include "KTProcessorTemplate.hh"
 
-#include "KTEggHeader.hh"
 #include "KTLogger.hh"
 #include "KTNOFactory.hh"
 #include "KTParam.hh"
 
 
-namespace Katydid
+namespace Nymph
 {
-    KTLOGGER([logger], "katydid.fft");
+    KTLOGGER([logger], "KTProcessorTemplate");
 
     // Register the processor
     KT_REGISTER_PROCESSOR(KTProcessorTemplate, "[config-name]");
@@ -46,4 +45,4 @@ namespace Katydid
 
     // All the normal stuff goes here
 
-} /* namespace Katydid */
+} /* namespace Nymph */

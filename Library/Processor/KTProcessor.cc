@@ -15,7 +15,7 @@
 
 using std::string;
 
-namespace Katydid
+namespace Nymph
 {
     //KTLOGGER(proclog, "KTProcessor");
 
@@ -126,4 +126,4 @@ namespace Katydid
 
 
 
-} /* namespace Katydid */
+} /* namespace Nymph */

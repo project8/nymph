@@ -17,7 +17,7 @@
 
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(slotlog, "KTSlot");
 
@@ -463,5 +463,5 @@ namespace Katydid
 
 
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTSLOT_HH_ */

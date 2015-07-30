@@ -16,7 +16,7 @@
 
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
 
     class KTConfigurator : public KTSingleton< KTConfigurator >
@@ -72,5 +72,5 @@ namespace Katydid
     }
 
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTCONFIGURATOR_HH_ */

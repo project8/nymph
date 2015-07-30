@@ -15,7 +15,7 @@ using std::string;
 
 using boost::filesystem::path;
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(dirlog, "KTDirectory");
 
@@ -83,4 +83,4 @@ namespace Katydid
         return true;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */

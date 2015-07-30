@@ -9,12 +9,12 @@
 
 #include "KTCommandLineOption.hh"
 
-#include "KatydidConfig.hh"
+//#include "NymphConfig.hh"
 
 #include <sstream>
 
 #ifndef PACKAGE_STRING
-#define PACKAGE_STRING Katydid (unknown version)
+#define PACKAGE_STRING Nymph (unknown version)
 #endif
 #define STRINGIFY_1(x) #x
 #define STRINGIFY_2(x) STRINGIFY_1(x)
@@ -22,7 +22,7 @@
 using std::string;
 using std::vector;
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(utillog, "KTCommandLineHandler");
 
@@ -358,7 +358,7 @@ namespace Katydid
         tPositionOpt.add("config-file", 1);
         */
 
-        // Add contributions of other options from elsewhere in Katydid
+        // Add contributions of other options from elsewhere in Nymph
         FinalizeNewOptionGroups();
 
         // Command line style
@@ -450,4 +450,4 @@ namespace Katydid
 
 
 
-} /* namespace Katydid */
+} /* namespace Nymph */

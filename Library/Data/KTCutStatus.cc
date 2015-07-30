@@ -10,7 +10,7 @@
 #include "KTExtensibleStructFactory.hh"
 #include "KTLogger.hh"
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(cutlog, "KTCut");
 
@@ -175,4 +175,4 @@ namespace Katydid
     }
 
 
-} /* namespace Katydid */
+} /* namespace Nymph */

@@ -8,7 +8,7 @@
 #ifndef KTDESTROYER_H_
 #define KTDESTROYER_H_
 
-namespace Katydid
+namespace Nymph
 {
 
     template< class XDoomed >
@@ -47,5 +47,5 @@ namespace Katydid
         fDoomed = d;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTDESTROYER_H_ */

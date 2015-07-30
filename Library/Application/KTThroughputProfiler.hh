@@ -37,7 +37,7 @@
 #endif // MACNANO
 #endif // __MACH__
 
-namespace Katydid
+namespace Nymph
 {
     class KTParamNode;
 
@@ -147,5 +147,5 @@ namespace Katydid
         return;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTTHROUGHPUTPROFILER_HH_ */

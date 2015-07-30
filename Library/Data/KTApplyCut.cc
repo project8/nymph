@@ -13,7 +13,7 @@
 using std::string;
 
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(cutlog, "KTApplyCut");
 
@@ -98,4 +98,4 @@ namespace Katydid
 
 
 
-} /* namespace Katydid */
+} /* namespace Nymph */

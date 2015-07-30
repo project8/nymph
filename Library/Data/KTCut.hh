@@ -15,7 +15,7 @@
 #include "KTNOFactory.hh"
 #include "KTMemberVariable.hh"
 
-namespace Katydid
+namespace Nymph
 {
     /*!
      @class KTCut
@@ -118,6 +118,6 @@ namespace Katydid
         static KTNORegistrar< KTCut, cut_class > sCut##cut_class##Registrar(cut_class::Result::sName); \
         static KTExtensibleStructRegistrar< KTCutResultCore, cut_class::Result > sCut##cut_class##ResultRegistrar(cut_class::Result::sName);
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 
 #endif /* KTCUT_HH_ */

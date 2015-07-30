@@ -7,7 +7,7 @@
 
 #include "KTData.hh"
 
-namespace Katydid
+namespace Nymph
 {
     const std::string KTData::sName("data");
 
@@ -29,4 +29,4 @@ namespace Katydid
     KTData::~KTData()
     {}
 
-} /* namespace Katydid */
+} /* namespace Nymph */

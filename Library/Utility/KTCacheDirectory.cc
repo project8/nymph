@@ -12,7 +12,7 @@
 
 using std::string;
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(dirlog, "KTCacheDirectory");
 
@@ -33,4 +33,4 @@ namespace Katydid
         return SetPath(node->GetValue("path", fPath.string()));
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */

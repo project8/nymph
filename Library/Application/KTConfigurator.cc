@@ -11,7 +11,7 @@
 
 using std::string;
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER( conflog, "KTConfigurator" );
 
@@ -43,4 +43,4 @@ namespace Katydid
         return fMasterConfig;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */

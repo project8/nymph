@@ -15,7 +15,7 @@
 #include <deque>
 #include <set>
 
-namespace Katydid
+namespace Nymph
 {
     class KTParamNode;
     class KTParamValue;
@@ -58,7 +58,7 @@ namespace Katydid
                  <li>group-order -- (optional) integer specifying the order in which slots should be called.
              </ul>
          </li>
-         <li>run-queue -- (array of strings and arrays of strings) define the queue of processors that will control the running of Katydid.
+         <li>run-queue -- (array of strings and arrays of strings) define the queue of processors that will control the running of Nymph.
          The elements of this array specify processors that are run sequentially.
          If an element is itself an array, those processors listed in the sub-array will be run in parallel.
              <ul>
@@ -140,5 +140,5 @@ namespace Katydid
 
     };
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTPROCESSORTOOLBOX_HH_ */

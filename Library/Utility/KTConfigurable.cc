@@ -14,7 +14,7 @@
 
 using std::string;
 
-namespace Katydid
+namespace Nymph
 {
 
     KTLOGGER(conflog, "KTConfigurable");
@@ -63,4 +63,4 @@ namespace Katydid
         return fIsConfigured;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */

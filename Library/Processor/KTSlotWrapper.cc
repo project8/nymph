@@ -7,7 +7,7 @@
 
 #include "KTSlotWrapper.hh"
 
-namespace Katydid
+namespace Nymph
 {
     SlotException::SlotException (std::string const& why)
       : std::logic_error(why)
@@ -25,4 +25,4 @@ namespace Katydid
         delete fSlotWrapper;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */

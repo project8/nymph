@@ -16,7 +16,7 @@
 
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     /*!
      @class KTSignalOneArg
@@ -183,5 +183,5 @@ namespace Katydid
 
 
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTSIGNAL_HH_ */

@@ -11,7 +11,7 @@
 #include "KTMemberVariable.hh"
 #include "KTParam.hh"
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(testlog, "TestApplyCut");
 
@@ -119,7 +119,7 @@ namespace Katydid
 }
 
 
-using namespace Katydid;
+using namespace Nymph;
 using namespace std;
 
 int main()

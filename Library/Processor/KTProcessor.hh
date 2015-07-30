@@ -26,7 +26,7 @@
 #include <sstream>
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(processorlog, "KTProcessor.hh");
 
@@ -135,7 +135,7 @@ namespace Katydid
 
 
 #define KT_REGISTER_PROCESSOR(proc_class, proc_name) \
-        static KTNORegistrar< KTProcessor, proc_class > sProc##proc_class##Registrar( proc_name );
+        static ::Nymph::KTNORegistrar< ::Nymph::KTProcessor, proc_class > sProc##proc_class##Registrar( proc_name );
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTPROCESSOR_HH_ */

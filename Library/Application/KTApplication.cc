@@ -7,7 +7,7 @@
 
 #include "KTApplication.hh"
 
-#include "KTEventLoop.hh"
+#include "../Utility/KTEventLoop.hh"
 #include "KTLogger.hh"
 #include "KTParamInputJSON.hh"
 
@@ -16,7 +16,7 @@ using std::string;
 
 #include <iostream>
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(applog, "KTApplication");
 
@@ -36,7 +36,7 @@ namespace Katydid
 #else
         if (makeTApp)
         {
-            KTWARN(applog, "TApplication requested, but Katydid has been built without ROOT dependence.");
+            KTWARN(applog, "TApplication requested, but Nymph has been built without ROOT dependence.");
         }
 #endif
     }
@@ -56,7 +56,7 @@ namespace Katydid
 #else
         if (makeTApp)
         {
-            KTWARN(applog, "TApplication requested, but Katydid has been built without ROOT dependence.");
+            KTWARN(applog, "TApplication requested, but Nymph has been built without ROOT dependence.");
         }
 #endif
 
@@ -136,7 +136,7 @@ namespace Katydid
 #ifdef ROOT_FOUND
             StartTApplication();
 #else
-            KTWARN(applog, "TApplication requested, but Katydid has been built without ROOT dependence.");
+            KTWARN(applog, "TApplication requested, but Nymph has been built without ROOT dependence.");
 #endif
         }
         return true;
@@ -170,4 +170,4 @@ namespace Katydid
     }
 #endif
 
-} /* namespace Katydid */
+} /* namespace Nymph */

@@ -7,7 +7,7 @@
 
 #include "KTSignalWrapper.hh"
 
-namespace Katydid
+namespace Nymph
 {
     SignalException::SignalException (std::string const& why)
       : std::logic_error(why)
@@ -23,4 +23,4 @@ namespace Katydid
         delete fSignalWrapper;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */

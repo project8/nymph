@@ -17,7 +17,7 @@ using std::string;
 
 
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER( plog, "KTParamInputJSON" );
 
@@ -214,4 +214,4 @@ namespace Katydid
         return false;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */

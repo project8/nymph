@@ -12,7 +12,7 @@
 
 #include "KTLogger.hh"
 
-namespace Katydid
+namespace Nymph
 {
 
     class KTPrimaryProcessor : public KTProcessor
@@ -31,5 +31,5 @@ namespace Katydid
 
     };
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTPRIMARYPROCESSOR_HH_ */

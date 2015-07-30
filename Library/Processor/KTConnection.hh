@@ -10,8 +10,8 @@
 
 #include <boost/signals2.hpp>
 
-namespace Katydid
+namespace Nymph
 {
     typedef boost::signals2::connection KTConnection;
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTCONNECTION_HH_ */

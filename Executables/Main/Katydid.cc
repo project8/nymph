@@ -16,7 +16,7 @@
 #include <string>
 
 using namespace std;
-using namespace Katydid;
+using namespace Nymph;
 
 KTLOGGER(katydidlog, "Katydid");
 

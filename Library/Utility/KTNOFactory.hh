@@ -14,7 +14,7 @@
 #include <map>
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(utillog_no_factory, "KTNOFactory");
 
@@ -195,5 +195,5 @@ namespace Katydid
         return dynamic_cast< XBaseType* >(new XDerivedType(objectName));
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTNOFACTORY_HH_ */

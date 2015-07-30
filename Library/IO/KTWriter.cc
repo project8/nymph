@@ -7,7 +7,7 @@
 
 #include "KTWriter.hh"
 
-namespace Katydid
+namespace Nymph
 {
 
     KTWriter::KTWriter(const std::string& name) :
@@ -31,4 +31,4 @@ namespace Katydid
 
 
 
-} /* namespace Katydid */
+} /* namespace Nymph */

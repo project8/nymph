@@ -7,7 +7,7 @@
 
 #include "KTReader.hh"
 
-namespace Katydid
+namespace Nymph
 {
 
     KTReader::KTReader(const std::string& name) :
@@ -19,4 +19,4 @@ namespace Katydid
     {
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */

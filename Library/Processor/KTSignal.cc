@@ -7,7 +7,7 @@
 
 #include "KTSignal.hh"
 
-namespace Katydid
+namespace Nymph
 {
 
     KTSignalOneArg< void >::KTSignalOneArg(const std::string& name, KTProcessor* proc) :

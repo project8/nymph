@@ -17,7 +17,7 @@
 
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     class KTDataCore
     {
@@ -73,5 +73,5 @@ namespace Katydid
 
     typedef boost::shared_ptr< KTData > KTDataPtr;
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTDATA_HH_ */

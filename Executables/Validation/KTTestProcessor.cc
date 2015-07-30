@@ -9,7 +9,7 @@
 
 #include "KTLogger.hh"
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(testsiglog, "KTTestProcessor")
 
@@ -66,4 +66,4 @@ namespace Katydid
 
 
 
-} /* namespace Katydid */
+} /* namespace Nymph */

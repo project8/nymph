@@ -16,7 +16,7 @@
 #include "KTParam.hh"
 #include "KTSlot.hh"
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(eqplog, "KTDataQueueProcessor");
 
@@ -376,5 +376,5 @@ namespace Katydid
         return;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTDATAQUEUEPROCESSOR_HH_ */

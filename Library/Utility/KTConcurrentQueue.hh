@@ -22,7 +22,7 @@
 
 #include <deque>
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(queuelog, "KTConcurrentQueue");
 
@@ -166,5 +166,5 @@ namespace Katydid
             }
     };
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTCONCURRENTQUEUE_HH_ */

@@ -14,7 +14,7 @@
 
 using boost::shared_ptr;
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(datalog, "KTPrintDataStructure");
 
@@ -109,4 +109,4 @@ namespace Katydid
         return;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */

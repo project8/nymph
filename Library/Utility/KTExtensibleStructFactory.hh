@@ -15,7 +15,7 @@
 #include <map>
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(utillog_esfactory, "KTExtensibleStructFactory");
 
@@ -196,5 +196,5 @@ namespace Katydid
         return dynamic_cast< KTExtensibleStructCore< XBaseType >* >(&object->template Of< XDerivedType >());
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTEXTENSIBLESTRUCTFACTORY_HH_ */

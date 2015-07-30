@@ -22,7 +22,7 @@ using std::set;
 using std::string;
 using std::vector;
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(proclog, "KTProcessorToolbox");
 
@@ -416,4 +416,4 @@ namespace Katydid
         return;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */

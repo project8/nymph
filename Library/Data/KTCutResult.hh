@@ -14,7 +14,7 @@
 
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     class KTCutResultCore
     {
@@ -47,6 +47,6 @@ namespace Katydid
         return XDerivedType::sName;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 
 #endif /* KTCUTRESULT_HH_ */

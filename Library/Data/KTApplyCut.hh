@@ -16,7 +16,7 @@
 
 #include <string>
 
-namespace Katydid
+namespace Nymph
 {
     class KTCut;
     class KTParamNode;
@@ -83,5 +83,5 @@ namespace Katydid
         return fCut;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTAPPLYCUT_HH_ */

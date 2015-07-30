@@ -9,7 +9,7 @@
 #ifndef KTEXTENSIBLESTRUCT_HH_
 #define KTEXTENSIBLESTRUCT_HH_
 
-namespace Katydid
+namespace Nymph
 {
 
     // *) operator= reallocates extended fields: to avoid this, use Pull().
@@ -328,5 +328,5 @@ namespace Katydid
         return;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTEXTENSIBLESTRUCT_HH_ */

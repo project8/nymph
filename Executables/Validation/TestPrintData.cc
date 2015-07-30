@@ -11,7 +11,7 @@
 #include "KTParam.hh"
 #include "KTPrintDataStructure.hh"
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(testlog, "TestPrintData");
 
@@ -115,7 +115,7 @@ namespace Katydid
 }
 
 
-using namespace Katydid;
+using namespace Nymph;
 using namespace std;
 
 int main()

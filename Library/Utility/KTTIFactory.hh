@@ -16,7 +16,7 @@
 #include <map>
 #include <typeinfo>
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(utillog_ti_factory, "KTTIFactory");
 
@@ -182,5 +182,5 @@ namespace Katydid
     }
 
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTTIFACTORY_HH_ */

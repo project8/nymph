@@ -9,7 +9,7 @@
 
 #include "KTLogger.hh"
 
-namespace Katydid
+namespace Nymph
 {
     KTLOGGER(proclog, "KTPrimaryProcessor");
 
@@ -31,4 +31,4 @@ namespace Katydid
         return;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */

@@ -10,7 +10,7 @@
 
 #include "KTConfigurable.hh"
 
-namespace Katydid
+namespace Nymph
 {
     class KTTestConfigurable : public KTConfigurable
     {
@@ -49,5 +49,5 @@ namespace Katydid
         return fStringData;
     }
 
-} /* namespace Katydid */
+} /* namespace Nymph */
 #endif /* KTTESTCONFIGURABLE_HH_ */
