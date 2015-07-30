@@ -130,7 +130,7 @@ namespace Nymph
 
 
 #define KT_REGISTER_WRITER(writer_class, writer_name) \
-        static KTNORegistrar< KTWriter, writer_class > s##writer_class##ReaderRegistrar(writer_name);
+        static ::Nymph::KTNORegistrar< ::Nymph::KTWriter, writer_class > s##writer_class##WriterRegistrar(writer_name);
 
 } /* namespace Nymph */
 #endif /* KTWRITER_HH_ */

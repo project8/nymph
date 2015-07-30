@@ -7,7 +7,7 @@
 
 #include "KTApplication.hh"
 
-#include "KTEventLoop.hh"
+#include "../Utility/KTEventLoop.hh"
 #include "KTLogger.hh"
 #include "KTParamInputJSON.hh"
 

@@ -21,7 +21,7 @@ namespace Nymph
     };
 
 #define KT_REGISTER_READER(reader_class, reader_name) \
-        static KTNORegistrar< KTReader, reader_class > s##reader_class##ReaderRegistrar(reader_name);
+        static ::Nymph::KTNORegistrar< ::Nymph::KTReader, reader_class > s##reader_class##ReaderRegistrar(reader_name);
 
 } /* namespace Nymph */
 #endif /* KTREADER_HH_ */

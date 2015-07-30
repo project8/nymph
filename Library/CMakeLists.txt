@@ -13,6 +13,7 @@ set (NYMPH_HEADERFILES
     ${UTIL_DIR}/KTConfigurable.hh
     ${UTIL_DIR}/KTDestroyer.hh
     ${UTIL_DIR}/KTDirectory.hh
+    ${UTIL_DIR}/KTEventLoop.hh
     ${UTIL_DIR}/KTException.hh
     ${UTIL_DIR}/KTExtensibleStruct.hh
     ${UTIL_DIR}/KTExtensibleStructFactory.hh
@@ -54,6 +55,7 @@ set (NYMPH_SOURCEFILES
     ${UTIL_DIR}/KTCacheDirectory.cc
     ${UTIL_DIR}/KTConfigurable.cc
     ${UTIL_DIR}/KTDirectory.cc
+    ${UTIL_DIR}/KTEventLoop.cc
     ${UTIL_DIR}/KTException.cc
     ${UTIL_DIR}/KTLogger.cc
     ${UTIL_DIR}/KTParam.cc

@@ -9,7 +9,7 @@
 
 #include "KTCommandLineOption.hh"
 
-#include "NymphConfig.hh"
+//#include "NymphConfig.hh"
 
 #include <sstream>
 
