@@ -114,18 +114,18 @@ namespace Nymph
             if (fColored)
             {
                 //cout << color << KTLogger::Private::sTimeBuff << " [" << setw(5) << level << "] " << setw(16) << left << loc.fFileName << "(" << loc.fLineNumber  << "): " << message << skKTEndColor << endl;
-                cout << Private::level2Color(level) << KTLogger::Private::sTimeBuff << " [" << setw(5) << Private::level2Str(level) << "] ";
+                cerr << Private::level2Color(level) << KTLogger::Private::sTimeBuff << " [" << setw(5) << Private::level2Str(level) << "] ";
                 copy(loc.fFileName.end() - std::min< int >(loc.fFileName.size(), 16), loc.fFileName.end(), ostream_iterator<char>(cout));
-                cout << "(" << loc.fLineNumber  << "): ";
-                cout << message << EndColor() << endl;
+                cerr << "(" << loc.fLineNumber  << "): ";
+                cerr << message << EndColor() << endl;
             }
             else
             {
                 //cout << KTLogger::Private::sTimeBuff << " [" << setw(5) << level << "] " << setw(16) << left << loc.fFileName << "(" << loc.fLineNumber  << "): " << message << endl;
-                cout << KTLogger::Private::sTimeBuff << " [" << setw(5) << Private::level2Str(level) << "] ";
+                cerr << KTLogger::Private::sTimeBuff << " [" << setw(5) << Private::level2Str(level) << "] ";
                 copy(loc.fFileName.end() - std::min< int >(loc.fFileName.size(), 16), loc.fFileName.end(), ostream_iterator<char>(cout));
-                cout << "(" << loc.fLineNumber  << "): ";
-                cout << message << endl;
+                cerr << "(" << loc.fLineNumber  << "): ";
+                cerr << message << endl;
             }
         }
     };
