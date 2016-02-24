@@ -84,6 +84,8 @@ int main(int argc, char** argv)
 
         // Execute the run queue!
         bool success = procTB.Run();
+        
+        procTB.ClearProcessors();
 
         KTPROG(katydidlog, "That's all, folks!");
 
