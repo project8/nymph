@@ -3,7 +3,7 @@
 # Author: N. Oblath
 
 # Set CMAKE_MODULE_PATH to include this directory
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR})
+list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/../Scarab/cmake )
 
 # Include the build script
 include (PackageBuilder)
@@ -94,6 +94,7 @@ macro (nymph_prepare_project)
 endmacro ()
 
 macro (nymph_build_core_library)
+    pbuilder_add_submodule( Scarab ${NYMPH_DIR}/Scarab/library )
 	add_subdirectory (${NYMPH_DIR}/Library)
 endmacro ()
 
