@@ -113,6 +113,17 @@ namespace Nymph
         }
 
         KTINFO( applog, "Final configuration:\n" << *(fConfigurator->Config()) );
+
+        AddConfigOptionsToCLHandler(fConfigurator->Config(), "");
+        fCLHandler->FinalizeNewOptionGroups();
+
+        if (fCLHandler->GetPrintHelpMessageAfterConfigFlag())
+        {
+        	fCLHandler->PrintHelpMessage();
+        	exit(0);
+        }
+
+        fCLHandler->DelayedCommandLineProcessing();
     }
 
     KTApplication::~KTApplication()
@@ -125,6 +136,43 @@ namespace Nymph
 #ifdef ROOT_FOUND
         delete fTApp;
 #endif
+    }
+
+    void KTApplication::AddConfigOptionsToCLHandler(const KTParam* param, const std::string& rootName)
+    {
+    	if (param->IsNull())
+    	{
+    		fCLHandler->AddOption("Config File Options", "Configuration flag: " + rootName, rootName, false);
+    	}
+    	else if (param->IsValue())
+    	{
+    		fCLHandler->AddOption< string >("Config File Options", "Configuration value: " + rootName, rootName, false);
+    	}
+    	else if (param->IsArray())
+    	{
+        	string nextRootName(rootName);
+        	if (! rootName.empty() && rootName.back() != '.') nextRootName += ".";
+
+        	const KTParamArray* paramArray = &param->AsArray();
+    		unsigned arraySize = paramArray->Size();
+    		for (unsigned iParam = 0; iParam < arraySize; ++iParam)
+    		{
+    			AddConfigOptionsToCLHandler(paramArray->At(iParam), nextRootName + std::to_string(iParam));
+    		}
+    	}
+    	else if (param->IsNode())
+    	{
+        	string nextRootName(rootName);
+        	if (! rootName.empty()) nextRootName += ".";
+
+        	const KTParamNode* paramNode = &param->AsNode();
+    		for (KTParamNode::const_iterator nodeIt = paramNode->Begin(); nodeIt != paramNode->End(); ++nodeIt)
+    		{
+    			AddConfigOptionsToCLHandler(nodeIt->second, nextRootName + nodeIt->first);
+    		}
+    	}
+
+    	return;
     }
 
     bool KTApplication::Configure(const KTParamNode* node)

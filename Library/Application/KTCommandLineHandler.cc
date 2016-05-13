@@ -68,13 +68,15 @@ namespace Nymph
         fArgV = argV;
         fArgumentsTaken = true;
 
-        ProcessCommandLine();
+        InitialCommandLineProcessing();
 
         return true;
     }
 
-    bool KTCommandLineHandler::ProcessCommandLine()
+    bool KTCommandLineHandler::ProcessCommandLine(int argC, char** argV)
     {
+    	TakeArguments(argC, argV);
+
         InitialCommandLineProcessing();
 
         return DelayedCommandLineProcessing();
