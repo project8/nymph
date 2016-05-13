@@ -64,6 +64,9 @@ namespace Nymph
             KTApplication(int argC, char** argV, bool makeTApp=false, bool requireArgs=true, KTParamNode* defaultConfig=NULL);
             virtual ~KTApplication();
 
+        private:
+            void AddConfigOptionsToCLHandler(const KTParam* param, const std::string& rootName);
+
         public:
             bool Configure(const KTParamNode* node);
 

@@ -87,6 +87,8 @@ namespace Nymph
             //**************
 
         public:
+            bool ProcessCommandLine(int argC, char** argV);
+
             bool TakeArguments(int argC, char** argV);
             bool GetArgumentsTaken();
             int GetNArgs();
@@ -96,8 +98,6 @@ namespace Nymph
             int fNArgs;
             char** fArgV;
             bool fArgumentsTaken;
-
-            bool ProcessCommandLine();
 
             //**************
             // Option-adding interface
