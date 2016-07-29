@@ -17,8 +17,6 @@
 
 namespace Nymph
 {
-    class scarab::param_node;
-    class scarab::paramValue;
     class KTPrimaryProcessor;
     class KTProcessor;
 
@@ -107,7 +105,7 @@ namespace Nymph
             };
             typedef std::set< Thread, CompareThread > ThreadGroup;
             typedef std::deque< ThreadGroup > RunQueue;
-            bool AddProcessorToThreadGroup(const scarab::paramValue* param, ThreadGroup& group);
+            bool AddProcessorToThreadGroup(const scarab::param_value* param, ThreadGroup& group);
 
         public:
             /// Process the run queue.
