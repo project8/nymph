@@ -16,7 +16,6 @@
 
 namespace Nymph
 {
-    class scarab::param_node;
 
     /*!
      @class KTPrintDataStructure

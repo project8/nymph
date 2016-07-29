@@ -8,7 +8,6 @@
 #include "KTPrintDataStructure.hh"
 
 #include "KTLogger.hh"
-#include "scarab::param.hh"
 
 #include <sstream>
 

@@ -13,7 +13,6 @@
 #include "KTConcurrentQueue.hh"
 #include "KTData.hh"
 #include "KTLogger.hh"
-#include "scarab::param.hh"
 #include "KTSlot.hh"
 
 namespace Nymph
@@ -219,7 +218,7 @@ namespace Nymph
     template< class XProcessorType >
     bool KTDataQueueProcessorTemplate< XProcessorType >::Configure(const scarab::param_node* node)
     {
-        fQueue.set_timeout(node->GetValue< unsigned >("timeout", fQueue.get_timeout()));
+        fQueue.set_timeout(node->get_value< unsigned >("timeout", fQueue.get_timeout()));
 
         if (! ConfigureSubClass(node)) return false;
         return true;
