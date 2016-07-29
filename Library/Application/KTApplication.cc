@@ -9,7 +9,7 @@
 
 #include "../Utility/KTEventLoop.hh"
 #include "KTLogger.hh"
-#include "scarab::paramInputJSON.hh"
+#include "KTParamInputJSON.hh"
 
 using std::set;
 using std::string;
@@ -89,7 +89,7 @@ namespace Nymph
         // JSON file configuration
         if (! fConfigFilename.empty())
         {
-            scarab::param_node* t_config_from_file = scarab::paramInputJSON::ReadFile( fConfigFilename );
+            scarab::param_node* t_config_from_file = KTParamInputJSON::ReadFile( fConfigFilename );
             if( t_config_from_file == NULL )
             {
                 throw KTException() << "error parsing config file <" << fConfigFilename << ">";
@@ -101,7 +101,7 @@ namespace Nymph
         // Command-line JSON configuration
         if (! clJSON.empty())
         {
-            scarab::param_node* t_config_from_json = scarab::paramInputJSON::ReadString( clJSON );
+            scarab::param_node* t_config_from_json = KTParamInputJSON::ReadString( clJSON );
             fConfigurator->Merge( *t_config_from_json );
             delete t_config_from_json;
         }
@@ -140,33 +140,33 @@ namespace Nymph
 
     void KTApplication::AddConfigOptionsToCLHandler(const scarab::param* param, const std::string& rootName)
     {
-    	if (param->IsNull())
+    	if (param->is_null())
     	{
     		fCLHandler->AddOption("Config File Options", "Configuration flag: " + rootName, rootName, false);
     	}
-    	else if (param->IsValue())
+    	else if (param->is_value())
     	{
     		fCLHandler->AddOption< string >("Config File Options", "Configuration value: " + rootName, rootName, false);
     	}
-    	else if (param->IsArray())
+    	else if (param->is_array())
     	{
         	string nextRootName(rootName);
         	if (! rootName.empty() && rootName.back() != '.') nextRootName += ".";
 
-        	const KTParamArray* paramArray = &param->AsArray();
-    		unsigned arraySize = paramArray->Size();
+        	const scarab::param_array* paramArray = &param->as_array();
+    		unsigned arraySize = paramArray->size();
     		for (unsigned iParam = 0; iParam < arraySize; ++iParam)
     		{
-    			AddConfigOptionsToCLHandler(paramArray->At(iParam), nextRootName + std::to_string(iParam));
+    			AddConfigOptionsToCLHandler(paramArray->at(iParam), nextRootName + std::to_string(iParam));
     		}
     	}
-    	else if (param->IsNode())
+    	else if (param->is_node())
     	{
         	string nextRootName(rootName);
         	if (! rootName.empty()) nextRootName += ".";
 
-        	const scarab::param_node* paramNode = &param->AsNode();
-    		for (scarab::param_node::const_iterator nodeIt = paramNode->Begin(); nodeIt != paramNode->End(); ++nodeIt)
+        	const scarab::param_node* paramNode = &param->as_node();
+    		for (scarab::param_node::const_iterator nodeIt = paramNode->begin(); nodeIt != paramNode->end(); ++nodeIt)
     		{
     			AddConfigOptionsToCLHandler(nodeIt->second, nextRootName + nodeIt->first);
     		}
@@ -179,7 +179,7 @@ namespace Nymph
     {
         if (node == NULL) return true;
 
-        if (node->GetValue("root-app", false))
+        if (node->get_value("root-app", false))
         {
 #ifdef ROOT_FOUND
             StartTApplication();

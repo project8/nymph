@@ -66,7 +66,7 @@ namespace Nymph
             virtual ~KTApplication();
 
         private:
-            void AddConfigOptionsToCLHandler(const KTParam* param, const std::string& rootName);
+            void AddConfigOptionsToCLHandler(const scarab::param* param, const std::string& rootName);
 
         public:
             bool Configure(const scarab::param_node* node);
