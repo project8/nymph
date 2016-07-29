@@ -29,7 +29,7 @@ namespace Nymph
 
     void KTConfigurator::Merge(const scarab::param_node& aNode)
     {
-        fMasterConfig->Merge(aNode);
+        fMasterConfig->merge(aNode);
         return;
     }
 
