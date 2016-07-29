@@ -1,5 +1,5 @@
 /*
- * scarab::paramInputJSON.hh
+ * KTParamInputJSON.hh
  *
  *  CreAted on: Jan 14, 2014
  *      Author: nsoblAth
@@ -10,18 +10,18 @@
 
 #include "document.h"
 
+#include "param.hh"
+
 #include <string>
 
 namespace Nymph
 {
-    class scarab::param;
-    class scarab::param_node;
 
-    class scarab::paramInputJSON
+    class KTParamInputJSON
     {
         public:
-            scarab::paramInputJSON();
-            virtual ~scarab::paramInputJSON();
+            KTParamInputJSON();
+            virtual ~KTParamInputJSON();
 
             static scarab::param_node* ReadFile( const std::string& aFilename );
             static scarab::param_node* ReadString( const std::string& aJSONStr );

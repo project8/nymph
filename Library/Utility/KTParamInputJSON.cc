@@ -1,14 +1,14 @@
 /*
- * scarab::paramInputJSON.cc
+ * KTParamInputJSON.cc
  *
  *  Created on: Jan 14, 2014
  *      Author: nsoblath
  */
 
-#include "scarab::paramInputJSON.hh"
+#include "KTParamInputJSON.hh"
 
 #include "KTLogger.hh"
-#include "scarab::param.hh"
+#include "param.hh"
 
 #include "filestream.h"
 
@@ -19,16 +19,16 @@ using std::string;
 
 namespace Nymph
 {
-    KTLOGGER( plog, "scarab::paramInputJSON" );
+    KTLOGGER( plog, "KTParamInputJSON" );
 
-    scarab::paramInputJSON::scarab::paramInputJSON()
+    KTParamInputJSON::KTParamInputJSON()
     {
     }
-    scarab::paramInputJSON::~scarab::paramInputJSON()
+    KTParamInputJSON::~KTParamInputJSON()
     {
     }
 
-    scarab::param_node* scarab::paramInputJSON::ReadFile( const std::string& aFilename )
+    scarab::param_node* KTParamInputJSON::ReadFile( const std::string& aFilename )
     {
         FILE* t_config_file = fopen( aFilename.c_str(), "r" );
         if( t_config_file == NULL )
@@ -75,10 +75,10 @@ namespace Nymph
         }
         fclose( t_config_file );
 
-        return scarab::paramInputJSON::ReadDocument( t_config_doc );
+        return KTParamInputJSON::ReadDocument( t_config_doc );
     }
 
-    scarab::param_node* scarab::paramInputJSON::ReadString( const std::string& aJSONString )
+    scarab::param_node* KTParamInputJSON::ReadString( const std::string& aJSONString )
     {
         rapidjson::Document t_config_doc;
         if( t_config_doc.Parse<0>( aJSONString.c_str() ).HasParseError() )
@@ -86,10 +86,10 @@ namespace Nymph
             KTERROR( plog, "error parsing string:\n" << t_config_doc.GetParseError() );
             return NULL;
         }
-        return scarab::paramInputJSON::ReadDocument( t_config_doc );
+        return KTParamInputJSON::ReadDocument( t_config_doc );
     }
 
-    scarab::param_node* scarab::paramInputJSON::ReadDocument( const rapidjson::Document& aDoc )
+    scarab::param_node* KTParamInputJSON::ReadDocument( const rapidjson::Document& aDoc )
     {
         scarab::param_node* t_config = new scarab::param_node();
         for( rapidjson::Value::ConstMemberIterator jsonIt = aDoc.MemberBegin();
@@ -97,16 +97,16 @@ namespace Nymph
                 ++jsonIt)
         {
             std::string name( jsonIt->name.GetString() );
-            if (! scarab::paramInputJSON::IsNameComment( name ) )
+            if (! KTParamInputJSON::IsNameComment( name ) )
             {
-                scarab::param* newValue = scarab::paramInputJSON::ReadValue( jsonIt->value );
-                if( newValue != NULL ) t_config->Replace( name, newValue );
+                scarab::param* newValue = KTParamInputJSON::ReadValue( jsonIt->value );
+                if( newValue != NULL ) t_config->replace( name, newValue );
             }
         }
         return t_config;
     }
 
-    scarab::param* scarab::paramInputJSON::ReadValue( const rapidjson::Value& aValue )
+    scarab::param* KTParamInputJSON::ReadValue( const rapidjson::Value& aValue )
     {
         // Only returns a NULL pointer in the following condition:
         //   If the value is an empty array and it's empty because the entire contents were commented with "###"
@@ -125,10 +125,10 @@ namespace Nymph
                     ++jsonIt)
             {
                 std::string name( jsonIt->name.GetString() );
-                if (! scarab::paramInputJSON::IsNameComment( name ) )
+                if (! KTParamInputJSON::IsNameComment( name ) )
                 {
-                    scarab::param* newValue = scarab::paramInputJSON::ReadValue( jsonIt->value );
-                    if( newValue != NULL ) t_config_object->Replace( name, newValue );
+                    scarab::param* newValue = KTParamInputJSON::ReadValue( jsonIt->value );
+                    if( newValue != NULL ) t_config_object->replace( name, newValue );
                 }
             }
             return t_config_object;
@@ -136,7 +136,7 @@ namespace Nymph
         if( aValue.IsArray() )
         {
             bool foundComment = false;
-            scarab::paramArray* t_config_array = new scarab::paramArray();
+            scarab::param_array* t_config_array = new scarab::param_array();
             for( rapidjson::Value::ConstValueIterator jsonIt = aValue.Begin();
                     jsonIt != aValue.End();
                     ++jsonIt)
@@ -146,10 +146,10 @@ namespace Nymph
                     foundComment = true;
                     break;
                 }
-                scarab::param* newValue = scarab::paramInputJSON::ReadValue( *jsonIt );
-                if( newValue != NULL ) t_config_array->PushBack( newValue );
+                scarab::param* newValue = KTParamInputJSON::ReadValue( *jsonIt );
+                if( newValue != NULL ) t_config_array->push_back( newValue );
             }
-            if( foundComment && t_config_array->Size() == 0 )
+            if( foundComment && t_config_array->size() == 0 )
             {
                 return NULL;
             }
@@ -157,51 +157,44 @@ namespace Nymph
         }
         if( aValue.IsString() )
         {
-            scarab::paramValue* t_config_value = new scarab::paramValue();
-            (*t_config_value) << aValue.GetString();
+            scarab::param_value* t_config_value = new scarab::param_value(aValue.GetString());
             return t_config_value;
         }
         if( aValue.IsBool() )
         {
-            scarab::paramValue* t_config_value = new scarab::paramValue();
-            (*t_config_value) << aValue.GetBool();
+            scarab::param_value* t_config_value = new scarab::param_value(aValue.GetBool());
             return t_config_value;
         }
         if( aValue.IsInt() )
         {
-            scarab::paramValue* t_config_value = new scarab::paramValue();
-            (*t_config_value) << aValue.GetInt();
+            scarab::param_value* t_config_value = new scarab::param_value(aValue.GetInt());
             return t_config_value;
         }
         if( aValue.IsUint() )
         {
-            scarab::paramValue* t_config_value = new scarab::paramValue();
-            (*t_config_value) << aValue.GetUint();
+            scarab::param_value* t_config_value = new scarab::param_value(aValue.GetUint());
             return t_config_value;
         }
         if( aValue.IsInt64() )
         {
-            scarab::paramValue* t_config_value = new scarab::paramValue();
-            (*t_config_value) << aValue.GetInt64();
+            scarab::param_value* t_config_value = new scarab::param_value(aValue.GetInt64());
             return t_config_value;
         }
         if( aValue.IsUint64() )
         {
-            scarab::paramValue* t_config_value = new scarab::paramValue();
-            (*t_config_value) << aValue.GetUint64();
+            scarab::param_value* t_config_value = new scarab::param_value(aValue.GetUint64());
             return t_config_value;
         }
         if( aValue.IsDouble() )
         {
-            scarab::paramValue* t_config_value = new scarab::paramValue();
-            (*t_config_value) << aValue.GetDouble();
+            scarab::param_value* t_config_value = new scarab::param_value(aValue.GetDouble());
             return t_config_value;
         }
         KTWARN( plog, "(config_reader_json) unknown type; returning null value" );
         return new scarab::param();
     }
 
-    bool scarab::paramInputJSON::IsNameComment( const std::string& name )
+    bool KTParamInputJSON::IsNameComment( const std::string& name )
     {
         const static std::string commentSymbol1( "comment" );
         const static std::string commentSymbol2( "#" );

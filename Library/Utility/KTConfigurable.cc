@@ -10,7 +10,7 @@
 #include "KTCommandLineHandler.hh"
 #include "KTLogger.hh"
 #include "KTConfigurator.hh"
-#include "scarab::param.hh"
+#include "param.hh"
 
 using std::string;
 

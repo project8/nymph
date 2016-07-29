@@ -54,7 +54,7 @@ namespace Nymph
         fParamBuffer = const_cast< scarab::param* >( fMasterConfig->at( aName ) );
         if( fParamBuffer != NULL && fParamBuffer->is_value() )
         {
-            return fParamBuffer->as_value().Get< XReturnType >();
+            return fParamBuffer->as_value().get< XReturnType >();
         }
         throw KTException() << "configurator does not have a value for <" << aName << ">";
     }
@@ -65,7 +65,7 @@ namespace Nymph
         fParamBuffer = const_cast< scarab::param* >( fMasterConfig->at( aName ) );
         if( fParamBuffer != NULL && fParamBuffer->is_value() )
         {
-            return fParamBuffer->as_value().Get< XReturnType >();
+            return fParamBuffer->as_value().get< XReturnType >();
         }
         return aDefault;
 
