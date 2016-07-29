@@ -7,8 +7,6 @@
 
 #include "KTThroughputProfiler.hh"
 
-#include "scarab::param.hh"
-
 #include <sstream>
 
 
@@ -41,8 +39,8 @@ namespace Nymph
 
     bool KTThroughputProfiler::Configure(const scarab::param_node* node)
     {
-        SetOutputFileFlag(node->GetValue< bool >("output-file-flag", fOutputFileFlag));
-        SetOutputFilename(node->GetValue("output-filename-base", fOutputFilename));
+        SetOutputFileFlag(node->get_value< bool >("output-file-flag", fOutputFileFlag));
+        SetOutputFilename(node->get_value("output-filename-base", fOutputFilename));
 
         return true;
     }

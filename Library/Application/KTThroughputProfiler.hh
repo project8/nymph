@@ -39,8 +39,6 @@
 
 namespace Nymph
 {
-    class scarab::param_node;
-
     /*!
      @class KTThroughputProfiler
      @author N. S. Oblath
