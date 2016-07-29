@@ -19,7 +19,6 @@
 namespace Nymph
 {
     class KTCut;
-    class scarab::param_node;
 
     /*!
      @class KTApplyCut

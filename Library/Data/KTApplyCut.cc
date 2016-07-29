@@ -8,7 +8,6 @@
 #include "KTApplyCut.hh"
 
 #include "KTCut.hh"
-#include "scarab::param.hh"
 
 using std::string;
 
@@ -37,7 +36,7 @@ namespace Nymph
         // Config-file settings
         if (node == NULL) return false;
 
-        for (scarab::param_node::const_iterator nodeIt = node->Begin(); nodeIt != node->End(); ++nodeIt)
+        for (scarab::param_node::const_iterator nodeIt = node->begin(); nodeIt != node->end(); ++nodeIt)
         {
             // first do configuration values we know about
             // as it happens, there aren't any
@@ -46,9 +45,9 @@ namespace Nymph
             // ignore any that don't work
             if (SelectCut(nodeIt->first))
             {
-                if (nodeIt->second->IsNode())
+                if (nodeIt->second->is_node())
                 {
-                    fCut->Configure(&nodeIt->second->AsNode());
+                    fCut->Configure(&nodeIt->second->as_node());
                 }
                 continue;
             }
