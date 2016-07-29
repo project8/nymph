@@ -14,7 +14,6 @@
 
 namespace Nymph
 {
-    class KTParamNode;
 
     class KTCacheDirectory : public KTDirectory, public KTSingleton< KTCacheDirectory >, public KTSelfConfigurable
     {
@@ -27,7 +26,7 @@ namespace Nymph
         public:
             using KTSelfConfigurable::Configure;
 
-            bool Configure(const KTParamNode* node);
+            bool Configure(const scarab::param_node* node);
 
             bool IsReady() const;
 

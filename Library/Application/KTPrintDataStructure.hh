@@ -16,7 +16,7 @@
 
 namespace Nymph
 {
-    class KTParamNode;
+    class scarab::param_node;
 
     /*!
      @class KTPrintDataStructure
@@ -50,7 +50,7 @@ namespace Nymph
             KTPrintDataStructure(const std::string& name = "print-data-structure");
             virtual ~KTPrintDataStructure();
 
-            bool Configure(const KTParamNode* node);
+            bool Configure(const scarab::param_node* node);
 
         public:
             void PrintDataStructure(KTDataPtr dataPtr);

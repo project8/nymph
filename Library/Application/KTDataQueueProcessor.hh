@@ -13,7 +13,7 @@
 #include "KTConcurrentQueue.hh"
 #include "KTData.hh"
 #include "KTLogger.hh"
-#include "KTParam.hh"
+#include "scarab::param.hh"
 #include "KTSlot.hh"
 
 namespace Nymph
@@ -68,8 +68,8 @@ namespace Nymph
             KTDataQueueProcessorTemplate(const std::string& name = "default-data-queue-proc-template-name");
             virtual ~KTDataQueueProcessorTemplate();
 
-            bool Configure(const KTParamNode* node);
-            virtual bool ConfigureSubClass(const KTParamNode* node) = 0;
+            bool Configure(const scarab::param_node* node);
+            virtual bool ConfigureSubClass(const scarab::param_node* node) = 0;
 
             Status GetStatus() const;
             void SetStatus(KTDataQueueProcessorTemplate< XProcessorType >::Status);
@@ -164,7 +164,7 @@ namespace Nymph
             KTDataQueueProcessor(const std::string& name = "data-queue");
             virtual ~KTDataQueueProcessor();
 
-            bool ConfigureSubClass(const KTParamNode* node);
+            bool ConfigureSubClass(const scarab::param_node* node);
 
         public:
             void EmitDataSignal(KTDataPtr data);
@@ -217,7 +217,7 @@ namespace Nymph
     }
 
     template< class XProcessorType >
-    bool KTDataQueueProcessorTemplate< XProcessorType >::Configure(const KTParamNode* node)
+    bool KTDataQueueProcessorTemplate< XProcessorType >::Configure(const scarab::param_node* node)
     {
         fQueue.set_timeout(node->GetValue< unsigned >("timeout", fQueue.get_timeout()));
 

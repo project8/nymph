@@ -10,7 +10,7 @@
 #include "KTCommandLineHandler.hh"
 #include "KTLogger.hh"
 #include "KTConfigurator.hh"
-#include "KTParam.hh"
+#include "scarab::param.hh"
 
 using std::string;
 
@@ -53,7 +53,7 @@ namespace Nymph
     {
         if (fIsConfigured) return true;
 
-        KTParamNode* node = KTConfigurator::GetInstance()->Config();
+        scarab::param_node* node = KTConfigurator::GetInstance()->Config();
         if (! this->Configure(node))
         {
             KTERROR(conflog, "An error occurred while configuring <" << fConfigName << ">");

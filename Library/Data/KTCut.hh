@@ -27,12 +27,12 @@ namespace Nymph
      A fully implemented cut MUST have the following:
      - Public nested class called Result, inheriting from KTCutResult, and containing a public static std::string name sName.
      - Cut registration using the macro KT_REGISTER_CUT([class name])
-     - Implementation of bool Configure(const KTParamNode*)
+     - Implementation of bool Configure(const scarab::param_node*)
      - Implementation of void Apply(KTDataPtr)
 
      The existence of [class name]::Result and [class name]::Result::sName are enforces at compile time by the KT_REGISTER_CUT macro.
 
-     The functions bool Configure(const KTParamNode*) and void Apply(KTDataPtr) are abstract in KTCut, and therefore must be implemented.
+     The functions bool Configure(const scarab::param_node*) and void Apply(KTDataPtr) are abstract in KTCut, and therefore must be implemented.
 
      --------------------------------------
      ------- Example Cut Definition -------
@@ -51,7 +51,7 @@ namespace Nymph
              KTExampleCut(const std::string& name = "default-example-cut");
              ~KTExampleCut();
 
-             bool Configure(const KTParamNode* node);
+             bool Configure(const scarab::param_node* node);
 
              MEMBERVARIABLE(double, AwesomenessThreshold);
 
@@ -77,7 +77,7 @@ namespace Nymph
      KTExampleCut::~KTExampleCut()
      {}
 
-     bool KTExampleCut::Configure(const KTParamNode* node)
+     bool KTExampleCut::Configure(const scarab::param_node* node)
      {
          if (node == NULL) return true;
          SetAwesomenessThreshold(node->GetValue("awesomeness", GetAwesomenessThreshold()));

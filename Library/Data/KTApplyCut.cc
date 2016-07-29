@@ -8,7 +8,7 @@
 #include "KTApplyCut.hh"
 
 #include "KTCut.hh"
-#include "KTParam.hh"
+#include "scarab::param.hh"
 
 using std::string;
 
@@ -32,12 +32,12 @@ namespace Nymph
         delete fCut;
     }
 
-    bool KTApplyCut::Configure(const KTParamNode* node)
+    bool KTApplyCut::Configure(const scarab::param_node* node)
     {
         // Config-file settings
         if (node == NULL) return false;
 
-        for (KTParamNode::const_iterator nodeIt = node->Begin(); nodeIt != node->End(); ++nodeIt)
+        for (scarab::param_node::const_iterator nodeIt = node->Begin(); nodeIt != node->End(); ++nodeIt)
         {
             // first do configuration values we know about
             // as it happens, there aren't any

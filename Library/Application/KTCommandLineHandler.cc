@@ -275,7 +275,7 @@ namespace Nymph
 
                 size_t t_node_start_pos = 0;
                 size_t t_node_sep_pos = t_full_name.find_first_of( fNodeSeparator );
-                KTParamNode* parentNode = &fConfigOverrideValues;
+                scarab::param_node* parentNode = &fConfigOverrideValues;
                 while (t_node_sep_pos != string::npos)
                 {
                     string nodeName(t_full_name.substr(t_node_start_pos, t_node_sep_pos));
@@ -285,7 +285,7 @@ namespace Nymph
                     }
                     else
                     {
-                        KTParamNode* newChildNode = new KTParamNode();
+                        scarab::param_node* newChildNode = new scarab::param_node();
                         parentNode->Add(nodeName, newChildNode);
                         parentNode = newChildNode;
                     }
@@ -295,7 +295,7 @@ namespace Nymph
 
                 string valueName(t_full_name.substr(t_node_start_pos, t_val_pos));
 
-                KTParamValue* new_value = new KTParamValue();
+                scarab::paramValue* new_value = new scarab::paramValue();
                 *new_value << argument.substr( t_val_pos + 1 );
 
                 //std::cout << "(parser) adding < " << t_name << "<" << t_type << "> > = <" << new_value.value() << ">" << std::endl;

@@ -12,6 +12,7 @@
 #include "KTCommandLineHandler.hh"
 #include "KTConfigurable.hh"
 #include "KTConfigurator.hh"
+#include "param.hh"
 
 #ifdef ROOT_FOUND
 #include "TApplication.h"
@@ -23,7 +24,7 @@
 namespace Nymph
 {
     class KTEventLoop;
-    class KTParamNode;
+    //class scarab::param_node;
 
     /*!
      @class KTApplication
@@ -61,14 +62,14 @@ namespace Nymph
         public:
             KTApplication(bool makeTApp=false);
             /// Constructor to use with command-line options; includes parsing of the command line by KTCommandLineHandler (except for config-file-dependent options)
-            KTApplication(int argC, char** argV, bool makeTApp=false, bool requireArgs=true, KTParamNode* defaultConfig=NULL);
+            KTApplication(int argC, char** argV, bool makeTApp=false, bool requireArgs=true, scarab::param_node* defaultConfig=NULL);
             virtual ~KTApplication();
 
         private:
             void AddConfigOptionsToCLHandler(const KTParam* param, const std::string& rootName);
 
         public:
-            bool Configure(const KTParamNode* node);
+            bool Configure(const scarab::param_node* node);
 
         public:
             KTCommandLineHandler* GetCommandLineHandler() const;

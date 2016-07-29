@@ -10,7 +10,7 @@
 
 #include "KTSingleton.hh"
 
-#include "KTParam.hh"
+#include "param.hh"
 
 #include "KTException.hh"
 
@@ -29,10 +29,10 @@ namespace Nymph
             virtual ~KTConfigurator();
 
         public:
-            void Merge(const KTParamNode& aNode);
+            void Merge(const scarab::param_node& aNode);
 
-            KTParamNode* Config();
-            const KTParamNode* Config() const;
+            scarab::param_node* Config();
+            const scarab::param_node* Config() const;
 
             template< typename XReturnType >
             XReturnType Get( const std::string& aName ) const;
@@ -41,9 +41,9 @@ namespace Nymph
             XReturnType Get( const std::string& aName, XReturnType aDefault ) const;
 
         private:
-            KTParamNode* fMasterConfig;
+            scarab::param_node* fMasterConfig;
 
-            mutable KTParam* fParamBuffer;
+            mutable scarab::param* fParamBuffer;
 
             std::string fStringBuffer;
     };
@@ -51,10 +51,10 @@ namespace Nymph
     template< typename XReturnType >
     XReturnType KTConfigurator::Get( const std::string& aName ) const
     {
-        fParamBuffer = const_cast< KTParam* >( fMasterConfig->At( aName ) );
-        if( fParamBuffer != NULL && fParamBuffer->IsValue() )
+        fParamBuffer = const_cast< scarab::param* >( fMasterConfig->at( aName ) );
+        if( fParamBuffer != NULL && fParamBuffer->is_value() )
         {
-            return fParamBuffer->AsValue().Get< XReturnType >();
+            return fParamBuffer->as_value().Get< XReturnType >();
         }
         throw KTException() << "configurator does not have a value for <" << aName << ">";
     }
@@ -62,10 +62,10 @@ namespace Nymph
     template< typename XReturnType >
     XReturnType KTConfigurator::Get( const std::string& aName, XReturnType aDefault ) const
     {
-        fParamBuffer = const_cast< KTParam* >( fMasterConfig->At( aName ) );
-        if( fParamBuffer != NULL && fParamBuffer->IsValue() )
+        fParamBuffer = const_cast< scarab::param* >( fMasterConfig->at( aName ) );
+        if( fParamBuffer != NULL && fParamBuffer->is_value() )
         {
-            return fParamBuffer->AsValue().Get< XReturnType >();
+            return fParamBuffer->as_value().Get< XReturnType >();
         }
         return aDefault;
 

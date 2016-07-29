@@ -1,5 +1,5 @@
 /*
- * KTParamInputJSON.hh
+ * scarab::paramInputJSON.hh
  *
  *  CreAted on: Jan 14, 2014
  *      Author: nsoblAth
@@ -14,19 +14,19 @@
 
 namespace Nymph
 {
-    class KTParam;
-    class KTParamNode;
+    class scarab::param;
+    class scarab::param_node;
 
-    class KTParamInputJSON
+    class scarab::paramInputJSON
     {
         public:
-            KTParamInputJSON();
-            virtual ~KTParamInputJSON();
+            scarab::paramInputJSON();
+            virtual ~scarab::paramInputJSON();
 
-            static KTParamNode* ReadFile( const std::string& aFilename );
-            static KTParamNode* ReadString( const std::string& aJSONStr );
-            static KTParamNode* ReadDocument( const rapidjson::Document& aDocument );
-            static KTParam* ReadValue( const rapidjson::Value& aValue );
+            static scarab::param_node* ReadFile( const std::string& aFilename );
+            static scarab::param_node* ReadString( const std::string& aJSONStr );
+            static scarab::param_node* ReadDocument( const rapidjson::Document& aDocument );
+            static scarab::param* ReadValue( const rapidjson::Value& aValue );
 
             static bool IsNameComment( const std::string& name );
     };

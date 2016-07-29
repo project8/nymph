@@ -13,6 +13,8 @@
 #include "KTLogger.hh"
 #include "KTProcessorToolbox.hh"
 
+#include "param.hh"
+
 #include <string>
 
 using namespace std;
@@ -57,7 +59,7 @@ int main(int argc, char** argv)
     {
         KTApplication app(argc, argv);
 
-        const KTParamNode* parentConfigNode = app.GetConfigurator()->Config();
+        const scarab::param_node* parentConfigNode = app.GetConfigurator()->Config();
 
         if (! app.Configure(parentConfigNode->NodeAt(app.GetConfigName())))
         {

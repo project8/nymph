@@ -17,8 +17,8 @@
 
 namespace Nymph
 {
-    class KTParamNode;
-    class KTParamValue;
+    class scarab::param_node;
+    class scarab::paramValue;
     class KTPrimaryProcessor;
     class KTProcessor;
 
@@ -80,10 +80,10 @@ namespace Nymph
 
         public:
             /// Configure the toolbox: create the processors; connnect signals and slots; and setup the run queue.
-            bool Configure(const KTParamNode* node);
+            bool Configure(const scarab::param_node* node);
 
             /// Configure processors (only those specified in the toolbox)
-            bool ConfigureProcessors(const KTParamNode* node);
+            bool ConfigureProcessors(const scarab::param_node* node);
 
         private:
             bool ParseSignalSlotName(const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot) const;
@@ -107,7 +107,7 @@ namespace Nymph
             };
             typedef std::set< Thread, CompareThread > ThreadGroup;
             typedef std::deque< ThreadGroup > RunQueue;
-            bool AddProcessorToThreadGroup(const KTParamValue* param, ThreadGroup& group);
+            bool AddProcessorToThreadGroup(const scarab::paramValue* param, ThreadGroup& group);
 
         public:
             /// Process the run queue.

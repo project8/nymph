@@ -9,7 +9,7 @@
 
 #include "../Utility/KTEventLoop.hh"
 #include "KTLogger.hh"
-#include "KTParamInputJSON.hh"
+#include "scarab::paramInputJSON.hh"
 
 using std::set;
 using std::string;
@@ -41,7 +41,7 @@ namespace Nymph
 #endif
     }
 
-    KTApplication::KTApplication(int argC, char** argV, bool makeTApp, bool requireArgs, KTParamNode* defaultConfig) :
+    KTApplication::KTApplication(int argC, char** argV, bool makeTApp, bool requireArgs, scarab::param_node* defaultConfig) :
             KTConfigurable("app"),
             fCLHandler(KTCommandLineHandler::GetInstance()),
             fConfigurator( KTConfigurator::GetInstance() ),
@@ -78,7 +78,7 @@ namespace Nymph
         // get configuration information from the CLHandler
         fConfigFilename = fCLHandler->GetConfigFilename();
         string clJSON = fCLHandler->GetCommandLineJSON();
-        const KTParamNode* clConfigOverride = fCLHandler->GetConfigOverride();
+        const scarab::param_node* clConfigOverride = fCLHandler->GetConfigOverride();
 
         // Default configuration
         if (defaultConfig != NULL)
@@ -89,7 +89,7 @@ namespace Nymph
         // JSON file configuration
         if (! fConfigFilename.empty())
         {
-            KTParamNode* t_config_from_file = KTParamInputJSON::ReadFile( fConfigFilename );
+            scarab::param_node* t_config_from_file = scarab::paramInputJSON::ReadFile( fConfigFilename );
             if( t_config_from_file == NULL )
             {
                 throw KTException() << "error parsing config file <" << fConfigFilename << ">";
@@ -101,7 +101,7 @@ namespace Nymph
         // Command-line JSON configuration
         if (! clJSON.empty())
         {
-            KTParamNode* t_config_from_json = KTParamInputJSON::ReadString( clJSON );
+            scarab::param_node* t_config_from_json = scarab::paramInputJSON::ReadString( clJSON );
             fConfigurator->Merge( *t_config_from_json );
             delete t_config_from_json;
         }
@@ -138,7 +138,7 @@ namespace Nymph
 #endif
     }
 
-    void KTApplication::AddConfigOptionsToCLHandler(const KTParam* param, const std::string& rootName)
+    void KTApplication::AddConfigOptionsToCLHandler(const scarab::param* param, const std::string& rootName)
     {
     	if (param->IsNull())
     	{
@@ -165,8 +165,8 @@ namespace Nymph
         	string nextRootName(rootName);
         	if (! rootName.empty()) nextRootName += ".";
 
-        	const KTParamNode* paramNode = &param->AsNode();
-    		for (KTParamNode::const_iterator nodeIt = paramNode->Begin(); nodeIt != paramNode->End(); ++nodeIt)
+        	const scarab::param_node* paramNode = &param->AsNode();
+    		for (scarab::param_node::const_iterator nodeIt = paramNode->Begin(); nodeIt != paramNode->End(); ++nodeIt)
     		{
     			AddConfigOptionsToCLHandler(nodeIt->second, nextRootName + nodeIt->first);
     		}
@@ -175,7 +175,7 @@ namespace Nymph
     	return;
     }
 
-    bool KTApplication::Configure(const KTParamNode* node)
+    bool KTApplication::Configure(const scarab::param_node* node)
     {
         if (node == NULL) return true;
 
