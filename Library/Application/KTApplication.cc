@@ -7,9 +7,10 @@
 
 #include "KTApplication.hh"
 
-#include "../Utility/KTEventLoop.hh"
+#include "KTEventLoop.hh"
 #include "KTLogger.hh"
-#include "KTParamInputJSON.hh"
+
+#include "param_json.hh"
 
 using std::set;
 using std::string;
@@ -89,7 +90,7 @@ namespace Nymph
         // JSON file configuration
         if (! fConfigFilename.empty())
         {
-            scarab::param_node* t_config_from_file = KTParamInputJSON::ReadFile( fConfigFilename );
+            scarab::param_node* t_config_from_file = scarab::param_input_json::read_file( fConfigFilename );
             if( t_config_from_file == NULL )
             {
                 throw KTException() << "error parsing config file <" << fConfigFilename << ">";
@@ -101,7 +102,7 @@ namespace Nymph
         // Command-line JSON configuration
         if (! clJSON.empty())
         {
-            scarab::param_node* t_config_from_json = KTParamInputJSON::ReadString( clJSON );
+            scarab::param_node* t_config_from_json = scarab::param_input_json::read_string( clJSON );
             fConfigurator->Merge( *t_config_from_json );
             delete t_config_from_json;
         }

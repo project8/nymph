@@ -1,13 +1,13 @@
 # CMakeLists for Nymph/Library
 # Author: N. Oblath
 
-set (UTIL_DIR Utility)
-set (DATA_DIR Data)
-set (PROC_DIR Processor)
-set (IO_DIR IO)
-set (APPL_DIR Application)
+set( UTIL_DIR Utility )
+set( DATA_DIR Data )
+set( PROC_DIR Processor )
+set( IO_DIR IO )
+set( APPL_DIR Application )
 
-set (NYMPH_HEADERFILES
+set( NYMPH_HEADERFILES
     ${UTIL_DIR}/KTCacheDirectory.hh
     ${UTIL_DIR}/KTConcurrentQueue.hh
     ${UTIL_DIR}/KTConfigurable.hh
@@ -21,8 +21,8 @@ set (NYMPH_HEADERFILES
     ${UTIL_DIR}/KTLogger.hh
     ${UTIL_DIR}/KTMemberVariable.hh
     ${UTIL_DIR}/KTNOFactory.hh
-    ${UTIL_DIR}/KTParam.hh
-    ${UTIL_DIR}/KTParamInputJSON.hh
+    #${UTIL_DIR}/KTParam.hh
+    #${UTIL_DIR}/KTParamInputJSON.hh
     ${UTIL_DIR}/KTSingleton.hh
     ${UTIL_DIR}/KTTIFactory.hh
     ${UTIL_DIR}/KTTime.hh
@@ -51,15 +51,15 @@ set (NYMPH_HEADERFILES
     ${APPL_DIR}/KTThroughputProfiler.hh
 )
 
-set (NYMPH_SOURCEFILES
+set( NYMPH_SOURCEFILES
     ${UTIL_DIR}/KTCacheDirectory.cc
     ${UTIL_DIR}/KTConfigurable.cc
     ${UTIL_DIR}/KTDirectory.cc
     ${UTIL_DIR}/KTEventLoop.cc
     ${UTIL_DIR}/KTException.cc
     ${UTIL_DIR}/KTLogger.cc
-    ${UTIL_DIR}/KTParam.cc
-    ${UTIL_DIR}/KTParamInputJSON.cc
+    #${UTIL_DIR}/KTParam.cc
+    #${UTIL_DIR}/KTParamInputJSON.cc
     ${UTIL_DIR}/KTTime.cc
     ${DATA_DIR}/KTApplyCut.cc
     ${DATA_DIR}/KTCut.cc
@@ -84,9 +84,5 @@ set (NYMPH_SOURCEFILES
 
 ##################################################
 
-add_library (Nymph ${NYMPH_SOURCEFILES})
-target_link_libraries (Nymph ${EXTERNAL_LIBRARIES})
-
-pbuilder_install_headers (${NYMPH_HEADERFILES})
-pbuilder_install_libraries (Nymph)
-
+pbuilder_library( Nymph NYMPH_SOURCEFILES "" )
+pbuilder_install_headers( ${NYMPH_HEADERFILES} )

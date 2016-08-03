@@ -12,11 +12,12 @@
 #include "KTCommandLineHandler.hh"
 #include "KTConfigurable.hh"
 #include "KTConfigurator.hh"
-#include "param.hh"
 
 #ifdef ROOT_FOUND
 #include "TApplication.h"
 #endif
+
+#include "param.hh"
 
 #include <set>
 #include <string>
