@@ -5,7 +5,7 @@
  *      Author: nsoblath
  */
 
-#include "../../Nymph/Library/Utility/KTEventLoop.hh"
+#include "KTEventLoop.hh"
 
 #include "KTLogger.hh"
 
