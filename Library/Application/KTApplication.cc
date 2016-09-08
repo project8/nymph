@@ -61,7 +61,7 @@ namespace Nymph
 #endif
 
         // process command-line arguments
-        fCLHandler->TakeArguments(argC, argV);
+        fCLHandler->ProcessCommandLine(argC, argV);
 
         // if requested, print help or version messages, and exit
         if (fCLHandler->GetPrintHelpMessageFlag() || (requireArgs && fCLHandler->GetNArgs() == 1))
@@ -102,6 +102,10 @@ namespace Nymph
         if (! clJSON.empty())
         {
             KTParamNode* t_config_from_json = KTParamInputJSON::ReadString( clJSON );
+            if( t_config_from_json == NULL )
+            {
+                throw KTException() << "error parsing CL JSON";
+            }
             fConfigurator->Merge( *t_config_from_json );
             delete t_config_from_json;
         }
