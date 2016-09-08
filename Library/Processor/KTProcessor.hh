@@ -13,9 +13,10 @@
 
 #include "KTConnection.hh"
 #include "KTLogger.hh"
-#include "KTNOFactory.hh"
 #include "KTSignalWrapper.hh"
 #include "KTSlotWrapper.hh"
+
+#include "factory.hh"
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
@@ -135,7 +136,7 @@ namespace Nymph
 
 
 #define KT_REGISTER_PROCESSOR(proc_class, proc_name) \
-        static ::Nymph::KTNORegistrar< ::Nymph::KTProcessor, proc_class > sProc##proc_class##Registrar( proc_name );
+        static ::scarab::registrar< ::Nymph::KTProcessor, proc_class, const std::string& > sProc##proc_class##Registrar( proc_name );
 
 } /* namespace Nymph */
 #endif /* KTPROCESSOR_HH_ */

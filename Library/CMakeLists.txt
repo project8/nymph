@@ -16,10 +16,8 @@ set( NYMPH_HEADERFILES
     ${UTIL_DIR}/KTException.hh
     ${UTIL_DIR}/KTExtensibleStruct.hh
     ${UTIL_DIR}/KTExtensibleStructFactory.hh
-    ${UTIL_DIR}/KTFactory.hh
     ${UTIL_DIR}/KTLogger.hh
     ${UTIL_DIR}/KTMemberVariable.hh
-    ${UTIL_DIR}/KTNOFactory.hh
     ${UTIL_DIR}/KTTIFactory.hh
     ${UTIL_DIR}/KTTime.hh
     ${DATA_DIR}/KTApplyCut.hh

@@ -10,6 +10,8 @@
 #include "KTLogger.hh"
 #include "KTPrimaryProcessor.hh"
 
+#include "factory.hh"
+
 #ifndef SINGLETHREADED
 #include <boost/thread.hpp>
 #endif
@@ -27,7 +29,7 @@ namespace Nymph
 
     KTProcessorToolbox::KTProcessorToolbox(const std::string& name) :
             KTConfigurable(name),
-            fProcFactory(KTNOFactory< KTProcessor >::get_instance()),
+            fProcFactory(scarab::factory< KTProcessor, const std::string& >::get_instance()),
             fRunQueue(),
             fProcMap()
     {
@@ -75,7 +77,7 @@ namespace Nymph
                 {
                     procName = procNode->get_value("name");
                 }
-                KTProcessor* newProc = fProcFactory->CreateNamed(procType);
+                KTProcessor* newProc = fProcFactory->create(procType, procType);
                 if (newProc == NULL)
                 {
                     KTERROR(proclog, "Unable to create processor of type <" << procType << ">");

@@ -70,7 +70,7 @@ namespace Nymph
 
     bool KTApplyCut::SelectCut(const string& cutName)
     {
-        KTCut* tempCut = KTNOFactory< KTCut >::get_instance()->Create(cutName);
+        KTCut* tempCut = scarab::factory< KTCut, const std::string& >::get_instance()->create(cutName, cutName);
         if (tempCut == NULL)
         {
             KTERROR(cutlog, "Invalid cut name given: <" << cutName << ">.");

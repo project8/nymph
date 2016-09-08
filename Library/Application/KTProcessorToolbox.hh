@@ -10,7 +10,9 @@
 #define KTPROCESSORTOOLBOX_HH_
 
 #include "KTConfigurable.hh"
-#include "KTNOFactory.hh"
+//#include "KTNOFactory.hh"
+
+#include "factory.hh"
 
 #include <deque>
 #include <set>
@@ -74,7 +76,7 @@ namespace Nymph
             virtual ~KTProcessorToolbox();
 
         private:
-            KTNOFactory< KTProcessor >* fProcFactory; // singleton; not owned by KTProcessorToolbox
+            scarab::factory< KTProcessor, const std::string& >* fProcFactory; // singleton; not owned by KTProcessorToolbox
 
         public:
             /// Configure the toolbox: create the processors; connnect signals and slots; and setup the run queue.
