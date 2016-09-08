@@ -11,7 +11,6 @@ set( NYMPH_HEADERFILES
     ${UTIL_DIR}/KTCacheDirectory.hh
     ${UTIL_DIR}/KTConcurrentQueue.hh
     ${UTIL_DIR}/KTConfigurable.hh
-    ${UTIL_DIR}/KTDestroyer.hh
     ${UTIL_DIR}/KTDirectory.hh
     ${UTIL_DIR}/KTEventLoop.hh
     ${UTIL_DIR}/KTException.hh
@@ -21,9 +20,6 @@ set( NYMPH_HEADERFILES
     ${UTIL_DIR}/KTLogger.hh
     ${UTIL_DIR}/KTMemberVariable.hh
     ${UTIL_DIR}/KTNOFactory.hh
-    #${UTIL_DIR}/KTParam.hh
-    #${UTIL_DIR}/KTParamInputJSON.hh
-    ${UTIL_DIR}/KTSingleton.hh
     ${UTIL_DIR}/KTTIFactory.hh
     ${UTIL_DIR}/KTTime.hh
     ${DATA_DIR}/KTApplyCut.hh
@@ -58,8 +54,6 @@ set( NYMPH_SOURCEFILES
     ${UTIL_DIR}/KTEventLoop.cc
     ${UTIL_DIR}/KTException.cc
     ${UTIL_DIR}/KTLogger.cc
-    #${UTIL_DIR}/KTParam.cc
-    #${UTIL_DIR}/KTParamInputJSON.cc
     ${UTIL_DIR}/KTTime.cc
     ${DATA_DIR}/KTApplyCut.cc
     ${DATA_DIR}/KTCut.cc
