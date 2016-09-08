@@ -10,6 +10,7 @@
 #include "KTEventLoop.hh"
 #include "KTLogger.hh"
 
+#include "param_codec.hh"
 #include "param_json.hh"
 
 using std::set;
@@ -90,21 +91,32 @@ namespace Nymph
         // JSON file configuration
         if (! fConfigFilename.empty())
         {
-            scarab::param_node* t_config_from_file = scarab::param_input_json::read_file( fConfigFilename );
-            if( t_config_from_file == NULL )
+            scarab::path configFilePath = scarab::expand_path( fConfigFilename );
+            scarab::param_translator translator;
+            scarab::param* configFromFile = translator.read_file( configFilePath.native() );
+            if( configFromFile == NULL )
             {
-                throw KTException() << "error parsing config file <" << fConfigFilename << ">";
+                throw KTException() << "[KTApplication] error parsing config file";
             }
-            fConfigurator->Merge( *t_config_from_file );
-            delete t_config_from_file;
+            if( ! configFromFile->is_node() )
+            {
+                throw KTException() << "[KTApplication] configuration file must consist of an object/node";
+            }
+            fConfigurator->Merge( configFromFile->as_node() );
+            delete configFromFile;
         }
 
         // Command-line JSON configuration
         if (! clJSON.empty())
         {
-            scarab::param_node* t_config_from_json = scarab::param_input_json::read_string( clJSON );
-            fConfigurator->Merge( *t_config_from_json );
-            delete t_config_from_json;
+            scarab::param_input_json inputJSON;
+            scarab::param* configFromJSON = inputJSON.read_string( clJSON );
+            if( ! configFromJSON->is_node() )
+            {
+                throw KTException() << "[KTApplication] command line json must be an object";
+            }
+            fConfigurator->Merge( configFromJSON->as_node() );
+            delete configFromJSON;
         }
 
         // Command-line overrides
