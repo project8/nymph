@@ -143,12 +143,11 @@ namespace Nymph
             //**************
 
         public:
-            /// Parses the remaining command line options (those that weren't parsed during the InitialCommandLineProcessing
-            bool DelayedCommandLineProcessing();
-
-        private:
             /// Parses the general options and stores the remaining options available for later parsing
             void InitialCommandLineProcessing();
+
+            /// Parses the remaining command line options (those that weren't parsed during the InitialCommandLineProcessing
+            bool DelayedCommandLineProcessing();
 
         private:
             std::vector< std::string > fCommandLineParseLater;

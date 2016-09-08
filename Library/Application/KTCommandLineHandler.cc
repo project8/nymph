@@ -68,8 +68,6 @@ namespace Nymph
         fArgV = argV;
         fArgumentsTaken = true;
 
-        InitialCommandLineProcessing();
-
         return true;
     }
 
