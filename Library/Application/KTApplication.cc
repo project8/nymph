@@ -61,7 +61,7 @@ namespace Nymph
 #endif
 
         // process command-line arguments
-        fCLHandler->TakeArguments(argC, argV);
+        fCLHandler->ProcessCommandLine(argC, argV);
 
         // if requested, print help or version messages, and exit
         if (fCLHandler->GetPrintHelpMessageFlag() || (requireArgs && fCLHandler->GetNArgs() == 1))
