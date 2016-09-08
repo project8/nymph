@@ -27,7 +27,7 @@ namespace Nymph
 
     KTProcessorToolbox::KTProcessorToolbox(const std::string& name) :
             KTConfigurable(name),
-            fProcFactory(KTNOFactory< KTProcessor >::GetInstance()),
+            fProcFactory(KTNOFactory< KTProcessor >::get_instance()),
             fRunQueue(),
             fProcMap()
     {

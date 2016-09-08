@@ -8,8 +8,9 @@
 #ifndef KTFACTORY_HH_
 #define KTFACTORY_HH_
 
-#include "KTSingleton.hh"
 #include "KTLogger.hh"
+
+#include "singleton.hh"
 
 #include <map>
 #include <string>
@@ -52,7 +53,7 @@ namespace Nymph
 
 
     template< class XBaseType >
-    class KTFactory : public KTSingleton< KTFactory< XBaseType > >
+    class KTFactory : public scarab::singleton< KTFactory< XBaseType > >
     {
         public:
             typedef std::map< std::string, const KTRegistrarBase< XBaseType >* > FactoryMap;
@@ -74,8 +75,8 @@ namespace Nymph
 
 
         protected:
-            friend class KTSingleton< KTFactory >;
-            friend class KTDestroyer< KTFactory >;
+            friend class scarab::singleton< KTFactory >;
+            friend class scarab::destroyer< KTFactory >;
             KTFactory();
             ~KTFactory();
     };
@@ -155,7 +156,7 @@ namespace Nymph
     template< class XBaseType, class XDerivedType >
     void KTRegistrar< XBaseType, XDerivedType >::Register(const std::string& className) const
     {
-        KTFactory< XBaseType >::GetInstance()->Register(className, this);
+        KTFactory< XBaseType >::get_instance()->Register(className, this);
         return;
     }
 

@@ -10,8 +10,9 @@
 #define KTCOMMANDLINEHANDLER_H_
 
 #include "KTLogger.hh"
+
 #include "param.hh"
-#include "KTSingleton.hh"
+#include "singleton.hh"
 
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
@@ -53,7 +54,7 @@ namespace Nymph
      If --help (-h) or --version (-v) were given, those will be handled immediately, and the program will exit.
     */
 
-    class KTCommandLineHandler : public KTSingleton< KTCommandLineHandler >
+    class KTCommandLineHandler : public scarab::singleton< KTCommandLineHandler >
     {
         protected:
             typedef std::map< std::string, po::options_description* > OptDescMap;
@@ -65,8 +66,8 @@ namespace Nymph
             //**************
 
         protected:
-            friend class KTSingleton< KTCommandLineHandler >;
-            friend class KTDestroyer< KTCommandLineHandler >;
+            friend class scarab::singleton< KTCommandLineHandler >;
+            friend class scarab::destroyer< KTCommandLineHandler >;
             KTCommandLineHandler();
             virtual ~KTCommandLineHandler();
 

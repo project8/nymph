@@ -8,8 +8,7 @@
 #ifndef KTCONFIGURATOR_HH_
 #define KTCONFIGURATOR_HH_
 
-#include "KTSingleton.hh"
-
+#include "singleton.hh"
 #include "param.hh"
 
 #include "KTException.hh"
@@ -19,11 +18,11 @@
 namespace Nymph
 {
 
-    class KTConfigurator : public KTSingleton< KTConfigurator >
+    class KTConfigurator : public scarab::singleton< KTConfigurator >
     {
         private:
-            friend class KTSingleton< KTConfigurator >;
-            friend class KTDestroyer< KTConfigurator >;
+            friend class scarab::singleton< KTConfigurator >;
+            friend class scarab::destroyer< KTConfigurator >;
 
             KTConfigurator();
             virtual ~KTConfigurator();

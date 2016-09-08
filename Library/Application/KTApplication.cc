@@ -24,8 +24,8 @@ namespace Nymph
 
     KTApplication::KTApplication(bool makeTApp) :
             KTConfigurable("app"),
-            fCLHandler(KTCommandLineHandler::GetInstance()),
-            fConfigurator( KTConfigurator::GetInstance() ),
+            fCLHandler(KTCommandLineHandler::get_instance()),
+            fConfigurator( KTConfigurator::get_instance() ),
             fConfigFilename()
     {
 
@@ -45,8 +45,8 @@ namespace Nymph
 
     KTApplication::KTApplication(int argC, char** argV, bool makeTApp, bool requireArgs, scarab::param_node* defaultConfig) :
             KTConfigurable("app"),
-            fCLHandler(KTCommandLineHandler::GetInstance()),
-            fConfigurator( KTConfigurator::GetInstance() ),
+            fCLHandler(KTCommandLineHandler::get_instance()),
+            fConfigurator( KTConfigurator::get_instance() ),
             fConfigFilename()
     {
 #ifdef ROOT_FOUND

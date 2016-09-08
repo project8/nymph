@@ -8,8 +8,9 @@
 #ifndef KTNOFACTORY_HH_
 #define KTNOFACTORY_HH_
 
-#include "KTSingleton.hh"
 #include "KTLogger.hh"
+
+#include "singleton.hh"
 
 #include <map>
 #include <string>
@@ -54,7 +55,7 @@ namespace Nymph
 
 
     template< class XBaseType >
-    class KTNOFactory : public KTSingleton< KTNOFactory< XBaseType > >
+    class KTNOFactory : public scarab::singleton< KTNOFactory< XBaseType > >
     {
         public:
             typedef std::map< std::string, const KTNORegistrarBase< XBaseType >* > FactoryMap;
@@ -79,8 +80,8 @@ namespace Nymph
 
 
         protected:
-            friend class KTSingleton< KTNOFactory >;
-            friend class KTDestroyer< KTNOFactory >;
+            friend class scarab::singleton< KTNOFactory >;
+            friend class scarab::destroyer< KTNOFactory >;
             KTNOFactory();
             ~KTNOFactory();
     };
@@ -179,7 +180,7 @@ namespace Nymph
     template< class XBaseType, class XDerivedType >
     void KTNORegistrar< XBaseType, XDerivedType >::Register(const std::string& className) const
     {
-        KTNOFactory< XBaseType >::GetInstance()->Register(className, this);
+        KTNOFactory< XBaseType >::get_instance()->Register(className, this);
         return;
     }
 

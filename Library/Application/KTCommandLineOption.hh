@@ -31,13 +31,13 @@ namespace Nymph
 
     template< typename XInputType >
     KTCommandLineOption< XInputType >::KTCommandLineOption() :
-            fCLHandler(KTCommandLineHandler::GetInstance())
+            fCLHandler(KTCommandLineHandler::get_instance())
     {
     }
 
     template< typename XInputType >
     KTCommandLineOption< XInputType >::KTCommandLineOption(const std::string& group, const std::string& helpMsg, const std::string& longOpt, char shortOpt) :
-            fCLHandler(KTCommandLineHandler::GetInstance())
+            fCLHandler(KTCommandLineHandler::get_instance())
     {
         if (shortOpt == '#')
         {
@@ -60,11 +60,11 @@ namespace Nymph
     {
         public:
             KTCommandLineOption() :
-                fCLHandler(KTCommandLineHandler::GetInstance())
+                fCLHandler(KTCommandLineHandler::get_instance())
             {
             }
             KTCommandLineOption(const std::string& group, const std::string& helpMsg, const std::string& longOpt, char shortOpt='#') :
-                fCLHandler(KTCommandLineHandler::GetInstance())
+                fCLHandler(KTCommandLineHandler::get_instance())
             {
                 if (shortOpt == '#')
                 {

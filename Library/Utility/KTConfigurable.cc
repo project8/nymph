@@ -24,7 +24,7 @@ namespace Nymph
     //******************
 
     KTConfigurable::KTConfigurable(const string& name) :
-            fCLHandler(KTCommandLineHandler::GetInstance()),
+            fCLHandler(KTCommandLineHandler::get_instance()),
             fConfigName(name)
     {
     }
@@ -53,7 +53,7 @@ namespace Nymph
     {
         if (fIsConfigured) return true;
 
-        scarab::param_node* node = KTConfigurator::GetInstance()->Config();
+        scarab::param_node* node = KTConfigurator::get_instance()->Config();
         if (! this->Configure(node))
         {
             KTERROR(conflog, "An error occurred while configuring <" << fConfigName << ">");

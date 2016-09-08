@@ -10,16 +10,17 @@
 
 #include "KTConfigurable.hh"
 #include "KTDirectory.hh"
-#include "KTSingleton.hh"
+
+#include "singleton.hh"
 
 namespace Nymph
 {
 
-    class KTCacheDirectory : public KTDirectory, public KTSingleton< KTCacheDirectory >, public KTSelfConfigurable
+    class KTCacheDirectory : public KTDirectory, public scarab::singleton< KTCacheDirectory >, public KTSelfConfigurable
     {
         protected:
-            friend class KTSingleton< KTCacheDirectory >;
-            friend class KTDestroyer< KTCacheDirectory >;
+            friend class scarab::singleton< KTCacheDirectory >;
+            friend class scarab::destroyer< KTCacheDirectory >;
             KTCacheDirectory(const std::string& name = "cache-directory");
             virtual ~KTCacheDirectory();
 

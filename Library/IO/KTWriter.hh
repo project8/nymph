@@ -94,7 +94,7 @@ namespace Nymph
             KTWriter(name),
             fTypeWriters()
     {
-        KTTIFactory< XTypist >* twFactory = KTTIFactory< XTypist >::GetInstance();
+        KTTIFactory< XTypist >* twFactory = KTTIFactory< XTypist >::get_instance();
         for (typename KTTIFactory< XTypist >::FactoryCIt factoryIt = twFactory->GetFactoryMapBegin();
                 factoryIt != twFactory->GetFactoryMapEnd();
                 factoryIt++)
