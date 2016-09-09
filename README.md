@@ -1,14 +1,14 @@
 Nymph
 =====
 
-Nymph is . . . .
+Nymph is a C++-based data analysis framework.
 
 
 Dependencies
 ------------
 
 **External**
-- CMake (3.0 or better)
+- CMake (3.1 or better)
 - Boost (date_time, filesystem, program_options, system, thread; 1.46 or better)
 
 **Distributed Code** (included with Mantis directly)
