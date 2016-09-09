@@ -9,8 +9,9 @@
 #define KTEXTENSIBLESTRUCTFACTORY_HH_
 
 #include "KTExtensibleStruct.hh"
-#include "KTSingleton.hh"
 #include "KTLogger.hh"
+
+#include "singleton.hh"
 
 #include <map>
 #include <string>
@@ -55,7 +56,7 @@ namespace Nymph
 
 
     template< class XBaseType >
-    class KTExtensibleStructFactory : public KTSingleton< KTExtensibleStructFactory< XBaseType > >
+    class KTExtensibleStructFactory : public scarab::singleton< KTExtensibleStructFactory< XBaseType > >
     {
         public:
             typedef std::map< std::string, const KTExtensibleStructRegistrarBase< XBaseType >* > FactoryMap;
@@ -80,8 +81,8 @@ namespace Nymph
 
 
         protected:
-            friend class KTSingleton< KTExtensibleStructFactory >;
-            friend class KTDestroyer< KTExtensibleStructFactory >;
+            friend class scarab::singleton< KTExtensibleStructFactory >;
+            friend class scarab::destroyer< KTExtensibleStructFactory >;
             KTExtensibleStructFactory();
             ~KTExtensibleStructFactory();
     };
@@ -180,7 +181,7 @@ namespace Nymph
     template< class XBaseType, class XDerivedType >
     void KTExtensibleStructRegistrar< XBaseType, XDerivedType >::Register(const std::string& className) const
     {
-        KTExtensibleStructFactory< XBaseType >::GetInstance()->Register(className, this);
+        KTExtensibleStructFactory< XBaseType >::get_instance()->Register(className, this);
         return;
     }
 

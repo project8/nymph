@@ -14,7 +14,7 @@
 #include "KTTestConfigurable.hh"
 #include "KTApplication.hh"
 #include "KTCommandLineOption.hh"
-#include "KTParam.hh"
+#include "scarab::param.hh"
 
 using namespace Nymph;
 using namespace std;
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
 
     KTTestConfigurable* testObj = new KTTestConfigurable();
 
-    const KTParamNode* topNode = app->GetConfigurator()->Config();
+    const scarab::param_node* topNode = app->GetConfigurator()->Config();
     if (topNode == NULL)
     {
         KTWARN(testapplog, "Top-level node <" << testObj->GetConfigName() << "> was not found");

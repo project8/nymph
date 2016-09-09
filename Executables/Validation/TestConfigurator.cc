@@ -10,7 +10,7 @@
 
 #include "KTConfigurator.hh"
 #include "KTLogger.hh"
-#include "KTParamInputJSON.hh"
+#include "scarab::paramInputJSON.hh"
 #include "KTTestConfigurable.hh"
 
 #include <string>
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     KTConfigurator* configurator = KTConfigurator::GetInstance();
 
     string configFilename(argv[1]);
-    KTParamNode* t_config_from_file = KTParamInputJSON::ReadFile( configFilename );
+    scarab::param_node* t_config_from_file = scarab::paramInputJSON::ReadFile( configFilename );
     if( t_config_from_file == NULL )
     {
         KTERROR(conflog, "Unable to parse the config file <" << configFilename << ">");
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
     configurator->Merge( *t_config_from_file );
     delete t_config_from_file;
 
-    const KTParamNode* topNode = configurator->Config();
+    const scarab::param_node* topNode = configurator->Config();
     if (topNode == NULL)
     {
         KTERROR(conflog, "Top-level node was not found");
@@ -74,14 +74,14 @@ int main(int argc, char** argv)
     // Testing nested data
     KTINFO(conflog, "Testing nested data");
 
-    const KTParamNode* nestedNode = topNode->NodeAt("nested-data");
+    const scarab::param_node* nestedNode = topNode->NodeAt("nested-data");
     if (nestedNode == NULL)
     {
         KTERROR(conflog, "Node <nested-data> was not found");
         return -5;
     }
 
-    const KTParamNode* nestedNode2 = topNode->NodeAt("nested-data-2");
+    const scarab::param_node* nestedNode2 = topNode->NodeAt("nested-data-2");
     if (nestedNode2 == NULL)
     {
         KTERROR(conflog, "Node <nested-data-2> was not found");
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 
     KTINFO(conflog, "Before merge:\n" << "Nested data:\n" << *nestedNode << "\n" << "Nested data 2:\n" << *nestedNode2);
 
-    KTParamNode copyOfNestedNode(*nestedNode);
+    scarab::param_node copyOfNestedNode(*nestedNode);
     copyOfNestedNode.Merge(*nestedNode2);
 
     KTINFO(conflog, "After merge:\n" << copyOfNestedNode);

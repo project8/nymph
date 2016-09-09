@@ -10,6 +10,8 @@
 
 #include "KTPrimaryProcessor.hh"
 
+#include "factory.hh"
+
 namespace Nymph
 {
     class KTReader : public KTPrimaryProcessor
@@ -21,7 +23,7 @@ namespace Nymph
     };
 
 #define KT_REGISTER_READER(reader_class, reader_name) \
-        static ::Nymph::KTNORegistrar< ::Nymph::KTReader, reader_class > s##reader_class##ReaderRegistrar(reader_name);
+        static ::scarab::registrar< ::Nymph::KTReader, reader_class, const std::string& > s##reader_class##ReaderRegistrar(reader_name);
 
 } /* namespace Nymph */
 #endif /* KTREADER_HH_ */

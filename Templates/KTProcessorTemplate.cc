@@ -9,7 +9,7 @@
 
 #include "KTLogger.hh"
 #include "KTNOFactory.hh"
-#include "KTParam.hh"
+#include "scarab::param.hh"
 
 
 namespace Nymph
@@ -34,7 +34,7 @@ namespace Nymph
     {
     }
 
-    bool KTProcessorTemplate::Configure(const KTParamNode* node)
+    bool KTProcessorTemplate::Configure(const scarab::param_node* node)
     {
         if (node == NULL) return false;
 

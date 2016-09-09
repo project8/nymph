@@ -13,6 +13,8 @@
 #include "KTLogger.hh"
 #include "KTProcessorToolbox.hh"
 
+#include "param.hh"
+
 #include <string>
 
 using namespace std;
@@ -57,9 +59,9 @@ int main(int argc, char** argv)
     {
         KTApplication app(argc, argv);
 
-        const KTParamNode* parentConfigNode = app.GetConfigurator()->Config();
+        const scarab::param_node* parentConfigNode = app.GetConfigurator()->Config();
 
-        if (! app.Configure(parentConfigNode->NodeAt(app.GetConfigName())))
+        if (! app.Configure(parentConfigNode->node_at(app.GetConfigName())))
         {
             KTERROR(katydidlog, "Unable to configure the application. Aborting.");
             return -2;
@@ -69,7 +71,7 @@ int main(int argc, char** argv)
         // This will create all of the requested processors, connect their signals and slots, and fill the run queue.
         KTProcessorToolbox procTB;
 
-        if ( ! procTB.Configure( parentConfigNode->NodeAt( procTB.GetConfigName() ) ) )
+        if ( ! procTB.Configure( parentConfigNode->node_at( procTB.GetConfigName() ) ) )
         {
             KTERROR(katydidlog, "Unable to configure processor toolbox. Aborting.");
             return -3;

@@ -39,8 +39,6 @@
 
 namespace Nymph
 {
-    class KTParamNode;
-
     /*!
      @class KTThroughputProfiler
      @author N. S. Oblath
@@ -83,7 +81,7 @@ namespace Nymph
             KTThroughputProfiler(const std::string& name = "throughput-profiler");
             virtual ~KTThroughputProfiler();
 
-            bool Configure(const KTParamNode* node);
+            bool Configure(const scarab::param_node* node);
 
             void Start();
             void Stop();

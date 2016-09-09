@@ -12,6 +12,8 @@
 
 #include "KTTIFactory.hh"
 
+#include "factory.hh"
+
 #include <map>
 #include <typeinfo>
 
@@ -94,7 +96,7 @@ namespace Nymph
             KTWriter(name),
             fTypeWriters()
     {
-        KTTIFactory< XTypist >* twFactory = KTTIFactory< XTypist >::GetInstance();
+        KTTIFactory< XTypist >* twFactory = KTTIFactory< XTypist >::get_instance();
         for (typename KTTIFactory< XTypist >::FactoryCIt factoryIt = twFactory->GetFactoryMapBegin();
                 factoryIt != twFactory->GetFactoryMapEnd();
                 factoryIt++)
@@ -130,7 +132,7 @@ namespace Nymph
 
 
 #define KT_REGISTER_WRITER(writer_class, writer_name) \
-        static ::Nymph::KTNORegistrar< ::Nymph::KTWriter, writer_class > s##writer_class##WriterRegistrar(writer_name);
+        static ::scarab::registrar< ::Nymph::KTWriter, writer_class, const std::string& > s##writer_class##WriterRegistrar(writer_name);
 
 } /* namespace Nymph */
 #endif /* KTWRITER_HH_ */

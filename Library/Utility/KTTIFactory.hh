@@ -10,8 +10,9 @@
 #ifndef KTTIFACTORY_HH_
 #define KTTIFACTORY_HH_
 
-#include "KTSingleton.hh"
 #include "KTLogger.hh"
+
+#include "singleton.hh"
 
 #include <map>
 #include <typeinfo>
@@ -54,7 +55,7 @@ namespace Nymph
 
 
     template< class XBaseType >
-    class KTTIFactory : public KTSingleton< KTTIFactory< XBaseType > >
+    class KTTIFactory : public scarab::singleton< KTTIFactory< XBaseType > >
     {
         public:
             struct CompareTypeInfo
@@ -88,8 +89,8 @@ namespace Nymph
 
 
         protected:
-            friend class KTSingleton< KTTIFactory >;
-            friend class KTDestroyer< KTTIFactory >;
+            friend class scarab::singleton< KTTIFactory >;
+            friend class scarab::destroyer< KTTIFactory >;
             KTTIFactory();
             ~KTTIFactory();
     };
@@ -171,7 +172,7 @@ namespace Nymph
     template< class XBaseType, class XDerivedType >
     void KTTIRegistrar< XBaseType, XDerivedType >::Register() const
     {
-        KTTIFactory< XBaseType >::GetInstance()->template Register<XDerivedType>(this);
+        KTTIFactory< XBaseType >::get_instance()->template Register<XDerivedType>(this);
         return;
     }
 
