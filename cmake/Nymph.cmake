@@ -5,11 +5,6 @@
 # Main directory for Nymph
 set (NYMPH_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
 
-# Version
-set (NYMPH_VERSION_MAJOR 1)
-set (NYMPH_VERSION_MINOR 0)
-set (NYMPH_REVISION 6)
-
 
 ##########
 # Macros #
