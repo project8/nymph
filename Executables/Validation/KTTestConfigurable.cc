@@ -6,7 +6,7 @@
  */
 
 #include "KTLogger.hh"
-#include "KTParam.hh"
+#include "scarab::param.hh"
 #include "KTTestConfigurable.hh"
 #include "KTCommandLineOption.hh"
 
@@ -30,7 +30,7 @@ namespace Nymph
     {
     }
 
-    bool KTTestConfigurable::Configure(const KTParamNode* node)
+    bool KTTestConfigurable::Configure(const scarab::param_node* node)
     {
         // Config-file options
         if (node != NULL)

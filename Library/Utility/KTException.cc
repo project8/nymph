@@ -17,7 +17,7 @@ namespace Nymph
     }
     KTException::KTException( const KTException& an_exception ) :
             std::exception(),
-            fException( an_exception.fException.str() )
+            fException( an_exception.fException )
     {
     }
 
@@ -27,7 +27,7 @@ namespace Nymph
 
     const char* KTException::what() const throw ()
     {
-        return fException.str().c_str();
+        return fException.c_str();
     }
 
 }

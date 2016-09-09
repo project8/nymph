@@ -10,8 +10,9 @@
 #define KTCOMMANDLINEHANDLER_H_
 
 #include "KTLogger.hh"
-#include "KTParam.hh"
-#include "KTSingleton.hh"
+
+#include "param.hh"
+#include "singleton.hh"
 
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
@@ -53,7 +54,7 @@ namespace Nymph
      If --help (-h) or --version (-v) were given, those will be handled immediately, and the program will exit.
     */
 
-    class KTCommandLineHandler : public KTSingleton< KTCommandLineHandler >
+    class KTCommandLineHandler : public scarab::singleton< KTCommandLineHandler >
     {
         protected:
             typedef std::map< std::string, po::options_description* > OptDescMap;
@@ -65,8 +66,8 @@ namespace Nymph
             //**************
 
         protected:
-            friend class KTSingleton< KTCommandLineHandler >;
-            friend class KTDestroyer< KTCommandLineHandler >;
+            friend class scarab::singleton< KTCommandLineHandler >;
+            friend class scarab::destroyer< KTCommandLineHandler >;
             KTCommandLineHandler();
             virtual ~KTCommandLineHandler();
 
@@ -181,13 +182,13 @@ namespace Nymph
             const po::parsed_options* GetParsedOptions() const;
             const po::variables_map* GetVariablesMap() const;
 
-            const KTParamNode* GetConfigOverride() const;
+            const scarab::param_node* GetConfigOverride() const;
 
         private:
             po::parsed_options fParsedOptions;
             po::variables_map fCommandLineVarMap;
 
-            KTParamNode fConfigOverrideValues;
+            scarab::param_node fConfigOverrideValues;
             static const char fDash = '-';
             static const char fSeparator = '=';
             static const char fNodeSeparator = '.';
@@ -336,7 +337,7 @@ namespace Nymph
         return &fCommandLineVarMap;
     }
 
-    inline const KTParamNode* KTCommandLineHandler::GetConfigOverride() const
+    inline const scarab::param_node* KTCommandLineHandler::GetConfigOverride() const
     {
         return &fConfigOverrideValues;
     }

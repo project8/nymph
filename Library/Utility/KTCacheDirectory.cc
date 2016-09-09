@@ -8,7 +8,7 @@
 #include "KTCacheDirectory.hh"
 
 #include "KTLogger.hh"
-#include "KTParam.hh"
+#include "param.hh"
 
 using std::string;
 
@@ -26,11 +26,11 @@ namespace Nymph
     {
     }
 
-    bool KTCacheDirectory::Configure(const KTParamNode* node)
+    bool KTCacheDirectory::Configure(const scarab::param_node* node)
     {
         if (node == NULL) return false;
 
-        return SetPath(node->GetValue("path", fPath.string()));
+        return SetPath(node->get_value("path", fPath.string()));
     }
 
 } /* namespace Nymph */

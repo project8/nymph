@@ -8,7 +8,6 @@
 #include "KTApplyCut.hh"
 
 #include "KTCut.hh"
-#include "KTParam.hh"
 
 using std::string;
 
@@ -32,12 +31,12 @@ namespace Nymph
         delete fCut;
     }
 
-    bool KTApplyCut::Configure(const KTParamNode* node)
+    bool KTApplyCut::Configure(const scarab::param_node* node)
     {
         // Config-file settings
         if (node == NULL) return false;
 
-        for (KTParamNode::const_iterator nodeIt = node->Begin(); nodeIt != node->End(); ++nodeIt)
+        for (scarab::param_node::const_iterator nodeIt = node->begin(); nodeIt != node->end(); ++nodeIt)
         {
             // first do configuration values we know about
             // as it happens, there aren't any
@@ -46,9 +45,9 @@ namespace Nymph
             // ignore any that don't work
             if (SelectCut(nodeIt->first))
             {
-                if (nodeIt->second->IsNode())
+                if (nodeIt->second->is_node())
                 {
-                    fCut->Configure(&nodeIt->second->AsNode());
+                    fCut->Configure(&nodeIt->second->as_node());
                 }
                 continue;
             }
@@ -71,7 +70,7 @@ namespace Nymph
 
     bool KTApplyCut::SelectCut(const string& cutName)
     {
-        KTCut* tempCut = KTNOFactory< KTCut >::GetInstance()->Create(cutName);
+        KTCut* tempCut = scarab::factory< KTCut, const std::string& >::get_instance()->create(cutName, cutName);
         if (tempCut == NULL)
         {
             KTERROR(cutlog, "Invalid cut name given: <" << cutName << ">.");

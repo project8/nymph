@@ -8,7 +8,7 @@
 #include "KTCut.hh"
 #include "KTLogger.hh"
 #include "KTMemberVariable.hh"
-#include "KTParam.hh"
+#include "scarab::param.hh"
 
 namespace Nymph
 {
@@ -45,7 +45,7 @@ namespace Nymph
             {}
             ~KTAwesomeCut() {}
 
-            bool Configure(const KTParamNode* node)
+            bool Configure(const scarab::param_node* node)
             {return true;}
 
             bool Apply(KTData& data, KTTestData& testData)
@@ -83,7 +83,7 @@ namespace Nymph
             {}
             ~KTNotAwesomeCut() {}
 
-            bool Configure(const KTParamNode* node)
+            bool Configure(const scarab::param_node* node)
             {return true;}
 
             bool Apply(KTData& data, KTTestData& testData)

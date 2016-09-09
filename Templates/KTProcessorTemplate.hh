@@ -20,7 +20,7 @@ namespace Nymph
     // Forward declare whatever classes you can
     // input data type . . .
     // output data type . . .
-    class KTParamNode;
+    class scarab::param_node;
 
     /*!
      @class KTProcessorTemplate
@@ -49,7 +49,7 @@ namespace Nymph
             KTProcessorTemplate(const std::string& name = "[config-name]");
             virtual ~KTProcessorTemplate();
 
-            bool Configure(const KTParamNode* node);
+            bool Configure(const scarab::param_node* node);
 
             // Getters and setters for configurable parameters go here
         private:

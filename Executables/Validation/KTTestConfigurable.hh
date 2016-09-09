@@ -19,7 +19,7 @@ namespace Nymph
             virtual ~KTTestConfigurable();
 
         public:
-            bool Configure(const KTParamNode* node);
+            bool Configure(const scarab::param_node* node);
 
         public:
             int GetIntData() const;

@@ -8,7 +8,6 @@
 #include "KTPrintDataStructure.hh"
 
 #include "KTLogger.hh"
-#include "KTParam.hh"
 
 #include <sstream>
 
@@ -34,7 +33,7 @@ namespace Nymph
     {
     }
 
-    bool KTPrintDataStructure::Configure(const KTParamNode* node)
+    bool KTPrintDataStructure::Configure(const scarab::param_node* node)
     {
         return true;
     }

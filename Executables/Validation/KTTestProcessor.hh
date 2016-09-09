@@ -22,7 +22,7 @@ namespace Nymph
             KTTestProcessorA();
             virtual ~KTTestProcessorA();
 
-            bool Configure(const KTParamNode* node);
+            bool Configure(const scarab::param_node* node);
 
             void EmitSignals(int);
 
@@ -37,7 +37,7 @@ namespace Nymph
             KTTestProcessorB();
             virtual ~KTTestProcessorB();
 
-            bool Configure(const KTParamNode* node);
+            bool Configure(const scarab::param_node* node);
 
             void Slot1(int);
             void Slot2(int);

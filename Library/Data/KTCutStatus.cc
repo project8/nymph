@@ -72,7 +72,7 @@ namespace Nymph
     {
         if (! HasCutResult(cutName))
         {
-            KTExtensibleStructFactory< KTCutResultCore >* factory = KTExtensibleStructFactory< KTCutResultCore >::GetInstance();
+            KTExtensibleStructFactory< KTCutResultCore >* factory = KTExtensibleStructFactory< KTCutResultCore >::get_instance();
             KTCutResult* newCut = factory->Create(cutName, fCutResults.get());
             if (newCut == NULL)
             {

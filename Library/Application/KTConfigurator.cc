@@ -16,7 +16,7 @@ namespace Nymph
     KTLOGGER( conflog, "KTConfigurator" );
 
     KTConfigurator::KTConfigurator() :
-            fMasterConfig( new KTParamNode() ),
+            fMasterConfig( new scarab::param_node() ),
             fParamBuffer( NULL ),
             fStringBuffer()
     {
@@ -27,18 +27,18 @@ namespace Nymph
         delete fMasterConfig;
     }
 
-    void KTConfigurator::Merge(const KTParamNode& aNode)
+    void KTConfigurator::Merge(const scarab::param_node& aNode)
     {
-        fMasterConfig->Merge(aNode);
+        fMasterConfig->merge(aNode);
         return;
     }
 
-    KTParamNode* KTConfigurator::Config()
+    scarab::param_node* KTConfigurator::Config()
     {
         return fMasterConfig;
     }
 
-    const KTParamNode* KTConfigurator::Config() const
+    const scarab::param_node* KTConfigurator::Config() const
     {
         return fMasterConfig;
     }

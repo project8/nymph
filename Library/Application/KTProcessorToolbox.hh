@@ -10,15 +10,15 @@
 #define KTPROCESSORTOOLBOX_HH_
 
 #include "KTConfigurable.hh"
-#include "KTNOFactory.hh"
+//#include "KTNOFactory.hh"
+
+#include "factory.hh"
 
 #include <deque>
 #include <set>
 
 namespace Nymph
 {
-    class KTParamNode;
-    class KTParamValue;
     class KTPrimaryProcessor;
     class KTProcessor;
 
@@ -76,14 +76,14 @@ namespace Nymph
             virtual ~KTProcessorToolbox();
 
         private:
-            KTNOFactory< KTProcessor >* fProcFactory; // singleton; not owned by KTProcessorToolbox
+            scarab::factory< KTProcessor, const std::string& >* fProcFactory; // singleton; not owned by KTProcessorToolbox
 
         public:
             /// Configure the toolbox: create the processors; connnect signals and slots; and setup the run queue.
-            bool Configure(const KTParamNode* node);
+            bool Configure(const scarab::param_node* node);
 
             /// Configure processors (only those specified in the toolbox)
-            bool ConfigureProcessors(const KTParamNode* node);
+            bool ConfigureProcessors(const scarab::param_node* node);
 
         private:
             bool ParseSignalSlotName(const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot) const;
@@ -107,7 +107,7 @@ namespace Nymph
             };
             typedef std::set< Thread, CompareThread > ThreadGroup;
             typedef std::deque< ThreadGroup > RunQueue;
-            bool AddProcessorToThreadGroup(const KTParamValue* param, ThreadGroup& group);
+            bool AddProcessorToThreadGroup(const scarab::param_value* param, ThreadGroup& group);
 
         public:
             /// Process the run queue.
