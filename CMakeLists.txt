@@ -59,7 +59,7 @@ nymph_process_options()
 # Scarab
 ########
 
-pbuilder_add_submodule( Scarab scarab/library )
+pbuilder_add_submodule( Scarab Scarab/library )
 
 #######
 # Boost
