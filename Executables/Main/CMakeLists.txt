@@ -8,7 +8,7 @@ if( Nymph_ENABLE_EXECUTABLES )
     
     set( programs
         ConfigCheck
-        Katydid
+        Nymph
     )
     
     pbuilder_executables( programs all_libs )
