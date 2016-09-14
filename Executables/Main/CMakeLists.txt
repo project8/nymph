@@ -8,8 +8,13 @@ if( Nymph_ENABLE_EXECUTABLES )
     
     set( programs
         ConfigCheck
-        Nymph
     )
+    
+    if( Nymph_BUILD_NYMPH_EXE )
+        set( programs
+            Nymph
+        )
+    endif( Nymph_BUILD_NYMPH_EXE )
     
     pbuilder_executables( programs all_libs )
     
