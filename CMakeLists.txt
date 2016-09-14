@@ -28,6 +28,9 @@ include( Nymph )
 # require C++11
 set_option( USE_CPP11 TRUE )
 
+# Build the Nymph executable (also requires Nymph_ENABLE_EXECUTABLES)
+option( Nymph_BUILD_NYMPH_EXE "Flag to build the Nymph executable; also requires Nymph_ENABLE_EXECUTABLES" ON )
+
 # Add a "Standard" build type
 #set (CMAKE_BUILD_TYPE standard)
 set (CMAKE_CXX_FLAGS_STANDARD "-O1 -DNDEBUG -DSTANDARD" CACHE STRING "Flags used by the compiler during standard builds.")
@@ -40,7 +43,6 @@ mark_as_advanced(CMAKE_CXX_FLAGS_STANDARD CMAKE_C_FLAGS_STANDARD CMAKE_EXE_LINKE
 
 # Single-threading option
 option (Nymph_SINGLETHREADED "Flag for running in single-threaded mode" OFF)
-
 
 # Optional compiler flags
 set (FLAG_WARNINGS "" CACHE STRING "Extra warning and error related flags")

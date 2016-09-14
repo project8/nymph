@@ -42,6 +42,7 @@ set( NYMPH_HEADERFILES
     ${APPL_DIR}/KTFilenameParsers.hh
     ${APPL_DIR}/KTPrintDataStructure.hh
     ${APPL_DIR}/KTProcessorToolbox.hh
+    ${APPL_DIR}/KTRunNymph.hh
     ${APPL_DIR}/KTThroughputProfiler.hh
 )
 
@@ -71,6 +72,7 @@ set( NYMPH_SOURCEFILES
     ${APPL_DIR}/KTFilenameParsers.cc
     ${APPL_DIR}/KTPrintDataStructure.cc
     ${APPL_DIR}/KTProcessorToolbox.cc
+    ${APPL_DIR}/KTRunNymph.cc
     ${APPL_DIR}/KTThroughputProfiler.cc
 )
 

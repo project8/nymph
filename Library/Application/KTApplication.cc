@@ -22,46 +22,20 @@ namespace Nymph
 {
     KTLOGGER(applog, "KTApplication");
 
-    KTApplication::KTApplication(bool makeTApp) :
+    KTApplication::KTApplication() :
             KTConfigurable("app"),
             fCLHandler(KTCommandLineHandler::get_instance()),
             fConfigurator( KTConfigurator::get_instance() ),
             fConfigFilename()
     {
-
-#ifdef ROOT_FOUND
-        fTApp = NULL;
-        if (makeTApp)
-        {
-            fTApp = new TApplication("", 0, 0);
-        }
-#else
-        if (makeTApp)
-        {
-            KTWARN(applog, "TApplication requested, but Nymph has been built without ROOT dependence.");
-        }
-#endif
     }
 
-    KTApplication::KTApplication(int argC, char** argV, bool makeTApp, bool requireArgs, scarab::param_node* defaultConfig) :
+    KTApplication::KTApplication(int argC, char** argV, bool requireArgs, scarab::param_node* defaultConfig) :
             KTConfigurable("app"),
             fCLHandler(KTCommandLineHandler::get_instance()),
             fConfigurator( KTConfigurator::get_instance() ),
             fConfigFilename()
     {
-#ifdef ROOT_FOUND
-        fTApp = NULL;
-        if (makeTApp)
-        {
-            StartTApplication();
-        }
-#else
-        if (makeTApp)
-        {
-            KTWARN(applog, "TApplication requested, but Nymph has been built without ROOT dependence.");
-        }
-#endif
-
         // process command-line arguments
         fCLHandler->ProcessCommandLine(argC, argV);
 
@@ -146,9 +120,6 @@ namespace Nymph
             // does NOT delete event loops
             (*loopIt)->Stop();
         }
-#ifdef ROOT_FOUND
-        delete fTApp;
-#endif
     }
 
     void KTApplication::AddConfigOptionsToCLHandler(const scarab::param* param, const std::string& rootName)
@@ -190,16 +161,8 @@ namespace Nymph
 
     bool KTApplication::Configure(const scarab::param_node* node)
     {
-        if (node == NULL) return true;
+        //if (node == NULL) return true;
 
-        if (node->get_value("root-app", false))
-        {
-#ifdef ROOT_FOUND
-            StartTApplication();
-#else
-            KTWARN(applog, "TApplication requested, but Nymph has been built without ROOT dependence.");
-#endif
-        }
         return true;
     }
 
@@ -214,21 +177,5 @@ namespace Nymph
         fEventLoops.erase(loop);
         return;
     }
-
-#ifdef ROOT_FOUND
-    bool KTApplication::StartTApplication()
-    {
-        if (fTApp != NULL)
-            return true;
-
-        fTApp = new TApplication("", 0, 0);
-
-        if (fTApp != NULL)
-        {
-            return true;
-        }
-        return false;
-    }
-#endif
 
 } /* namespace Nymph */
