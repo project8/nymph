@@ -22,7 +22,7 @@ KTLOGGER(testlog, "TestCacheDirectory");
 int main()
 {
 
-    KTCacheDirectory* cacheDir = KTCacheDirectory::GetInstance();
+    KTCacheDirectory* cacheDir = KTCacheDirectory::get_instance();
 
     KTINFO(testlog, "Testing ./ (should pass if the current directory is read/writeable)");
     KTINFO(testlog, "Current cache directory is: " << cacheDir->GetPath());

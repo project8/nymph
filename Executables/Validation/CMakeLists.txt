@@ -17,51 +17,38 @@ if (Nymph_ENABLE_TESTING)
         KTTestProcessor.hh
     )
     
+    set (VALIDATION_SOURCEFILES
+        KTTestConfigurable.cc
+        KTTestProcessor.cc
+    )
+    
+    set( LIB_DEPENDENCIES
+        Nymph
+    )
+    
+    
+    pbuilder_library( NymphValidation VALIDATION_SOURCEFILES LIB_DEPENDENCIES )
     pbuilder_install_headers (${VALIDATION_HEADERFILES})
     
-    
+ 
     # Executables
     
-    add_executable (TestApplication TestApplication.cc
-                                    KTTestConfigurable.cc)
-    target_link_libraries (TestApplication KTCore ${EXTERNAL_LIBRARIES})
-
-    add_executable (TestApplyCut TestApplyCut.cc)
-    target_link_libraries (TestApplyCut KTCore ${EXTERNAL_LIBRARIES})
-    
-    add_executable (TestCacheDirectory TestCacheDirectory.cc)
-    target_link_libraries (TestCacheDirectory KTCore ${EXTERNAL_LIBRARIES})
-    
-    add_executable (TestConfigurator TestConfigurator.cc
-                                       KTTestConfigurable.cc)
-    target_link_libraries (TestConfigurator KTCore ${EXTERNAL_LIBRARIES})
-    
-    add_executable (TestCut TestCut.cc)
-    target_link_libraries (TestCut KTCore ${EXTERNAL_LIBRARIES})
-    
-    add_executable (TestLogger TestLogger.cc)
-    target_link_libraries (TestLogger KTCore ${EXTERNAL_LIBRARIES})
-    
-    add_executable (TestPrintData TestPrintData.cc)
-    target_link_libraries (TestPrintData KTCore ${EXTERNAL_LIBRARIES})
-    
-    add_executable (TestSignalsAndSlots TestSignalsAndSlots.cc
-                                        KTTestProcessor.cc
+    set( LIB_DEPENDENCIES
+        Nymph 
+        NymphValidation
     )
-    target_link_libraries (TestSignalsAndSlots KTCore ${EXTERNAL_LIBRARIES})
     
-    add_executable (TestThroughputProfiler TestThroughputProfiler.cc)
-    target_link_libraries (TestThroughputProfiler KTCore ${EXTERNAL_LIBRARIES})
-
-    pbuilder_install_executables (
-                     TestApplication
-                     TestApplyCut
-                     TestCacheDirectory
-                     TestConfigurator
-                     TestCut
-                     TestLogger
-                     TestSignalsAndSlots
-                     TestThroughputProfiler
+    set( TEST_PROGRAMS
+        TestApplication
+        TestApplyCut
+        TestCacheDirectory
+        TestCut
+        TestLogger
+        TestPrintData
+        TestSignalsAndSlots
+        TestThroughputProfiler
     )
+    
+    pbuilder_executables( TEST_PROGRAMS LIB_DEPENDENCIES )
         
 endif (Nymph_ENABLE_TESTING) 

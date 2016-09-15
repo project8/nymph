@@ -57,6 +57,5 @@ endmacro ()
 
 macro (nymph_build_executables)
 	add_subdirectory (${NYMPH_DIR}/Executables/Main)
-	add_subdirectory (${NYMPH_DIR}/Executables/Validation)
 endmacro ()
 
