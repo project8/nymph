@@ -6,9 +6,10 @@
  */
 
 #include "KTLogger.hh"
-#include "scarab::param.hh"
 #include "KTTestConfigurable.hh"
 #include "KTCommandLineOption.hh"
+
+#include "param.hh"
 
 using std::string;
 
@@ -36,16 +37,16 @@ namespace Nymph
         if (node != NULL)
         {
             // option: check for data before getting it from the node
-            if (node->Has("int-data"))
+            if (node->has("int-data"))
             {
-                fIntData = node->GetValue< int >("int-data", fIntData);
+                fIntData = node->get_value< int >("int-data", fIntData);
                 KTINFO(testparamlog, "Configured integer (= existing value if not provided): " << fIntData);
             }
 
             // option: don't check for data before getting it from the node; rely on the default if it's not there.
-            fDoubleData = node->GetValue< double >("double-data", fDoubleData);
+            fDoubleData = node->get_value< double >("double-data", fDoubleData);
             KTINFO(testparamlog, "Configured double (= existing value if not provided): " << fDoubleData);
-            fStringData = node->GetValue("string-data", fStringData);
+            fStringData = node->get_value("string-data", fStringData);
             KTINFO(testparamlog, "Configured string (= existing value if not provided): " << fStringData);
         }
 
