@@ -8,8 +8,9 @@
 #include "KTCut.hh"
 #include "KTLogger.hh"
 #include "KTMemberVariable.hh"
-#include "scarab::param.hh"
 #include "KTPrintDataStructure.hh"
+
+#include "param.hh"
 
 namespace Nymph
 {
