@@ -13,10 +13,6 @@
 #include "KTConfigurable.hh"
 #include "KTConfigurator.hh"
 
-#ifdef ROOT_FOUND
-#include "TApplication.h"
-#endif
-
 #include "param.hh"
 
 #include <set>
@@ -45,7 +41,6 @@ namespace Nymph
 
      When creating an application, the user would perform the following steps:
      1. Create the KTApplication and pass it the command-line arguments (argc and argv).
-        Note: if the user wants to build a ROOT application, there's a flag which will create a TApplication as well.
         The configuration file will be automatically extracted from the command line.
         If --help (-h) or --version (-v) were given, those will be handled immediately, and the program will exit.
      2. Call KTApplication::ReadConfigFile() to read the config file and store the values in the parameter store.
@@ -61,16 +56,16 @@ namespace Nymph
     class KTApplication : public KTConfigurable
     {
         public:
-            KTApplication(bool makeTApp=false);
+            KTApplication();
             /// Constructor to use with command-line options; includes parsing of the command line by KTCommandLineHandler (except for config-file-dependent options)
-            KTApplication(int argC, char** argV, bool makeTApp=false, bool requireArgs=true, scarab::param_node* defaultConfig=NULL);
+            KTApplication(int argC, char** argV, bool requireArgs=true, scarab::param_node* defaultConfig=NULL);
             virtual ~KTApplication();
 
         private:
             void AddConfigOptionsToCLHandler(const scarab::param* param, const std::string& rootName);
 
         public:
-            bool Configure(const scarab::param_node* node);
+            virtual bool Configure(const scarab::param_node* node);
 
         public:
             KTCommandLineHandler* GetCommandLineHandler() const;
@@ -89,14 +84,6 @@ namespace Nymph
 
             std::set< KTEventLoop* > fEventLoops;
 
-#ifdef ROOT_FOUND
-        public:
-            bool StartTApplication();
-            TApplication* GetTApplication() const;
-
-        protected:
-            TApplication* fTApp;
-#endif
     };
 
     inline KTCommandLineHandler* KTApplication::GetCommandLineHandler() const
@@ -113,13 +100,6 @@ namespace Nymph
     {
         return fConfigFilename;
     }
-
-#ifdef ROOT_FOUND
-    TApplication* KTApplication::GetTApplication() const
-    {
-        return fTApp;
-    }
-#endif
 
 } /* namespace Nymph */
 #endif /* KTAPPLICATION_HH_ */
