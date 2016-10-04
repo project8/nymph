@@ -44,15 +44,17 @@ namespace Nymph
             typedef typename boost::signals2::signal< signature >::slot_type slot_type;
 
         public:
+            KTSignalOneArg();
             KTSignalOneArg(const std::string& name, KTProcessor* proc);
             virtual ~KTSignalOneArg();
 
         protected:
-            KTSignalOneArg();
             KTSignalOneArg(const KTSignalOneArg&);
 
         public:
             void operator()(XSignalArgument arg);
+
+            boost_signal* Signal();
 
         protected:
             boost_signal fSignal;
@@ -73,15 +75,17 @@ namespace Nymph
             typedef typename boost::signals2::signal< signature >::slot_type slot_type;
 
         public:
+            KTSignalOneArg();
             KTSignalOneArg(const std::string& name, KTProcessor* proc);
             virtual ~KTSignalOneArg();
 
         protected:
-            KTSignalOneArg();
             KTSignalOneArg(const KTSignalOneArg&);
 
         public:
             void operator()();
+
+            boost_signal* Signal();
 
         protected:
             boost_signal fSignal;
@@ -124,15 +128,17 @@ namespace Nymph
             typedef boost::signals2::signal< ref_signature >::slot_type ref_slot_type;
 
         public:
+            KTSignalData();
             KTSignalData(const std::string& name, KTProcessor* proc);
             virtual ~KTSignalData();
 
         protected:
-            KTSignalData();
             KTSignalData(const KTSignalData&);
 
         public:
             void operator()(KTDataPtr arg);
+
+            ref_boost_signal* RefSignal();
 
         protected:
             ref_boost_signal fRefSignal;
@@ -168,10 +174,21 @@ namespace Nymph
         fSignal(arg);
     }
 
+    template< class XSignalArgument >
+    inline typename KTSignalOneArg< XSignalArgument >::boost_signal* KTSignalOneArg< XSignalArgument >::Signal()
+    {
+        return &fSignal;
+    }
+
 
     inline void KTSignalOneArg< void >::operator()()
     {
         fSignal();
+    }
+
+    inline typename KTSignalOneArg< void >::boost_signal* KTSignalOneArg< void >::Signal()
+    {
+        return &fSignal;
     }
 
 
@@ -181,7 +198,10 @@ namespace Nymph
         fRefSignal(arg);
     }
 
-
+    inline typename KTSignalData::ref_boost_signal* KTSignalData::RefSignal()
+    {
+        return &fRefSignal;
+    }
 
 } /* namespace Nymph */
 #endif /* KTSIGNAL_HH_ */
