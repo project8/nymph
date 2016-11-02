@@ -26,6 +26,7 @@ int main()
     KTAwesomeCut cut;
     cut.Apply(data, testData);
 
+    KTINFO(testlog, "Cuts present: " << cutStatus.CutResultsPresent())
     KTINFO(testlog, "Has cut result \"awesome-cut\"? " << cutStatus.HasCutResult("awesome-cut"));
     KTINFO(testlog, "Has cut result <KTAwesomeCut::Result>? " << cutStatus.HasCutResult< KTAwesomeCut::Result >());
     KTINFO(testlog, "Cut state of \"awesome-cut\" is: " << cutStatus.GetCutState("awesome-cut"));
@@ -37,6 +38,7 @@ int main()
     KTNotAwesomeCut naCut;
     naCut.Apply(data, testData);
 
+    KTINFO(testlog, "Cuts present: " << cutStatus.CutResultsPresent())
     KTINFO(testlog, "Has cut result \"awesome-cut\"? " << cutStatus.HasCutResult("awesome-cut"));
     KTINFO(testlog, "Has cut result <KTAwesomeCut::Result>? " << cutStatus.HasCutResult< KTAwesomeCut::Result >());
     KTINFO(testlog, "Cut state of \"awesome-cut\" is: " << cutStatus.GetCutState("awesome-cut"));

@@ -30,6 +30,7 @@ int main()
     applyCut.SetCut(new KTAwesomeCut());
     applyCut.ApplyCut(dataPtr);
 
+    KTINFO(testlog, "Cuts present: " << cutStatus.CutResultsPresent())
     KTINFO(testlog, "Has cut result \"awesome-cut\"? " << cutStatus.HasCutResult("awesome-cut"));
     KTINFO(testlog, "Has cut result <KTAwesomeCut::Result>? " << cutStatus.HasCutResult< KTAwesomeCut::Result >());
     KTINFO(testlog, "Cut state of \"awesome-cut\" is: " << cutStatus.GetCutState("awesome-cut"));
@@ -41,6 +42,7 @@ int main()
     applyCut.SelectCut("not-awesome-cut");
     applyCut.ApplyCut(dataPtr);
 
+    KTINFO(testlog, "Cuts present: " << cutStatus.CutResultsPresent())
     KTINFO(testlog, "Has cut result \"awesome-cut\"? " << cutStatus.HasCutResult("awesome-cut"));
     KTINFO(testlog, "Has cut result <KTAwesomeCut::Result>? " << cutStatus.HasCutResult< KTAwesomeCut::Result >());
     KTINFO(testlog, "Cut state of \"awesome-cut\" is: " << cutStatus.GetCutState("awesome-cut"));

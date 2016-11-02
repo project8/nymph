@@ -112,6 +112,9 @@ namespace Nymph
             // cannot currently update by cut name
             //void RemoveCutResult(const std::string& cutName, bool doUpdateStatus=true);
 
+            /// Returns a string with the names of the cuts that are present in bitset order
+            std::string CutResultsPresent() const;
+
             size_t size() const;
         private:
             friend std::ostream& operator<<(std::ostream& out, const KTCutStatus& status);
