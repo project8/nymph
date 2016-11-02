@@ -30,10 +30,12 @@ namespace Nymph
      KTApplyCut applies a cut to data -- the type of cut and its parameters are specified at runtime
      from the set of cuts registered.
 
+     Only one cut can be applied by a given instance of KTApplyCut.  To apply more than one cut, add another instance.
+
      Configuration name: "apply-cut"
 
      Available configuration values:
-     - "[cut name]": subtree -- sets the type of window function to be used; parent node for the cut configuration
+     - "[cut name]": subtree -- specifies the cut to be used; parent node for the cut configuration
 
      Slots:
      - "apply-cut": void (KTDataPtr) -- Applies the cut to the received data; Requirements are set by the cut; No data is added.
