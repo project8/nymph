@@ -12,6 +12,7 @@
 #include "KTProcessor.hh"
 
 #include "KTLogger.hh"
+#include "KTMemberVariable.hh"
 #include "KTSlot.hh"
 
 #include <string>
@@ -41,7 +42,9 @@ namespace Nymph
      - "apply-cut": void (KTDataPtr) -- Applies the cut to the received data; Requirements are set by the cut; No data is added.
 
      Signals:
-     - "after-cut": void (KTDataPtr) -- Emitted upon application of the cut.
+     - "after-cut": void (KTDataPtr) -- Emitted upon application of the cut regardless of cut result.
+     - "after-cut-pass": void (KTDataPtr) -- Emitted upon application of the cut if the cut passed.
+     - "after-cut-fail": void (KTDataPtr) -- Emitted upon application of the cut if the cut failed.
     */
 
     class KTApplyCut : public KTProcessor
@@ -69,6 +72,8 @@ namespace Nymph
 
         private:
             KTSignalData fAfterCutSignal;
+            KTSignalData fAfterCutPassSignal;
+            KTSignalData fAfterCutFailSignal;
 
             //***************
             // Slots

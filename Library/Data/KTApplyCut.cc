@@ -21,7 +21,9 @@ namespace Nymph
     KTApplyCut::KTApplyCut(const std::string& name) :
             KTProcessor(name),
             fCut(NULL),
-            fAfterCutSignal("after-cut", this)
+            fAfterCutSignal("after-cut", this),
+            fAfterCutPassSignal("after-cut-pass", this),
+            fAfterCutFailSignal("after-cut-fail", this)
     {
         RegisterSlot("apply-cut", this, &KTApplyCut::ApplyCut);
     }
@@ -88,9 +90,15 @@ namespace Nymph
             KTERROR(cutlog, "No cut was specified");
             return;
         }
-        if (fCut->Apply(data))
+        bool cutPassed = fCut->Apply(data);
+        fAfterCutSignal(data);
+        if (cutPassed)
         {
-            fAfterCutSignal(data);
+            fAfterCutPassSignal(data);
+        }
+        else
+        {
+            fAfterCutFailSignal(data);
         }
         return;
     }
