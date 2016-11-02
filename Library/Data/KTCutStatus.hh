@@ -53,9 +53,10 @@ namespace Nymph
 
     class KTCutStatus
     {
-        private:
+        public:
             typedef boost::dynamic_bitset< > bitset_type;
 
+        private:
             // private class KTCutStatus::KTCutResultHandle
             // purposefully not registered with the cut factory
             class KTCutResultHandle : public KTExtensibleCutResult< KTCutResultHandle >
@@ -111,6 +112,10 @@ namespace Nymph
             // cannot currently update by cut name
             //void RemoveCutResult(const std::string& cutName, bool doUpdateStatus=true);
 
+            /// Returns a string with the names of the cuts that are present in bitset order
+            std::string CutResultsPresent() const;
+
+            size_t size() const;
         private:
             friend std::ostream& operator<<(std::ostream& out, const KTCutStatus& status);
 
@@ -123,6 +128,9 @@ namespace Nymph
             bool IsCut(const bitset_type& mask) const;
             bool IsCut(unsigned long long mask) const;
             bool IsCut(const std::string& mask) const;
+
+            bitset_type ToBitset(unsigned long long mask) const;
+            bitset_type ToBitset(const std::string& mask) const;
 
     };
 
@@ -207,6 +215,10 @@ namespace Nymph
         return;
     }
 
+    inline size_t KTCutStatus::size() const
+    {
+        return fSummary.size();
+    }
 
     inline bool KTCutStatus::IsCut() const
     {
@@ -220,13 +232,24 @@ namespace Nymph
 
     inline bool KTCutStatus::IsCut(unsigned long long mask) const
     {
-        return IsCut(bitset_type(fSummary.size(), mask));
+        return IsCut(ToBitset(mask));
     }
 
     inline bool KTCutStatus::IsCut(const std::string& mask) const
     {
-        return IsCut(bitset_type(mask));
+        return IsCut(ToBitset(mask));
     }
+
+    inline KTCutStatus::bitset_type KTCutStatus::ToBitset(unsigned long long mask) const
+    {
+        return bitset_type(fSummary.size(), mask);
+    }
+
+    inline KTCutStatus::bitset_type KTCutStatus::ToBitset(const std::string& mask) const
+    {
+        return bitset_type(mask);
+    }
+
 } /* namespace Nymph */
 
 #endif /* KTCUTSTATUS_HH_ */
