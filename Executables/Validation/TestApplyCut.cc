@@ -5,100 +5,12 @@
  *      Author: nsoblath
  */
 
+#include "KTTestCuts.hh"
+
 #include "KTApplyCut.hh"
-#include "KTCut.hh"
 #include "KTLogger.hh"
-#include "KTMemberVariable.hh"
 
-#include "param.hh"
-
-namespace Nymph
-{
-    KTLOGGER(testlog, "TestApplyCut");
-
-    class KTTestData : public KTExtensibleData< KTTestData >
-    {
-        public:
-            KTTestData() :
-                KTExtensibleData< KTTestData >(),
-                fIsAwesome(false)
-            {}
-            virtual ~KTTestData() {}
-
-            MEMBERVARIABLE(bool, IsAwesome);
-
-        public:
-            static const std::string sName;
-
-    };
-
-    // Cuts data that is NOT awesome
-    class KTAwesomeCut : public KTCutOneArg< KTTestData >
-    {
-        public:
-            struct Result : KTExtensibleCutResult< Result >
-            {
-                static const std::string sName;
-            };
-
-        public:
-            KTAwesomeCut(const std::string& name = "default-awesome-cut") :
-                KTCutOneArg(name)
-            {}
-            ~KTAwesomeCut() {}
-
-            bool Configure(const scarab::param_node* node)
-            {return true;}
-
-            bool Apply(KTData& data, KTTestData& testData)
-            {
-                bool isCut = ! testData.GetIsAwesome();
-                KTDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
-                KTDEBUG(testlog, "Is data cut? " << isCut);
-                data.GetCutStatus().AddCutResult< KTAwesomeCut::Result >(isCut);
-                return isCut;
-            }
-    };
-
-    // Cuts data that is IS awesome
-    class KTNotAwesomeCut : public KTCutOneArg< KTTestData >
-    {
-        public:
-            struct Result : KTExtensibleCutResult< Result >
-            {
-                static const std::string sName;
-            };
-
-        public:
-            KTNotAwesomeCut(const std::string& name = "default-not-awesome-cut") :
-                KTCutOneArg(name)
-            {}
-            ~KTNotAwesomeCut() {}
-
-            bool Configure(const scarab::param_node* node)
-            {return true;}
-
-            bool Apply(KTData& data, KTTestData& testData)
-            {
-                bool isCut = testData.GetIsAwesome();
-                KTDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
-                KTDEBUG(testlog, "Is data cut? " << isCut);
-                // use the name-based AddCutResult
-                data.GetCutStatus().AddCutResult("not-awesome-cut", isCut);
-                return isCut;
-            }
-    };
-
-
-    const std::string KTTestData::sName = "test-data";
-
-    const std::string KTAwesomeCut::Result::sName = "awesome-cut";
-    const std::string KTNotAwesomeCut::Result::sName = "not-awesome-cut";
-
-    KT_REGISTER_CUT(KTAwesomeCut);
-    KT_REGISTER_CUT(KTNotAwesomeCut);
-}
-
+KTLOGGER(testlog, "TestApplyCut");
 
 using namespace Nymph;
 using namespace std;
