@@ -14,11 +14,13 @@ if (Nymph_ENABLE_TESTING)
     # Headers for any test classes
     set (VALIDATION_HEADERFILES
         KTTestConfigurable.hh
+        KTTestCuts.hh
         KTTestProcessor.hh
     )
     
     set (VALIDATION_SOURCEFILES
         KTTestConfigurable.cc
+        KTTestCuts.cc
         KTTestProcessor.cc
     )
     
@@ -43,6 +45,7 @@ if (Nymph_ENABLE_TESTING)
         TestApplyCut
         TestCacheDirectory
         TestCut
+        TestCutFilter
         TestLogger
         TestPrintData
         TestSignalsAndSlots

@@ -5,120 +5,12 @@
  *      Author: nsoblath
  */
 
+#include "KTTestCuts.hh"
+
 #include "KTApplyCut.hh"
-#include "KTCut.hh"
 #include "KTLogger.hh"
-#include "KTMemberVariable.hh"
 
-#include "param.hh"
-
-namespace Nymph
-{
-    KTLOGGER(testlog, "TestApplyCut");
-
-    class KTTestData : public KTExtensibleData< KTTestData >
-    {
-        public:
-            KTTestData() :
-                KTExtensibleData< KTTestData >(),
-                fIsAwesome(false)
-            {}
-            virtual ~KTTestData() {}
-
-            MEMBERVARIABLE(bool, IsAwesome);
-
-        public:
-            static const std::string sName;
-
-    };
-
-    // Cuts data that is NOT awesome
-    class KTAwesomeCut : public KTCut
-    {
-        public:
-            struct Result : KTExtensibleCutResult< Result >
-            {
-                static const std::string sName;
-            };
-
-        public:
-            KTAwesomeCut(const std::string& name = "default-awesome-cut") :
-                KTCut(name)
-            {}
-            ~KTAwesomeCut() {}
-
-            bool Configure(const scarab::param_node* node)
-            {return true;}
-
-            bool Apply(KTData& data, KTTestData& testData)
-            {
-                bool isCut = ! testData.GetIsAwesome();
-                KTDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
-                KTDEBUG(testlog, "Is data cut? " << isCut);
-                data.GetCutStatus().AddCutResult< KTAwesomeCut::Result >(isCut);
-                return isCut;
-            }
-
-            bool Apply(KTDataPtr dataPtr)
-            {
-                if (! dataPtr->Has< KTTestData >())
-                {
-                    KTERROR(testlog, "Data type <KTTestData> was not present");
-                    return false;
-                }
-                return Apply(dataPtr->Of< KTData >(), dataPtr->Of< KTTestData >());
-            }
-    };
-
-    // Cuts data that is IS awesome
-    class KTNotAwesomeCut : public KTCut
-    {
-        public:
-            struct Result : KTExtensibleCutResult< Result >
-            {
-                static const std::string sName;
-            };
-
-        public:
-            KTNotAwesomeCut(const std::string& name = "default-not-awesome-cut") :
-                KTCut(name)
-            {}
-            ~KTNotAwesomeCut() {}
-
-            bool Configure(const scarab::param_node* node)
-            {return true;}
-
-            bool Apply(KTData& data, KTTestData& testData)
-            {
-                bool isCut = testData.GetIsAwesome();
-                KTDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
-                KTDEBUG(testlog, "Is data cut? " << isCut);
-                // use the name-based AddCutResult
-                data.GetCutStatus().AddCutResult("not-awesome-cut", isCut);
-                return isCut;
-            }
-
-            bool Apply(KTDataPtr dataPtr)
-            {
-                if (! dataPtr->Has< KTTestData >())
-                {
-                    KTERROR(testlog, "Data type <KTTestData> was not present");
-                    return false;
-                }
-                return Apply(dataPtr->Of< KTData >(), dataPtr->Of< KTTestData >());
-            }
-    };
-
-
-    const std::string KTTestData::sName = "test-data";
-
-    const std::string KTAwesomeCut::Result::sName = "awesome-cut";
-    const std::string KTNotAwesomeCut::Result::sName = "not-awesome-cut";
-
-    KT_REGISTER_CUT(KTAwesomeCut);
-    KT_REGISTER_CUT(KTNotAwesomeCut);
-}
-
+KTLOGGER(testlog, "TestApplyCut");
 
 using namespace Nymph;
 using namespace std;
@@ -137,6 +29,7 @@ int main()
     applyCut.SetCut(new KTAwesomeCut());
     applyCut.ApplyCut(dataPtr);
 
+    KTINFO(testlog, "Cuts present: " << cutStatus.CutResultsPresent())
     KTINFO(testlog, "Has cut result \"awesome-cut\"? " << cutStatus.HasCutResult("awesome-cut"));
     KTINFO(testlog, "Has cut result <KTAwesomeCut::Result>? " << cutStatus.HasCutResult< KTAwesomeCut::Result >());
     KTINFO(testlog, "Cut state of \"awesome-cut\" is: " << cutStatus.GetCutState("awesome-cut"));
@@ -148,6 +41,7 @@ int main()
     applyCut.SelectCut("not-awesome-cut");
     applyCut.ApplyCut(dataPtr);
 
+    KTINFO(testlog, "Cuts present: " << cutStatus.CutResultsPresent())
     KTINFO(testlog, "Has cut result \"awesome-cut\"? " << cutStatus.HasCutResult("awesome-cut"));
     KTINFO(testlog, "Has cut result <KTAwesomeCut::Result>? " << cutStatus.HasCutResult< KTAwesomeCut::Result >());
     KTINFO(testlog, "Cut state of \"awesome-cut\" is: " << cutStatus.GetCutState("awesome-cut"));

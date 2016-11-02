@@ -155,6 +155,22 @@ namespace Nymph
     }
     */
 
+    std::string KTCutStatus::CutResultsPresent() const
+    {
+        KTCutResult* cut = fCutResults.get()->Next(); // skip over KTCutResultHandle
+        if (cut == NULL ) return "";
+
+        std::string cutsPresent;
+        while (true)
+        {
+            cutsPresent = cut->Name() + cutsPresent;
+            cut = cut->Next();
+            if (cut != NULL) cutsPresent = " " + cutsPresent;
+            else break;
+        }
+        return cutsPresent;
+    }
+
     // private class KTCutStatus::KTCutResultHandle
     // purposefully not registered with the cut factory
     KTCutStatus::KTCutResultHandle::KTCutResultHandle() :
