@@ -33,7 +33,7 @@ namespace Nymph
     };
 
     // Cuts data that is NOT awesome
-    class KTAwesomeCut : public KTCut
+    class KTAwesomeCut : public KTCutOneArg< KTTestData >
     {
         public:
             struct Result : KTExtensibleCutResult< Result >
@@ -43,7 +43,7 @@ namespace Nymph
 
         public:
             KTAwesomeCut(const std::string& name = "default-awesome-cut") :
-                KTCut(name)
+                KTCutOneArg(name)
             {}
             ~KTAwesomeCut() {}
 
@@ -58,20 +58,10 @@ namespace Nymph
                 data.GetCutStatus().AddCutResult< KTAwesomeCut::Result >(isCut);
                 return isCut;
             }
-
-            bool Apply(KTDataPtr dataPtr)
-            {
-                if (! dataPtr->Has< KTTestData >())
-                {
-                    KTERROR(testlog, "Data type <KTTestData> was not present");
-                    return false;
-                }
-                return Apply(dataPtr->Of< KTData >(), dataPtr->Of< KTTestData >());
-            }
     };
 
     // Cuts data that is IS awesome
-    class KTNotAwesomeCut : public KTCut
+    class KTNotAwesomeCut : public KTCutOneArg< KTTestData >
     {
         public:
             struct Result : KTExtensibleCutResult< Result >
@@ -81,7 +71,7 @@ namespace Nymph
 
         public:
             KTNotAwesomeCut(const std::string& name = "default-not-awesome-cut") :
-                KTCut(name)
+                KTCutOneArg(name)
             {}
             ~KTNotAwesomeCut() {}
 
@@ -96,16 +86,6 @@ namespace Nymph
                 // use the name-based AddCutResult
                 data.GetCutStatus().AddCutResult("not-awesome-cut", isCut);
                 return isCut;
-            }
-
-            bool Apply(KTDataPtr dataPtr)
-            {
-                if (! dataPtr->Has< KTTestData >())
-                {
-                    KTERROR(testlog, "Data type <KTTestData> was not present");
-                    return false;
-                }
-                return Apply(dataPtr->Of< KTData >(), dataPtr->Of< KTTestData >());
             }
     };
 
