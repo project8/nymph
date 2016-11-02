@@ -22,6 +22,7 @@ set( NYMPH_HEADERFILES
     ${UTIL_DIR}/KTTime.hh
     ${DATA_DIR}/KTApplyCut.hh
     ${DATA_DIR}/KTCut.hh
+    ${DATA_DIR}/KTCutFilter.hh
     ${DATA_DIR}/KTCutResult.hh
     ${DATA_DIR}/KTCutStatus.hh
     ${DATA_DIR}/KTData.hh
@@ -56,6 +57,7 @@ set( NYMPH_SOURCEFILES
     ${UTIL_DIR}/KTTime.cc
     ${DATA_DIR}/KTApplyCut.cc
     ${DATA_DIR}/KTCut.cc
+    ${DATA_DIR}/KTCutFilter.cc
     ${DATA_DIR}/KTCutStatus.cc
     ${DATA_DIR}/KTData.cc
     ${PROC_DIR}/KTPrimaryProcessor.cc

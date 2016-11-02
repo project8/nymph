@@ -33,18 +33,22 @@ namespace Nymph
 
      Only one cut can be applied by a given instance of KTApplyCut.  To apply more than one cut, add another instance.
 
+     Interpretation of boolean returned by KTCut::Apply
+     - TRUE means the cut was failed
+     - FALSE means the cut was passed
+
      Configuration name: "apply-cut"
 
      Available configuration values:
      - "[cut name]": subtree -- specifies the cut to be used; parent node for the cut configuration
 
      Slots:
-     - "apply-cut": void (KTDataPtr) -- Applies the cut to the received data; Requirements are set by the cut; No data is added.
+     - "apply": void (KTDataPtr) -- Applies the cut to the received data; Requirements are set by the cut; No data is added.
 
      Signals:
-     - "after-cut": void (KTDataPtr) -- Emitted upon application of the cut regardless of cut result.
-     - "after-cut-pass": void (KTDataPtr) -- Emitted upon application of the cut if the cut passed.
-     - "after-cut-fail": void (KTDataPtr) -- Emitted upon application of the cut if the cut failed.
+     - "all": void (KTDataPtr) -- Emitted upon application of the cut regardless of cut result.
+     - "pass": void (KTDataPtr) -- Emitted upon application of the cut if the cut passed.
+     - "fail": void (KTDataPtr) -- Emitted upon application of the cut if the cut failed.
     */
 
     class KTApplyCut : public KTProcessor

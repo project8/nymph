@@ -26,7 +26,7 @@ namespace Nymph
      @class KTCut
      @author N. S. Oblath
 
-     @brief Base class for applying a cut to data.
+     @brief Base class for a cut that gets applied to data objects.
 
      @details
      A fully implemented cut MUST have the following:
@@ -42,15 +42,17 @@ namespace Nymph
      The functions bool Configure(const scarab::param_node*) and void Apply(KTData&, <DataType(s)>) are abstract in the base classes, and therefore must be implemented.
 
      Boolean return value interpretation:
-     - TRUE means the cut was passed
-     - FALSE means the cut was failed
+     - TRUE means the cut was failed
+     - FALSE means the cut was passed
 
      --------------------------------------
      ------- Example Cut Definition -------
      --------------------------------------
 
      class KTSomeData;
-     class KTExampleCut : public KTCutOneArg< KTSomeData >
+
+     // Data must be at least as awesome as fAwesomenessThreshold to pass this cut
+     class KTAwesomenessCut : public KTCutOneArg< KTSomeData >
      {
          public:
              struct Result : KTCutResult
@@ -59,8 +61,8 @@ namespace Nymph
              };
 
          public:
-             KTExampleCut(const std::string& name = "default-example-cut");
-             ~KTExampleCut();
+             KTAwesomenessCut(const std::string& name = "default-example-cut");
+             ~KTAwesomenessCut();
 
              bool Configure(const scarab::param_node* node);
 
@@ -75,33 +77,37 @@ namespace Nymph
      ------- Example Implementation -------
      --------------------------------------
 
-     const std::string KTExampleCut::Result::sName = "example-cut";
+     const std::string KTExampleCut::Result::sName = "awesomeness-cut";
 
      KT_REGISTER_CUT(KTExampleCut, KTExampleCut::Result::sName);
 
-     KTExampleCut::KTExampleCut(const std::string& name) :
+     KTAwesomenessCut::KTAwesomenessCut(const std::string& name) :
              KTCutOneArg(name),
              fAwesomenessThreshold(1000000.)
      {}
 
-     KTExampleCut::~KTExampleCut()
+     KTAwesomenessCut::~KTExampleCut()
      {}
 
-     bool KTExampleCut::Configure(const scarab::param_node* node)
+     bool KTAwesomenessCut::Configure(const scarab::param_node* node)
      {
          if (node == NULL) return true;
          SetAwesomenessThreshold(node->GetValue("awesomeness", GetAwesomenessThreshold()));
          return true;
      }
 
-     bool KTExampleCut::Apply(KTData& data, KTSomeData& someData)
+     bool KTAwesomenessCut::Apply(KTData& data, KTSomeData& someData)
      {
-         bool isCut = someData.Awesomeness() > fAwesomenessThreshold;
-         data.GetCutStatus().AddCutResult< KTExampleCut::Result >(isCut);
+         bool isCut = someData.Awesomeness() < fAwesomenessThreshold;
+         data.GetCutStatus().AddCutResult< KTAwesomenessCut::Result >(isCut);
          return isCut;
      }
 
     */
+
+    //************************************
+    // KTCut -- base class for all cuts
+    //************************************
 
     class KTCut : public KTConfigurable
     {
@@ -111,6 +117,11 @@ namespace Nymph
 
             virtual bool Apply(KTDataPtr) = 0;
     };
+
+
+    //*****************************************************************
+    // KTCutOneArg -- base class for cuts operating on one data type
+    //*****************************************************************
 
     template< class XDataType >
     class KTCutOneArg : public KTCut
@@ -123,6 +134,28 @@ namespace Nymph
 
             virtual bool Apply(KTDataPtr dataPtr);
     };
+
+
+    //*******************************************************************
+    // KTCutTwoArgs -- base class for cuts operating on two data types
+    //*******************************************************************
+
+    template< class XDataType1, class XDataType2 >
+    class KTCutTwoArgs : public KTCut
+    {
+        public:
+            KTCutTwoArgs(const std::string& name = "default-cut-name");
+            virtual ~KTCutTwoArgs();
+
+            virtual bool Apply(KTData& data, XDataType1& dataType1, XDataType2& dataType2) = 0;
+
+            virtual bool Apply(KTDataPtr dataPtr);
+    };
+
+
+    //*******************
+    // Implementations
+    //*******************
 
     template< class XDataType >
     KTCutOneArg< XDataType >::KTCutOneArg(const std::string& name) :
@@ -145,18 +178,6 @@ namespace Nymph
         return Apply(dataPtr->Of< KTData >(), dataPtr->Of< XDataType >());
     }
 
-
-    template< class XDataType1, class XDataType2 >
-    class KTCutTwoArgs : public KTCut
-    {
-        public:
-            KTCutTwoArgs(const std::string& name = "default-cut-name");
-            virtual ~KTCutTwoArgs();
-
-            virtual bool Apply(KTData& data, XDataType1& dataType1, XDataType2& dataType2) = 0;
-
-            virtual bool Apply(KTDataPtr dataPtr);
-    };
 
     template< class XDataType1, class XDataType2 >
     KTCutTwoArgs< XDataType1, XDataType2 >::KTCutTwoArgs(const std::string& name) :
@@ -184,7 +205,9 @@ namespace Nymph
         return Apply(dataPtr->Of< KTData >(), dataPtr->Of< XDataType1 >(), dataPtr->Of< XDataType2 >());
     }
 
-/*
+/* Playing around: wouldn't it be cool if this could be done with variadic tmeplates?
+ * Unfortunately we'll need to be able to iterate over the types in the template pack in the Apply(KTDataPtr) function.
+ *
     template< class ... DataTypes >
     class KTCutOnData : public KTCut
     {
