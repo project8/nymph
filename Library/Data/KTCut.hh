@@ -62,7 +62,7 @@ namespace Nymph
 
          public:
              KTAwesomenessCut(const std::string& name = "default-example-cut");
-             ~KTAwesomenessCut();
+             virtual ~KTAwesomenessCut();
 
              bool Configure(const scarab::param_node* node);
 
