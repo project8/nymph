@@ -24,9 +24,9 @@ namespace Nymph
             fCutMaskInt(0),
             fConvertToBitset(false),
             fAllBits(true),
-            fAfterCutSignal("after-cut", this),
-            fAfterCutPassSignal("after-cut-pass", this),
-            fAfterCutFailSignal("after-cut-fail", this)
+            fAfterCutSignal("all", this),
+            fAfterCutPassSignal("pass", this),
+            fAfterCutFailSignal("fail", this)
     {
         RegisterSlot("filter", this, &KTCutFilter::FilterData);
     }
