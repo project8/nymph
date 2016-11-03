@@ -30,7 +30,7 @@ namespace Nymph
 
      @details
      A fully implemented cut MUST have the following:
-     - Public nested class called Result, inheriting from KTCutResult, and containing a public static std::string name sName.
+     - Public nested class called Result, inheriting from KTExtensibleCutResult< Result >, and containing a public static std::string name sName.
      - Cut registration using the macro KT_REGISTER_CUT([class name])
      - Implementation of bool Configure(const scarab::param_node*)
      - Implementation of bool Apply(KTData&, <DataType(s)>)
@@ -55,14 +55,14 @@ namespace Nymph
      class KTAwesomenessCut : public KTCutOneArg< KTSomeData >
      {
          public:
-             struct Result : KTCutResult
+             struct Result : KTExtensibleCutResult< Result >
              {
                  static const std::string sName;
              };
 
          public:
              KTAwesomenessCut(const std::string& name = "default-example-cut");
-             ~KTAwesomenessCut();
+             virtual ~KTAwesomenessCut();
 
              bool Configure(const scarab::param_node* node);
 
@@ -79,7 +79,7 @@ namespace Nymph
 
      const std::string KTExampleCut::Result::sName = "awesomeness-cut";
 
-     KT_REGISTER_CUT(KTExampleCut, KTExampleCut::Result::sName);
+     KT_REGISTER_CUT(KTExampleCut);
 
      KTAwesomenessCut::KTAwesomenessCut(const std::string& name) :
              KTCutOneArg(name),
@@ -239,8 +239,8 @@ namespace Nymph
 
     // this macro enforces the existence of cut_class::Result and cut_class::Result::sName at compile time
 #define KT_REGISTER_CUT(cut_class) \
-        static scarab::registrar< KTCut, cut_class, const std::string& > sCut##cut_class##Registrar( cut_class::Result::sName ); \
-        static KTExtensibleStructRegistrar< KTCutResultCore, cut_class::Result > sCut##cut_class##ResultRegistrar( cut_class::Result::sName );
+        static ::scarab::registrar< ::Nymph::KTCut, cut_class, const std::string& > sCut##cut_class##Registrar( cut_class::Result::sName ); \
+        static ::Nymph::KTExtensibleStructRegistrar< ::Nymph::KTCutResultCore, cut_class::Result > sCut##cut_class##ResultRegistrar( cut_class::Result::sName );
 
 } /* namespace Nymph */
 
