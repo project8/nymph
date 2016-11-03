@@ -239,8 +239,8 @@ namespace Nymph
 
     // this macro enforces the existence of cut_class::Result and cut_class::Result::sName at compile time
 #define KT_REGISTER_CUT(cut_class) \
-        static scarab::registrar< KTCut, cut_class, const std::string& > sCut##cut_class##Registrar( cut_class::Result::sName ); \
-        static KTExtensibleStructRegistrar< KTCutResultCore, cut_class::Result > sCut##cut_class##ResultRegistrar( cut_class::Result::sName );
+        static ::scarab::registrar< ::Nymph::KTCut, cut_class, const std::string& > sCut##cut_class##Registrar( cut_class::Result::sName ); \
+        static ::Nymph::KTExtensibleStructRegistrar< ::Nymph::KTCutResultCore, cut_class::Result > sCut##cut_class##ResultRegistrar( cut_class::Result::sName );
 
 } /* namespace Nymph */
 
