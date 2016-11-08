@@ -92,7 +92,7 @@ namespace Nymph
      bool KTAwesomenessCut::Configure(const scarab::param_node* node)
      {
          if (node == NULL) return true;
-         SetAwesomenessThreshold(node->GetValue("awesomeness", GetAwesomenessThreshold()));
+         SetAwesomenessThreshold(node->get_value("awesomeness", GetAwesomenessThreshold()));
          return true;
      }
 
