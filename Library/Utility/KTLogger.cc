@@ -46,7 +46,7 @@ namespace Nymph
         static size_t getTimeAbsoluteStr()
         {
             time(&KTLogger::Private::sRawTime);
-            sProcessedTime = gmtime(&KTLogger::Private::sRawTime);
+            sProcessedTime = localtime(&KTLogger::Private::sRawTime);
             return strftime(KTLogger::Private::sTimeBuff, 512,
                     KTLogger::Private::sDateTimeFormat,
                     KTLogger::Private::sProcessedTime);
