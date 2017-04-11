@@ -117,6 +117,16 @@ namespace Nymph
         private:
             RunQueue fRunQueue;
 
+        public:
+            /// Make a connection between the signal from one processor and the slot from another processor
+            /// Both processors should already have been added to the Toolbox
+            /// Signal and slot strings should be formatted as: [processor name]:[signal/slot name]
+            bool MakeConnection( const std::string& signal, const std::string& slot );
+
+            /// Make a connection between the signal from one processor and the slot from another processor
+            /// Both processors should already have been added to the Toolbox
+            bool MakeConnection( const std::string& signalProc, const std::string& signalName, const std::string& slotProc, const std::string& slotName );
+
         private:
             struct ProcessorInfo
             {
