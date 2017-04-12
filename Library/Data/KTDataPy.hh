@@ -10,7 +10,7 @@
 
 #include "KTData.hh"
 
-void export_KTDataPy()
+void export_DataPy()
 {
     using namespace Nymph;
     using namespace boost::python;
