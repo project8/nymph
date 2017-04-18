@@ -78,7 +78,18 @@ set( NYMPH_SOURCEFILES
     ${APPL_DIR}/KTThroughputProfiler.cc
 )
 
+set( NYMPH_PY_HEADERFILES
+    ${DATA_DIR}/KTDataPy.hh
+)
+
 ##################################################
 
 pbuilder_library( Nymph NYMPH_SOURCEFILES "" )
 pbuilder_install_headers( ${NYMPH_HEADERFILES} )
+
+if (Nymph_ENABLE_PYTHON)
+    add_library(nymphPy MODULE NymphPy.cc)
+    target_link_libraries(nymphPy ${EXTERNAL_LIBRARIES} Nymph)
+    set_target_properties(nymphPy PROPERTIES PREFIX "")
+    pbuilder_install_libraries(nymphPy)
+endif (Nymph_ENABLE_PYTHON)

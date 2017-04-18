@@ -14,7 +14,7 @@ void export_DataPy()
 {
     using namespace Nymph;
     using namespace boost::python;
-    class_<KTData, KTDataPtr>("KTData", init<>())
+    class_<KTData, KTDataPtr, boost::noncopyable>("KTData", init<>())
         .add_property("Counter", &KTData::GetCounter, &KTData::SetCounter)
         .add_property("LastData", &KTData::GetLastData, &KTData::SetLastData)
         ;
