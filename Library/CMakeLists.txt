@@ -80,6 +80,8 @@ set( NYMPH_SOURCEFILES
 
 set( NYMPH_PY_HEADERFILES
     ${DATA_DIR}/KTDataPy.hh
+    ${PROC_DIR}/KTProcessorPy.hh
+    ${APPL_DIR}/KTProcessorToolboxPy.hh
 )
 
 ##################################################

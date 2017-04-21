@@ -88,8 +88,8 @@ pbuilder_add_ext_libraries (${Boost_LIBRARIES})
 # python deps
 if (Nymph_ENABLE_PYTHON)
     # this next bit is disgusting, please come up with something better
-    execute_process(COMMAND python2-config --includes COMMAND awk "{print substr($1,3)}" OUTPUT_VARIABLE PYTHON_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
-    execute_process(COMMAND python2-config --ldflags COMMAND awk "{print substr($1,3)\"/lib\"substr($2,3)}" OUTPUT_VARIABLE PYTHON_LIBRARY_base OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND python-config --includes COMMAND awk "{print substr($1,3)}" OUTPUT_VARIABLE PYTHON_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND python-config --ldflags COMMAND awk "{print substr($1,3)\"/lib\"substr($2,3)}" OUTPUT_VARIABLE PYTHON_LIBRARY_base OUTPUT_STRIP_TRAILING_WHITESPACE)
     file(GLOB PYTHON_LIBRARY "${PYTHON_LIBRARY_base}.so"  "${PYTHON_LIBRARY_base}.dylib")
     # end of disgusting hack
     if ("${PYTHON_LIBRARY}" STREQUAL "")
