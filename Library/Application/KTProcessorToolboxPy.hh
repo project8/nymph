@@ -32,7 +32,7 @@ void export_ProcessorToolbox()
 
         //.def("GetProcessor", &KTProcessorToolbox::GetProcessor, "Get a pointer to a processor in the toolbox")
         //TODO: what does this ownership statement mean in the context of boost::python? Also doesn't build
-        //.def("AddProcessor", &KTProcessorToolbox::AddProcessor, "add a processor to the toolbox, toolbox takes ownership")
+        .def("AddProcessor", &KTProcessorToolbox::AddProcessor, "add a processor to the toolbox, toolbox takes ownership")
         .def("RemoveProcessor", &KTProcessorToolbox::RemoveProcessor, "remove a processor from the toolbox")
         //TODO this next one doesn't build
         //.def("ReleaseProcessor", &KTProcessorToolbox::ReleaseProcessor, "Remove a processor from the toolbox and return it to the user, ownership is passed") // what does this passed ownership mean in boost::python?

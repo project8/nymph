@@ -15,8 +15,8 @@ void export_Processor()
 {
     using namespace Nymph;
     using namespace boost::python;
-    class_<KTProcessor>("KTProcessor", no_init)
-        ;
+    //class_<KTProcessor>("KTProcessor", no_init)
+    //    ;
 }
 
 /*{
