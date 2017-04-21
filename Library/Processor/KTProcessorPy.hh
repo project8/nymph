@@ -15,22 +15,21 @@ void export_Processor()
 {
     using namespace Nymph;
     using namespace boost::python;
+
+    // KTProcessor base class
     class_<KTProcessor, boost::noncopyable>("KTProcessor", no_init)
+        .def("ConnectASlot", &KTProcessor::ConnectASlot)
+        .def("ConnectASignal", &KTProcessor::ConnectASignal)
+        .def("ConnectSignalToSlot", &KTProcessor::ConnectSignalToSlot)
         ;
+
+    // register functions
 }
 
 /*{
     class KTProcessor : public KTConfigurable
     {
         public:
-            KTProcessor(const std::string& name="default-proc-name");
-            virtual ~KTProcessor();
-
-        public:
-
-            void ConnectASlot(const std::string& signalName, KTProcessor* processor, const std::string& slotName, int groupNum=-1);
-            void ConnectASignal(KTProcessor* processor, const std::string& signalName, const std::string& slotName, int groupNum=-1);
-            void ConnectSignalToSlot(KTSignalWrapper* signal, KTSlotWrapper* slot, int groupNum=-1);
 
             template< class XProcessor >
             void RegisterSignal(std::string name, XProcessor* signalPtr);
@@ -102,9 +101,6 @@ void export_Processor()
         return;
     }
 
-
-#define KT_REGISTER_PROCESSOR(proc_class, proc_name) \
-        static ::scarab::registrar< ::Nymph::KTProcessor, proc_class, const std::string& > sProc##proc_class##Registrar( proc_name );
 
 }*/
 #endif /* KTPROCESSORPY_HH_ */
