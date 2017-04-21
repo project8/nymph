@@ -91,7 +91,11 @@ pbuilder_install_headers( ${NYMPH_HEADERFILES} )
 
 if (Nymph_ENABLE_PYTHON)
     add_library(nymphPy MODULE NymphPy.cc)
-    target_link_libraries(nymphPy ${EXTERNAL_LIBRARIES} Nymph)
+    target_link_libraries(nymphPy ${EXTERNAL_LIBRARIES} ${Nymph_LIBRARIES})
     set_target_properties(nymphPy PROPERTIES PREFIX "")
     pbuilder_install_libraries(nymphPy)
+    # TODO this next line is *very bad* and should go away; like, now
+    MESSAGE("nl1: ${Nymph_LIBRARIES}")
+    set_property( GLOBAL PROPERTY Nymph_LIBRARIES Nymph_Katydid Scarab_Nymph_Katydid )
+    MESSAGE("nl2: ${Nymph_LIBRARIES}")
 endif (Nymph_ENABLE_PYTHON)

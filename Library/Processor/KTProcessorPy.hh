@@ -21,9 +21,9 @@ void export_Processor()
         .def("ConnectASlot", &KTProcessor::ConnectASlot)
         .def("ConnectASignal", &KTProcessor::ConnectASignal)
         .def("ConnectSignalToSlot", &KTProcessor::ConnectSignalToSlot)
+        //.def("GetSignal", KTProcessor::GetSignal)
+        //.def("RegisterSignal", &KTProcessor::RegisterSignal)
         ;
-
-    // register functions
 }
 
 /*{
