@@ -27,7 +27,7 @@ void export_ProcessorToolbox()
         .def("Run", &KTProcessorToolbox::Run, "Call Run() on all processors in the run queue")
 
         // Push new processors to back of run queue
-        .def("PushBackToRunQueue", &Nymph::KTProcessorToolbox::PushBackToRunQueue_string, "Push a single processor to the back of the run queue")
+        .def("PushBackToRunQueue", PushBackToRunQueue_string, "Push a single processor to the back of the run queue")
 
         // Remove items from run queue
         .def("PopBackOfRunQueue", &KTProcessorToolbox::PopBackOfRunQueue, "Remove the last item in the run queue, whether it's a single processor or a group of processors")
