@@ -110,12 +110,4 @@ if (Nymph_ENABLE_EXECUTABLES)
     add_subdirectory( Executables/Validation )
 endif (Nymph_ENABLE_EXECUTABLES)
 
-# build python bindings
-#if (Nymph_ENABLE_PYTHON)
-#    add_library(nymphPy SHARED Library/NymphPy.cc)
-#    target_link_libraries(nymphPy ${EXTERNAL_LIBRARIES})
-#    set_target_properties(nymphPy PROPERTIES PREFIX "")
-#    pbuilder_install_libraries(nymphPy)
-#endif (Nymph_ENABLE_PYTHON)
-
 pbuilder_variables_for_parent()
