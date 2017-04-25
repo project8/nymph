@@ -30,12 +30,14 @@ void export_ProcessorToolbox()
 
         // Not adding Configure methods as they are for conf files, not interactive sessions
 
-        //.def("GetProcessor", &KTProcessorToolbox::GetProcessor, "Get a pointer to a processor in the toolbox")
-        //TODO: what does this ownership statement mean in the context of boost::python? Also doesn't build
+        //TODO: not sure why this won't build, maybe because there is a const and non-const signature?
+        //.def("GetProcessor", &KTProcessorToolbox::GetProcessor, return_value_policy<reference_existing_object>(), "Get a pointer to a processor in the toolbox")
         .def("AddProcessor", &KTProcessorToolbox::AddProcessor, "add a processor to the toolbox, toolbox takes ownership")
         .def("RemoveProcessor", &KTProcessorToolbox::RemoveProcessor, "remove a processor from the toolbox")
-        //TODO this next one doesn't build
-        //.def("ReleaseProcessor", &KTProcessorToolbox::ReleaseProcessor, "Remove a processor from the toolbox and return it to the user, ownership is passed") // what does this passed ownership mean in boost::python?
+
+        //TODO: Not 100% certain that the reference count for this processor is now correct, given the return_value_policy
+        .def("ReleaseProcessor", &KTProcessorToolbox::ReleaseProcessor, return_value_policy<reference_existing_object>(), "Remove a processor from the toolbox and return it to the user, ownership is passed")
+
         .def("ClearProcessors", &KTProcessorToolbox::ClearProcessors, "Remove all processors and clear run queue")
 
         // make signal-slot connection
