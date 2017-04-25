@@ -5,7 +5,7 @@
 #include "KTProcessorPy.hh"
 #include "KTProcessorToolboxPy.hh"
 
-BOOST_PYTHON_MODULE(nymphPy)
+BOOST_PYTHON_MODULE(NymphPy)
 {
     using namespace boost::python;
     export_DataPy();
