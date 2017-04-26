@@ -114,6 +114,7 @@ namespace Nymph
             /// Add a processor to the toolbox
             /// Toolbox takes ownership of the processor
             bool AddProcessor(const std::string& procName, KTProcessor* proc);
+            bool AddProcessor(const std::string& procType, const std::string& procName);
 
             /// Remove a processor from the toolbox
             bool RemoveProcessor(const std::string& procName);

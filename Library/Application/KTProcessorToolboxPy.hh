@@ -21,6 +21,10 @@ bool (Nymph::KTProcessorToolbox::*PushBackToRunQueue_string)(const std::string& 
 bool (Nymph::KTProcessorToolbox::*PushBackToRunQueue_init_list)(std::initializer_list< std::string >) = &Nymph::KTProcessorToolbox::PushBackToRunQueue;
 bool (Nymph::KTProcessorToolbox::*PushBackToRunQueue_vector)(std::vector< std::string >) = &Nymph::KTProcessorToolbox::PushBackToRunQueue;
 
+// Add Processor overloads
+bool (Nymph::KTProcessorToolbox::*AddProcessor_Ref)(const std::string&, Nymph::KTProcessor*) = &Nymph::KTProcessorToolbox::AddProcessor;
+bool (Nymph::KTProcessorToolbox::*AddProcessor_TypeStr)(const std::string&, const std::string&) = &Nymph::KTProcessorToolbox::AddProcessor;
+
 void export_ProcessorToolbox()
 {
     using namespace Nymph;
@@ -32,7 +36,8 @@ void export_ProcessorToolbox()
 
         //TODO: not sure why this won't build, maybe because there is a const and non-const signature?
         //.def("GetProcessor", &KTProcessorToolbox::GetProcessor, return_value_policy<reference_existing_object>(), "Get a pointer to a processor in the toolbox")
-        .def("AddProcessor", &KTProcessorToolbox::AddProcessor, "add a processor to the toolbox, toolbox takes ownership")
+        .def("AddProcessor", AddProcessor_Ref, "add a processor to the toolbox, toolbox takes ownership")
+        .def("AddProcessor", AddProcessor_TypeStr, "add a processor to the toolbox, toolbox takes ownership")
         .def("RemoveProcessor", &KTProcessorToolbox::RemoveProcessor, "remove a processor from the toolbox")
 
         //TODO: Not 100% certain that the reference count for this processor is now correct, given the return_value_policy
