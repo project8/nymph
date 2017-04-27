@@ -55,7 +55,7 @@ namespace Nymph
                         return fSignal;
                     }
                 private:
-                    XSignature* fSignal; //not owned by this KTSignalWrapper
+                    XSignature* fSignal; //not owned by this KTSpecifiedInternalSignalWrapper
             };
 
         public:

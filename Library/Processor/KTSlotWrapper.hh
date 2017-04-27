@@ -11,7 +11,6 @@
 #include "KTConnection.hh"
 #include "KTSignalWrapper.hh"
 
-#include <boost/function.hpp>
 #include <boost/signals2.hpp>
 
 namespace Nymph
@@ -38,14 +37,13 @@ namespace Nymph
             class KTSpecifiedInternalSlotWrapper : public KTInternalSlotWrapper, public boost::noncopyable
             {
                 public:
-                    KTSpecifiedInternalSlotWrapper(XSignature* funcPtr, XTypeContainer* typeCont=NULL) :
+                    KTSpecifiedInternalSlotWrapper(XSignature funcPtr, XTypeContainer* typeCont=NULL) :
                             fSlot(funcPtr)
                     {
                         (void)typeCont; // to suppress warnings
                     }
                     virtual ~KTSpecifiedInternalSlotWrapper()
                     {
-                        delete fSlot;
                     }
 
                     virtual KTConnection Connect(KTSignalWrapper* signalWrap, int groupNum=-1)
@@ -61,18 +59,18 @@ namespace Nymph
                         }
                         if (groupNum >= 0)
                         {
-                            return derivedSignalWrapper->GetSignal()->connect(groupNum, *fSlot);
+                            return derivedSignalWrapper->GetSignal()->connect(groupNum, fSlot);
                         }
-                        return derivedSignalWrapper->GetSignal()->connect(*fSlot);
+                        return derivedSignalWrapper->GetSignal()->connect(fSlot);
                     }
 
                 private:
-                    XSignature* fSlot; // is owned by this KTSlot
+                    XSignature fSlot;
             };
 
         public:
             template< typename XSignature, typename XTypeContainer >
-            KTSlotWrapper(XSignature* signalPtr, XTypeContainer* typeCont);
+            KTSlotWrapper(XSignature signalPtr, XTypeContainer* typeCont);
             ~KTSlotWrapper();
 
         private:
@@ -91,7 +89,7 @@ namespace Nymph
     };
 
     template< typename XSignature, typename XTypeContainer >
-    KTSlotWrapper::KTSlotWrapper(XSignature* signalPtr, XTypeContainer* typeCont) :
+    KTSlotWrapper::KTSlotWrapper(XSignature signalPtr, XTypeContainer* typeCont) :
             fSlotWrapper(new KTSpecifiedInternalSlotWrapper< XSignature, XTypeContainer >(signalPtr, typeCont)),
             fConnection()
     {}

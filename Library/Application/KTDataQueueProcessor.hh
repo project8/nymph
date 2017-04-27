@@ -129,7 +129,7 @@ namespace Nymph
             // Signals
             //*********
         protected:
-            KTSignalOneArg< void > fQueueDoneSignal;
+            KTSignalDone fQueueDoneSignal;
 
     };
 

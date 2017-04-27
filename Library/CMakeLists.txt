@@ -64,7 +64,6 @@ set( NYMPH_SOURCEFILES
     ${DATA_DIR}/KTData.cc
     ${PROC_DIR}/KTPrimaryProcessor.cc
     ${PROC_DIR}/KTProcessor.cc
-    ${PROC_DIR}/KTSignal.cc
     ${PROC_DIR}/KTSignalWrapper.cc
     ${PROC_DIR}/KTSlotWrapper.cc
     ${IO_DIR}/KTReader.cc

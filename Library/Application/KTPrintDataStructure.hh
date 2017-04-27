@@ -72,9 +72,9 @@ namespace Nymph
             //***************
 
         private:
-            KTSlotOneArg< void (KTDataPtr) > fDataStructSlot;
-            KTSlotOneArg< void (KTDataPtr) > fCutStructSlot;
-            KTSlotOneArg< void (KTDataPtr) > fDataAndCutStructSlot;
+            KTSlotOneArg< void, KTDataPtr > fDataStructSlot;
+            KTSlotOneArg< void, KTDataPtr > fCutStructSlot;
+            KTSlotOneArg< void, KTDataPtr > fDataAndCutStructSlot;
 
     };
 }

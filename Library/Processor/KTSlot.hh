@@ -12,209 +12,69 @@
 #include "KTLogger.hh"
 #include "KTSignal.hh"
 
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
-
+#include <functional>
+#include <signal.h>
 #include <string>
 
 namespace Nymph
 {
     KTLOGGER(slotlog, "KTSlot");
 
-    template< typename Signature>
-    class KTSlotNoArg
-    {
-        public:
-            typedef boost::function< Signature > function_signature;
-            typedef typename function_signature::result_type return_type;
-
-        public:
-            /// Constructor for the case where the processor has the function that will be called by the slot
-            template< class XFuncOwnerType >
-            KTSlotNoArg(const std::string& name, XFuncOwnerType* owner, return_type (XFuncOwnerType::*func)());
-            /// Constructor for the case where the processor and the object with the function that will be called are different
-            template< class XFuncOwnerType >
-            KTSlotNoArg(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, return_type (XFuncOwnerType::*func)());
-            virtual ~KTSlotNoArg();
-
-            return_type operator()();
-
-        protected:
-            boost::function< Signature > fFunc;
-
-    };
-
     /*!
-     @class KTSlotOneArg
+     @class KTSlot
      @author N. S. Oblath
 
-     @brief Creates a slot that calls a member function of the func_owner_type object, taking one argument.
+     @brief Creates a slot that calls a member function of the func_owner_type object, taking 0 or more arguments.
 
      @details
      Usage:
      To use this slot type the function to be called by the slot must exist in an object of type FuncOwnerType.
-     The function should have the signature ReturnType (ArgumentType).
+     The function should have the signature ReturnType (Args).
 
-     In your Processor's header add a member variable of type KTSlotOneArg< ProcessorType, ArgumentType, ReturnType >.
+     In your Processor's header add a member variable of type KTSlot< ProcessorType, ReturnType, Args >.
      The variable may be private.
 
      Initialize the slot with the name of the slot, the address of the owner of the slot function, and the function pointer.
      Optionally, if the Processor is separate from the owner of the slot function, the Processor address is specified as the second argument to the constructor.
     */
-    template< typename Signature>
-    class KTSlotOneArg
+    template< typename ReturnType, typename... Args >
+    class KTSlot
     {
-        public:
-            typedef boost::function< Signature > function_signature;
-            typedef typename function_signature::result_type return_type;
-            typedef typename function_signature::argument_type argument_type;
-
         public:
             /// Constructor for the case where the processor has the function that will be called by the slot
             template< class XFuncOwnerType >
-            KTSlotOneArg(const std::string& name, XFuncOwnerType* owner, return_type (XFuncOwnerType::*func)(argument_type));
+            KTSlot( const std::string& name, XFuncOwnerType* owner, ReturnType (XFuncOwnerType::*func)( Args... ) );
+
             /// Constructor for the case where the processor and the object with the function that will be called are different
             template< class XFuncOwnerType >
-            KTSlotOneArg(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, return_type (XFuncOwnerType::*func)(argument_type));
-            virtual ~KTSlotOneArg();
+            KTSlot( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, ReturnType (XFuncOwnerType::*func)( Args... ) );
 
-            return_type operator()(argument_type arg);
-
-        protected:
-            boost::function< Signature > fFunc;
+            virtual ~KTSlot();
 
     };
 
-    template< typename Signature>
-    class KTSlotTwoArg
-    {
-        public:
-            typedef boost::function< Signature > function_signature;
-            typedef typename function_signature::result_type return_type;
-            typedef typename function_signature::first_argument_type first_argument_type;
-            typedef typename function_signature::second_argument_type second_argument_type;
+    // Typedefs for backwards compatibility
 
-        public:
-            /// Constructor for the case where the processor has the function that will be called by the slot
-            template< class XFuncOwnerType >
-            KTSlotTwoArg(const std::string& name, XFuncOwnerType* owner, return_type (XFuncOwnerType::*func)(first_argument_type, second_argument_type));
-            /// Constructor for the case where the processor and the object with the function that will be called are different
-            template< class XFuncOwnerType >
-            KTSlotTwoArg(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, return_type (XFuncOwnerType::*func)(first_argument_type, second_argument_type));
-            virtual ~KTSlotTwoArg();
+    template < typename ReturnType >
+    using KTSlotNoArg = KTSlot< ReturnType >;
 
-            return_type operator()(first_argument_type arg1, second_argument_type arg2);
+    template < typename ReturnType, typename Arg1 >
+    using KTSlotOneArg = KTSlot< ReturnType, Arg1 >;
 
-        protected:
-            boost::function< Signature > fFunc;
-
-    };
-
-
-
-    template< typename Signature>
-    template< class XFuncOwnerType >
-    KTSlotNoArg< Signature >::KTSlotNoArg(const std::string& name, XFuncOwnerType* owner, return_type (XFuncOwnerType::*func)()) :
-            fFunc(boost::bind(func, owner))
-    {
-        owner->RegisterSlot(name, this, &KTSlotNoArg::operator());
-    }
-
-    template< typename Signature>
-    template< class XFuncOwnerType >
-    KTSlotNoArg< Signature >::KTSlotNoArg(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, return_type (XFuncOwnerType::*func)()) :
-            fFunc(boost::bind(func, owner))
-    {
-        proc->RegisterSlot(name, this, &KTSlotNoArg::operator());
-    }
-
-    template< typename Signature>
-    KTSlotNoArg< Signature >::~KTSlotNoArg()
-    {
-    }
-
-    template< typename Signature>
-    typename KTSlotNoArg< Signature >::return_type KTSlotNoArg< Signature >::operator()()
-    {
-        return fFunc();
-    }
-
-
-
-
-    template< typename Signature>
-    template< class XFuncOwnerType >
-    KTSlotOneArg< Signature >::KTSlotOneArg(const std::string& name, XFuncOwnerType* owner, return_type (XFuncOwnerType::*func)(argument_type)) :
-            fFunc(boost::bind(func, owner, _1))
-    {
-        owner->RegisterSlot(name, this, &KTSlotOneArg::operator());
-    }
-
-    template< typename Signature>
-    template< class XFuncOwnerType >
-    KTSlotOneArg< Signature >::KTSlotOneArg(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, return_type (XFuncOwnerType::*func)(argument_type)) :
-            fFunc(boost::bind(func, owner, _1))
-    {
-        proc->RegisterSlot(name, this, &KTSlotOneArg::operator());
-    }
-
-    template< typename Signature>
-    KTSlotOneArg< Signature >::~KTSlotOneArg()
-    {
-    }
-
-    template< typename Signature>
-    typename KTSlotOneArg< Signature >::return_type KTSlotOneArg< Signature >::operator()(argument_type arg)
-    {
-        return fFunc(arg);
-    }
-
-
-
-
-
-    template< typename Signature>
-    template< class XFuncOwnerType >
-    KTSlotTwoArg< Signature >::KTSlotTwoArg(const std::string& name, XFuncOwnerType* owner, return_type (XFuncOwnerType::*func)(first_argument_type, second_argument_type)) :
-            fFunc(boost::bind(func, owner, _1, _2))
-    {
-        owner->RegisterSlot(name, this, &KTSlotTwoArg::operator());
-    }
-
-    template< typename Signature>
-    template< class XFuncOwnerType >
-    KTSlotTwoArg< Signature >::KTSlotTwoArg(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, return_type (XFuncOwnerType::*func)(first_argument_type, second_argument_type)) :
-            fFunc(boost::bind(func, owner, _1, _2))
-    {
-        proc->RegisterSlot(name, this, &KTSlotTwoArg::operator());
-    }
-
-    template< typename Signature>
-    KTSlotTwoArg< Signature >::~KTSlotTwoArg()
-    {
-    }
-
-    template< typename Signature>
-    typename KTSlotTwoArg< Signature >::return_type KTSlotTwoArg< Signature >::operator()(first_argument_type arg1, second_argument_type arg2)
-    {
-        return fFunc(arg1, arg2);
-    }
-
-
-
-
+    template< typename ReturnType, typename Arg1, typename Arg2 >
+    using KTSlotTwoArg = KTSlot< ReturnType, Arg1, Arg2 >;
 
 
     /*!
-     @class KTDataSlotOneArg
+     @class KTDataSlot
      @author N. S. Oblath
 
-     @brief Creates a slot that takes a KTDataPtr object as the argument; the function that gets called should take DataType& as its argument.
+     @brief Creates a slot that takes a KTDataPtr object as the argument; the function that gets called should take 0 or more DataType&'s as its argument.
 
      @details
      Usage:
      This slot type adds the slot function (signature void (KTDataPtr).
-     Your processor (or, optionally, a different object) must have a member function with the signature bool (DataType&).
+     Your processor (or, optionally, a different object) must have a member function with the signature bool (DataType1&, . . .).
      The slot function checks that the provided KTData object contains data of type DataType, and then calls the member function.
 
      In your Processor's header add a member variable of type KTSlotOneArg< DataType >.
@@ -225,176 +85,86 @@ namespace Nymph
 
      Also optionally, a signal to be emitted after the return of the member function can be specified as the last argument.
     */
-    template< class XDataType >
-    class KTSlotDataOneType
+    template< class... XDataTypes >
+    class KTSlotData
     {
-        public:
-            typedef XDataType data_type;
-            typedef boost::function< void (KTDataPtr) > function_signature;
-            typedef typename function_signature::result_type return_type;
-            typedef typename function_signature::argument_type argument_type;
-
-        public:
-            /// Constructor for the case where the processor has the function that will be called by the slot
-            template< class XFuncOwnerType >
-            KTSlotDataOneType(const std::string& name, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)(data_type&), KTSignalData* signalPtr=NULL);
-            /// Constructor for the case where the processor and the object with the function that will be called are different
-            template< class XFuncOwnerType >
-            KTSlotDataOneType(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)(data_type&), KTSignalData* signalPtr=NULL);
-            virtual ~KTSlotDataOneType();
-
-            void operator()(KTDataPtr data);
-
-        protected:
-            boost::function< bool (data_type&) > fFunc;
-
-            KTSignalData* fSignalPtr;
-    };
-
-
-    template< class XDataType1, class XDataType2 >
-    class KTSlotDataTwoTypes
-    {
-        public:
-            typedef XDataType1 first_data_type;
-            typedef XDataType2 second_data_type;
-            typedef boost::function< void (KTDataPtr) > function_signature;
-            typedef typename function_signature::result_type return_type;
-            typedef typename function_signature::argument_type argument_type;
+        //public:
+            //typedef XDataType data_type;
+            //typedef std::function< bool( KTDataPtr ) > function_signature;
+            //typedef typename function_signature::result_type return_type;
 
         public:
             /// Constructor for the case where the processor has the function that will be called by the slot
             template< class XFuncOwnerType >
-            KTSlotDataTwoTypes(const std::string& name, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)(first_data_type&, second_data_type&), KTSignalData* signalPtr=NULL);
+            KTSlotData( const std::string& name, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( XDataTypes&... ), KTSignalData* signalPtr=nullptr );
+
             /// Constructor for the case where the processor and the object with the function that will be called are different
             template< class XFuncOwnerType >
-            KTSlotDataTwoTypes(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)(first_data_type&, second_data_type&), KTSignalData* signalPtr=NULL);
-            virtual ~KTSlotDataTwoTypes();
+            KTSlotData( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( XDataTypes&... ), KTSignalData* signalPtr=nullptr );
 
-            void operator()(KTDataPtr data);
+            virtual ~KTSlotData();
+
+            void operator()( KTDataPtr data );
 
         protected:
-            boost::function< bool (first_data_type&, second_data_type&) > fFunc;
+            template< typename... DataTypes >
+            bool DataPresent( KTDataPtr data );
+
+            //template<  >
+            //bool DataPresent( KTDataPtr data );
+            //template< typename DataType, typename... DataTypes >
+            //bool DataPresent( KTDataPtr data );
+
+            //function_signature fFunc;
+            std::function< bool (XDataTypes&...) > fFunc;
 
             KTSignalData* fSignalPtr;
     };
 
-
-
-
-
-    template< class XDataType >
-    template< class XFuncOwnerType >
-    KTSlotDataOneType< XDataType >::KTSlotDataOneType(const std::string& name, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)(data_type&), KTSignalData* signalPtr) :
-            fFunc(boost::bind(func, owner, _1)),
-            fSignalPtr(signalPtr)
+    // helper structs (have to be defined outside the templated KTSlot class to use specialization
+    template< typename... DataTypes >
+    struct DataPresentHelper
     {
-        owner->RegisterSlot(name, this, &KTSlotDataOneType::operator());
-    }
-
-    template< class XDataType >
-    template< class XFuncOwnerType >
-    KTSlotDataOneType< XDataType >::KTSlotDataOneType(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)(data_type&), KTSignalData* signalPtr) :
-            fFunc(boost::bind(func, owner, _1)),
-            fSignalPtr(signalPtr)
-    {
-        proc->RegisterSlot(name, this, &KTSlotDataOneType::operator());
-    }
-
-    template< class XDataType >
-    KTSlotDataOneType< XDataType >::~KTSlotDataOneType()
-    {
-    }
-
-    template< class XDataType >
-    void KTSlotDataOneType< XDataType >::operator()(KTDataPtr data)
-    {
-        // Standard data slot pattern:
-        // Check to ensure that the required data type is present
-        if (! data->Has< data_type >())
+        static bool DataPresent( KTDataPtr )
         {
-            KTERROR(slotlog, "Data not found with type <" << typeid(data_type).name() << ">");
-            return;
+            return true;
         }
-        // Call the function
-        if (! fFunc(data->Of< data_type >()))
-        {
-            KTERROR(slotlog, "Something went wrong while analyzing data with type <" << typeid(data_type).name() << ">");
-            return;
-        }
-        // If there's a signal pointer, emit the signal
-        if (fSignalPtr != NULL)
-        {
-            (*fSignalPtr)(data);
-        }
-        return;
-    }
+    };
 
-
-
-    template< class XDataType1, class XDataType2 >
-    template< class XFuncOwnerType >
-    KTSlotDataTwoTypes< XDataType1, XDataType2 >::KTSlotDataTwoTypes(const std::string& name, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)(first_data_type&, second_data_type&), KTSignalData* signalPtr) :
-            fFunc(boost::bind(func, owner, _1, _2)),
-            fSignalPtr(signalPtr)
+    template< typename DataType, typename... DataTypes >
+    struct DataPresentHelper< DataType, DataTypes... >
     {
-        owner->RegisterSlot(name, this, &KTSlotDataTwoTypes::operator());
-    }
+        static bool DataPresent( KTDataPtr data )
+        {
+            if( ! data->Has< DataType >() )
+            {
+                KTERROR( slotlog, "Data not found with type <" << typeid( DataType ).name() << ">" );
+                return false;
+            }
+            return DataPresentHelper< DataTypes... >::DataPresent( data );
+        }
+    };
 
-    template< class XDataType1, class XDataType2 >
-    template< class XFuncOwnerType >
-    KTSlotDataTwoTypes< XDataType1, XDataType2 >::KTSlotDataTwoTypes(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)(first_data_type&, second_data_type&), KTSignalData* signalPtr) :
-            fFunc(boost::bind(func, owner, _1, _2)),
-            fSignalPtr(signalPtr)
-    {
-        proc->RegisterSlot(name, this, &KTSlotDataTwoTypes::operator());
-    }
 
-    template< class XDataType1, class XDataType2 >
-    KTSlotDataTwoTypes< XDataType1, XDataType2 >::~KTSlotDataTwoTypes()
-    {
-    }
+    // Typedefs for backwards compatibility
 
-    template< class XDataType1, class XDataType2 >
-    void KTSlotDataTwoTypes< XDataType1, XDataType2 >::operator()(KTDataPtr data)
-    {
-        // Standard data slot pattern:
-        // Check to ensure that the required data type is present
-        if (! data->Has< first_data_type >())
-        {
-            KTERROR(slotlog, "Data not found with type <" << typeid(first_data_type).name() << ">");
-            return;
-        }
-        if (! data->Has< second_data_type >())
-        {
-            KTERROR(slotlog, "Data not found with type <" << typeid(second_data_type).name() << ">");
-            return;
-        }
-        // Call the function
-        if (! fFunc(data->Of< first_data_type >(), data->Of< second_data_type >()))
-        {
-            KTERROR(slotlog, "Something went wrong while analyzing data with types <" << typeid(first_data_type).name() << "> and <" << typeid(second_data_type).name() << ">");
-            return;
-        }
-        // If there's a signal pointer, emit the signal
-        if (fSignalPtr != NULL)
-        {
-            (*fSignalPtr)(data);
-        }
-        return;
-    }
+    template< typename XDataType1 >
+    using KTSlotDataOneType = KTSlotData< XDataType1 >;
+
+    template< typename XDataType1, typename XDataType2 >
+    using KTSlotDataTwoTypes = KTSlotData< XDataType1, XDataType2 >;
 
 
     /*!
-     @class KTDoneSlot
+     @class KTSlotDone
      @author N. S. Oblath
 
      @brief Creates a slot to receive indication that upstream processing is complete and will emit a similar signal.
 
      @details
      Usage:
-     This slot type adds the slot function (signature void ().
-     Your processor (or, optionally, a different object) must have a member function with the signature bool ().
+     This slot type adds the slot function (signature void ()).
+     Your processor (or, optionally, a different object) must have a member function with the signature void ().
      The slot calls the member function.
 
      In your Processor's header add a member variable of type KTDoneSlot.
@@ -407,10 +177,6 @@ namespace Nymph
     */
     class KTSlotDone
     {
-        public:
-            typedef boost::function< void () > function_signature;
-            typedef bool return_type;
-
         public:
             /// Constructor for the case where the processor has the function that will be called by the slot
             template< class XFuncOwnerType >
@@ -428,9 +194,98 @@ namespace Nymph
             KTSignalDone* fSignalPtr;
     };
 
+
+    //*******************
+    // Implementations
+    //*******************
+
+    // KTSlot
+
+    template< typename ReturnType, typename... Args >
+    template< class XFuncOwnerType >
+    KTSlot< ReturnType, Args... >::KTSlot( const std::string& name, XFuncOwnerType* owner, ReturnType (XFuncOwnerType::*func)( Args... ) )
+    {
+        owner->RegisterSlot( name, owner, func );
+    }
+
+    template< typename ReturnType, typename... Args >
+    template< class XFuncOwnerType >
+    KTSlot< ReturnType, Args... >::KTSlot( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, ReturnType (XFuncOwnerType::*func)( Args... ) )
+    {
+        proc->RegisterSlot( name, owner, func );
+    }
+
+    template< typename ReturnType, typename... Args >
+    KTSlot< ReturnType, Args... >::~KTSlot()
+    {
+    }
+
+
+    // KTSlotData
+
+    template< class... XDataTypes >
+    template< class XFuncOwnerType >
+    KTSlotData< XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( XDataTypes&... ), KTSignalData* signalPtr) :
+            fFunc([func, owner](XDataTypes... args){return (owner->*func)(args...);}),
+            fSignalPtr(signalPtr)
+    {
+        owner->RegisterSlot(name, this, &KTSlotData::operator());
+    }
+
+    template< class... XDataTypes >
+    template< class XFuncOwnerType >
+    KTSlotData< XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( XDataTypes&... ), KTSignalData* signalPtr) :
+            fFunc([func, owner](XDataTypes... args){return (owner->*func)(args...);}),
+            fSignalPtr(signalPtr)
+    {
+        proc->RegisterSlot(name, this, &KTSlotData::operator());
+    }
+
+    template< class... XDataTypes >
+    KTSlotData< XDataTypes... >::~KTSlotData()
+    {
+    }
+
+    template< class... XDataTypes >
+    void KTSlotData< XDataTypes... >::operator()( KTDataPtr data )
+    {
+        // Standard data slot pattern:
+        // Check to ensure that the required data type is present
+
+        if (! DataPresent< XDataTypes... >( data ) )
+        {
+            KTFATAL( slotlog, "Failed to find all of the necessary data types in the standard slot function. Aborting." );
+            raise(SIGINT);
+            return;
+        }
+        // Call the function
+        if ( ! fFunc(data->Of< XDataTypes >()...) )
+        {
+            KTFATAL( slotlog, "Something went wrong in the standard slot function. Aborting." );
+            raise(SIGINT);
+            return;
+        }
+        // If there's a signal pointer, emit the signal
+        if (fSignalPtr != NULL)
+        {
+            (*fSignalPtr)(data);
+        }
+        return;
+    }
+
+    template< class... XDataTypes >
+    template< typename... DataTypes >
+    bool KTSlotData< XDataTypes... >::DataPresent( KTDataPtr data )
+    {
+        return DataPresentHelper< DataTypes... >::DataPresent( data );
+    }
+
+
+    // KTSlotDone
+
     template< class XFuncOwnerType >
     KTSlotDone::KTSlotDone(const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)(), KTSignalDone* signalPtr) :
-            fFunc(boost::bind(func, owner)),
+            fFunc([func, owner](){return (owner->*func)();}),
             fSignalPtr(signalPtr)
     {
         owner->RegisterSlot(name, this, &KTSlotDone::operator());
@@ -438,7 +293,7 @@ namespace Nymph
 
     template< class XFuncOwnerType >
     KTSlotDone::KTSlotDone(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)(), KTSignalDone* signalPtr) :
-            fFunc(boost::bind(func, owner)),
+            fFunc([func, owner](){return (owner->*func)();}),
             fSignalPtr(signalPtr)
     {
         proc->RegisterSlot(name, this, &KTSlotDone::operator());
@@ -460,8 +315,6 @@ namespace Nymph
         }
         return;
     }
-
-
 
 } /* namespace Nymph */
 #endif /* KTSLOT_HH_ */
