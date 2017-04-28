@@ -21,7 +21,7 @@ endmacro()
 # macro to add python library
 macro( python_package_add_module VALUE )
     get_filename_component(this_py_lib ${VALUE} NAME_WE)
-    add_library(${this_py_lib} SHARED ${VALUE})
+    add_library(${this_py_lib} MODULE ${VALUE})
     get_property(THIS_PACKAGE_LIBS GLOBAL PROPERTY ${PROJECT_NAME}_LIBRARIES)
     target_link_libraries(${this_py_lib} ${EXTERNAL_LIBRARIES} ${THIS_PACKAGE_LIBS})
 
