@@ -18,6 +18,8 @@
 
 #include <vector>
 
+#include "param_codec.hh"
+
 using std::deque;
 using std::set;
 using std::string;
@@ -240,6 +242,14 @@ namespace Nymph
             }
         }
         return true;
+    }
+
+    bool KTProcessorToolbox::ConfigureProcessors(const std::string& config)
+    {
+        scarab::param_translator translator;
+        scarab::param_node optNode;
+        optNode.add( "encoding", new scarab::param_value( "json" ) );
+        return ConfigureProcessors( &translator.read_string( config, &optNode )->as_node() );
     }
 
     bool KTProcessorToolbox::Run()

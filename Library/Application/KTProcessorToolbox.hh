@@ -87,6 +87,8 @@ namespace Nymph
 
             /// Configure processors (only those specified in the toolbox)
             bool ConfigureProcessors(const scarab::param_node* node);
+            /// Configure processors from a json-encoding of their configurations
+            bool ConfigureProcessors(const std::string& config);
 
 
         public:

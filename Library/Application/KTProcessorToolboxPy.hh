@@ -25,6 +25,12 @@ bool (Nymph::KTProcessorToolbox::*PushBackToRunQueue_vector)(std::vector< std::s
 bool (Nymph::KTProcessorToolbox::*AddProcessor_Ref)(const std::string&, Nymph::KTProcessor*) = &Nymph::KTProcessorToolbox::AddProcessor;
 bool (Nymph::KTProcessorToolbox::*AddProcessor_TypeStr)(const std::string&, const std::string&) = &Nymph::KTProcessorToolbox::AddProcessor;
 
+// Get Processor overloads
+Nymph::KTProcessor* (Nymph::KTProcessorToolbox::*GetProcessor_wrap)(const std::string&) = &Nymph::KTProcessorToolbox::GetProcessor;
+
+// Configure Processor overloads
+bool (Nymph::KTProcessorToolbox::*ConfigureProcessors_JsonStr)(const std::string&) = &Nymph::KTProcessorToolbox::ConfigureProcessors;
+
 void export_ProcessorToolbox()
 {
     using namespace Nymph;
@@ -32,10 +38,8 @@ void export_ProcessorToolbox()
     class_<KTProcessorToolbox, boost::noncopyable>("KTProcessorToolbox", init<std::string>())
         .def("Run", &KTProcessorToolbox::Run, "Call Run() on all processors in the run queue")
 
-        // Not adding Configure methods as they are for conf files, not interactive sessions
-
-        //TODO: not sure why this won't build, maybe because there is a const and non-const signature?
-        //.def("GetProcessor", &KTProcessorToolbox::GetProcessor, return_value_policy<reference_existing_object>(), "Get a pointer to a processor in the toolbox")
+        .def("GetProcessor", GetProcessor_wrap, return_value_policy<reference_existing_object>(), "Get a pointer to a processor in the toolbox")
+        .def("ConfigureProcessors", ConfigureProcessors_JsonStr, "Configure processors from a json dictionary. Top-level keys are processor names, values are dictionaries with their configurations")
         .def("AddProcessor", AddProcessor_Ref, "add a processor to the toolbox, toolbox takes ownership")
         .def("AddProcessor", AddProcessor_TypeStr, "add a processor to the toolbox, toolbox takes ownership")
         .def("RemoveProcessor", &KTProcessorToolbox::RemoveProcessor, "remove a processor from the toolbox")
