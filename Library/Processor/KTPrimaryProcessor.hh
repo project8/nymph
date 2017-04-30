@@ -12,22 +12,24 @@
 
 #include "KTLogger.hh"
 
+#include <future>
+
 namespace Nymph
 {
 
     class KTPrimaryProcessor : public KTProcessor
     {
         public:
-            KTPrimaryProcessor(const std::string& name = "default-primary-processor-name");
+            KTPrimaryProcessor( const std::string& name = "default-primary-processor-name" );
             virtual ~KTPrimaryProcessor();
 
         public:
             /// Callable function used by boost::thread
-            virtual void operator()();
+            virtual void operator()( std::promise< KTDataPtr >& promise );
 
         public:
             /// Starts the  main action of the processor
-            virtual bool Run() = 0;
+            virtual bool Run( std::promise< KTDataPtr >& promise ) = 0;
 
     };
 

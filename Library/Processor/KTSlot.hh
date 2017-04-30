@@ -9,6 +9,7 @@
 #define KTSLOT_HH_
 
 #include "KTData.hh"
+#include "KTException.hh"
 #include "KTLogger.hh"
 #include "KTSignal.hh"
 
@@ -51,6 +52,10 @@ namespace Nymph
 
             virtual ~KTSlot();
 
+            const std::string& GetName() const;
+
+        protected:
+            std::string fName;
     };
 
     // Typedefs for backwards compatibility
@@ -66,7 +71,7 @@ namespace Nymph
 
 
     /*!
-     @class KTDataSlot
+     @class KTSlotData
      @author N. S. Oblath
 
      @brief Creates a slot that takes a KTDataPtr object as the argument; the function that gets called should take 0 or more DataType&'s as its argument.
@@ -86,7 +91,7 @@ namespace Nymph
      Also optionally, a signal to be emitted after the return of the member function can be specified as the last argument.
     */
     template< class... XDataTypes >
-    class KTSlotData : public KTSlot< void, KTDataPtr >
+    class KTSlotData : public KTSlot< void, KTDataPtr,  KTDataPtrReturn&  >
     {
         //public:
             //typedef XDataType data_type;
@@ -104,7 +109,7 @@ namespace Nymph
 
             virtual ~KTSlotData();
 
-            void operator()( KTDataPtr data );
+            void operator()( KTDataPtr data, KTDataPtrReturn& ret );
 
         protected:
             template< typename... DataTypes >
@@ -203,14 +208,16 @@ namespace Nymph
 
     template< typename ReturnType, typename... Args >
     template< class XFuncOwnerType >
-    KTSlot< ReturnType, Args... >::KTSlot( const std::string& name, XFuncOwnerType* owner, ReturnType (XFuncOwnerType::*func)( Args... ) )
+    KTSlot< ReturnType, Args... >::KTSlot( const std::string& name, XFuncOwnerType* owner, ReturnType (XFuncOwnerType::*func)( Args... ) ):
+            fName( name )
     {
         owner->RegisterSlot( name, owner, func );
     }
 
     template< typename ReturnType, typename... Args >
     template< class XFuncOwnerType >
-    KTSlot< ReturnType, Args... >::KTSlot( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, ReturnType (XFuncOwnerType::*func)( Args... ) )
+    KTSlot< ReturnType, Args... >::KTSlot( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, ReturnType (XFuncOwnerType::*func)( Args... ) ) :
+            fName( name )
     {
         proc->RegisterSlot( name, owner, func );
     }
@@ -220,6 +227,11 @@ namespace Nymph
     {
     }
 
+    template< typename ReturnType, typename... Args >
+    const std::string& KTSlot< ReturnType, Args... >::GetName() const
+    {
+        return fName;
+    }
 
     // KTSlotData
 
@@ -247,28 +259,33 @@ namespace Nymph
     }
 
     template< class... XDataTypes >
-    void KTSlotData< XDataTypes... >::operator()( KTDataPtr data )
+    void KTSlotData< XDataTypes... >::operator()( KTDataPtr data, KTDataPtrReturn& ret )
     {
         // Standard data slot pattern:
-        // Check to ensure that the required data type is present
 
+        // Check to ensure that the required data type is present
         if( ! DataPresent< XDataTypes... >( data ) )
         {
-            KTFATAL( slotlog, "Failed to find all of the necessary data types in the standard slot function. Aborting." );
-            raise( SIGINT );
+            KTERROR( slotlog, "Failed to find all of the necessary data types in slot <" << fName << ">. Aborting." );
+            ret.set_exception( std::make_exception_ptr( KTException() << "Failed to find all of the necessary data types in slot <" << fName << ">. Aborting." ) );
             return;
         }
+
         // Call the function
         if( ! fFunc(data->Of< XDataTypes >()...) )
         {
-            KTFATAL( slotlog, "Something went wrong in the standard slot function. Aborting." );
-            raise( SIGINT );
+            KTERROR( slotlog, "Something went wrong in slot <" << fName << ">. Aborting." );
+            ret.set_exception( std::make_exception_ptr( KTException() << "Something went wrong in slot <" << fName << ">. Aborting." ) );
             return;
         }
+
+        // Set the return
+        ret.set_value( data );
+
         // If there's a signal pointer, emit the signal
         if( fSignalPtr != nullptr )
         {
-            (*fSignalPtr)( data );
+            (*fSignalPtr)( data, ret );
         }
         return;
     }

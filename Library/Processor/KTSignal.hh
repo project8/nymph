@@ -85,7 +85,7 @@ namespace Nymph
 
      That's it!
     */
-    typedef KTSignal< KTDataPtr > KTSignalData;
+    typedef KTSignal< KTDataPtr, KTDataPtrReturn& > KTSignalData;
 
 
     //*******************

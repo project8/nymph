@@ -91,7 +91,7 @@ namespace Nymph
             //*********
         public:
             /// Begins processing of queue (switches status from kStopped to kRunning)
-            bool Run();
+            bool Run( std::promise< KTDataPtr >& promise );
 
             /// Stops processing of queue (switches status to kStopped)
             void Stop();
@@ -225,7 +225,7 @@ namespace Nymph
     }
 
     template< class XProcessorType >
-    bool KTDataQueueProcessorTemplate< XProcessorType >::Run()
+    bool KTDataQueueProcessorTemplate< XProcessorType >::Run( std::promise< KTDataPtr >& promise )
     {
         fStatus = kRunning;
         KTINFO(eqplog, "Queue started");

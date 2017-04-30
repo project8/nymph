@@ -13,8 +13,8 @@
 #include "KTCutStatus.hh"
 #include "KTMemberVariable.hh"
 
-#include <boost/shared_ptr.hpp>
-
+#include <future>
+#include <memory>
 #include <string>
 
 namespace Nymph
@@ -71,7 +71,9 @@ namespace Nymph
         return fCutStatus;
     }
 
-    typedef boost::shared_ptr< KTData > KTDataPtr;
+    typedef std::shared_ptr< KTData > KTDataPtr;
+
+    typedef std::promise< KTDataPtr > KTDataPtrReturn;
 
 } /* namespace Nymph */
 #endif /* KTDATA_HH_ */
