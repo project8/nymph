@@ -80,7 +80,7 @@ namespace Nymph
         public:
             bool Filter(KTData& data);
 
-            void FilterData(KTDataPtr);
+            void FilterData(KTDataPtr dataPtr, KTDataPtrReturn& ret);
 
 
             //***************

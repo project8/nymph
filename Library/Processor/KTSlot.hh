@@ -275,7 +275,7 @@ namespace Nymph
         if( ! fFunc(data->Of< XDataTypes >()...) )
         {
             KTERROR( slotlog, "Something went wrong in slot <" << fName << ">. Aborting." );
-            ret.set_exception( std::make_exception_ptr( KTException() << "Something went wrong in slot <" << fName << ">. Aborting." ) );
+            THROW_RETURN_EXCEPTION( ret, KTException() << "Something went wrong in slot <" << fName << ">. Aborting." );
             return;
         }
 

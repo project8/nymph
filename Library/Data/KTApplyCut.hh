@@ -67,7 +67,7 @@ namespace Nymph
             KTCut* fCut;
 
         public:
-            void ApplyCut(KTDataPtr);
+            void ApplyCut(KTDataPtr dataPtr, KTDataPtrReturn& ret);
 
 
             //***************

@@ -31,15 +31,15 @@ namespace Nymph
         return true;
     }
 
-    void KTDataQueueProcessor::EmitDataSignal(KTDataPtr data)
+    void KTDataQueueProcessor::EmitDataSignal(KTDataPtr data, KTDataPtrReturn& ret)
     {
-        fDataSignal(data);
+        fDataSignal(data, ret);
         return;
     }
 
-    void KTDataQueueProcessor::QueueData(KTDataPtr& data)
+    void KTDataQueueProcessor::QueueData(KTDataPtr& data, KTDataPtrReturn& ret)
     {
-        return DoQueueData(data, &KTDataQueueProcessor::EmitDataSignal);
+        return DoQueueData(data, ret, &KTDataQueueProcessor::EmitDataSignal);
     }
 /*
     void KTDataQueueProcessor::QueueDataList(list< KTDataPtr >* dataList)

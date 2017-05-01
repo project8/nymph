@@ -83,11 +83,11 @@ namespace Nymph
     }
 
 
-    void KTApplyCut::ApplyCut(KTDataPtr dataPtr)
+    void KTApplyCut::ApplyCut(KTDataPtr dataPtr, KTDataPtrReturn& ret)
     {
         if (fCut == NULL)
         {
-            KTERROR(cutlog, "No cut was specified");
+            ret.set_exception( std::make_exception_ptr( KTException() << "No cut was specified" ) );
             return;
         }
 
@@ -95,13 +95,13 @@ namespace Nymph
 
         if (cutFailed)
         {
-            fAfterCutFailSignal(dataPtr);
+            fAfterCutFailSignal(dataPtr, ret);
         }
         else
         {
-            fAfterCutPassSignal(dataPtr);
+            fAfterCutPassSignal(dataPtr, ret);
         }
-        fAfterCutSignal(dataPtr);
+        fAfterCutSignal(dataPtr, ret);
         return;
     }
 

@@ -38,36 +38,36 @@ namespace Nymph
         return true;
     }
 
-    void KTPrintDataStructure::PrintDataStructure(KTDataPtr dataPtr)
+    void KTPrintDataStructure::PrintDataStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret)
     {
-        DoPrintDataStructure(dataPtr);
+        DoPrintDataStructure(dataPtr, ret);
 
-        fDataSignal(dataPtr);
+        fDataSignal(dataPtr, ret);
 
         return;
     }
 
-    void KTPrintDataStructure::PrintCutStructure(KTDataPtr dataPtr)
+    void KTPrintDataStructure::PrintCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret)
     {
-        DoPrintCutStructure(dataPtr);
+        DoPrintCutStructure(dataPtr, ret);
 
-        fDataSignal(dataPtr);
+        fDataSignal(dataPtr, ret);
 
         return;
     }
 
 
-    void KTPrintDataStructure::PrintDataAndCutStructure(KTDataPtr dataPtr)
+    void KTPrintDataStructure::PrintDataAndCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret)
     {
-        DoPrintDataStructure(dataPtr);
-        DoPrintCutStructure(dataPtr);
+        DoPrintDataStructure(dataPtr, ret);
+        DoPrintCutStructure(dataPtr, ret);
 
-        fDataSignal(dataPtr);
+        fDataSignal(dataPtr, ret);
 
         return;
     }
 
-    void KTPrintDataStructure::DoPrintDataStructure(KTDataPtr dataPtr)
+    void KTPrintDataStructure::DoPrintDataStructure(KTDataPtr dataPtr, KTDataPtrReturn&)
     {
         std::stringstream printbuf;
 
@@ -87,7 +87,7 @@ namespace Nymph
         return;
     }
 
-    void KTPrintDataStructure::DoPrintCutStructure(KTDataPtr dataPtr)
+    void KTPrintDataStructure::DoPrintCutStructure(KTDataPtr dataPtr, KTDataPtrReturn&)
     {
         std::stringstream printbuf;
 

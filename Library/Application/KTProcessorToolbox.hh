@@ -173,7 +173,7 @@ namespace Nymph
             {
                 bool operator() (const Thread& lhs, const Thread& rhs)
                 {
-                    return lhs.fName < rhs.fName;
+                    return lhs.fProc < rhs.fProc;
                 }
             };
             typedef std::set< Thread, CompareThread > ThreadGroup;

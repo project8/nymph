@@ -250,30 +250,32 @@ namespace Nymph
 #ifndef SINGLETHREADED
         unsigned iGroup = 0;
 #endif
-        for (RunQueue::const_iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
+        for (RunQueue::iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
         {
 //#ifdef SINGLETHREADED
-            std::promise< KTDataPtr > promise;
-            for (ThreadGroup::const_iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
+            for (ThreadGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
             {
-                std::thread thread( tgIter->fProc, &KTPrimaryProcessor::operator(), promise );
+                std::promise< KTDataPtr > promise;
+                std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( promise ) );
                 std::future< KTDataPtr > future = promise.get_future();
-                thread.join();
                 try
                 {
                     future.get();
                 }
                 catch( std::exception& e )
                 {
-                    KTERROR( proclog, "An error occurred while running processor <" << tgIter->fProc->GetName() << ">: " << e.what() );
+                    KTERROR( proclog, "An error occurred while running processor <" << tgIter->fName << ">: " << e.what() );
                     break;
                 }
+                thread.join();
                 //if (! tgIter->fProc->Run())
                 //{
                 //    return false;
                 //}
             }
 //#else
+// for now, don't do this seciton of code
+#if 0
             KTDEBUG(proclog, "Starting thread group " << iGroup);
             boost::thread_group parallelThreads;
             unsigned iThread = 0;
@@ -289,7 +291,7 @@ namespace Nymph
             // wait for execution to complete
             parallelThreads.join_all();
             iGroup++;
-//#endif
+#endif // this endif was here before i put in the temporary #if 0
         }
         KTPROG(proclog, ". . . processing complete.");
         return true;

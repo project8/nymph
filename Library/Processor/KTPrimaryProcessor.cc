@@ -7,6 +7,7 @@
 
 #include "KTPrimaryProcessor.hh"
 
+#include "KTException.hh"
 #include "KTLogger.hh"
 
 namespace Nymph
@@ -22,17 +23,16 @@ namespace Nymph
     {
     }
 
-    void KTPrimaryProcessor::operator ()( std::promise< KTDataPtr >& promise )
+    void KTPrimaryProcessor::operator ()( KTDataPtrReturn ret )
     {
-        if (! Run( promise ))
+        if (! Run( ret ))
         {
             KTERROR(proclog, "An error occurred during processor running.");
-            //TODO: make sure we're using the exception pointer correctly
-            promise.set_exception( std::make_exception_ptr( std::exception( "An error occurred during processor running" ) ) );
+            THROW_RETURN_EXCEPTION( ret, KTException() << "An error occurred during processor running" );
         }
         else
         {
-            promise.set_value( KTDataPtr() );
+            ret.set_value( KTDataPtr() );
         }
         return;
     }

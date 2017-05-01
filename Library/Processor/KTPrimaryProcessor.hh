@@ -10,6 +10,7 @@
 
 #include "KTProcessor.hh"
 
+#include "KTData.hh"
 #include "KTLogger.hh"
 
 #include <future>
@@ -25,11 +26,11 @@ namespace Nymph
 
         public:
             /// Callable function used by boost::thread
-            virtual void operator()( std::promise< KTDataPtr >& promise );
+            virtual void operator()( KTDataPtrReturn ret );
 
         public:
             /// Starts the  main action of the processor
-            virtual bool Run( std::promise< KTDataPtr >& promise ) = 0;
+            virtual bool Run( KTDataPtrReturn& ret ) = 0;
 
     };
 

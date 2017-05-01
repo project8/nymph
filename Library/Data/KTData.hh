@@ -75,5 +75,8 @@ namespace Nymph
 
     typedef std::promise< KTDataPtr > KTDataPtrReturn;
 
+#define THROW_RETURN_EXCEPTION( ret_promise, exception ) \
+    ret_promise.set_exception( std::make_exception_ptr( exception ) );
+
 } /* namespace Nymph */
 #endif /* KTDATA_HH_ */
