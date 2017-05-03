@@ -88,7 +88,7 @@ namespace Nymph
             KTConnection fConnection;
 
         public:
-            KTThreadReference* GetThreadRef();
+            KTThreadReference* GetThreadRef() const;
             void SetThreadRef(KTThreadReference* ref);
 
         private:
@@ -121,7 +121,7 @@ namespace Nymph
         return;
     }
 
-    inline KTThreadReference* KTSlotWrapper::GetThreadRef()
+    inline KTThreadReference* KTSlotWrapper::GetThreadRef() const
     {
         return fThreadRef;
     }

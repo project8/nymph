@@ -67,7 +67,7 @@ namespace Nymph
             KTCut* fCut;
 
         public:
-            void ApplyCut(KTDataPtr dataPtr, KTDataPtrReturn ret, KTProcessorToolbox::ThreadPacket& threadPacket);
+            void ApplyCut(KTDataPtr dataPtr);
 
 
             //***************
@@ -82,6 +82,8 @@ namespace Nymph
             //***************
             // Slots
             //***************
+
+            KTSlotWrapper* fApplyCutSW;
 
         private:
 

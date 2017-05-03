@@ -25,7 +25,7 @@ namespace Nymph
             fAfterCutPassSignal("pass", this),
             fAfterCutFailSignal("fail", this)
     {
-        RegisterSlot("apply", this, &KTApplyCut::ApplyCut);
+        fApplyCutSW = RegisterSlot("apply", this, &KTApplyCut::ApplyCut, {"all", "pass", "fail"});
     }
 
     KTApplyCut::~KTApplyCut()
@@ -83,25 +83,29 @@ namespace Nymph
     }
 
 
-    void KTApplyCut::ApplyCut(KTDataPtr dataPtr, KTDataPtrReturn ret, KTProcessorToolbox::ThreadPacket& threadPacket)
+    void KTApplyCut::ApplyCut(KTDataPtr dataPtr)
     {
+        KTThreadReference* ref = fApplyCutSW->GetThreadRef();
+
         if (fCut == NULL)
         {
-            ret.set_exception( std::make_exception_ptr( KTException() << "No cut was specified" ) );
+            ref->fDataPtrRet.set_exception( std::make_exception_ptr( KTException() << "No cut was specified" ) );
             return;
         }
 
         bool cutFailed = fCut->Apply(dataPtr);
 
+        ref->Break( dataPtr );
+
         if (cutFailed)
         {
-            fAfterCutFailSignal(dataPtr, ret, threadPacket);
+            fAfterCutFailSignal(dataPtr);
         }
         else
         {
-            fAfterCutPassSignal(dataPtr, ret, threadPacket);
+            fAfterCutPassSignal(dataPtr);
         }
-        fAfterCutSignal(dataPtr, ret, threadPacket);
+        fAfterCutSignal(dataPtr);
         return;
     }
 

@@ -52,13 +52,13 @@ namespace Nymph
             bool Configure(const scarab::param_node* node);
 
         public:
-            void PrintDataStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
-            void PrintCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
-            void PrintDataAndCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
+            void PrintDataStructure(KTDataPtr dataPtr);
+            void PrintCutStructure(KTDataPtr dataPtr);
+            void PrintDataAndCutStructure(KTDataPtr dataPtr);
 
         private:
-            void DoPrintDataStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
-            void DoPrintCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
+            void DoPrintDataStructure(KTDataPtr dataPtr);
+            void DoPrintCutStructure(KTDataPtr dataPtr);
 
             //***************
             // Signals
@@ -72,9 +72,9 @@ namespace Nymph
             //***************
 
         private:
-            KTSlot< void, KTDataPtr, KTDataPtrReturn& > fDataStructSlot;
-            KTSlot< void, KTDataPtr, KTDataPtrReturn& > fCutStructSlot;
-            KTSlot< void, KTDataPtr, KTDataPtrReturn& > fDataAndCutStructSlot;
+            KTSlot< void, KTDataPtr > fDataStructSlot;
+            KTSlot< void, KTDataPtr > fCutStructSlot;
+            KTSlot< void, KTDataPtr > fDataAndCutStructSlot;
 
     };
 }

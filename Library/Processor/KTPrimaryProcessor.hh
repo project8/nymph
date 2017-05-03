@@ -31,7 +31,8 @@ namespace Nymph
             /// Starts the  main action of the processor
             virtual bool Run() = 0;
 
-            void SetThreadReference( KTThreadReference&& ref );
+            void SetThreadRef( KTThreadReference&& ref );
+            KTThreadReference* GetThreadRef();
 
         protected:
             KTThreadReference fThreadRef;
@@ -39,10 +40,15 @@ namespace Nymph
 
     };
 
-    inline void KTPrimaryProcessor::SetThreadReference( KTThreadReference&& ref )
+    inline void KTPrimaryProcessor::SetThreadRef( KTThreadReference&& ref )
     {
         fThreadRef = ref;
         return;
+    }
+
+    inline KTThreadReference* KTPrimaryProcessor::GetThreadRef()
+    {
+        return &fThreadRef;
     }
 
 } /* namespace Nymph */

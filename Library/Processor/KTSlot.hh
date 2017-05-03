@@ -53,6 +53,8 @@ namespace Nymph
 
             const std::string& GetName() const;
 
+            KTSlotWrapper* GetSlotWrapper();
+
         protected:
             std::string fName;
             KTSlotWrapper* fSlotWrapper;
@@ -228,9 +230,15 @@ namespace Nymph
     }
 
     template< typename ReturnType, typename... Args >
-    const std::string& KTSlot< ReturnType, Args... >::GetName() const
+    inline const std::string& KTSlot< ReturnType, Args... >::GetName() const
     {
         return fName;
+    }
+
+    template< typename ReturnType, typename... Args >
+    inline KTSlotWrapper* KTSlot< ReturnType, Args... >::GetSlotWrapper()
+    {
+        return fSlotWrapper;
     }
 
     // KTSlotData

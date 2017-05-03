@@ -179,7 +179,7 @@ namespace Nymph
             RunQueue fRunQueue;
 
         public:
-            struct ThreadPacket
+/*            struct ThreadPacket
             {
                 KTProcessorToolbox* fProcTB;
                 bool fBreakFlag; // only use outside of blocks protected by fBreakContMutex are reads, so we shouldn't need to make this an atomic
@@ -189,7 +189,7 @@ namespace Nymph
                 void Break( const KTDataPtr& dataPtr, KTDataPtrReturn& ret  )
                 {
                     bool breakInititatedHere = false;
-                    if( /* breakpoint is set here */ false )
+                    if( /* breakpoint is set here *//* false )
                     {
                         breakInititatedHere = true;
                         fProcTB->InitiateBreak();
@@ -204,7 +204,7 @@ namespace Nymph
                     return;
                 }
             };
-
+*/
             /// Process the run queue.
             /// This will call Run() on all of the processors in the queue.
             bool Run();
@@ -227,7 +227,7 @@ namespace Nymph
             void TakeFuture( std::future< KTDataPtr > future );
 
             std::vector< std::future< KTDataPtr > > fThreadFutures;
-            std::vector< ThreadPacket > fThreadPackets;
+            std::vector< KTThreadIndicator > fThreadIndicators;
 
             std::promise< void > fContinueSignaler;
             std::shared_future< void > fMasterContSignal;

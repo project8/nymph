@@ -23,9 +23,9 @@ namespace Nymph
     KTPrintDataStructure::KTPrintDataStructure(const std::string& name) :
             KTProcessor(name),
             fDataSignal("data", this),
-            fDataStructSlot("print-data", this, &KTPrintDataStructure::PrintDataStructure),
-            fCutStructSlot("print-cuts", this, &KTPrintDataStructure::PrintCutStructure),
-            fDataAndCutStructSlot("print-data-and-cuts", this, &KTPrintDataStructure::PrintDataAndCutStructure)
+            fDataStructSlot("print-data", this, &KTPrintDataStructure::PrintDataStructure, {"data"}),
+            fCutStructSlot("print-cuts", this, &KTPrintDataStructure::PrintCutStructure, {"data"}),
+            fDataAndCutStructSlot("print-data-and-cuts", this, &KTPrintDataStructure::PrintDataAndCutStructure, {"data"})
     {
     }
 
@@ -38,36 +38,42 @@ namespace Nymph
         return true;
     }
 
-    void KTPrintDataStructure::PrintDataStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket)
+    void KTPrintDataStructure::PrintDataStructure(KTDataPtr dataPtr)
     {
-        DoPrintDataStructure(dataPtr, ret, threadPacket);
+        DoPrintDataStructure(dataPtr);
 
-        fDataSignal(dataPtr, ret, threadPacket);
+        fDataStructSlot.GetSlotWrapper()->GetThreadRef()->Break( dataPtr );
+
+        fDataSignal(dataPtr);
 
         return;
     }
 
-    void KTPrintDataStructure::PrintCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket)
+    void KTPrintDataStructure::PrintCutStructure(KTDataPtr dataPtr)
     {
-        DoPrintCutStructure(dataPtr, ret, threadPacket);
+        DoPrintCutStructure(dataPtr);
 
-        fDataSignal(dataPtr, ret, threadPacket);
+        fCutStructSlot.GetSlotWrapper()->GetThreadRef()->Break( dataPtr );
+
+        fDataSignal(dataPtr);
 
         return;
     }
 
 
-    void KTPrintDataStructure::PrintDataAndCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket)
+    void KTPrintDataStructure::PrintDataAndCutStructure(KTDataPtr dataPtr)
     {
-        DoPrintDataStructure(dataPtr, ret, threadPacket);
-        DoPrintCutStructure(dataPtr, ret, threadPacket);
+        DoPrintDataStructure(dataPtr);
+        DoPrintCutStructure(dataPtr);
 
-        fDataSignal(dataPtr, ret, threadPacket);
+        fDataAndCutStructSlot.GetSlotWrapper()->GetThreadRef()->Break( dataPtr );
+
+        fDataSignal(dataPtr);
 
         return;
     }
 
-    void KTPrintDataStructure::DoPrintDataStructure(KTDataPtr dataPtr, KTDataPtrReturn&, KTProcessorToolbox::ThreadPacket& threadPacket)
+    void KTPrintDataStructure::DoPrintDataStructure(KTDataPtr dataPtr)
     {
         std::stringstream printbuf;
 
@@ -87,7 +93,7 @@ namespace Nymph
         return;
     }
 
-    void KTPrintDataStructure::DoPrintCutStructure(KTDataPtr dataPtr, KTDataPtrReturn&, KTProcessorToolbox::ThreadPacket& threadPacket)
+    void KTPrintDataStructure::DoPrintCutStructure(KTDataPtr dataPtr)
     {
         std::stringstream printbuf;
 

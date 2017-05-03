@@ -16,13 +16,18 @@ namespace Nymph
 {
     class KTProcessorToolbox;
 
+    struct KTThreadIndicator
+    {
+        bool fBreakFlag; // only use outside of blocks protected by a mutex are reads, so we shouldn't need to make this an atomic
+        std::shared_future< void > fContinueSignal;
+    };
+
     struct KTThreadReference
     {
         KTDataPtrReturn fDataPtrRet;
         KTProcessorToolbox* fProcTB;
-        bool fBreakFlag; // only use outside of blocks protected by fBreakContMutex are reads, so we shouldn't need to make this an atomic
-        std::shared_future< void > fContinueSignal;
         std::thread* fThread;
+        KTThreadIndicator* fThreadIndicator;
 
         void Break( const KTDataPtr& dataPtr  );
     };

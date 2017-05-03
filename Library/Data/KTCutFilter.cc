@@ -28,7 +28,7 @@ namespace Nymph
             fAfterCutPassSignal("pass", this),
             fAfterCutFailSignal("fail", this)
     {
-        RegisterSlot("filter", this, &KTCutFilter::FilterData);
+        fFilterDataSW = RegisterSlot("filter", this, &KTCutFilter::FilterData, {"all", "pass", "fail"});
     }
 
     KTCutFilter::~KTCutFilter()
@@ -74,18 +74,25 @@ namespace Nymph
         return cutStatus.IsCut(fCutMask);
     }
 
-    void KTCutFilter::FilterData(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket)
+    void KTCutFilter::FilterData(KTDataPtr dataPtr)
     {
+        KTThreadReference* ref = fFilterDataSW->GetThreadRef();
+
         // all KTDataPtr's have KTData, so we won't bother checking
-        if (Filter(dataPtr->Of< KTData >()))
+
+        bool failCut = Filter(dataPtr->Of< KTData >());
+
+        ref->Break( dataPtr );
+
+        if (failCut)
         {
-            fAfterCutFailSignal(dataPtr, ret, threadPacket);
+            fAfterCutFailSignal(dataPtr);
         }
         else
         {
-            fAfterCutPassSignal(dataPtr, ret, threadPacket);
+            fAfterCutPassSignal(dataPtr);
         }
-        fAfterCutSignal(dataPtr, ret, threadPacket);
+        fAfterCutSignal(dataPtr);
 
         return;
     }

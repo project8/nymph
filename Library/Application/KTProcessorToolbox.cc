@@ -36,7 +36,7 @@ namespace Nymph
             fRunQueue(),
             fProcMap(),
             fThreadFutures(),
-            fThreadPackets(),
+            //fThreadPackets(),
             fContinueSignaler(),
             fMasterContSignal(),
             fBreakContMutex(),
@@ -504,7 +504,7 @@ namespace Nymph
                         {
                             std::string procName( tgIter->fName );
                             KTINFO( proclog, "Starting processor <" << procName << ">" );
-
+/*
                             KTDataPtrReturn dataRet;
                             fThreadFutures.push_back( dataRet.get_future() );
                             if( ! fThreadFutures.back().valid() )
@@ -512,14 +512,29 @@ namespace Nymph
                                 KTERROR( proclog, "Invalid thread future created" );
                                 throw std::future_error( std::future_errc::no_state );
                             }
+*/
+                            KTThreadReference thisThreadRef;
 
-                            fThreadPackets.push_back( ThreadPacket() );
-                            fThreadPackets.back().fProcTB = this;
-                            fThreadPackets.back().fContinueSignal = fMasterContSignal;
+                            fThreadFutures.push_back( thisThreadRef.fDataPtrRet.get_future() );
+                            if( ! fThreadFutures.back().valid() )
+                            {
+                                KTERROR( proclog, "Invalid thread future created" );
+                                throw std::future_error( std::future_errc::no_state );
+                            }
 
-                            std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( dataRet ), fThreadPackets.back() );
+                            fThreadIndicators.push_back( KTThreadIndicator() );
+                            fThreadIndicators.back().fBreakFlag = false;
+                            fThreadIndicators.back().fContinueSignal = fMasterContSignal;
 
-                            KTDEBUG( proclog, "Thread ID is <" << fThreadPackets.back().fThread->get_id() << ">" );
+                            thisThreadRef.fThreadIndicator = &fThreadIndicators.back();
+                            thisThreadRef.fProcTB = this;
+
+                            //std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( dataRet ), fThreadPackets.back() );
+                            tgIter->fProc->SetThreadRef( std::move( thisThreadRef ) );
+                            std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc );
+                            tgIter->fProc->GetThreadRef()->fThread = &thread;
+
+                            KTDEBUG( proclog, "Thread ID is <" << thread.get_id() << ">" );
 
                             bool stillRunning = true; // determines behavior that depends on whether a return from the thread was temporary or from the thread completing
                             do
@@ -531,7 +546,7 @@ namespace Nymph
                                 } while (status != std::future_status::ready);
 
                                 stillRunning = false;
-                                if( fThreadPackets.back().fBreakFlag )
+                                if( fThreadIndicators.back().fBreakFlag )
                                 {
                                     KTDEBUG( proclog, "Breakpoint reached" );
                                     continueSignal.wait();
@@ -641,9 +656,9 @@ namespace Nymph
 
         // reset all break flags
         fDoRunBreakFlag = false;
-        for( std::vector< ThreadPacket >::iterator tpIt = fThreadPackets.begin(); tpIt != fThreadPackets.end(); ++tpIt )
+        for( std::vector< KTThreadIndicator >::iterator tiIt = fThreadIndicators.begin(); tiIt != fThreadIndicators.end(); ++tiIt )
         {
-            tpIt->fBreakFlag = false;
+            tiIt->fBreakFlag = false;
         }
 
         KTINFO( proclog, "Continuing from breakpoint" );
@@ -653,9 +668,9 @@ namespace Nymph
         // reset the signaler and all signals
         // hopefull the delay of creating the new signaler and starting the for loop is enough that anything waiting on the old signal has already seen that signal and moved on
         fContinueSignaler = std::promise< void >();
-        for( std::vector< ThreadPacket >::iterator tpIt = fThreadPackets.begin(); tpIt != fThreadPackets(); ++tpIt )
+        for( std::vector< KTThreadIndicator >::iterator tiIt = fThreadIndicators.begin(); tiIt != fThreadIndicators(); ++tiIt )
         {
-            tpIt->fContinueSignal = fContinueSignaler.get_future();
+            tiIt->fContinueSignal = fContinueSignaler.get_future();
         }
 
         return;
@@ -667,9 +682,9 @@ namespace Nymph
 
         // set all break flags
         fDoRunBreakFlag = true;
-        for( std::vector< ThreadPacket >::iterator tpIt = fThreadPackets.begin(); tpIt != fThreadPackets.end(); ++tpIt )
+        for( std::vector< KTThreadIndicator >::iterator tiIt = fThreadIndicators.begin(); tiIt != fThreadIndicators.end(); ++tiIt )
         {
-            tpIt->fBreakFlag = true;
+            tiIt->fBreakFlag = true;
         }
 
         return;

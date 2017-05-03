@@ -48,6 +48,9 @@ namespace Nymph
 
     void KTProcessor::PassThreadRefUpdate(const std::string& slotName, KTThreadReference* threadRef)
     {
+        // update the thread reference pointer for this slot
+        GetSlot(slotName)->SetThreadRef(threadRef);
+
         // get the list of slot-to-signal connections for this slot
         auto stsRange = fSlotToSigMap.equal_range(slotName);
 
@@ -58,10 +61,8 @@ namespace Nymph
             auto sigConnRange = fSigConnMap.equal_range(stsIt->second);
             for (SigConnMapCIt sigConnIt = sigConnRange.first; sigConnIt != sigConnRange.second; ++sigConnIt)
             {
-                // update the thread reference pointer for this connection
-                sigConnIt->second.fThreadRef = threadRef;
                 // pass the update on to the connected-to processor
-                sigConnIt->second.fProc->PassThreadRefUpdate(sigConnIt->second.fSlotName, threadRef);
+                sigConnIt->second.first->PassThreadRefUpdate(sigConnIt->second.second, threadRef);
             }
         }
     }
