@@ -56,8 +56,12 @@ namespace Nymph
 
             boost_signal* Signal();
 
+            const std::string& GetName() const;
+
         protected:
             boost_signal fSignal;
+
+            std::string fName;
     };
 
     /// Convenience typedef for done signals
@@ -85,7 +89,7 @@ namespace Nymph
 
      That's it!
     */
-    typedef KTSignal< KTDataPtr, KTDataPtrReturn& > KTSignalData;
+    typedef KTSignal< KTDataPtr > KTSignalData;
 
 
     //*******************
@@ -94,19 +98,22 @@ namespace Nymph
 
     template< class... XSignalArguments >
     KTSignal< XSignalArguments... >::KTSignal( const std::string& name, KTProcessor* proc ) :
-            fSignal()
+            fSignal(),
+            fName( name )
     {
         proc->RegisterSignal(name, &fSignal);
     }
 
     template< class... XSignalArguments >
     KTSignal< XSignalArguments... >::KTSignal() :
-            fSignal()
+            fSignal(),
+            fName("none")
     {}
 
     template< class... XSignalArguments >
-    KTSignal< XSignalArguments... >::KTSignal( const KTSignal& ) :
-            fSignal()
+    KTSignal< XSignalArguments... >::KTSignal( const KTSignal& signal ) :
+            fSignal(),
+            fName( signal.fName )
     {}
 
     template< class... XSignalArguments >
@@ -124,6 +131,12 @@ namespace Nymph
     inline typename KTSignal< XSignalArguments... >::boost_signal* KTSignal< XSignalArguments... >::Signal()
     {
         return &fSignal;
+    }
+
+    template< class... XSignalArguments >
+    inline const std::string& KTSignal< XSignalArguments... >::GetName() const
+    {
+        return fName;
     }
 
 } /* namespace Nymph */

@@ -86,9 +86,9 @@ namespace Nymph
             void Start();
             void Stop();
 
-            void StartProfiling(KTDataPtr data, KTDataPtrReturn& ret);
+            void StartProfiling(KTDataPtr data, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
 
-            void Data(KTDataPtr data, KTDataPtrReturn& ret);
+            void Data(KTDataPtr data, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
 
             void Finish();
 

@@ -12,10 +12,11 @@
 
 namespace Nymph
 {
-    KTLOGGER(proclog, "KTPrimaryProcessor");
+    KTLOGGER( proclog, "KTPrimaryProcessor" );
 
-    KTPrimaryProcessor::KTPrimaryProcessor(const std::string& name) :
-            KTProcessor(name)
+    KTPrimaryProcessor::KTPrimaryProcessor( const std::string& name ) :
+            KTProcessor( name ),
+            fThreadRef()
     {
     }
 
@@ -23,16 +24,16 @@ namespace Nymph
     {
     }
 
-    void KTPrimaryProcessor::operator ()( KTDataPtrReturn ret )
+    void KTPrimaryProcessor::operator ()()
     {
-        if (! Run( ret ))
+        if( ! Run() )
         {
-            KTERROR(proclog, "An error occurred during processor running.");
-            THROW_RETURN_EXCEPTION( ret, KTException() << "An error occurred during processor running" );
+            KTERROR( proclog, "An error occurred during processor running." );
+            THROW_RETURN_EXCEPTION( fThreadRef.fDataPtrRet, KTException() << "An error occurred during processor running" );
         }
         else
         {
-            ret.set_value( KTDataPtr() );
+            fThreadRef.fDataPtrRet.set_value( KTDataPtr() );
         }
         return;
     }

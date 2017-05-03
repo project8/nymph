@@ -10,6 +10,7 @@
 
 #include "KTConnection.hh"
 #include "KTSignalWrapper.hh"
+#include "KTThreadReference.hh"
 
 #include <boost/signals2.hpp>
 
@@ -86,12 +87,20 @@ namespace Nymph
         private:
             KTConnection fConnection;
 
+        public:
+            KTThreadReference* GetThreadRef();
+            void SetThreadRef(KTThreadReference* ref);
+
+        private:
+            KTThreadReference* fThreadRef;
+
     };
 
     template< typename XSignature, typename XTypeContainer >
     KTSlotWrapper::KTSlotWrapper(XSignature signalPtr, XTypeContainer* typeCont) :
             fSlotWrapper(new KTSpecifiedInternalSlotWrapper< XSignature, XTypeContainer >(signalPtr, typeCont)),
-            fConnection()
+            fConnection(),
+            fThreadRef()
     {}
 
     inline void KTSlotWrapper::SetConnection(KTConnection conn)
@@ -109,6 +118,17 @@ namespace Nymph
     inline void KTSlotWrapper::Disconnect()
     {
         fConnection.disconnect();
+        return;
+    }
+
+    inline KTThreadReference* KTSlotWrapper::GetThreadRef()
+    {
+        return fThreadRef;
+    }
+
+    inline void KTSlotWrapper::SetThreadRef(KTThreadReference* ref)
+    {
+        fThreadRef = ref;
         return;
     }
 

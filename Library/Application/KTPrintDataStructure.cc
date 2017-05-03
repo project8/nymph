@@ -38,36 +38,36 @@ namespace Nymph
         return true;
     }
 
-    void KTPrintDataStructure::PrintDataStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret)
+    void KTPrintDataStructure::PrintDataStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket)
     {
-        DoPrintDataStructure(dataPtr, ret);
+        DoPrintDataStructure(dataPtr, ret, threadPacket);
 
-        fDataSignal(dataPtr, ret);
+        fDataSignal(dataPtr, ret, threadPacket);
 
         return;
     }
 
-    void KTPrintDataStructure::PrintCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret)
+    void KTPrintDataStructure::PrintCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket)
     {
-        DoPrintCutStructure(dataPtr, ret);
+        DoPrintCutStructure(dataPtr, ret, threadPacket);
 
-        fDataSignal(dataPtr, ret);
+        fDataSignal(dataPtr, ret, threadPacket);
 
         return;
     }
 
 
-    void KTPrintDataStructure::PrintDataAndCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret)
+    void KTPrintDataStructure::PrintDataAndCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket)
     {
-        DoPrintDataStructure(dataPtr, ret);
-        DoPrintCutStructure(dataPtr, ret);
+        DoPrintDataStructure(dataPtr, ret, threadPacket);
+        DoPrintCutStructure(dataPtr, ret, threadPacket);
 
-        fDataSignal(dataPtr, ret);
+        fDataSignal(dataPtr, ret, threadPacket);
 
         return;
     }
 
-    void KTPrintDataStructure::DoPrintDataStructure(KTDataPtr dataPtr, KTDataPtrReturn&)
+    void KTPrintDataStructure::DoPrintDataStructure(KTDataPtr dataPtr, KTDataPtrReturn&, KTProcessorToolbox::ThreadPacket& threadPacket)
     {
         std::stringstream printbuf;
 
@@ -87,7 +87,7 @@ namespace Nymph
         return;
     }
 
-    void KTPrintDataStructure::DoPrintCutStructure(KTDataPtr dataPtr, KTDataPtrReturn&)
+    void KTPrintDataStructure::DoPrintCutStructure(KTDataPtr dataPtr, KTDataPtrReturn&, KTProcessorToolbox::ThreadPacket& threadPacket)
     {
         std::stringstream printbuf;
 

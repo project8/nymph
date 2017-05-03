@@ -11,7 +11,7 @@
 #include "KTProcessor.hh"
 
 #include "KTData.hh"
-#include "KTLogger.hh"
+#include "KTThreadReference.hh"
 
 #include <future>
 
@@ -25,14 +25,25 @@ namespace Nymph
             virtual ~KTPrimaryProcessor();
 
         public:
-            /// Callable function used by boost::thread
-            virtual void operator()( KTDataPtrReturn ret );
+            /// Callable function used by std::thread
+            void operator()();
 
-        public:
             /// Starts the  main action of the processor
-            virtual bool Run( KTDataPtrReturn& ret ) = 0;
+            virtual bool Run() = 0;
+
+            void SetThreadReference( KTThreadReference&& ref );
+
+        protected:
+            KTThreadReference fThreadRef;
+
 
     };
+
+    inline void KTPrimaryProcessor::SetThreadReference( KTThreadReference&& ref )
+    {
+        fThreadRef = ref;
+        return;
+    }
 
 } /* namespace Nymph */
 #endif /* KTPRIMARYPROCESSOR_HH_ */

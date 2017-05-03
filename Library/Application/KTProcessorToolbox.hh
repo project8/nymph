@@ -10,7 +10,7 @@
 #define KTPROCESSORTOOLBOX_HH_
 
 #include "KTConfigurable.hh"
-//#include "KTNOFactory.hh"
+#include "KTMemberVariable.hh"
 
 #include "factory.hh"
 
@@ -47,6 +47,7 @@ namespace Nymph
 
      Available (nested) configuration values:
      <ul>
+         <li>run-single-threaded (bool) -- specify whether to run in single-threaded mode (will be ignored if the application has been compiled with the SINGLETHREADED flag set)
          <li>processors (array of objects) -- create a processor; each object in the array should consist of:
              <ul>
                  <li>type -- string specifying the processor type (matches the string given to the Registrar, which should be specified before the class implementation in each processor's .cc file).</li>
@@ -88,12 +89,7 @@ namespace Nymph
             /// Configure processors (only those specified in the toolbox)
             bool ConfigureProcessors(const scarab::param_node* node);
 
-
-        public:
-            /// Process the run queue.
-            /// This will call Run() on all of the processors in the queue.
-            bool Run();
-
+            MEMBERVARIABLE( bool, RunSingleThreaded );
 
         private:
             struct ProcessorInfo
@@ -182,6 +178,65 @@ namespace Nymph
 
             RunQueue fRunQueue;
 
+        public:
+            struct ThreadPacket
+            {
+                KTProcessorToolbox* fProcTB;
+                bool fBreakFlag; // only use outside of blocks protected by fBreakContMutex are reads, so we shouldn't need to make this an atomic
+                std::shared_future< void > fContinueSignal;
+                std::thread* fThread;
+
+                void Break( const KTDataPtr& dataPtr, KTDataPtrReturn& ret  )
+                {
+                    bool breakInititatedHere = false;
+                    if( /* breakpoint is set here */ false )
+                    {
+                        breakInititatedHere = true;
+                        fProcTB->InitiateBreak();
+                    }
+                    if( fBreakFlag || breakInititatedHere )
+                    {
+                        ret.set_value( dataPtr );
+                        fContinueSignal.wait();
+                        ret = KTDataPtrReturn();
+                        fProcTB->TakeFuture( ret.get_future() );
+                    }
+                    return;
+                }
+            };
+
+            /// Process the run queue.
+            /// This will call Run() on all of the processors in the queue.
+            bool Run();
+
+            void AsyncRun();
+
+            void WaitForContinue();
+
+            /// Returns when processing is completed or a breakpoint is reached
+            /// Throws an exception if an error occurred during processing
+            /// If the return is true, processing can continue after the break
+            bool WaitForBreak();
+
+            void Continue();
+
+        private:
+            // called from ThreadPacket::Break
+            void InitiateBreak();
+            // called from ThreadPacket::Break
+            void TakeFuture( std::future< KTDataPtr > future );
+
+            std::vector< std::future< KTDataPtr > > fThreadFutures;
+            std::vector< ThreadPacket > fThreadPackets;
+
+            std::promise< void > fContinueSignaler;
+            std::shared_future< void > fMasterContSignal;
+            std::mutex fBreakContMutex;
+
+            std::thread* fDoRunThread;
+            std::promise< void > fDoRunPromise;
+            bool fDoRunBreakFlag; // only use outside of blocks protected by fBreakContMutex is reads, so we shouldn't need to make this an atomic
+
     };
 
     inline void KTProcessorToolbox::PopBackOfRunQueue()
@@ -193,6 +248,18 @@ namespace Nymph
     inline void KTProcessorToolbox::ClearRunQueue()
     {
         fRunQueue.clear();
+        return;
+    }
+
+    inline void KTProcessorToolbox::WaitForContinue()
+    {
+        fMasterContSignal.wait();
+        return;
+    }
+
+    inline void KTProcessorToolbox::TakeFuture( std::future< KTDataPtr > future )
+    {
+        fThreadFutures.push_back( future );
         return;
     }
 

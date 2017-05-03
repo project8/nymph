@@ -17,6 +17,7 @@ namespace Nymph
         KTDataQueueProcessorTemplate< KTDataQueueProcessor >(name),
         fDataSignal("data", this)
     {
+        SetFuncPtr(&KTDataQueueProcessor::EmitDataSignal);
         RegisterSlot("data", this, &KTDataQueueProcessor::QueueData);
         //RegisterSlot("data-list", this, &KTDataQueueProcessor::QueueDataList);
     }
@@ -31,15 +32,15 @@ namespace Nymph
         return true;
     }
 
-    void KTDataQueueProcessor::EmitDataSignal(KTDataPtr data, KTDataPtrReturn& ret)
+    void KTDataQueueProcessor::EmitDataSignal(KTDataPtr data, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket)
     {
-        fDataSignal(data, ret);
+        fDataSignal(data, ret, threadPacket);
         return;
     }
 
-    void KTDataQueueProcessor::QueueData(KTDataPtr& data, KTDataPtrReturn& ret)
+    void KTDataQueueProcessor::QueueData(KTDataPtr& data, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket)
     {
-        return DoQueueData(data, ret, &KTDataQueueProcessor::EmitDataSignal);
+        return DoQueueData(data, ret, threadPacket);
     }
 /*
     void KTDataQueueProcessor::QueueDataList(list< KTDataPtr >* dataList)

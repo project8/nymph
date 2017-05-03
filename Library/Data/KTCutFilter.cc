@@ -74,18 +74,18 @@ namespace Nymph
         return cutStatus.IsCut(fCutMask);
     }
 
-    void KTCutFilter::FilterData(KTDataPtr dataPtr, KTDataPtrReturn& ret)
+    void KTCutFilter::FilterData(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket)
     {
         // all KTDataPtr's have KTData, so we won't bother checking
         if (Filter(dataPtr->Of< KTData >()))
         {
-            fAfterCutFailSignal(dataPtr, ret);
+            fAfterCutFailSignal(dataPtr, ret, threadPacket);
         }
         else
         {
-            fAfterCutPassSignal(dataPtr, ret);
+            fAfterCutPassSignal(dataPtr, ret, threadPacket);
         }
-        fAfterCutSignal(dataPtr, ret);
+        fAfterCutSignal(dataPtr, ret, threadPacket);
 
         return;
     }

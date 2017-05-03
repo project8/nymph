@@ -32,8 +32,17 @@ namespace Nymph
     KTProcessorToolbox::KTProcessorToolbox(const std::string& name) :
             KTConfigurable(name),
             fProcFactory(scarab::factory< KTProcessor, const std::string& >::get_instance()),
+            fRunSingleThreaded( true ), //TODO: switch this to false once multithreading is available
             fRunQueue(),
-            fProcMap()
+            fProcMap(),
+            fThreadFutures(),
+            fThreadPackets(),
+            fContinueSignaler(),
+            fMasterContSignal(),
+            fBreakContMutex(),
+            fDoRunThread( nullptr ),
+            fDoRunPromise(),
+            fDoRunBreakFlag( false )
     {
     }
 
@@ -45,7 +54,10 @@ namespace Nymph
     bool KTProcessorToolbox::Configure(const scarab::param_node* node)
     {
         KTPROG(proclog, "Configuring . . .");
-        // Deal with "processor" blocks first
+
+        SetRunSingleThreaded( node->get_value( "single-threaded", fRunSingleThreaded ) );
+
+        // Deal with "processor" blocks
         const scarab::param_array* procArray = node->array_at( "processors" );
         if (procArray == NULL)
         {
@@ -243,60 +255,6 @@ namespace Nymph
         }
         return true;
     }
-
-    bool KTProcessorToolbox::Run()
-    {
-        KTPROG(proclog, "Beginning processing . . .");
-#ifndef SINGLETHREADED
-        unsigned iGroup = 0;
-#endif
-        for (RunQueue::iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
-        {
-//#ifdef SINGLETHREADED
-            for (ThreadGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
-            {
-                std::promise< KTDataPtr > promise;
-                std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( promise ) );
-                std::future< KTDataPtr > future = promise.get_future();
-                try
-                {
-                    future.get();
-                }
-                catch( std::exception& e )
-                {
-                    KTERROR( proclog, "An error occurred while running processor <" << tgIter->fName << ">: " << e.what() );
-                    break;
-                }
-                thread.join();
-                //if (! tgIter->fProc->Run())
-                //{
-                //    return false;
-                //}
-            }
-//#else
-// for now, don't do this seciton of code
-#if 0
-            KTDEBUG(proclog, "Starting thread group " << iGroup);
-            boost::thread_group parallelThreads;
-            unsigned iThread = 0;
-            for (ThreadGroup::const_iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
-            {
-                // create a boost::thread object to launch the thread
-                // use boost::ref to avoid copying the processor
-                KTDEBUG(proclog, "Starting thread " << iThread << ": " << tgIter->fName);
-                parallelThreads.create_thread(boost::ref(*(tgIter->fProc)));
-                //parallelThreads.create_thread(boost::ref(**tgIter));
-                iThread++;
-            }
-            // wait for execution to complete
-            parallelThreads.join_all();
-            iGroup++;
-#endif // this endif was here before i put in the temporary #if 0
-        }
-        KTPROG(proclog, ". . . processing complete.");
-        return true;
-    }
-
 
     KTProcessor* KTProcessorToolbox::GetProcessor(const std::string& procName)
     {
@@ -507,5 +465,303 @@ namespace Nymph
         group.insert(Thread(primaryProc, name));
         return true;
     }
+
+    void KTProcessorToolbox::AsyncRun()
+    {
+        if( fDoRunThread != nullptr )
+        {
+            KTERROR( proclog, "It appears that a run has already been started" );
+            return;
+        }
+
+        bool willRunSingleThreaded = fRunSingleThreaded;
+#ifdef SINGLETHREADED
+        willRunSingleThreaded = true;
+#endif
+
+        if( willRunSingleThreaded )
+        {
+            auto singleThreadRun = [&]()
+            {
+                try
+                {
+                    // reset the continue signaler
+                    fContinueSignaler = std::promise< void >();
+                    fMasterContSignal( fContinueSignaler.get_future() );
+                    if( ! fMasterContSignal.valid() )
+                    {
+                        KTERROR( proclog, "Invalid master continue-signal created" );
+                        throw std::future_error( std::future_errc::no_state );
+                    }
+                    // copy for use in this function
+                    std::shared_future< void > continueSignal = fMasterContSignal;
+
+                    KTPROG( proclog, "Starting single-threaded processing" );
+
+                    for (RunQueue::iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
+                    {
+                        for (ThreadGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
+                        {
+                            std::string procName( tgIter->fName );
+                            KTINFO( proclog, "Starting processor <" << procName << ">" );
+
+                            KTDataPtrReturn dataRet;
+                            fThreadFutures.push_back( dataRet.get_future() );
+                            if( ! fThreadFutures.back().valid() )
+                            {
+                                KTERROR( proclog, "Invalid thread future created" );
+                                throw std::future_error( std::future_errc::no_state );
+                            }
+
+                            fThreadPackets.push_back( ThreadPacket() );
+                            fThreadPackets.back().fProcTB = this;
+                            fThreadPackets.back().fContinueSignal = fMasterContSignal;
+
+                            std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( dataRet ), fThreadPackets.back() );
+
+                            KTDEBUG( proclog, "Thread ID is <" << fThreadPackets.back().fThread->get_id() << ">" );
+
+                            bool stillRunning = true; // determines behavior that depends on whether a return from the thread was temporary or from the thread completing
+                            do
+                            {
+                                std::future_status status;
+                                do
+                                {
+                                    status = fThreadFutures.back().wait_for(std::chrono::milliseconds(500));
+                                } while (status != std::future_status::ready);
+
+                                stillRunning = false;
+                                if( fThreadPackets.back().fBreakFlag )
+                                {
+                                    KTDEBUG( proclog, "Breakpoint reached" );
+                                    continueSignal.wait();
+                                    stillRunning = true;
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        fThreadFutures.back().get();
+                                    }
+                                    catch( std::exception& e )
+                                    {
+                                        // this transfers an exception thrown by a processor to the outer catch block in this function
+                                        throw KTException() << "An error occurred while running processor <" << procName << ">: " << e.what();
+                                    }
+                                    stillRunning = false;
+                                }
+                            } while( stillRunning );
+
+                            KTINFO( proclog, "Processor <" << procName << "> has finished" );
+
+                            thread.join();
+                        } // end for loop over the thread group
+                    } // end for loop over the run-queue
+
+                    KTPROG( proclog, "Processing is complete (single-threaded)" );
+                }
+                catch( ... )
+                {
+                    // exceptions thrown in this function or from within processors will end up here
+                    fDoRunPromise.set_exception( std::current_exception() );
+                }
+                fDoRunPromise.set_value();
+                return;
+            };
+
+            fDoRunThread = new std::thread( singleThreadRun );
+        }
+        else
+        {
+            auto multiThreadRun = [&]()
+            {
+                try
+                {
+                    std::shared_future< void > fMasterContSignal( fContinueSignaler.get_future() );
+                    if( ! fMasterContSignal.valid() )
+                    {
+                        KTERROR( proclog, "Invalid master continue-signal created" );
+                        throw std::future_error( std::future_errc::no_state );
+                    }
+
+                    KTPROG( proclog, "Starting multi-threaded processing" );
+
+                    // TODO logic to start threads goes here
+
+                    KTPROG( proclog, "Processing is complete (multi-threaded)" );
+                }
+                catch( ... )
+                {
+                    fDoRunPromise.set_exception( std::current_exception() );
+                }
+                fDoRunPromise.set_value();
+                return;
+            };
+
+            fDoRunThread = new std::thread( multiThreadRun );
+        }
+
+        return;
+    }
+
+    bool KTProcessorToolbox::WaitForBreak()
+    {
+        std::future< void > doRunFuture = fDoRunPromise.get_future();
+
+        std::future_status doRunStatus;
+        do
+        {
+            doRunStatus = doRunFuture.wait_for( std::chrono::milliseconds( 500 ) );
+        } while( doRunStatus != std::future_status::ready );
+
+        if( fDoRunBreakFlag )
+        {
+            KTDEBUG( proclog, "Breakpoint reached" );
+            return true;
+        }
+
+        try
+        {
+            doRunFuture.get();
+            return false;
+        }
+        catch( std::exception& e )
+        {
+            // this transfers an exception thrown by a processor to the outer catch block in this function
+            throw;
+        }
+    }
+
+    void KTProcessorToolbox::Continue()
+    {
+        std::unique_lock< std::mutex > breakContLock( fBreakContMutex );
+
+        // futures have been used; clear them to be replaced
+        fThreadFutures.clear();
+
+        // reset all break flags
+        fDoRunBreakFlag = false;
+        for( std::vector< ThreadPacket >::iterator tpIt = fThreadPackets.begin(); tpIt != fThreadPackets.end(); ++tpIt )
+        {
+            tpIt->fBreakFlag = false;
+        }
+
+        KTINFO( proclog, "Continuing from breakpoint" );
+        // signal everything to resume
+        fContinueSignaler.set_value();
+
+        // reset the signaler and all signals
+        // hopefull the delay of creating the new signaler and starting the for loop is enough that anything waiting on the old signal has already seen that signal and moved on
+        fContinueSignaler = std::promise< void >();
+        for( std::vector< ThreadPacket >::iterator tpIt = fThreadPackets.begin(); tpIt != fThreadPackets(); ++tpIt )
+        {
+            tpIt->fContinueSignal = fContinueSignaler.get_future();
+        }
+
+        return;
+    }
+
+    void KTProcessorToolbox::InitiateBreak()
+    {
+        std::unique_lock< std::mutex > breakContLock( fBreakContMutex );
+
+        // set all break flags
+        fDoRunBreakFlag = true;
+        for( std::vector< ThreadPacket >::iterator tpIt = fThreadPackets.begin(); tpIt != fThreadPackets.end(); ++tpIt )
+        {
+            tpIt->fBreakFlag = true;
+        }
+
+        return;
+    }
+
+    bool KTProcessorToolbox::Run()
+    {
+        AsyncRun();
+
+        std::future< void > doRunFuture = fDoRunPromise.get_future();
+
+        try
+        {
+            while( WaitForBreak() )
+            {
+                KTINFO( proclog, "Skipping breakpoint" );
+                Continue();
+            }
+        }
+        catch( std::exception& e )
+        {
+            KTERROR( proclog, "An error occurred: " << e.what() );
+            return false;
+        }
+
+        return true;
+
+        /*
+        KTPROG(proclog, "Beginning processing . . .");
+#ifndef SINGLETHREADED
+        unsigned iGroup = 0;
+#endif
+        try
+        {
+            for (RunQueue::iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
+            {
+    //#ifdef SINGLETHREADED
+                for (ThreadGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
+                {
+                    std::promise< KTDataPtr > promise;
+                    std::future< KTDataPtr > future = promise.get_future();
+                    std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( promise ) );
+                    if( ! future.valid() )
+                    {
+                        throw std::future_error( std::future_errc::no_state );
+                    }
+                    std::future_status status;
+                    do
+                    {
+                        status = future.wait_for(std::chrono::milliseconds(500));
+                    } while (status != std::future_status::ready);
+
+                    try
+                    {
+                        future.get();
+                    }
+                    catch( std::exception& e )
+                    {
+                        throw KTException() << "An error occurred while running processor <" << tgIter->fName << ">: " << e.what();
+                    }
+                    thread.join();
+                }
+//#else
+// for now, don't do this section of code
+#if 0
+                KTDEBUG(proclog, "Starting thread group " << iGroup);
+                boost::thread_group parallelThreads;
+                unsigned iThread = 0;
+                for (ThreadGroup::const_iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
+                {
+                    // create a boost::thread object to launch the thread
+                    // use boost::ref to avoid copying the processor
+                    KTDEBUG(proclog, "Starting thread " << iThread << ": " << tgIter->fName);
+                    parallelThreads.create_thread(boost::ref(*(tgIter->fProc)));
+                    //parallelThreads.create_thread(boost::ref(**tgIter));
+                    iThread++;
+                }
+                // wait for execution to complete
+                parallelThreads.join_all();
+                iGroup++;
+#endif // this endif was here before i put in the temporary #if 0
+            }
+        }
+        catch( std::exception& e )
+        {
+            KTERROR( proclog, e.what() );
+            return false;
+        }
+        KTPROG(proclog, ". . . processing complete.");
+        return true;
+        */
+    }
+
 
 } /* namespace Nymph */

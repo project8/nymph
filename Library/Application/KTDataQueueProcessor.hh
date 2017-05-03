@@ -46,10 +46,12 @@ namespace Nymph
     class KTDataQueueProcessorTemplate : public KTPrimaryProcessor
     {
         public:
+            typedef void (XProcessorType::*FuncPtrType)(KTDataPtr, KTDataPtrReturn&, KTProcessorToolbox::ThreadPacket&);
+
             struct DataAndFunc
             {
                 KTDataPtr fData;
-                void (XProcessorType::*fFuncPtr)(KTDataPtr, KTDataPtrReturn&);
+                FuncPtrType fFuncPtr;
             };
 
             typedef KTConcurrentQueue< DataAndFunc > Queue;
@@ -76,14 +78,14 @@ namespace Nymph
         protected:
             Status fStatus;
 
-            //**************************************
-            // Derived Processor function pointer
-            //**************************************
+            //**********************************************
+            // Derived Processor function pointer (optional)
+            //**********************************************
         public:
-            void SetFuncPtr(void (XProcessorType::*ptr)(KTDataPtr, KTDataPtrReturn&));
+            void SetFuncPtr(FuncPtrType ptr);
 
         protected:
-            void (XProcessorType::*fFuncPtr)(KTDataPtr, KTDataPtrReturn&);
+            FuncPtrType fFuncPtr;
 
 
             //*********
@@ -91,13 +93,13 @@ namespace Nymph
             //*********
         public:
             /// Begins processing of queue (switches status from kStopped to kRunning)
-            bool Run( KTDataPtrReturn& ret );
+            bool Run( KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket );
 
             /// Stops processing of queue (switches status to kStopped)
             void Stop();
 
             /// Begins processing of queue if status is already kRunning; otherwise does nothing.
-            bool ProcessQueue( KTDataPtrReturn& ret );
+            bool ProcessQueue( KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket );
 
             void ClearQueue();
 
@@ -109,9 +111,13 @@ namespace Nymph
             // Queueing functions for slots
             //*********
         protected:
-            /// Queue an data object
+            /// Queue an data object with a provided function
             /// Assumes ownership of the data; original shared pointer will be nullified
-            void DoQueueData(KTDataPtr& data, KTDataPtrReturn& ret, void (XProcessorType::*func)(KTDataPtr, KTDataPtrReturn&));
+            void DoQueueData(KTDataPtr& data, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket, FuncPtrType func);
+
+            /// Queue an data object with fFuncPtr
+            /// Assumes ownership of the data; original shared pointer will be nullified
+            void DoQueueData(KTDataPtr& data, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
 
             /// Queue a list of data objects
             /// Assumes ownership of all data objects and the list; original shared pointers will be nullified
@@ -168,7 +174,7 @@ namespace Nymph
             bool ConfigureSubClass(const scarab::param_node* node);
 
         public:
-            void EmitDataSignal(KTDataPtr data, KTDataPtrReturn& ret);
+            void EmitDataSignal(KTDataPtr data, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
 
             //***************
             // Signals
@@ -183,7 +189,7 @@ namespace Nymph
         public:
             /// Queue an data object; will emit data signal
             /// Assumes ownership of the data; original shared pointer will be nullified
-            void QueueData(KTDataPtr& data, KTDataPtrReturn& ret);
+            void QueueData(KTDataPtr& data, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
 
             /// Queue a list of data objects; will emit data signal
             /// Assumes ownership of all data objects and the list; original shared pointers will be nullified
@@ -227,11 +233,11 @@ namespace Nymph
     }
 
     template< class XProcessorType >
-    bool KTDataQueueProcessorTemplate< XProcessorType >::Run( std::promise< KTDataPtr >& ret )
+    bool KTDataQueueProcessorTemplate< XProcessorType >::Run( std::promise< KTDataPtr >& ret, KTProcessorToolbox::ThreadPacket& threadPacket )
     {
         fStatus = kRunning;
         KTINFO(eqplog, "Queue started");
-        return ProcessQueue( ret );
+        return ProcessQueue( ret, threadPacket );
     }
 
     template< class XProcessorType >
@@ -244,7 +250,7 @@ namespace Nymph
     }
 
     template< class XProcessorType >
-    void KTDataQueueProcessorTemplate< XProcessorType >::SetFuncPtr(void (XProcessorType::*ptr)(KTDataPtr, KTDataPtrReturn&))
+    void KTDataQueueProcessorTemplate< XProcessorType >::SetFuncPtr(FuncPtrType ptr)
     {
         fFuncPtr = ptr;
         return;
@@ -252,7 +258,7 @@ namespace Nymph
 
 
     template< class XProcessorType >
-    bool KTDataQueueProcessorTemplate< XProcessorType >::ProcessQueue( KTDataPtrReturn& ret )
+    bool KTDataQueueProcessorTemplate< XProcessorType >::ProcessQueue( KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket )
     {
         KTINFO(eqplog, "Beginning to process queue");
         while (fStatus != kStopped)
@@ -262,7 +268,7 @@ namespace Nymph
             if ((fQueue.*fPopFromQueue)(daf))
             {
                 KTDEBUG(eqplog, "Data acquired for processing");
-                (static_cast<XProcessorType*>(this)->*(daf.fFuncPtr))(daf.fData, ret);
+                (static_cast<XProcessorType*>(this)->*(daf.fFuncPtr))(daf.fData, ret, threadPacket);
                 if (daf.fData->GetLastData()) fStatus = kStopped;
             }
             else
@@ -296,7 +302,7 @@ namespace Nymph
 
 
     template< class XProcessorType >
-    void KTDataQueueProcessorTemplate< XProcessorType >::DoQueueData(KTDataPtr& data, KTDataPtrReturn& ret, void (XProcessorType::*func)(KTDataPtr, KTDataPtrReturn&))
+    void KTDataQueueProcessorTemplate< XProcessorType >::DoQueueData(KTDataPtr& data, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket, FuncPtrType func)
     {
         KTDEBUG(eqplog, "Queueing data");
         DataAndFunc daf;
@@ -304,6 +310,13 @@ namespace Nymph
         data.reset();
         daf.fFuncPtr = func;
         fQueue.push(daf);
+        return;
+    }
+
+    template< class XProcessorType >
+    void KTDataQueueProcessorTemplate< XProcessorType >::DoQueueData(KTDataPtr& data, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket)
+    {
+        DoQueueData(data, ret, threadPacket, &fFuncPtr);
         return;
     }
 /*

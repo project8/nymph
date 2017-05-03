@@ -52,13 +52,13 @@ namespace Nymph
             bool Configure(const scarab::param_node* node);
 
         public:
-            void PrintDataStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret);
-            void PrintCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret);
-            void PrintDataAndCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret);
+            void PrintDataStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
+            void PrintCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
+            void PrintDataAndCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
 
         private:
-            void DoPrintDataStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret);
-            void DoPrintCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret);
+            void DoPrintDataStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
+            void DoPrintCutStructure(KTDataPtr dataPtr, KTDataPtrReturn& ret, KTProcessorToolbox::ThreadPacket& threadPacket);
 
             //***************
             // Signals

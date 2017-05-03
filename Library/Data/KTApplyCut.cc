@@ -83,7 +83,7 @@ namespace Nymph
     }
 
 
-    void KTApplyCut::ApplyCut(KTDataPtr dataPtr, KTDataPtrReturn& ret)
+    void KTApplyCut::ApplyCut(KTDataPtr dataPtr, KTDataPtrReturn ret, KTProcessorToolbox::ThreadPacket& threadPacket)
     {
         if (fCut == NULL)
         {
@@ -95,13 +95,13 @@ namespace Nymph
 
         if (cutFailed)
         {
-            fAfterCutFailSignal(dataPtr, ret);
+            fAfterCutFailSignal(dataPtr, ret, threadPacket);
         }
         else
         {
-            fAfterCutPassSignal(dataPtr, ret);
+            fAfterCutPassSignal(dataPtr, ret, threadPacket);
         }
-        fAfterCutSignal(dataPtr, ret);
+        fAfterCutSignal(dataPtr, ret, threadPacket);
         return;
     }
 
