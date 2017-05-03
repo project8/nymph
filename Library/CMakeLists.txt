@@ -1,6 +1,8 @@
 # CMakeLists for Nymph/Library
 # Author: N. Oblath
 
+include( PythonPackage )
+
 set( UTIL_DIR Utility )
 set( DATA_DIR Data )
 set( PROC_DIR Processor )
@@ -78,7 +80,17 @@ set( NYMPH_SOURCEFILES
     ${APPL_DIR}/KTThroughputProfiler.cc
 )
 
+set( NYMPH_PY_HEADERFILES
+    ${DATA_DIR}/KTDataPy.hh
+    ${PROC_DIR}/KTProcessorPy.hh
+    ${APPL_DIR}/KTProcessorToolboxPy.hh
+)
+
 ##################################################
 
 pbuilder_library( Nymph NYMPH_SOURCEFILES "" )
 pbuilder_install_headers( ${NYMPH_HEADERFILES} )
+
+if (Nymph_ENABLE_PYTHON)
+    python_package_add_module(NymphPy.cc)
+endif (Nymph_ENABLE_PYTHON)

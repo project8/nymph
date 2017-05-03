@@ -79,7 +79,8 @@
         private: \
             TYPE f##NAME; \
         public: \
-            inline const TYPE& Get##NAME() const {return f##NAME;}
+            inline const TYPE& Get##NAME() const {return f##NAME;} \
+            inline TYPE& GET##NAME() {return f##NAME;}
 
 #define MEMBERVARIABLEREF(TYPE, NAME) \
         MEMBERVARIABLEREF_NOSET(TYPE, NAME) \
@@ -89,7 +90,8 @@
         protected: \
             TYPE f##NAME; \
         public: \
-            inline const TYPE& Get##NAME() const {return f##NAME;}
+            inline const TYPE& Get##NAME() const {return f##NAME;} \
+            inline TYPE& GET##NAME() {return f##NAME;}
 
 #define MEMBERVARIABLEREF_PROTECTED(TYPE, NAME) \
         MEMBERVARIABLEREF_PROTECTED_NOSET(TYPE, NAME) \

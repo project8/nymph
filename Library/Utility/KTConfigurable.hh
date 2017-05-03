@@ -31,6 +31,8 @@ namespace Nymph
             virtual bool Configure(const scarab::param_node* node) = 0;
             /// Implement the option for calling Configure without passing a parameter store node.
             //virtual bool Configure();
+            /// Configure from a JSON string
+            bool Configure(const std::string& config);
 
         protected:
             KTCommandLineHandler* fCLHandler;

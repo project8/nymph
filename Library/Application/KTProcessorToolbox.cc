@@ -18,6 +18,8 @@
 
 #include <vector>
 
+#include "param_codec.hh"
+
 using std::deque;
 using std::set;
 using std::string;
@@ -242,6 +244,14 @@ namespace Nymph
         return true;
     }
 
+    bool KTProcessorToolbox::ConfigureProcessors(const std::string& config)
+    {
+        scarab::param_translator translator;
+        scarab::param_node optNode;
+        optNode.add( "encoding", new scarab::param_value( "json" ) );
+        return ConfigureProcessors( &translator.read_string( config, &optNode )->as_node() );
+    }
+
     bool KTProcessorToolbox::Run()
     {
         KTPROG(proclog, "Beginning processing . . .");
@@ -312,6 +322,29 @@ namespace Nymph
             pInfo.fProc = proc;
             fProcMap.insert(ProcMapValue(procName, pInfo));
             KTDEBUG(proclog, "Added processor <" << procName << "> (a.k.a. " << proc->GetConfigName() << ")");
+            return true;
+        }
+        KTWARN(proclog, "Processor <" << procName << "> already exists; new processor was not added.");
+        return false;
+    }
+
+    bool KTProcessorToolbox::AddProcessor(const std::string& procType, const std::string& procName)
+    {
+        ProcMapIt it = fProcMap.find(procName);
+        if (it == fProcMap.end())
+        {
+            KTProcessor* newProc = fProcFactory->create(procType, procType);
+            if (newProc == NULL)
+            {
+                KTERROR(proclog, "Unable to create processor of type <" << procType << ">");
+                return false;
+            }
+            if (! AddProcessor(procName, newProc))
+            {
+                KTERROR(proclog, "Unable to add processor <" << procName << ">");
+                delete newProc;
+                return false;
+            }
             return true;
         }
         KTWARN(proclog, "Processor <" << procName << "> already exists; new processor was not added.");

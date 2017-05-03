@@ -87,6 +87,8 @@ namespace Nymph
 
             /// Configure processors (only those specified in the toolbox)
             bool ConfigureProcessors(const scarab::param_node* node);
+            /// Configure processors from a json-encoding of their configurations
+            bool ConfigureProcessors(const std::string& config);
 
 
         public:
@@ -114,6 +116,7 @@ namespace Nymph
             /// Add a processor to the toolbox
             /// Toolbox takes ownership of the processor
             bool AddProcessor(const std::string& procName, KTProcessor* proc);
+            bool AddProcessor(const std::string& procType, const std::string& procName);
 
             /// Remove a processor from the toolbox
             bool RemoveProcessor(const std::string& procName);
