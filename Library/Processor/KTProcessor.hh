@@ -52,6 +52,9 @@ namespace Nymph
             KTProcessor(const std::string& name="default-proc-name");
             virtual ~KTProcessor();
 
+            template< class XDerivedProc >
+            static scarab::registrar< Nymph::KTProcessor, XDerivedProc, const std::string& >* RegisterProcessor( const std::string& name );
+
         public:
 
             void ConnectASlot(const std::string& signalName, KTProcessor* processor, const std::string& slotName, int groupNum=-1);
@@ -134,6 +137,11 @@ namespace Nymph
         return;
     }
 
+    template< class XDerivedProc >
+    scarab::registrar< KTProcessor, XDerivedProc, const std::string& >* KTProcessor::RegisterProcessor( const std::string& name )
+    {
+        return new scarab::registrar< KTProcessor, XDerivedProc, const std::string& >( name );
+    }
 
 #define KT_REGISTER_PROCESSOR(proc_class, proc_name) \
         static ::scarab::registrar< ::Nymph::KTProcessor, proc_class, const std::string& > sProc##proc_class##Registrar( proc_name );
