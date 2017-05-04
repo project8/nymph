@@ -14,7 +14,7 @@
 
 namespace Nymph
 {
-    class KTProcessorToolbox;
+    //class KTProcessorToolbox;
 
     struct KTThreadIndicator
     {
@@ -25,7 +25,9 @@ namespace Nymph
     struct KTThreadReference
     {
         KTDataPtrReturn fDataPtrRet;
-        KTProcessorToolbox* fProcTB;
+        //KTProcessorToolbox* fProcTB;
+        std::function< void() > fInitiateBreakFunc;
+        std::function< void(std::future< KTDataPtr >&&) > fRefreshFutureFunc;
         std::thread* fThread;
         KTThreadIndicator* fThreadIndicator;
 

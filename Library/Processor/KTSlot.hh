@@ -275,7 +275,7 @@ namespace Nymph
         if( ! DataPresent< XDataTypes... >( dataPtr ) )
         {
             KTERROR( slotlog, "Failed to find all of the necessary data types in slot <" << fName << ">. Aborting." );
-            ref->fDataPtrRet.set_exception( std::make_exception_ptr( KTException() << "Failed to find all of the necessary data types in slot <" << fName << ">. Aborting." ) );
+            THROW_RETURN_EXCEPTION( ref->fDataPtrRet, KTException() << "Failed to find all of the necessary data types in slot <" << fName << ">. Aborting." );
             return;
         }
 

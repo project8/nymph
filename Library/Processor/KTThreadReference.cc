@@ -7,25 +7,29 @@
 
 #include "KTThreadReference.hh"
 
-#include "KTProcessorToolbox.hh"
+//#include "KTProcessorToolbox.hh"
 
 namespace Nymph
 {
 
     KTThreadReference::KTThreadReference() :
             fDataPtrRet(),
-            fProcTB( nullptr ),
+            //fProcTB( nullptr ),
+            fInitiateBreakFunc(),
+            fRefreshFutureFunc(),
             fThread( nullptr ),
             fThreadIndicator( nullptr )
     {}
 
     KTThreadReference::KTThreadReference( KTThreadReference&& orig ) :
             fDataPtrRet( std::move( orig.fDataPtrRet ) ),
-            fProcTB( orig.fProcTB ),
+            //fProcTB( orig.fProcTB ),
+            fInitiateBreakFunc( std::move( orig.fInitiateBreakFunc ) ),
+            fRefreshFutureFunc( std::move( orig.fRefreshFutureFunc ) ),
             fThread( orig.fThread ),
             fThreadIndicator( orig.fThreadIndicator )
     {
-        orig.fProcTB = nullptr;
+        //orig.fProcTB = nullptr;
         orig.fThread = nullptr;
         orig.fThreadIndicator = nullptr;
     }
@@ -33,11 +37,13 @@ namespace Nymph
     KTThreadReference& KTThreadReference::operator=( KTThreadReference&& orig )
     {
         fDataPtrRet = std::move( orig.fDataPtrRet );
-        fProcTB = orig.fProcTB;
+        //fProcTB = orig.fProcTB;
+        fInitiateBreakFunc = std::move( orig.fInitiateBreakFunc );
+        fRefreshFutureFunc = std::move( orig.fRefreshFutureFunc );
         fThread = orig.fThread;
         fThreadIndicator = orig.fThreadIndicator;
 
-        orig.fProcTB = nullptr;
+        //orig.fProcTB = nullptr;
         orig.fThread = nullptr;
         orig.fThreadIndicator = nullptr;
 
@@ -51,14 +57,16 @@ namespace Nymph
         if( /* breakpoint is set here */ false )
         {
             breakInititatedHere = true;
-            fProcTB->InitiateBreak();
+            fInitiateBreakFunc();
+            //fProcTB->InitiateBreak();
         }
         if( fThreadIndicator->fBreakFlag || breakInititatedHere )
         {
             fDataPtrRet.set_value( dataPtr );
             fThreadIndicator->fContinueSignal.wait();
             fDataPtrRet = KTDataPtrReturn();
-            fProcTB->TakeFuture( fDataPtrRet.get_future() );
+            //fProcTB->TakeFuture( fDataPtrRet.get_future() );
+            fRefreshFutureFunc( fDataPtrRet.get_future() );
         }
         return;
     }

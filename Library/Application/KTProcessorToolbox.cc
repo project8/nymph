@@ -528,7 +528,9 @@ namespace Nymph
                             fThreadIndicators.back().fContinueSignal = fMasterContSignal;
 
                             thisThreadRef.fThreadIndicator = &fThreadIndicators.back();
-                            thisThreadRef.fProcTB = this;
+                            //thisThreadRef.fProcTB = this;
+                            thisThreadRef.fInitiateBreakFunc = [&](){ this->InitiateBreak(); };
+                            thisThreadRef.fRefreshFutureFunc = [&]( std::future< KTDataPtr >&& ret ){ this->TakeFuture( std::move(ret) ); };
 
                             //std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( dataRet ), fThreadPackets.back() );
                             tgIter->fProc->SetThreadRef( std::move( thisThreadRef ) );
