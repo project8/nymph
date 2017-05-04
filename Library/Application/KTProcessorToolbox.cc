@@ -505,15 +505,7 @@ namespace Nymph
                         {
                             std::string procName( tgIter->fName );
                             KTINFO( proclog, "Starting processor <" << procName << ">" );
-/*
-                            KTDataPtrReturn dataRet;
-                            fThreadFutures.push_back( dataRet.get_future() );
-                            if( ! fThreadFutures.back().valid() )
-                            {
-                                KTERROR( proclog, "Invalid thread future created" );
-                                throw std::future_error( std::future_errc::no_state );
-                            }
-*/
+
                             KTThreadReference thisThreadRef;
 
                             fThreadFutures.push_back( thisThreadRef.fDataPtrRet.get_future() );
@@ -524,18 +516,13 @@ namespace Nymph
                             }
 
                             fThreadIndicators.push_back( KTThreadIndicator() );
-                            fThreadIndicators.back().fBreakFlag = false;
                             fThreadIndicators.back().fContinueSignal = fMasterContSignal;
 
                             thisThreadRef.fThreadIndicator = &fThreadIndicators.back();
-                            //thisThreadRef.fProcTB = this;
                             thisThreadRef.fInitiateBreakFunc = [&](){ this->InitiateBreak(); };
                             thisThreadRef.fRefreshFutureFunc = [&]( std::future< KTDataPtr >&& ret ){ this->TakeFuture( std::move(ret) ); };
 
-                            //std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( dataRet ), fThreadPackets.back() );
-                            //tgIter->fProc->SetThreadRef( std::move( thisThreadRef ) );
                             std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( thisThreadRef ) );
-                            //tgIter->fProc->GetThreadRef()->fThread = &thread;
 
                             KTDEBUG( proclog, "Thread ID is <" << thread.get_id() << ">" );
 
@@ -714,72 +701,6 @@ namespace Nymph
         }
 
         return true;
-
-        /*
-        KTPROG(proclog, "Beginning processing . . .");
-#ifndef SINGLETHREADED
-        unsigned iGroup = 0;
-#endif
-        try
-        {
-            for (RunQueue::iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
-            {
-    //#ifdef SINGLETHREADED
-                for (ThreadGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
-                {
-                    std::promise< KTDataPtr > promise;
-                    std::future< KTDataPtr > future = promise.get_future();
-                    std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( promise ) );
-                    if( ! future.valid() )
-                    {
-                        throw std::future_error( std::future_errc::no_state );
-                    }
-                    std::future_status status;
-                    do
-                    {
-                        status = future.wait_for(std::chrono::milliseconds(500));
-                    } while (status != std::future_status::ready);
-
-                    try
-                    {
-                        future.get();
-                    }
-                    catch( std::exception& e )
-                    {
-                        throw KTException() << "An error occurred while running processor <" << tgIter->fName << ">: " << e.what();
-                    }
-                    thread.join();
-                }
-//#else
-// for now, don't do this section of code
-#if 0
-                KTDEBUG(proclog, "Starting thread group " << iGroup);
-                boost::thread_group parallelThreads;
-                unsigned iThread = 0;
-                for (ThreadGroup::const_iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
-                {
-                    // create a boost::thread object to launch the thread
-                    // use boost::ref to avoid copying the processor
-                    KTDEBUG(proclog, "Starting thread " << iThread << ": " << tgIter->fName);
-                    parallelThreads.create_thread(boost::ref(*(tgIter->fProc)));
-                    //parallelThreads.create_thread(boost::ref(**tgIter));
-                    iThread++;
-                }
-                // wait for execution to complete
-                parallelThreads.join_all();
-                iGroup++;
-#endif // this endif was here before i put in the temporary #if 0
-            }
-        }
-        catch( std::exception& e )
-        {
-            KTERROR( proclog, e.what() );
-            return false;
-        }
-        KTPROG(proclog, ". . . processing complete.");
-        return true;
-        */
     }
-
 
 } /* namespace Nymph */
