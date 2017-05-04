@@ -11,6 +11,8 @@
 
 #include "KTProcessor.hh"
 
+bool (Nymph::KTConfigurable::*Configure_JsonStr)(const std::string& config) = &Nymph::KTConfigurable::Configure;
+
 void export_Processor()
 {
     using namespace Nymph;
@@ -21,6 +23,7 @@ void export_Processor()
         .def("ConnectASlot", &KTProcessor::ConnectASlot)
         .def("ConnectASignal", &KTProcessor::ConnectASignal)
         .def("ConnectSignalToSlot", &KTProcessor::ConnectSignalToSlot)
+        .def("Configure", Configure_JsonStr, "Configure from json encoded configuration")
         //.def("GetSignal", KTProcessor::GetSignal)
         //.def("RegisterSignal", &KTProcessor::RegisterSignal)
         ;
