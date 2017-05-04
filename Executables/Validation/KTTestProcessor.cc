@@ -39,8 +39,8 @@ namespace Nymph
 
     KTTestProcessorB::KTTestProcessorB()
     {
-        RegisterSlot("first_slot", this, &KTTestProcessorB::Slot1);
-        RegisterSlot("second_slot", this, &KTTestProcessorB::Slot2);
+        RegisterSlot("first_slot", this, &KTTestProcessorB::Slot1, {});
+        RegisterSlot("second_slot", this, &KTTestProcessorB::Slot2, {});
     }
 
     KTTestProcessorB::~KTTestProcessorB()
