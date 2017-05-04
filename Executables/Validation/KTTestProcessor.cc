@@ -14,9 +14,8 @@ namespace Nymph
     KTLOGGER(testsiglog, "KTTestProcessor")
 
     KTTestProcessorA::KTTestProcessorA() :
-            fTheSignal()
+            fTheSignal("the-signal", this)
     {
-        RegisterSignal("the_signal", &fTheSignal);
     }
 
     KTTestProcessorA::~KTTestProcessorA()
@@ -37,10 +36,10 @@ namespace Nymph
 
 
 
-    KTTestProcessorB::KTTestProcessorB()
+    KTTestProcessorB::KTTestProcessorB() :
+            fSlot1("first-slot", this, &KTTestProcessorB::SlotFunc1, {}),
+            fSlot2("second-slot", this, &KTTestProcessorB::SlotFunc2, {})
     {
-        RegisterSlot("first_slot", this, &KTTestProcessorB::Slot1, {});
-        RegisterSlot("second_slot", this, &KTTestProcessorB::Slot2, {});
     }
 
     KTTestProcessorB::~KTTestProcessorB()
@@ -52,15 +51,15 @@ namespace Nymph
         return true;
     }
 
-    void KTTestProcessorB::Slot1(int input)
+    void KTTestProcessorB::SlotFunc1(int input)
     {
         KTINFO(testsiglog, "Slot1: input is " << input);
         return;
     }
 
-    void KTTestProcessorB::Slot2(int input)
+    void KTTestProcessorB::SlotFunc2(int input)
     {
-        KTINFO(testsiglog, "Slot2: twice input is " << 2*input);
+        KTINFO(testsiglog, "Slot2: twice input is " << 2 * input);
         return;
     }
 

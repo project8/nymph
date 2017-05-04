@@ -8,7 +8,6 @@
 #ifndef KTSLOT_HH_
 #define KTSLOT_HH_
 
-#include "KTData.hh"
 #include "KTException.hh"
 #include "KTLogger.hh"
 #include "KTSignal.hh"
@@ -37,17 +36,17 @@ namespace Nymph
      Initialize the slot with the name of the slot, the address of the owner of the slot function, and the function pointer.
      Optionally, if the Processor is separate from the owner of the slot function, the Processor address is specified as the second argument to the constructor.
     */
-    template< typename ReturnType, typename... Args >
+    template< typename... Args >
     class KTSlot
     {
         public:
             /// Constructor for the case where the processor has the function that will be called by the slot
             template< class XFuncOwnerType >
-            KTSlot( const std::string& name, XFuncOwnerType* owner, ReturnType (XFuncOwnerType::*func)( Args... ), std::initializer_list< std::string > signals );
+            KTSlot( const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( Args... ), std::initializer_list< std::string > signals );
 
             /// Constructor for the case where the processor and the object with the function that will be called are different
             template< class XFuncOwnerType >
-            KTSlot( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, ReturnType (XFuncOwnerType::*func)( Args... ), std::initializer_list< std::string > signals );
+            KTSlot( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( Args... ), std::initializer_list< std::string > signals );
 
             virtual ~KTSlot();
 
@@ -62,14 +61,13 @@ namespace Nymph
 
     // Typedefs for backwards compatibility
 
-    template < typename ReturnType >
-    using KTSlotNoArg = KTSlot< ReturnType >;
+    typedef KTSlot<> KTSlotNoArg;
 
-    template < typename ReturnType, typename Arg1 >
-    using KTSlotOneArg = KTSlot< ReturnType, Arg1 >;
+    template < typename Arg1 >
+    using KTSlotOneArg = KTSlot< Arg1 >;
 
-    template< typename ReturnType, typename Arg1, typename Arg2 >
-    using KTSlotTwoArg = KTSlot< ReturnType, Arg1, Arg2 >;
+    template< typename Arg1, typename Arg2 >
+    using KTSlotTwoArg = KTSlot< Arg1, Arg2 >;
 
 
     /*!
@@ -93,7 +91,7 @@ namespace Nymph
      Also optionally, a signal to be emitted after the return of the member function can be specified as the last argument.
     */
     template< class... XDataTypes >
-    class KTSlotData : public KTSlot< void, KTDataPtr  >
+    class KTSlotData : public KTSlot< KTDataPtr  >
     {
         //public:
             //typedef XDataType data_type;
@@ -182,7 +180,7 @@ namespace Nymph
 
      Also optionally, a signal to be emitted after the return of the member function can be specified as the last argument.
     */
-    class KTSlotDone : public KTSlot< void >
+    class KTSlotDone : public KTSlot<>
     {
         public:
             /// Constructor for the case where the processor has the function that will be called by the slot
@@ -208,35 +206,35 @@ namespace Nymph
 
     // KTSlot
 
-    template< typename ReturnType, typename... Args >
+    template< typename... Args >
     template< class XFuncOwnerType >
-    KTSlot< ReturnType, Args... >::KTSlot( const std::string& name, XFuncOwnerType* owner, ReturnType (XFuncOwnerType::*func)( Args... ), std::initializer_list< std::string > signals ):
+    KTSlot< Args... >::KTSlot( const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( Args... ), std::initializer_list< std::string > signals ):
             fName( name )
     {
         fSlotWrapper = owner->RegisterSlot( name, owner, func, signals );
     }
 
-    template< typename ReturnType, typename... Args >
+    template< typename... Args >
     template< class XFuncOwnerType >
-    KTSlot< ReturnType, Args... >::KTSlot( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, ReturnType (XFuncOwnerType::*func)( Args... ), std::initializer_list< std::string > signals ) :
+    KTSlot< Args... >::KTSlot( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( Args... ), std::initializer_list< std::string > signals ) :
             fName( name )
     {
         fSlotWrapper = proc->RegisterSlot( name, owner, func, signals );
     }
 
-    template< typename ReturnType, typename... Args >
-    KTSlot< ReturnType, Args... >::~KTSlot()
+    template< typename... Args >
+    KTSlot< Args... >::~KTSlot()
     {
     }
 
-    template< typename ReturnType, typename... Args >
-    inline const std::string& KTSlot< ReturnType, Args... >::GetName() const
+    template< typename... Args >
+    inline const std::string& KTSlot< Args... >::GetName() const
     {
         return fName;
     }
 
-    template< typename ReturnType, typename... Args >
-    inline KTSlotWrapper* KTSlot< ReturnType, Args... >::GetSlotWrapper()
+    template< typename... Args >
+    inline KTSlotWrapper* KTSlot< Args... >::GetSlotWrapper()
     {
         return fSlotWrapper;
     }
