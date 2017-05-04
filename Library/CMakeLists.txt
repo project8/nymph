@@ -56,7 +56,6 @@ set( NYMPH_SOURCEFILES
     ${UTIL_DIR}/KTDirectory.cc
     ${UTIL_DIR}/KTEventLoop.cc
     ${UTIL_DIR}/KTException.cc
-    ${UTIL_DIR}/KTLogger.cc
     ${UTIL_DIR}/KTTime.cc
     ${DATA_DIR}/KTApplyCut.cc
     ${DATA_DIR}/KTCut.cc
