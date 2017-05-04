@@ -28,9 +28,9 @@ namespace Nymph
             fTimeEnd(),
             fNDataProcessed(0)
     {
-        RegisterSlot("start", this, &KTThroughputProfiler::StartProfiling);
-        RegisterSlot("data", this, &KTThroughputProfiler::Data);
-        RegisterSlot("stop", this, &KTThroughputProfiler::Finish);
+        RegisterSlot("start", this, &KTThroughputProfiler::StartProfiling, {});
+        RegisterSlot("data", this, &KTThroughputProfiler::Data, {});
+        RegisterSlot("stop", this, &KTThroughputProfiler::Finish, {});
     };
 
     KTThroughputProfiler::~KTThroughputProfiler()
@@ -64,7 +64,7 @@ namespace Nymph
         return Diff(fTimeStart, fTimeEnd);
     }
 
-    void KTThroughputProfiler::StartProfiling(KTDataPtr header, KTDataPtrReturn&, KTProcessorToolbox::ThreadPacket&)
+    void KTThroughputProfiler::StartProfiling(KTDataPtr header)
     {
         KTINFO(proflog, "Profiling started");
         fNDataProcessed = 0;
@@ -72,7 +72,7 @@ namespace Nymph
         return;
     }
 
-    void KTThroughputProfiler::Data(KTDataPtr data, KTDataPtrReturn&, KTProcessorToolbox::ThreadPacket&)
+    void KTThroughputProfiler::Data(KTDataPtr data)
     {
         (void)data;
         fNDataProcessed++;

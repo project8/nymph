@@ -18,7 +18,7 @@ namespace Nymph
         fDataSignal("data", this)
     {
         SetFuncPtr(&KTDataQueueProcessor::EmitDataSignal);
-        fQueueDataSW = RegisterSlot("data", this, &KTDataQueueProcessor::QueueData);
+        fQueueDataSW = RegisterSlot("data", this, &KTDataQueueProcessor::QueueData, {});
         //RegisterSlot("data-list", this, &KTDataQueueProcessor::QueueDataList);
     }
 

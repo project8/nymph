@@ -213,9 +213,9 @@ namespace Nymph
             fPopFromQueue(&KTConcurrentQueue< DataAndFunc >::wait_and_pop),
             fQueueDoneSignal("queue-done", this)
     {
-        RegisterSlot("use-timed-pop", this, &KTDataQueueProcessorTemplate< XProcessorType >::SwitchToTimedPop);
-        RegisterSlot("use-untimed-pop", this, &KTDataQueueProcessorTemplate< XProcessorType >::SwitchToUntimedPop);
-        RegisterSlot("use-single-pop", this, &KTDataQueueProcessorTemplate< XProcessorType >::SwitchToSinglePop);
+        RegisterSlot("use-timed-pop", this, &KTDataQueueProcessorTemplate< XProcessorType >::SwitchToTimedPop, {});
+        RegisterSlot("use-untimed-pop", this, &KTDataQueueProcessorTemplate< XProcessorType >::SwitchToUntimedPop, {});
+        RegisterSlot("use-single-pop", this, &KTDataQueueProcessorTemplate< XProcessorType >::SwitchToSinglePop, {});
     }
 
     template< class XProcessorType >
@@ -317,7 +317,7 @@ namespace Nymph
     template< class XProcessorType >
     void KTDataQueueProcessorTemplate< XProcessorType >::DoQueueData(KTDataPtr& data)
     {
-        DoQueueData(data, &fFuncPtr);
+        DoQueueData(data, fFuncPtr);
         return;
     }
 /*

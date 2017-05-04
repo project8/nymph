@@ -42,7 +42,7 @@ namespace Nymph
 
     inline void KTPrimaryProcessor::SetThreadRef( KTThreadReference&& ref )
     {
-        fThreadRef = ref;
+        fThreadRef = std::move( ref );
         return;
     }
 

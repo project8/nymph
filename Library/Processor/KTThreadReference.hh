@@ -29,6 +29,13 @@ namespace Nymph
         std::thread* fThread;
         KTThreadIndicator* fThreadIndicator;
 
+        KTThreadReference();
+        KTThreadReference( const KTThreadReference& ) = delete;
+        KTThreadReference( KTThreadReference&& orig );
+
+        KTThreadReference& operator=( const KTThreadReference& ) = delete;
+        KTThreadReference& operator=( KTThreadReference&& );
+
         void Break( const KTDataPtr& dataPtr  );
     };
 

@@ -7,8 +7,43 @@
 
 #include "KTThreadReference.hh"
 
+#include "KTProcessorToolbox.hh"
+
 namespace Nymph
 {
+
+    KTThreadReference::KTThreadReference() :
+            fDataPtrRet(),
+            fProcTB( nullptr ),
+            fThread( nullptr ),
+            fThreadIndicator( nullptr )
+    {}
+
+    KTThreadReference::KTThreadReference( KTThreadReference&& orig ) :
+            fDataPtrRet( std::move( orig.fDataPtrRet ) ),
+            fProcTB( orig.fProcTB ),
+            fThread( orig.fThread ),
+            fThreadIndicator( orig.fThreadIndicator )
+    {
+        orig.fProcTB = nullptr;
+        orig.fThread = nullptr;
+        orig.fThreadIndicator = nullptr;
+    }
+
+    KTThreadReference& KTThreadReference::operator=( KTThreadReference&& orig )
+    {
+        fDataPtrRet = std::move( orig.fDataPtrRet );
+        fProcTB = orig.fProcTB;
+        fThread = orig.fThread;
+        fThreadIndicator = orig.fThreadIndicator;
+
+        orig.fProcTB = nullptr;
+        orig.fThread = nullptr;
+        orig.fThreadIndicator = nullptr;
+
+        return *this;
+    }
+
 
     void KTThreadReference::Break( const KTDataPtr& dataPtr  )
     {

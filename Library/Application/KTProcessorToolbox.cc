@@ -7,6 +7,7 @@
 
 #include "KTProcessorToolbox.hh"
 
+#include "KTException.hh"
 #include "KTLogger.hh"
 #include "KTPrimaryProcessor.hh"
 
@@ -487,7 +488,7 @@ namespace Nymph
                 {
                     // reset the continue signaler
                     fContinueSignaler = std::promise< void >();
-                    fMasterContSignal( fContinueSignaler.get_future() );
+                    fMasterContSignal = fContinueSignaler.get_future();
                     if( ! fMasterContSignal.valid() )
                     {
                         KTERROR( proclog, "Invalid master continue-signal created" );
@@ -666,9 +667,9 @@ namespace Nymph
         fContinueSignaler.set_value();
 
         // reset the signaler and all signals
-        // hopefull the delay of creating the new signaler and starting the for loop is enough that anything waiting on the old signal has already seen that signal and moved on
-        fContinueSignaler = std::promise< void >();
-        for( std::vector< KTThreadIndicator >::iterator tiIt = fThreadIndicators.begin(); tiIt != fThreadIndicators(); ++tiIt )
+        // hopefully the delay of creating the new signaler and starting the for loop is enough that anything waiting on the old signal has already seen that signal and moved on
+        fContinueSignaler = std::move( std::promise< void >() );
+        for( std::vector< KTThreadIndicator >::iterator tiIt = fThreadIndicators.begin(); tiIt != fThreadIndicators.end(); ++tiIt )
         {
             tiIt->fContinueSignal = fContinueSignaler.get_future();
         }

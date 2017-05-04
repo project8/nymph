@@ -11,10 +11,12 @@
 
 #include "KTConfigurable.hh"
 #include "KTMemberVariable.hh"
+#include "KTThreadReference.hh"
 
 #include "factory.hh"
 
 #include <deque>
+#include <future>
 #include <initializer_list>
 #include <limits>
 #include <set>
@@ -221,10 +223,12 @@ namespace Nymph
             void Continue();
 
         private:
+            friend class KTThreadReference;
+
             // called from ThreadPacket::Break
             void InitiateBreak();
             // called from ThreadPacket::Break
-            void TakeFuture( std::future< KTDataPtr > future );
+            void TakeFuture( std::future< KTDataPtr >&& future );
 
             std::vector< std::future< KTDataPtr > > fThreadFutures;
             std::vector< KTThreadIndicator > fThreadIndicators;
@@ -257,9 +261,9 @@ namespace Nymph
         return;
     }
 
-    inline void KTProcessorToolbox::TakeFuture( std::future< KTDataPtr > future )
+    inline void KTProcessorToolbox::TakeFuture( std::future< KTDataPtr >&& future )
     {
-        fThreadFutures.push_back( future );
+        fThreadFutures.push_back( std::move( future ) );
         return;
     }
 
