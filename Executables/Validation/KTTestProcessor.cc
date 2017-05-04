@@ -7,6 +7,7 @@
 
 #include "KTTestProcessor.hh"
 
+#include "KTException.hh"
 #include "KTLogger.hh"
 
 namespace Nymph
@@ -32,8 +33,6 @@ namespace Nymph
         fTheSignal(value);
         return;
     }
-
-
 
 
     KTTestProcessorB::KTTestProcessorB() :
@@ -63,6 +62,37 @@ namespace Nymph
         return;
     }
 
+
+
+    KTTestProcessorC::KTTestProcessorC() :
+            fSlot1("first-slot", this, &KTTestProcessorC::SlotFunc1, {})
+    {
+    }
+
+    KTTestProcessorC::~KTTestProcessorC()
+    {
+    }
+
+    bool KTTestProcessorC::Configure(const scarab::param_node*)
+    {
+        return true;
+    }
+
+    void KTTestProcessorC::SlotFunc1(int input)
+    {
+        KTThreadReference* ref = fSlot1.GetSlotWrapper()->GetThreadRef();
+
+        try
+        {
+            KTINFO(testsiglog, "Slot1: input is " << input);
+            throw KTException() << "A HUGE problem occurred!!!! (just kidding, this is the expected result)";
+        }
+        catch( ... )
+        {
+            ref->fDataPtrRet.set_exception( std::current_exception() );
+        }
+        return;
+    }
 
 
 } /* namespace Nymph */

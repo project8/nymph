@@ -33,7 +33,7 @@ int main()
     */
 
     /* More Complicated Test */
-    KTINFO(testsiglog, "Connecting the_signal to first_slot and second_slot");
+    KTINFO(testsiglog, "Connecting the-signal to first-slot and second-slot");
     try
     {
         tpA.ConnectASlot("the-signal", &tpB, "first-slot", 20);

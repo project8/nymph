@@ -34,7 +34,7 @@ namespace Nymph
     };
 
     /*!
-     * A simple test procesor that has two slots with integer arguments
+     * A simple test processor that has two slots with integer arguments
      */
     class KTTestProcessorB : public KTProcessor
     {
@@ -50,7 +50,24 @@ namespace Nymph
         private:
             KTSlot< int > fSlot1;
             KTSlot< int > fSlot2;
-};
+    };
+
+    /*!
+     * A simple test processor that has one slot that throws an exception
+     */
+    class KTTestProcessorC : public KTProcessor
+    {
+        public:
+            KTTestProcessorC();
+            virtual ~KTTestProcessorC();
+
+            bool Configure(const scarab::param_node* node);
+
+            void SlotFunc1(int);
+
+        private:
+            KTSlot< int > fSlot1;
+    };
 
 
 } /* namespace Nymph */

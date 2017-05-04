@@ -46,6 +46,7 @@ if (Nymph_ENABLE_TESTING)
         TestCacheDirectory
         TestCut
         TestCutFilter
+        TestExceptionInSlot
         TestLogger
         TestPrintData
         TestSignalsAndSlots
