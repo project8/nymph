@@ -11,40 +11,35 @@
 
 namespace Nymph
 {
+    KTThreadIndicator::KTThreadIndicator() :
+            fBreakFlag( false ),
+            fContinueSignal(),
+            fCanceled( false )
+    {}
 
     KTThreadReference::KTThreadReference() :
             fDataPtrRet(),
-            //fProcTB( nullptr ),
             fInitiateBreakFunc(),
             fRefreshFutureFunc(),
-            fThread( nullptr ),
             fThreadIndicator( nullptr )
     {}
 
     KTThreadReference::KTThreadReference( KTThreadReference&& orig ) :
             fDataPtrRet( std::move( orig.fDataPtrRet ) ),
-            //fProcTB( orig.fProcTB ),
             fInitiateBreakFunc( std::move( orig.fInitiateBreakFunc ) ),
             fRefreshFutureFunc( std::move( orig.fRefreshFutureFunc ) ),
-            fThread( orig.fThread ),
             fThreadIndicator( orig.fThreadIndicator )
     {
-        //orig.fProcTB = nullptr;
-        orig.fThread = nullptr;
         orig.fThreadIndicator = nullptr;
     }
 
     KTThreadReference& KTThreadReference::operator=( KTThreadReference&& orig )
     {
         fDataPtrRet = std::move( orig.fDataPtrRet );
-        //fProcTB = orig.fProcTB;
         fInitiateBreakFunc = std::move( orig.fInitiateBreakFunc );
         fRefreshFutureFunc = std::move( orig.fRefreshFutureFunc );
-        fThread = orig.fThread;
         fThreadIndicator = orig.fThreadIndicator;
 
-        //orig.fProcTB = nullptr;
-        orig.fThread = nullptr;
         orig.fThreadIndicator = nullptr;
 
         return *this;
@@ -58,14 +53,12 @@ namespace Nymph
         {
             breakInititatedHere = true;
             fInitiateBreakFunc();
-            //fProcTB->InitiateBreak();
         }
         if( fThreadIndicator->fBreakFlag || breakInititatedHere )
         {
             fDataPtrRet.set_value( dataPtr );
             fThreadIndicator->fContinueSignal.wait();
             fDataPtrRet = KTDataPtrReturn();
-            //fProcTB->TakeFuture( fDataPtrRet.get_future() );
             fRefreshFutureFunc( fDataPtrRet.get_future() );
         }
         return;

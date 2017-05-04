@@ -21,30 +21,25 @@ namespace Nymph
     class KTPrimaryProcessor : public KTProcessor
     {
         public:
-            KTPrimaryProcessor( const std::string& name = "default-primary-processor-name" );
+            KTPrimaryProcessor( std::initializer_list< std::string > signals, const std::string& name = "default-primary-processor-name" );
             virtual ~KTPrimaryProcessor();
 
         public:
             /// Callable function used by std::thread
-            void operator()();
+            void operator()( KTThreadReference&& ref );
 
             /// Starts the  main action of the processor
             virtual bool Run() = 0;
 
-            void SetThreadRef( KTThreadReference&& ref );
             KTThreadReference* GetThreadRef();
 
         protected:
+            std::vector< std::string > fSignalsEmitted;
+
             KTThreadReference fThreadRef;
 
 
     };
-
-    inline void KTPrimaryProcessor::SetThreadRef( KTThreadReference&& ref )
-    {
-        fThreadRef = std::move( ref );
-        return;
-    }
 
     inline KTThreadReference* KTPrimaryProcessor::GetThreadRef()
     {

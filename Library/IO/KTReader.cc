@@ -11,7 +11,7 @@ namespace Nymph
 {
 
     KTReader::KTReader(const std::string& name) :
-            KTPrimaryProcessor(name)
+            KTPrimaryProcessor({}, name)
     {
     }
 

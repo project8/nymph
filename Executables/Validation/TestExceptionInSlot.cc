@@ -41,19 +41,26 @@ int main()
     std::atomic< bool > canceled( false );
 
     auto exeFunc = [&]() {
-        std::this_thread::sleep_for( std::chrono::milliseconds(1) ); // delay to let the main thread get to the std::future::wait() call
+        try
+        {
+            std::this_thread::sleep_for( std::chrono::milliseconds(1) ); // delay to let the main thread get to the std::future::wait() call
 
-        KTINFO( testexclog, "Emitting signals" );
+            KTINFO( testexclog, "Emitting signals" );
 
-        if( canceled.load() ) return;
-        KTINFO( testexclog, "First test signal: 5" );
-        tpA.EmitSignals( 5 );
+            if( canceled.load() ) return;
+            KTINFO( testexclog, "First test signal: 5" );
+            tpA.EmitSignals( 5 );
 
-        std::this_thread::sleep_for( std::chrono::milliseconds(1) ); // delay to let the main thread react to the exception
+            std::this_thread::sleep_for( std::chrono::milliseconds(1) ); // delay to let the main thread react to the exception
 
-        if( canceled.load() ) return;
-        KTINFO( testexclog, "Second test signal: 18" );
-        tpA.EmitSignals( 18 );
+            if( canceled.load() ) return;
+            KTINFO( testexclog, "Second test signal: 18" );
+            tpA.EmitSignals( 18 );
+        }
+        catch( ... )
+        {
+            exeThreadRef.fDataPtrRet.set_exception( std::current_exception() );
+        }
 
         return;
     };
@@ -80,6 +87,3 @@ int main()
 
     return 0;
 }
-
-
-

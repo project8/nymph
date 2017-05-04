@@ -533,9 +533,9 @@ namespace Nymph
                             thisThreadRef.fRefreshFutureFunc = [&]( std::future< KTDataPtr >&& ret ){ this->TakeFuture( std::move(ret) ); };
 
                             //std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( dataRet ), fThreadPackets.back() );
-                            tgIter->fProc->SetThreadRef( std::move( thisThreadRef ) );
-                            std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc );
-                            tgIter->fProc->GetThreadRef()->fThread = &thread;
+                            //tgIter->fProc->SetThreadRef( std::move( thisThreadRef ) );
+                            std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( thisThreadRef ) );
+                            //tgIter->fProc->GetThreadRef()->fThread = &thread;
 
                             KTDEBUG( proclog, "Thread ID is <" << thread.get_id() << ">" );
 

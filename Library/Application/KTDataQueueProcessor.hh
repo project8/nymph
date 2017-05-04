@@ -206,7 +206,7 @@ namespace Nymph
 
     template< class XProcessorType >
     KTDataQueueProcessorTemplate< XProcessorType >::KTDataQueueProcessorTemplate(const std::string& name) :
-            KTPrimaryProcessor(name),
+            KTPrimaryProcessor({"queue-done"}, name),
             fStatus(kStopped),
             fFuncPtr(NULL),
             fQueue(),

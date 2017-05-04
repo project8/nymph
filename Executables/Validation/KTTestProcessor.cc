@@ -82,15 +82,9 @@ namespace Nymph
     {
         KTThreadReference* ref = fSlot1.GetSlotWrapper()->GetThreadRef();
 
-        try
-        {
-            KTINFO(testsiglog, "Slot1: input is " << input);
-            throw KTException() << "A HUGE problem occurred!!!! (just kidding, this is the expected result)";
-        }
-        catch( ... )
-        {
-            ref->fDataPtrRet.set_exception( std::current_exception() );
-        }
+        KTINFO(testsiglog, "Slot1: input is " << input);
+        throw KTException() << "A HUGE problem occurred!!!! (just kidding, this is the expected result)";
+
         return;
     }
 
