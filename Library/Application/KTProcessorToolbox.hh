@@ -169,7 +169,6 @@ namespace Nymph
                     Thread(KTPrimaryProcessor* proc, const std::string& name) : fProc(proc), fName(name)
                     {}
             };
-            //typedef std::set< KTPrimaryProcessor* > ThreadGroup;
             struct CompareThread
             {
                 bool operator() (const Thread& lhs, const Thread& rhs)
@@ -197,6 +196,8 @@ namespace Nymph
             /// If the return is true, processing can continue after the break
             bool WaitForBreak();
 
+            void WaitForEndOfRun();
+
             void Continue();
 
         private:
@@ -208,14 +209,16 @@ namespace Nymph
             void TakeFuture( std::future< KTDataPtr >&& future );
 
             std::vector< std::future< KTDataPtr > > fThreadFutures;
-            std::vector< KTThreadIndicator > fThreadIndicators;
+            std::vector< std::shared_ptr< KTThreadIndicator > > fThreadIndicators;
 
             std::promise< void > fContinueSignaler;
             std::shared_future< void > fMasterContSignal;
             std::mutex fBreakContMutex;
+            std::mutex fWaitForBreakMutex;
 
             std::thread* fDoRunThread;
             std::promise< void > fDoRunPromise;
+            std::shared_future< void > fDoRunFuture;
             bool fDoRunBreakFlag; // only use outside of blocks protected by fBreakContMutex is reads, so we shouldn't need to make this an atomic
 
     };

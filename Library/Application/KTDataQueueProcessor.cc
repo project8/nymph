@@ -41,7 +41,7 @@ namespace Nymph
 
     void KTDataQueueProcessor::QueueData(KTDataPtr& data)
     {
-        fQueueDataSW->GetThreadRef()->Break(data);
+        fQueueDataSW->GetThreadRef()->Break(data, fQueueDataSW->GetDoBreakpoint());
         return DoQueueData(data);
     }
 /*

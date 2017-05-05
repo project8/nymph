@@ -45,6 +45,8 @@ namespace Nymph
             fSlot1("first-slot", this, &KTTestProcessorB::SlotFunc1, {}),
             fSlot2("second-slot", this, &KTTestProcessorB::SlotFunc2, {})
     {
+        fSlot1Wrapper = GetSlot( "first-slot" );
+        fSlot2Wrapper = GetSlot( "second-slot" );
     }
 
     KTTestProcessorB::~KTTestProcessorB()
@@ -59,12 +61,14 @@ namespace Nymph
     void KTTestProcessorB::SlotFunc1(int input)
     {
         KTINFO(testsiglog, "Slot1: input is " << input);
+        fSlot1Wrapper->GetThreadRef()->Break( KTDataPtr(), fSlot1Wrapper->GetDoBreakpoint());
         return;
     }
 
     void KTTestProcessorB::SlotFunc2(int input)
     {
         KTINFO(testsiglog, "Slot2: twice input is " << 2 * input);
+        fSlot2Wrapper->GetThreadRef()->Break( KTDataPtr(), fSlot2Wrapper->GetDoBreakpoint());
         return;
     }
 

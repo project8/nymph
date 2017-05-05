@@ -7,7 +7,9 @@
 
 #include "KTThreadReference.hh"
 
-//#include "KTProcessorToolbox.hh"
+#include "KTLogger.hh"
+
+KTLOGGER( trlog, "KTThreadReference" );
 
 namespace Nymph
 {
@@ -21,7 +23,7 @@ namespace Nymph
             fDataPtrRet(),
             fInitiateBreakFunc(),
             fRefreshFutureFunc(),
-            fThreadIndicator( nullptr )
+            fThreadIndicator( new KTThreadIndicator() )
     {}
 
     KTThreadReference::KTThreadReference( KTThreadReference&& orig ) :
@@ -45,20 +47,23 @@ namespace Nymph
         return *this;
     }
 
-
-    void KTThreadReference::Break( const KTDataPtr& dataPtr  )
+    void KTThreadReference::Break( const KTDataPtr& dataPtr, bool doBreakpoint )
     {
-        bool breakInititatedHere = false;
-        if( /* breakpoint is set here */ false )
+        if( doBreakpoint )
         {
-            breakInititatedHere = true;
+            KTDEBUG( trlog, "Initiating break" );
             fInitiateBreakFunc();
         }
-        if( fThreadIndicator->fBreakFlag || breakInititatedHere )
+        if( fThreadIndicator->fBreakFlag || doBreakpoint )
         {
+            KTDEBUG( trlog, "Reacting to break" );
+            // set the return for this thread
             fDataPtrRet.set_value( dataPtr );
+            // wait for continue signal
             fThreadIndicator->fContinueSignal.wait();
+            // reset the promise
             fDataPtrRet = KTDataPtrReturn();
+            // pass the future back to the processor toolbox (if it's in use)
             fRefreshFutureFunc( fDataPtrRet.get_future() );
         }
         return;

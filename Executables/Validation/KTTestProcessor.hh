@@ -50,6 +50,9 @@ namespace Nymph
         private:
             KTSlot< int > fSlot1;
             KTSlot< int > fSlot2;
+
+            KTSlotWrapper* fSlot1Wrapper;
+            KTSlotWrapper* fSlot2Wrapper;
     };
 
     /*!

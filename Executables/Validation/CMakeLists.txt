@@ -51,10 +51,12 @@ if (Nymph_ENABLE_TESTING)
         TestExceptionInSlot
         TestLogger
         TestPrimaryProcessor
+        TestPrimaryProcessorNoThreading
         TestPrintData
         TestProcessorToolbox
         TestSignalsAndSlots
         TestThroughputProfiler
+        TestUseBreakpoint
     )
     
     pbuilder_executables( TEST_PROGRAMS LIB_DEPENDENCIES )

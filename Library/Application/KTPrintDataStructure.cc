@@ -42,7 +42,8 @@ namespace Nymph
     {
         DoPrintDataStructure(dataPtr);
 
-        fDataStructSlot.GetSlotWrapper()->GetThreadRef()->Break( dataPtr );
+        KTSlotWrapper* slotWrap = fDataStructSlot.GetSlotWrapper();
+        slotWrap->GetThreadRef()->Break( dataPtr, slotWrap->GetDoBreakpoint() );
 
         fDataSignal(dataPtr);
 
@@ -53,7 +54,8 @@ namespace Nymph
     {
         DoPrintCutStructure(dataPtr);
 
-        fCutStructSlot.GetSlotWrapper()->GetThreadRef()->Break( dataPtr );
+        KTSlotWrapper* slotWrap = fCutStructSlot.GetSlotWrapper();
+        fCutStructSlot.GetSlotWrapper()->GetThreadRef()->Break( dataPtr, slotWrap->GetDoBreakpoint() );
 
         fDataSignal(dataPtr);
 
@@ -66,7 +68,8 @@ namespace Nymph
         DoPrintDataStructure(dataPtr);
         DoPrintCutStructure(dataPtr);
 
-        fDataAndCutStructSlot.GetSlotWrapper()->GetThreadRef()->Break( dataPtr );
+        KTSlotWrapper* slotWrap = fDataAndCutStructSlot.GetSlotWrapper();
+        fDataAndCutStructSlot.GetSlotWrapper()->GetThreadRef()->Break( dataPtr, slotWrap->GetDoBreakpoint() );
 
         fDataSignal(dataPtr);
 

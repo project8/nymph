@@ -39,10 +39,10 @@ namespace Nymph
             fRunQueue(),
             fProcMap(),
             fThreadFutures(),
-            //fThreadPackets(),
             fContinueSignaler(),
             fMasterContSignal(),
             fBreakContMutex(),
+            fWaitForBreakMutex(),
             fDoRunThread( nullptr ),
             fDoRunPromise(),
             fDoRunBreakFlag( false )
@@ -508,6 +508,9 @@ namespace Nymph
             return;
         }
 
+        fDoRunPromise = std::promise< void >();
+        fDoRunFuture = fDoRunPromise.get_future().share();
+
         bool willRunSingleThreaded = fRunSingleThreaded;
 #ifdef SINGLETHREADED
         willRunSingleThreaded = true;
@@ -521,7 +524,7 @@ namespace Nymph
                 {
                     // reset the continue signaler
                     fContinueSignaler = std::promise< void >();
-                    fMasterContSignal = fContinueSignaler.get_future();
+                    fMasterContSignal = fContinueSignaler.get_future().share();
                     if( ! fMasterContSignal.valid() )
                     {
                         KTERROR( proclog, "Invalid master continue-signal created" );
@@ -548,10 +551,10 @@ namespace Nymph
                                 throw std::future_error( std::future_errc::no_state );
                             }
 
-                            fThreadIndicators.push_back( KTThreadIndicator() );
-                            fThreadIndicators.back().fContinueSignal = fMasterContSignal;
+                            fThreadIndicators.emplace_back( new KTThreadIndicator() );
+                            fThreadIndicators.back()->fContinueSignal = fMasterContSignal;
 
-                            thisThreadRef.fThreadIndicator = &fThreadIndicators.back();
+                            thisThreadRef.fThreadIndicator = fThreadIndicators.back();
                             thisThreadRef.fInitiateBreakFunc = [&](){ this->InitiateBreak(); };
                             thisThreadRef.fRefreshFutureFunc = [&]( std::future< KTDataPtr >&& ret ){ this->TakeFuture( std::move(ret) ); };
 
@@ -569,11 +572,13 @@ namespace Nymph
                                 } while (status != std::future_status::ready);
 
                                 stillRunning = false;
-                                if( fThreadIndicators.back().fBreakFlag )
+                                if( fThreadIndicators.back()->fBreakFlag )
                                 {
                                     KTDEBUG( proclog, "Breakpoint reached" );
                                     continueSignal.wait();
+                                    KTDEBUG( proclog, "Breakpoint finished" );
                                     stillRunning = true;
+                                    continueSignal = fMasterContSignal; // refresh the local copy of the shared future
                                 }
                                 else
                                 {
@@ -593,6 +598,8 @@ namespace Nymph
                             KTINFO( proclog, "Processor <" << procName << "> has finished" );
 
                             thread.join();
+                            fThreadIndicators.pop_back();
+                            fThreadFutures.pop_back();
                         } // end for loop over the thread group
                     } // end for loop over the run-queue
 
@@ -644,7 +651,7 @@ namespace Nymph
 
     bool KTProcessorToolbox::WaitForBreak()
     {
-        std::future< void > doRunFuture = fDoRunPromise.get_future();
+        std::shared_future< void > doRunFuture = fDoRunFuture;
 
         std::future_status doRunStatus;
         do
@@ -654,20 +661,34 @@ namespace Nymph
 
         if( fDoRunBreakFlag )
         {
-            KTDEBUG( proclog, "Breakpoint reached" );
+            KTDEBUG( proclog, "Breakpoint reached (the wait is over)" );
             return true;
         }
 
         try
         {
             doRunFuture.get();
+            KTDEBUG( proclog, "End-of-run reached (the wait-for-break is over)" );
             return false;
         }
         catch( std::exception& e )
         {
-            // this transfers an exception thrown by a processor to the outer catch block in this function
-            throw;
+            KTERROR( proclog, "An error occurred during processing: " << e.what() );
+            return false;
         }
+    }
+
+    void KTProcessorToolbox::WaitForEndOfRun()
+    {
+        KTDEBUG( proclog, "Waiting for end-of-run" );
+        while( WaitForBreak() )
+        {
+            KTDEBUG( proclog, "Reached breakpoint; waiting for continue" );
+            WaitForContinue();
+            KTDEBUG( proclog, "Processing resuming; waiting for end-of-run" );
+        }
+        KTDEBUG( proclog, "End-of-run reached" );
+        return;
     }
 
     void KTProcessorToolbox::Continue()
@@ -679,10 +700,14 @@ namespace Nymph
 
         // reset all break flags
         fDoRunBreakFlag = false;
-        for( std::vector< KTThreadIndicator >::iterator tiIt = fThreadIndicators.begin(); tiIt != fThreadIndicators.end(); ++tiIt )
+        for( auto tiIt = fThreadIndicators.begin(); tiIt != fThreadIndicators.end(); ++tiIt )
         {
-            tiIt->fBreakFlag = false;
+            (*tiIt)->fBreakFlag = false;
         }
+
+        // reset the do-run promise and future
+        fDoRunPromise = std::promise< void >();
+        fDoRunFuture = fDoRunPromise.get_future().share();
 
         KTINFO( proclog, "Continuing from breakpoint" );
         // signal everything to resume
@@ -690,10 +715,11 @@ namespace Nymph
 
         // reset the signaler and all signals
         // hopefully the delay of creating the new signaler and starting the for loop is enough that anything waiting on the old signal has already seen that signal and moved on
-        fContinueSignaler = std::move( std::promise< void >() );
-        for( std::vector< KTThreadIndicator >::iterator tiIt = fThreadIndicators.begin(); tiIt != fThreadIndicators.end(); ++tiIt )
+        fContinueSignaler = std::promise< void >();
+        fMasterContSignal = fContinueSignaler.get_future().share();
+        for( auto tiIt = fThreadIndicators.begin(); tiIt != fThreadIndicators.end(); ++tiIt )
         {
-            tiIt->fContinueSignal = fContinueSignaler.get_future();
+            (*tiIt)->fContinueSignal = fMasterContSignal;
         }
 
         return;
@@ -704,11 +730,16 @@ namespace Nymph
         std::unique_lock< std::mutex > breakContLock( fBreakContMutex );
 
         // set all break flags
+        // master break flag
         fDoRunBreakFlag = true;
-        for( std::vector< KTThreadIndicator >::iterator tiIt = fThreadIndicators.begin(); tiIt != fThreadIndicators.end(); ++tiIt )
+        // thread break flags
+        for( auto tiIt = fThreadIndicators.begin(); tiIt != fThreadIndicators.end(); ++tiIt )
         {
-            tiIt->fBreakFlag = true;
+            (*tiIt)->fBreakFlag = true;
         }
+
+        // use the do-run promise to signal the break
+        fDoRunPromise.set_value();
 
         return;
     }

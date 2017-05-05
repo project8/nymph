@@ -132,6 +132,26 @@ namespace Nymph
         return iter->second;
     }
 
+    inline bool KTProcessor::GetDoBreakpoint(const std::string& slotName)
+    {
+        KTSlotWrapper* slot = GetSlot(slotName);
+        if (slot != nullptr)
+        {
+            return slot->GetDoBreakpoint();
+        }
+        KTWARN(processorlog, "Slot <" << slotName << "> was not found");
+        return false;
+    }
 
+    void KTProcessor::SetDoBreakpoint(const std::string& slotName, bool flag)
+    {
+        KTSlotWrapper* slot = GetSlot(slotName);
+        if (slot != nullptr)
+        {
+            return slot->SetDoBreakpoint(flag);
+        }
+        KTWARN(processorlog, "Slot <" << slotName << "> was not found");
+        return;
+    }
 
 } /* namespace Nymph */

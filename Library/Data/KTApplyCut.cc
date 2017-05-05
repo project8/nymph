@@ -95,7 +95,7 @@ namespace Nymph
 
         bool cutFailed = fCut->Apply(dataPtr);
 
-        ref->Break( dataPtr );
+        ref->Break( dataPtr, fApplyCutSW->GetDoBreakpoint() );
 
         if (cutFailed)
         {

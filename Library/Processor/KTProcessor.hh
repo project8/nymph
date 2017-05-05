@@ -80,6 +80,9 @@ namespace Nymph
 
             KTSlotWrapper* GetSlot(const std::string& name);
 
+            bool GetDoBreakpoint(const std::string& slotName);
+            void SetDoBreakpoint(const std::string& slotName, bool flag);
+
         protected:
             void ConnectSignalToSlot(KTSignalWrapper* signal, KTSlotWrapper* slot, int groupNum=-1);
 
@@ -127,7 +130,6 @@ namespace Nymph
         processor->ConnectASlot(signalName, this, slotName, groupNum);
         return;
     }
-
 
 #define KT_REGISTER_PROCESSOR(proc_class, proc_name) \
         static ::scarab::registrar< ::Nymph::KTProcessor, proc_class, const std::string& > sProc##proc_class##Registrar( proc_name );

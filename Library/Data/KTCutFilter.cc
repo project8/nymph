@@ -82,7 +82,7 @@ namespace Nymph
 
         bool failCut = Filter(dataPtr->Of< KTData >());
 
-        ref->Break( dataPtr );
+        ref->Break( dataPtr, fFilterDataSW->GetDoBreakpoint() );
 
         if (failCut)
         {

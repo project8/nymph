@@ -2,7 +2,7 @@
  * TestPrimaryProcessor.cc
  *
  *  Created on: May 4, 2017
- *      Author: obla999
+ *      Author: N.S. Oblath
  */
 
 #include "KTTestPrimaryProcessor.hh"
@@ -37,9 +37,6 @@ int main()
     KTThreadReference exeThreadRef;
     auto exeThreadFuture = exeThreadRef.fDataPtrRet.get_future();
 
-    KTThreadIndicator exeThreadInd;
-    exeThreadRef.fThreadIndicator = &exeThreadInd;
-
     // run the thread
     std::thread thread( &KTPrimaryProcessor::operator(), &tpp, std::move( exeThreadRef ) );
 
@@ -52,7 +49,7 @@ int main()
     }
     catch( std::exception& e )
     {
-        exeThreadInd.fCanceled = true;
+        exeThreadRef.fThreadIndicator->fCanceled = true;
         KTERROR( testpplog, "An error occurred while running a processor: " << e.what() );
     }
 

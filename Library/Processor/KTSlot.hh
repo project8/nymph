@@ -289,7 +289,7 @@ namespace Nymph
 
         // Perform breakpoint here if necessary (either if initiated here or if stopping here due to a breakpoint elsewhere)
         // Sets the dataPtr into the return
-        ref->Break( dataPtr );
+        ref->Break( dataPtr, fSlotWrapper->GetDoBreakpoint() );
 
         // If there's a signal pointer, emit the signal
         if( fSignalPtr != nullptr )
@@ -333,6 +333,10 @@ namespace Nymph
     {
         // Call the function
         fFunc();
+
+        // Perform breakpoint here if necessary (either if initiated here or if stopping here due to a breakpoint elsewhere)
+        // Sets the dataPtr into the return
+        fSlotWrapper->GetThreadRef()->Break( KTDataPtr(), fSlotWrapper->GetDoBreakpoint() );
 
         // If there's a signal pointer, emit the signal
         if( fSignalPtr != nullptr )

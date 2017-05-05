@@ -10,6 +10,7 @@
 
 #include "KTData.hh"
 
+#include <memory>
 #include <thread>
 
 namespace Nymph
@@ -27,7 +28,7 @@ namespace Nymph
         KTDataPtrReturn fDataPtrRet;
         std::function< void() > fInitiateBreakFunc;
         std::function< void(std::future< KTDataPtr >&&) > fRefreshFutureFunc;
-        KTThreadIndicator* fThreadIndicator;
+        std::shared_ptr< KTThreadIndicator > fThreadIndicator;
 
         KTThreadReference();
         KTThreadReference( const KTThreadReference& ) = delete;
@@ -36,7 +37,7 @@ namespace Nymph
         KTThreadReference& operator=( const KTThreadReference& ) = delete;
         KTThreadReference& operator=( KTThreadReference&& );
 
-        void Break( const KTDataPtr& dataPtr  );
+        void Break( const KTDataPtr& dataPtr, bool doBreakpoint  );
     };
 
 } /* namespace Nymph */

@@ -33,11 +33,12 @@ namespace Nymph
 
             KTThreadReference* GetThreadRef();
 
+            MEMBERVARIABLE( bool, DoBreakpoint );
+
         protected:
             std::vector< std::string > fSignalsEmitted;
 
             KTThreadReference fThreadRef;
-
 
     };
 

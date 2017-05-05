@@ -91,8 +91,12 @@ namespace Nymph
             KTThreadReference* GetThreadRef() const;
             void SetThreadRef(KTThreadReference* ref);
 
+            bool GetDoBreakpoint() const;
+            void SetDoBreakpoint(bool flag);
+
         private:
             KTThreadReference* fThreadRef;
+            bool fDoBreakpoint;
 
     };
 
@@ -100,7 +104,8 @@ namespace Nymph
     KTSlotWrapper::KTSlotWrapper(XSignature signalPtr, XTypeContainer* typeCont) :
             fSlotWrapper(new KTSpecifiedInternalSlotWrapper< XSignature, XTypeContainer >(signalPtr, typeCont)),
             fConnection(),
-            fThreadRef()
+            fThreadRef(),
+            fDoBreakpoint(false)
     {}
 
     inline void KTSlotWrapper::SetConnection(KTConnection conn)
@@ -131,6 +136,18 @@ namespace Nymph
         fThreadRef = ref;
         return;
     }
+
+    inline bool KTSlotWrapper::GetDoBreakpoint() const
+    {
+        return fDoBreakpoint;
+    }
+
+    inline void KTSlotWrapper::SetDoBreakpoint(bool flag)
+    {
+        fDoBreakpoint = flag;
+        return;
+    }
+
 
 } /* namespace Nymph */
 #endif /* KTSLOTWRAPPER_HH_ */

@@ -17,7 +17,8 @@ namespace Nymph
     KTPrimaryProcessor::KTPrimaryProcessor( std::initializer_list< std::string > signals, const std::string& name ) :
             KTProcessor( name ),
             fSignalsEmitted( signals ),
-            fThreadRef()
+            fThreadRef(),
+            fDoBreakpoint(false)
     {
 
     }
