@@ -52,6 +52,7 @@ if (Nymph_ENABLE_TESTING)
         TestLogger
         TestPrimaryProcessor
         TestPrintData
+        TestProcessorToolbox
         TestSignalsAndSlots
         TestThroughputProfiler
     )

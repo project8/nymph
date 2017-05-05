@@ -10,8 +10,10 @@
 namespace Nymph
 {
 
-    KTTestPrimaryProcessor::KTTestPrimaryProcessor() :
-            KTPrimaryProcessor( {"the-signal"} ),
+    KT_REGISTER_PROCESSOR(KTTestPrimaryProcessor, "test-p-proc");
+
+    KTTestPrimaryProcessor::KTTestPrimaryProcessor( const std::string& name ) :
+            KTPrimaryProcessor( {"the-signal"}, name ),
             fIterations(10),
             fTheSignal("the-signal", this)
     {

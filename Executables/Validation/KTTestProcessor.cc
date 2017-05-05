@@ -14,7 +14,10 @@ namespace Nymph
 {
     KTLOGGER(testsiglog, "KTTestProcessor")
 
-    KTTestProcessorA::KTTestProcessorA() :
+    KT_REGISTER_PROCESSOR(KTTestProcessorA, "test-proc-a");
+
+    KTTestProcessorA::KTTestProcessorA( const std::string& name ) :
+            KTProcessor( name ),
             fTheSignal("the-signal", this)
     {
     }
@@ -35,7 +38,10 @@ namespace Nymph
     }
 
 
-    KTTestProcessorB::KTTestProcessorB() :
+    KT_REGISTER_PROCESSOR(KTTestProcessorB, "test-proc-b");
+
+    KTTestProcessorB::KTTestProcessorB( const std::string& name ) :
+            KTProcessor( name ),
             fSlot1("first-slot", this, &KTTestProcessorB::SlotFunc1, {}),
             fSlot2("second-slot", this, &KTTestProcessorB::SlotFunc2, {})
     {
@@ -63,8 +69,10 @@ namespace Nymph
     }
 
 
+    KT_REGISTER_PROCESSOR(KTTestProcessorC, "test-proc-c");
 
-    KTTestProcessorC::KTTestProcessorC() :
+    KTTestProcessorC::KTTestProcessorC( const std::string& name ) :
+            KTProcessor( name ),
             fSlot1("first-slot", this, &KTTestProcessorC::SlotFunc1, {})
     {
     }

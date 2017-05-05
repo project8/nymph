@@ -16,10 +16,10 @@
 namespace Nymph
 {
 
-    class KTTestPrimaryProcessor : public KTPrimaryProcessor
+   class KTTestPrimaryProcessor : public KTPrimaryProcessor
     {
         public:
-            KTTestPrimaryProcessor();
+            KTTestPrimaryProcessor( const std::string& name = "test-p-proc" );
             virtual ~KTTestPrimaryProcessor();
 
         public:

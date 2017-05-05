@@ -22,7 +22,7 @@ namespace Nymph
     class KTTestProcessorA : public KTProcessor
     {
         public:
-            KTTestProcessorA();
+            KTTestProcessorA( const std::string& name = "test-proc-a" );
             virtual ~KTTestProcessorA();
 
             bool Configure(const scarab::param_node* node);
@@ -39,7 +39,7 @@ namespace Nymph
     class KTTestProcessorB : public KTProcessor
     {
         public:
-            KTTestProcessorB();
+            KTTestProcessorB( const std::string& name = "test-proc-b" );
             virtual ~KTTestProcessorB();
 
             bool Configure(const scarab::param_node* node);
@@ -58,7 +58,7 @@ namespace Nymph
     class KTTestProcessorC : public KTProcessor
     {
         public:
-            KTTestProcessorC();
+            KTTestProcessorC( const std::string& name = "test-proc-c" );
             virtual ~KTTestProcessorC();
 
             bool Configure(const scarab::param_node* node);
