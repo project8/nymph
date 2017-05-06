@@ -42,7 +42,6 @@ namespace Nymph
             fContinueSignaler(),
             fMasterContSignal(),
             fBreakContMutex(),
-            fWaitForBreakMutex(),
             fDoRunThread( nullptr ),
             fDoRunPromise(),
             fDoRunBreakFlag( false )
@@ -51,6 +50,10 @@ namespace Nymph
 
     KTProcessorToolbox::~KTProcessorToolbox()
     {
+        CancelThreads();
+
+        JoinRunThread();
+
         ClearProcessors();
     }
 
@@ -164,6 +167,15 @@ namespace Nymph
                 {
                     KTERROR(proclog, "Unable to make connection <" << connNode->get_value("signal") << "> --> <" << connNode->get_value("slot") << ">");
                     return false;
+                }
+
+                if (connNode->has("breakpoint"))
+                {
+                    if (! SetBreakpoint(connNode->get_value("slot")))
+                    {
+                        KTERROR(proclog, "Unable to set breakpoint on <" << connNode->get_value("slot"));
+                        return false;
+                    }
                 }
 
                 KTINFO(proclog, "Signal <" << connNode->get_value("signal") << "> connected to slot <" << connNode->get_value("slot") << ">");
@@ -420,6 +432,72 @@ namespace Nymph
         }
 
         return true;
+    }
+
+    bool KTProcessorToolbox::SetBreakpoint(const std::string& slot)
+    {
+        string slotProcName, slotName;
+        if (! ParseSignalSlotName(slot, slotProcName, slotName))
+        {
+            KTERROR(proclog, "Unable to parse slot name: <" << slot << ">");
+            return false;
+        }
+
+        return SetBreakpoint(slotProcName, slotName);
+    }
+
+    bool KTProcessorToolbox::SetBreakpoint(const std::string& slotProcName, const std::string& slotName)
+    {
+        KTProcessor* slotProc = GetProcessor(slotProcName);
+        if (slotProc == NULL)
+        {
+            KTERROR(proclog, "Processor named <" << slotProcName << "> was not found!");
+            return false;
+        }
+
+        try
+        {
+            slotProc->SetDoBreakpoint(slotName, true);
+            return true;
+        }
+        catch (std::exception& e)
+        {
+            KTERROR(proclog, "Unable to set breakpoint: " << e.what());
+            return false;
+        }
+    }
+
+    bool KTProcessorToolbox::RemoveBreakpoint(const std::string& slot)
+    {
+        string slotProcName, slotName;
+        if (! ParseSignalSlotName(slot, slotProcName, slotName))
+        {
+            KTERROR(proclog, "Unable to parse slot name: <" << slot << ">");
+            return false;
+        }
+
+        return RemoveBreakpoint(slotProcName, slotName);
+    }
+
+    bool KTProcessorToolbox::RemoveBreakpoint(const std::string& slotProcName, const std::string& slotName)
+    {
+        KTProcessor* slotProc = GetProcessor(slotProcName);
+        if (slotProc == NULL)
+        {
+            KTERROR(proclog, "Processor named <" << slotProcName << "> was not found!");
+            return false;
+        }
+
+        try
+        {
+            slotProc->SetDoBreakpoint(slotName, false);
+            return true;
+        }
+        catch (std::exception& e)
+        {
+            KTERROR(proclog, "Unable to set breakpoint: " << e.what());
+            return false;
+        }
     }
 
     bool KTProcessorToolbox::ParseSignalSlotName(const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot) const
@@ -744,25 +822,23 @@ namespace Nymph
         return;
     }
 
+    void KTProcessorToolbox::CancelThreads()
+    {
+        std::unique_lock< std::mutex > breakContLock( fBreakContMutex );
+        for( auto tiIt = fThreadIndicators.begin(); tiIt != fThreadIndicators.end(); ++tiIt )
+        {
+            (*tiIt)->fCanceled = true;
+        }
+        return;
+    }
+
     bool KTProcessorToolbox::Run()
     {
         AsyncRun();
 
-        std::future< void > doRunFuture = fDoRunPromise.get_future();
+        WaitForEndOfRun();
 
-        try
-        {
-            while( WaitForBreak() )
-            {
-                KTINFO( proclog, "Skipping breakpoint" );
-                Continue();
-            }
-        }
-        catch( std::exception& e )
-        {
-            KTERROR( proclog, "An error occurred: " << e.what() );
-            return false;
-        }
+        JoinRunThread();
 
         return true;
     }

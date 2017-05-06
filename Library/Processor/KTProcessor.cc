@@ -7,9 +7,8 @@
 
 #include "KTProcessor.hh"
 
+#include "KTException.hh"
 //#include "KTLogger.hh"
-
-#include <boost/foreach.hpp>
 
 #include <string>
 
@@ -139,8 +138,7 @@ namespace Nymph
         {
             return slot->GetDoBreakpoint();
         }
-        KTWARN(processorlog, "Slot <" << slotName << "> was not found");
-        return false;
+        throw KTException() << "Slot <" << slotName << "> was not found";
     }
 
     void KTProcessor::SetDoBreakpoint(const std::string& slotName, bool flag)
@@ -150,7 +148,7 @@ namespace Nymph
         {
             return slot->SetDoBreakpoint(flag);
         }
-        KTWARN(processorlog, "Slot <" << slotName << "> was not found");
+        throw KTException() << "Slot <" << slotName << "> was not found";
         return;
     }
 

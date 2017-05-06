@@ -141,6 +141,18 @@ namespace Nymph
             /// Both processors should already have been added to the Toolbox
             bool MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName, int order = std::numeric_limits< int >::min());
 
+            /// Set a breakpoint on a slot
+            /// Slot string should be formatted as: [processor name]:[slot name]
+            bool SetBreakpoint(const std::string& slot);
+            /// Set a breakpoint on a slot
+            bool SetBreakpoint(const std::string& slotProcName, const std::string& slotName);
+
+            /// Remove a breakpoint from a slot
+            /// Slot string should be formatted as: [processor name]:[slot name]
+            bool RemoveBreakpoint(const std::string& slot);
+            /// Remove a breakpoint from a slot
+            bool RemoveBreakpoint(const std::string& slotProcName, const std::string& slotName);
+
         private:
             bool ParseSignalSlotName(const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot) const;
             static const char fSigSlotNameSep = ':';
@@ -200,6 +212,10 @@ namespace Nymph
 
             void Continue();
 
+            void CancelThreads();
+
+            void JoinRunThread();
+
         private:
             friend class KTThreadReference;
 
@@ -214,12 +230,11 @@ namespace Nymph
             std::promise< void > fContinueSignaler;
             std::shared_future< void > fMasterContSignal;
             std::mutex fBreakContMutex;
-            std::mutex fWaitForBreakMutex;
 
             std::thread* fDoRunThread;
             std::promise< void > fDoRunPromise;
             std::shared_future< void > fDoRunFuture;
-            bool fDoRunBreakFlag; // only use outside of blocks protected by fBreakContMutex is reads, so we shouldn't need to make this an atomic
+            bool fDoRunBreakFlag;
 
     };
 
@@ -247,7 +262,13 @@ namespace Nymph
         return;
     }
 
-
+    inline void KTProcessorToolbox::JoinRunThread()
+    {
+        if( fDoRunThread == nullptr ) return;
+        fDoRunThread->join();
+        delete fDoRunThread;
+        fDoRunThread = nullptr;
+    }
 
 } /* namespace Nymph */
 #endif /* KTPROCESSORTOOLBOX_HH_ */

@@ -7,8 +7,6 @@
 
 #include "KTProcessorToolbox.hh"
 
-#include "KTProcessor.hh" // temporary (todo below)
-
 #include "KTLogger.hh"
 
 using namespace Nymph;
@@ -35,8 +33,11 @@ int main()
         return -1;
     }
     // set breakpoint
-    // TODO: use configuration instead of manually setting
-    ptb.GetProcessor( "tp" )->SetDoBreakpoint( "first-slot", true );
+    if( ! ptb.SetBreakpoint( "tp", "first-slot" ) )
+    {
+        KTERROR( testptlog, "Unable to set the breakpoint" );
+        return -1;
+    }
 
     // make connections
     if( ! ptb.MakeConnection( "tpp:the-signal", "tp:first-slot" ) )
@@ -75,6 +76,8 @@ int main()
     ptb.WaitForEndOfRun();
 
     KTINFO( testptlog, "Processing complete" );
+
+    ptb.JoinRunThread();
 
     KTINFO( testptlog, "Tests complete" );
 
