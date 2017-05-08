@@ -12,16 +12,10 @@
 #include "KTPrimaryProcessor.hh"
 
 #include "factory.hh"
-
-#ifndef SINGLETHREADED
-#include <boost/thread.hpp>
-#endif
-
-#include <future>
-#include <thread>
-#include <vector>
-
 #include "param_codec.hh"
+
+#include <boost/system/error_code.hpp>
+#include <boost/thread.hpp>
 
 using std::deque;
 using std::set;
@@ -586,7 +580,7 @@ namespace Nymph
             return;
         }
 
-        fDoRunPromise = std::promise< void >();
+        fDoRunPromise = boost::promise< void >();
         fDoRunFuture = fDoRunPromise.get_future().share();
 
         bool willRunSingleThreaded = fRunSingleThreaded;
@@ -601,15 +595,15 @@ namespace Nymph
                 try
                 {
                     // reset the continue signaler
-                    fContinueSignaler = std::promise< void >();
+                    fContinueSignaler = boost::promise< void >();
                     fMasterContSignal = fContinueSignaler.get_future().share();
                     if( ! fMasterContSignal.valid() )
                     {
                         KTERROR( proclog, "Invalid master continue-signal created" );
-                        throw std::future_error( std::future_errc::no_state );
+                        throw KTException() << "Invalid master continue-signal created";
                     }
                     // copy for use in this function
-                    std::shared_future< void > continueSignal = fMasterContSignal;
+                    boost::shared_future< void > continueSignal = fMasterContSignal;
 
                     KTPROG( proclog, "Starting single-threaded processing" );
 
@@ -626,7 +620,7 @@ namespace Nymph
                             if( ! fThreadFutures.back().valid() )
                             {
                                 KTERROR( proclog, "Invalid thread future created" );
-                                throw std::future_error( std::future_errc::no_state );
+                                throw KTException() << "Invalid thread future created";
                             }
 
                             fThreadIndicators.emplace_back( new KTThreadIndicator() );
@@ -636,7 +630,8 @@ namespace Nymph
                             thisThreadRef.fInitiateBreakFunc = [&](){ this->InitiateBreak(); };
                             thisThreadRef.fRefreshFutureFunc = [&]( std::future< KTDataPtr >&& ret ){ this->TakeFuture( std::move(ret) ); };
 
-                            std::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( thisThreadRef ) );
+                            //boost::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( thisThreadRef ) );
+                            boost::thread thread( [&](){ tgIter->fProc->operator()( std::move( thisThreadRef ) ); } );
 
                             KTDEBUG( proclog, "Thread ID is <" << thread.get_id() << ">" );
 
@@ -692,50 +687,124 @@ namespace Nymph
                 return;
             };
 
-            fDoRunThread = new std::thread( singleThreadRun );
+            fDoRunThread = new boost::thread( singleThreadRun );
         }
         else
-        {
+        {/*
             auto multiThreadRun = [&]()
             {
                 try
                 {
-                    std::shared_future< void > fMasterContSignal( fContinueSignaler.get_future() );
+                    // reset the continue signaler
+                    fContinueSignaler = boost::promise< void >();
+                    fMasterContSignal = fContinueSignaler.get_future().share();
                     if( ! fMasterContSignal.valid() )
                     {
                         KTERROR( proclog, "Invalid master continue-signal created" );
-                        throw std::future_error( std::future_errc::no_state );
+                        throw boost::future_error( boost::future_errc::no_state );
                     }
+                    // copy for use in this function
+                    boost::shared_future< void > continueSignal = fMasterContSignal;
 
                     KTPROG( proclog, "Starting multi-threaded processing" );
 
-                    // TODO logic to start threads goes here
+                    for (RunQueue::iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
+                    {
+                        vector< boost::thread > threads;
+
+                        for (ThreadGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
+                        {
+                            std::string procName( tgIter->fName );
+                            KTINFO( proclog, "Starting processor <" << procName << ">" );
+
+                            KTThreadReference thisThreadRef;
+
+                            fThreadFutures.push_back( thisThreadRef.fDataPtrRet.get_future() );
+                            if( ! fThreadFutures.back().valid() )
+                            {
+                                KTERROR( proclog, "Invalid thread future created" );
+                                throw boost::future_error( boost::future_errc::no_state );
+                            }
+
+                            fThreadIndicators.emplace_back( new KTThreadIndicator() );
+                            fThreadIndicators.back()->fContinueSignal = fMasterContSignal;
+
+                            thisThreadRef.fThreadIndicator = fThreadIndicators.back();
+                            thisThreadRef.fInitiateBreakFunc = [&](){ this->InitiateBreak(); };
+                            thisThreadRef.fRefreshFutureFunc = [&]( boost::future< KTDataPtr >&& ret ){ this->TakeFuture( std::move(ret) ); };
+
+                            threads.emplace_back( boost::thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( thisThreadRef ) ) );
+
+                            KTDEBUG( proclog, "Thread ID is <" << threads.back().get_id() << ">" );
+                        }// end for loop over the thread group
+
+                        bool stillRunning = true; // determines behavior that depends on whether a return from the thread was temporary or from the thread completing
+                        do
+                        {
+                            boost::future_status status;
+                            do
+                            {
+                                status = fThreadFutures.back().wait_for(boost::chrono::milliseconds(500));
+                            } while (status != boost::future_status::ready);
+
+                            stillRunning = false;
+                            if( fDoRunBreakFlag )
+                            {
+                                KTDEBUG( proclog, "Breakpoint reached" );
+                                continueSignal.wait();
+                                KTDEBUG( proclog, "Breakpoint finished" );
+                                stillRunning = true;
+                                continueSignal = fMasterContSignal; // refresh the local copy of the shared future
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    fThreadFutures.back().get();
+                                }
+                                catch( std::exception& e )
+                                {
+                                    // this transfers an exception thrown by a processor to the outer catch block in this function
+                                    throw KTException() << "An error occurred while running processor <" << procName << ">: " << e.what();
+                                }
+                                stillRunning = false;
+                            }
+                        } while( stillRunning );
+
+                        KTINFO( proclog, "Processor <" << procName << "> has finished" );
+
+                        thread.join();
+                        fThreadIndicators.pop_back();
+                        fThreadFutures.pop_back();
+
+                    } // end for loop over the run-queue
 
                     KTPROG( proclog, "Processing is complete (multi-threaded)" );
                 }
                 catch( ... )
                 {
+                    // exceptions thrown in this function or from within processors will end up here
                     fDoRunPromise.set_exception( std::current_exception() );
                 }
                 fDoRunPromise.set_value();
                 return;
             };
 
-            fDoRunThread = new std::thread( multiThreadRun );
-        }
+            fDoRunThread = new boost::thread( multiThreadRun );
+        */}
 
         return;
     }
 
     bool KTProcessorToolbox::WaitForBreak()
     {
-        std::shared_future< void > doRunFuture = fDoRunFuture;
+        boost::shared_future< void > doRunFuture = fDoRunFuture;
 
-        std::future_status doRunStatus;
+        boost::future_status doRunStatus;
         do
         {
-            doRunStatus = doRunFuture.wait_for( std::chrono::milliseconds( 500 ) );
-        } while( doRunStatus != std::future_status::ready );
+            doRunStatus = doRunFuture.wait_for( boost::chrono::milliseconds( 500 ) );
+        } while( doRunStatus != boost::future_status::ready );
 
         if( fDoRunBreakFlag )
         {
@@ -771,7 +840,7 @@ namespace Nymph
 
     void KTProcessorToolbox::Continue()
     {
-        std::unique_lock< std::mutex > breakContLock( fBreakContMutex );
+        boost::unique_lock< boost::mutex > breakContLock( fBreakContMutex );
 
         // futures have been used; clear them to be replaced
         fThreadFutures.clear();
@@ -784,7 +853,7 @@ namespace Nymph
         }
 
         // reset the do-run promise and future
-        fDoRunPromise = std::promise< void >();
+        fDoRunPromise = boost::promise< void >();
         fDoRunFuture = fDoRunPromise.get_future().share();
 
         KTINFO( proclog, "Continuing from breakpoint" );
@@ -793,7 +862,7 @@ namespace Nymph
 
         // reset the signaler and all signals
         // hopefully the delay of creating the new signaler and starting the for loop is enough that anything waiting on the old signal has already seen that signal and moved on
-        fContinueSignaler = std::promise< void >();
+        fContinueSignaler = boost::promise< void >();
         fMasterContSignal = fContinueSignaler.get_future().share();
         for( auto tiIt = fThreadIndicators.begin(); tiIt != fThreadIndicators.end(); ++tiIt )
         {
@@ -805,7 +874,7 @@ namespace Nymph
 
     void KTProcessorToolbox::InitiateBreak()
     {
-        std::unique_lock< std::mutex > breakContLock( fBreakContMutex );
+        boost::unique_lock< boost::mutex > breakContLock( fBreakContMutex );
 
         // set all break flags
         // master break flag
@@ -824,7 +893,7 @@ namespace Nymph
 
     void KTProcessorToolbox::CancelThreads()
     {
-        std::unique_lock< std::mutex > breakContLock( fBreakContMutex );
+        boost::unique_lock< boost::mutex > breakContLock( fBreakContMutex );
         for( auto tiIt = fThreadIndicators.begin(); tiIt != fThreadIndicators.end(); ++tiIt )
         {
             (*tiIt)->fCanceled = true;

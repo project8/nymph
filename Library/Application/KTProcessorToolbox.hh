@@ -15,8 +15,11 @@
 
 #include "factory.hh"
 
+#include <boost/thread/future.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+
 #include <deque>
-#include <future>
 #include <initializer_list>
 #include <limits>
 #include <set>
@@ -227,13 +230,13 @@ namespace Nymph
             std::vector< std::future< KTDataPtr > > fThreadFutures;
             std::vector< std::shared_ptr< KTThreadIndicator > > fThreadIndicators;
 
-            std::promise< void > fContinueSignaler;
-            std::shared_future< void > fMasterContSignal;
-            std::mutex fBreakContMutex;
+            boost::promise< void > fContinueSignaler;
+            boost::shared_future< void > fMasterContSignal;
+            boost::mutex fBreakContMutex;
 
-            std::thread* fDoRunThread;
-            std::promise< void > fDoRunPromise;
-            std::shared_future< void > fDoRunFuture;
+            boost::thread* fDoRunThread;
+            boost::promise< void > fDoRunPromise;
+            boost::shared_future< void > fDoRunFuture;
             bool fDoRunBreakFlag;
 
     };

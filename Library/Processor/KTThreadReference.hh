@@ -10,15 +10,16 @@
 
 #include "KTData.hh"
 
+#include <boost/thread/future.hpp>
+
 #include <memory>
-#include <thread>
 
 namespace Nymph
 {
     struct KTThreadIndicator
     {
         bool fBreakFlag; // only use outside of blocks protected by a mutex are reads, so we shouldn't need to make this an atomic
-        std::shared_future< void > fContinueSignal;
+        boost::shared_future< void > fContinueSignal;
         bool fCanceled;
         KTThreadIndicator();
     };
