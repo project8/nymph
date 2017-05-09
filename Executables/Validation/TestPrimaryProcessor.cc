@@ -10,7 +10,7 @@
 
 #include "KTLogger.hh"
 
-#include <thread>
+#include <boost/thread.hpp>
 
 using namespace Nymph;
 
@@ -38,7 +38,18 @@ int main()
     auto exeThreadFuture = exeThreadRef.fDataPtrRet.get_future();
 
     // run the thread
-    std::thread thread( &KTPrimaryProcessor::operator(), &tpp, std::move( exeThreadRef ) );
+    boost::condition_variable threadStartedCV;
+    boost::mutex threadStartedMutex;
+    bool threadStartedFlag = false;
+
+    boost::unique_lock< boost::mutex > threadStartedLock( threadStartedMutex );
+    boost::thread thread( [&](){ tpp( std::move( exeThreadRef ), threadStartedCV, threadStartedFlag ); } );
+
+    while( ! threadStartedFlag )
+    {
+        threadStartedCV.wait( threadStartedLock );
+    }
+    KTDEBUG( testpplog, "Thread has started" );
 
     // wait for a result to be set
     exeThreadFuture.wait();

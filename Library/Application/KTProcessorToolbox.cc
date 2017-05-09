@@ -636,8 +636,19 @@ namespace Nymph
                             thisThreadRef.fInitiateBreakFunc = [&](){ this->InitiateBreak(); };
                             thisThreadRef.fRefreshFutureFunc = [&]( const std::string& name, Future&& ret ){ this->TakeFuture( name, std::move(ret) ); };
 
+                            boost::condition_variable threadStartedCV;
+                            boost::mutex threadStartedMutex;
+                            bool threadStartedFlag = false;
+
                             //boost::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( thisThreadRef ) );
-                            boost::thread thread( [&](){ tgIter->fProc->operator()( std::move( thisThreadRef ) ); } );
+                            boost::unique_lock< boost::mutex > threadStartedLock( threadStartedMutex );
+                            boost::thread thread( [&](){ tgIter->fProc->operator()( std::move( thisThreadRef ), threadStartedCV, threadStartedFlag ); } );
+                            KTDEBUG( proclog, "Thread ID is <" << thread.get_id() << ">; waiting for thread start" );
+                            while( ! threadStartedFlag )
+                            {
+                                threadStartedCV.wait( threadStartedLock );
+                            }
+                            KTDEBUG( proclog, "Thread has started" );
 
                             KTDEBUG( proclog, "Thread ID is <" << thread.get_id() << ">" );
 
@@ -654,7 +665,7 @@ namespace Nymph
                                 stillRunning = false;
                                 if( fThreadIndicators.back()->fBreakFlag )
                                 {
-                                    KTDEBUG( proclog, "Breakpoint reached (originated in thread <" << fThreadNames.back() << ">)" );
+                                    KTDEBUG( proclog, "Breakpoint reached (seen first in thread <" << fThreadNames.back() << ">; may not be where breakpoint is set)" );
                                     continueSignal.wait();
                                     KTDEBUG( proclog, "Breakpoint finished" );
                                     stillRunning = true;
@@ -691,8 +702,9 @@ namespace Nymph
 
                     KTPROG( proclog, "Processing is complete (single-threaded)" );
                 }
-                catch( ... )
+                catch( std::exception& e )
                 {
+                    KTDEBUG( proclog, "Caught exception thrown in a processor or in the multi-threaded run function: " << e.what() );
                     // exceptions thrown in this function or from within processors will end up here
                     fDoRunPromise.set_exception( std::current_exception() );
                 }
@@ -754,9 +766,19 @@ namespace Nymph
                             thisThreadRef.fInitiateBreakFunc = [&](){ this->InitiateBreak(); };
                             thisThreadRef.fRefreshFutureFunc = [&]( const std::string& name, Future&& ret ){ this->TakeFuture( name, std::move(ret) ); };
 
+                            boost::condition_variable threadStartedCV;
+                            boost::mutex threadStartedMutex;
+                            bool threadStartedFlag = false;
+
                             //threads.emplace_back( boost::thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( thisThreadRef ) ) );
-                            boost::thread* thisThread = new boost::thread( [&](){ tgIter->fProc->operator()( std::move( thisThreadRef ) ); } );
-                            KTDEBUG( proclog, "Thread ID is <" << thisThread->get_id() << ">" );
+                            boost::unique_lock< boost::mutex > threadStartedLock( threadStartedMutex );
+                            boost::thread* thisThread = new boost::thread( [&](){ tgIter->fProc->operator()( std::move( thisThreadRef ), threadStartedCV, threadStartedFlag ); } );
+                            KTDEBUG( proclog, "Thread ID is <" << thisThread->get_id() << ">; waiting for thread start" );
+                            while( ! threadStartedFlag )
+                            {
+                                threadStartedCV.wait( threadStartedLock );
+                            }
+                            KTDEBUG( proclog, "Thread has started" );
 
                             threads.add_thread( thisThread );
 
@@ -776,7 +798,7 @@ namespace Nymph
                             if( fDoRunBreakFlag )
                             {
                                 // a breakpoint has been reached
-                                KTDEBUG( proclog, "Breakpoint reached (originated in thread <" << threadName << ">)" );
+                                KTDEBUG( proclog, "Breakpoint reached (seen first in thread <" << threadName << ">; may not be where breakpoint is set)" );
                                 continueSignal.wait();
                                 KTDEBUG( proclog, "Breakpoint finished" );
                                 stillRunning = true;
@@ -800,7 +822,6 @@ namespace Nymph
                                     throw KTException() << "An error occurred while running processor <" << threadName << ">: " << e.what();
                                 }
 
-                                fThreadFutures.erase( finishedFuturePtr );
                                 if( fThreadFutures.empty() ) stillRunning = false;
                                 else stillRunning = true;
                             }
@@ -814,9 +835,10 @@ namespace Nymph
 
                     KTPROG( proclog, "Processing is complete (multi-threaded)" );
                 }
-                catch( ... )
+                catch( std::exception& e )
                 {
                     // exceptions thrown in this function or from within processors will end up here
+                    KTDEBUG( proclog, "Caught exception thrown in a processor or in the multi-threaded run function: " << e.what() );
                     fDoRunPromise.set_exception( std::current_exception() );
                 }
                 fDoRunPromise.set_value();
@@ -833,11 +855,12 @@ namespace Nymph
     {
         boost::shared_future< void > doRunFuture = fDoRunFuture;
 
-        boost::future_status doRunStatus;
-        do
-        {
-            doRunStatus = doRunFuture.wait_for( boost::chrono::milliseconds( 500 ) );
-        } while( doRunStatus != boost::future_status::ready );
+        doRunFuture.wait();
+        //boost::future_status doRunStatus;
+        //do
+        //{
+        //    doRunStatus = doRunFuture.wait_for( boost::chrono::milliseconds( 500 ) );
+        //} while( doRunStatus != boost::future_status::ready );
 
         if( fDoRunBreakFlag )
         {

@@ -27,9 +27,12 @@ namespace Nymph
     {
     }
 
-    void KTPrimaryProcessor::operator ()( KTThreadReference&& ref )
+    void KTPrimaryProcessor::operator ()( KTThreadReference&& ref, boost::condition_variable& startedCV, bool& startedFlag )
     {
         fThreadRef = std::move( ref );
+
+        startedFlag = true;
+        startedCV.notify_all();
 
         // pass updated thread reference to downstream slots
         for( auto sigIt = fSignalsEmitted.begin(); sigIt != fSignalsEmitted.end(); ++sigIt )

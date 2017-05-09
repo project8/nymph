@@ -11,7 +11,7 @@
 
 using namespace Nymph;
 
-KTLOGGER( testptlog, "TestProcessorToolbox" )
+KTLOGGER( testptlog, "TestProcessorToolboxMultithreaded" )
 
 int main()
 {
@@ -19,52 +19,34 @@ int main()
 
     KTProcessorToolbox ptb;
 
-    // add the primary processor, thread 1
-    if( ! ptb.AddProcessor( "test-p-proc", "tpp1" ) )
+    // set for multi-threaded running
+    ptb.SetRunSingleThreaded( false );
+
+    // add the primary processor
+    if( ! ptb.AddProcessor( "test-p-proc", "tpp" ) )
     {
-        KTERROR( testptlog, "Unable to create test primary processor (thread 1)" );
+        KTERROR( testptlog, "Unable to create test primary processor" );
         return -1;
     }
 
-    // add processor b, thread 1
-    if( ! ptb.AddProcessor( "test-proc-b", "tp1" ) )
+    // add processor b
+    if( ! ptb.AddProcessor( "test-proc-b", "tp" ) )
     {
-        KTERROR( testptlog, "Unable to create test processor b (thread 1)" );
+        KTERROR( testptlog, "Unable to create test processor b" );
         return -1;
     }
 
-    // add the primary processor, thread 2
-    if( ! ptb.AddProcessor( "test-p-proc", "tpp2" ) )
+    // make connections
+    if( ! ptb.MakeConnection( "tpp:the-signal", "tp:first-slot" ) )
     {
-        KTERROR( testptlog, "Unable to create test primary processor (thread 2)" );
-        return -1;
-    }
-
-    // add processor b, thread 2
-    if( ! ptb.AddProcessor( "test-proc-b", "tp2" ) )
-    {
-        KTERROR( testptlog, "Unable to create test processor b (thread 2)" );
-        return -1;
-    }
-
-    // make connections, thread 1
-    if( ! ptb.MakeConnection( "tpp1:the-signal", "tp1:first-slot" ) )
-    {
-        KTERROR( testptlog, "Unable to connect tpp1 to tp1" );
-        return -1;
-    }
-
-    // make connections, thread 2
-    if( ! ptb.MakeConnection( "tpp2:the-signal", "tp2:first-slot" ) )
-    {
-        KTERROR( testptlog, "Unable to connect tpp2 to tp2" );
+        KTERROR( testptlog, "Unable to connect tpp to tp" );
         return -1;
     }
 
     // set the run queue
-    if( ! ptb.PushBackToRunQueue( {"tpp1", "tpp2"} ) )
+    if( ! ptb.PushBackToRunQueue( "tpp" ) )
     {
-        KTERROR( testptlog, "Unable to add {tpp1, tpp2} to the run queue" );
+        KTERROR( testptlog, "Unable to add tpp to the run queue" );
         return -1;
     }
 
