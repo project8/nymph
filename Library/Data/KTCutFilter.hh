@@ -80,7 +80,7 @@ namespace Nymph
         public:
             bool Filter(KTData& data);
 
-            void FilterData(KTDataPtr);
+            void FilterData(KTDataPtr dataPtr);
 
 
             //***************
@@ -95,6 +95,8 @@ namespace Nymph
             //***************
             // Slots
             //***************
+
+            KTSlotWrapper* fFilterDataSW;
 
         private:
 

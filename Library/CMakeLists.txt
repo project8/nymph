@@ -35,6 +35,7 @@ set( NYMPH_HEADERFILES
     ${PROC_DIR}/KTSignalWrapper.hh
     ${PROC_DIR}/KTSlot.hh
     ${PROC_DIR}/KTSlotWrapper.hh
+    ${PROC_DIR}/KTThreadReference.hh
     ${IO_DIR}/KTReader.hh
     ${IO_DIR}/KTWriter.hh
     ${APPL_DIR}/KTApplication.hh
@@ -55,7 +56,6 @@ set( NYMPH_SOURCEFILES
     ${UTIL_DIR}/KTDirectory.cc
     ${UTIL_DIR}/KTEventLoop.cc
     ${UTIL_DIR}/KTException.cc
-    ${UTIL_DIR}/KTLogger.cc
     ${UTIL_DIR}/KTTime.cc
     ${DATA_DIR}/KTApplyCut.cc
     ${DATA_DIR}/KTCut.cc
@@ -64,9 +64,9 @@ set( NYMPH_SOURCEFILES
     ${DATA_DIR}/KTData.cc
     ${PROC_DIR}/KTPrimaryProcessor.cc
     ${PROC_DIR}/KTProcessor.cc
-    ${PROC_DIR}/KTSignal.cc
     ${PROC_DIR}/KTSignalWrapper.cc
     ${PROC_DIR}/KTSlotWrapper.cc
+    ${PROC_DIR}/KTThreadReference.cc
     ${IO_DIR}/KTReader.cc
     ${IO_DIR}/KTWriter.cc
     ${APPL_DIR}/KTApplication.cc

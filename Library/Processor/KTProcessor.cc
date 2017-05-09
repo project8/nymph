@@ -7,9 +7,8 @@
 
 #include "KTProcessor.hh"
 
+#include "KTException.hh"
 //#include "KTLogger.hh"
-
-#include <boost/foreach.hpp>
 
 #include <string>
 
@@ -27,7 +26,9 @@ namespace Nymph
     KTProcessor::KTProcessor(const string& name) :
             KTConfigurable(name),
             fSignalMap(),
-            fSlotMap()
+            fSlotMap(),
+            fSlotToSigMap(),
+            fSigConnMap()
     {
     }
 
@@ -44,13 +45,36 @@ namespace Nymph
         }
     }
 
+    void KTProcessor::PassThreadRefUpdate(const std::string& slotName, KTThreadReference* threadRef)
+    {
+        // update the thread reference pointer for this slot
+        GetSlot(slotName)->SetThreadRef(threadRef);
+
+        // get the list of slot-to-signal connections for this slot
+        auto stsRange = fSlotToSigMap.equal_range(slotName);
+
+        // loop over signals called in the performance of slot slotName
+        for (SlotToSigMapCIt stsIt = stsRange.first; stsIt != stsRange.second; ++stsIt)
+        {
+            // loop over all processor:slots called by this signal
+            auto sigConnRange = fSigConnMap.equal_range(stsIt->second);
+            for (SigConnMapCIt sigConnIt = sigConnRange.first; sigConnIt != sigConnRange.second; ++sigConnIt)
+            {
+                // pass the update on to the connected-to processor
+                sigConnIt->second.first->PassThreadRefUpdate(sigConnIt->second.second, threadRef);
+            }
+        }
+    }
+
     void KTProcessor::ConnectASlot(const std::string& signalName, KTProcessor* processor, const std::string& slotName, int groupNum)
     {
+        // get the signal and slot wrapper pointers
         KTSignalWrapper* signal = GetSignal(signalName);
         KTSlotWrapper* slot = processor->GetSlot(slotName);
 
         try
         {
+            // make the connection
             ConnectSignalToSlot(signal, slot, groupNum);
         }
         catch (std::exception& e)
@@ -62,28 +86,11 @@ namespace Nymph
                     string("\tIf the slot pointer is NULL, you may have the slot name wrong.");
             throw std::logic_error(errorMsg);
         }
-        KTDEBUG(processorlog, "Connected signal <" << signalName << "> to slot <" << slotName << ">");
 
-        return;
-    }
+        // record the connection in the signal-connection map
+        fSigConnMap.insert(SigConnMapVal(signalName, std::make_pair(processor, slotName)));
 
-    void KTProcessor::ConnectASignal(KTProcessor* processor, const std::string& signalName, const std::string& slotName, int groupNum)
-    {
-        KTSignalWrapper* signal = processor->GetSignal(signalName);
-        KTSlotWrapper* slot = GetSlot(slotName);
-
-        try
-        {
-            ConnectSignalToSlot(signal, slot, groupNum);
-        }
-        catch (std::exception& e)
-        {
-            string errorMsg = string("Exception caught in KTProcessor::ConnectASignal; signal: ") +
-                    signalName + string(", slot: ") + slotName + string("\n") + e.what() + string("\n") +
-                    string("Check that the signatures of the signal and slot match exactly.");
-            throw std::logic_error(errorMsg);
-        }
-        KTDEBUG(processorlog, "Connected slot <" << signalName << "> to signal <" << slotName << ">");
+        KTDEBUG(processorlog, "Connected signal <" << this->GetConfigName() << ":" << signalName << "> to slot <" << processor->GetConfigName() << ":" << slotName << ">");
 
         return;
     }
@@ -124,6 +131,25 @@ namespace Nymph
         return iter->second;
     }
 
+    inline bool KTProcessor::GetDoBreakpoint(const std::string& slotName)
+    {
+        KTSlotWrapper* slot = GetSlot(slotName);
+        if (slot != nullptr)
+        {
+            return slot->GetDoBreakpoint();
+        }
+        throw KTException() << "Slot <" << slotName << "> was not found";
+    }
 
+    void KTProcessor::SetDoBreakpoint(const std::string& slotName, bool flag)
+    {
+        KTSlotWrapper* slot = GetSlot(slotName);
+        if (slot != nullptr)
+        {
+            return slot->SetDoBreakpoint(flag);
+        }
+        throw KTException() << "Slot <" << slotName << "> was not found";
+        return;
+    }
 
 } /* namespace Nymph */

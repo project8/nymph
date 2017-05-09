@@ -33,11 +33,11 @@ int main()
     */
 
     /* More Complicated Test */
-    KTINFO(testsiglog, "Connecting the_signal to first_slot and second_slot");
+    KTINFO(testsiglog, "Connecting the-signal to first-slot and second-slot");
     try
     {
-        tpA.ConnectASlot("the_signal", &tpB, "first_slot", 20);
-        tpB.ConnectASignal(&tpA, "the_signal", "second_slot", 10);
+        tpA.ConnectASlot("the-signal", &tpB, "first-slot", 20);
+        tpB.ConnectASignal(&tpA, "the-signal", "second-slot", 10);
     }
     catch(std::exception& e)
     {

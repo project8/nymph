@@ -15,12 +15,14 @@ if (Nymph_ENABLE_TESTING)
     set (VALIDATION_HEADERFILES
         KTTestConfigurable.hh
         KTTestCuts.hh
+        KTTestPrimaryProcessor.hh
         KTTestProcessor.hh
     )
     
     set (VALIDATION_SOURCEFILES
         KTTestConfigurable.cc
         KTTestCuts.cc
+        KTTestPrimaryProcessor.cc
         KTTestProcessor.cc
     )
     
@@ -46,10 +48,16 @@ if (Nymph_ENABLE_TESTING)
         TestCacheDirectory
         TestCut
         TestCutFilter
+        TestExceptionInSlot
         TestLogger
+        TestPrimaryProcessor
+        TestPrimaryProcessorNoThreading
         TestPrintData
+        TestProcessorToolbox
+        TestProcessorToolboxMultithreaded
         TestSignalsAndSlots
         TestThroughputProfiler
+        TestUseBreakpoint
     )
     
     pbuilder_executables( TEST_PROGRAMS LIB_DEPENDENCIES )

@@ -19,83 +19,57 @@
 namespace Nymph
 {
     /*!
-     @class KTSignalOneArg
+     @class KTSignal
      @author N. S. Oblath
 
-     @brief Creates a signal that takes a single argument.
+     @brief Creates a signal that takes 0 or more arguments.
 
      @details
      The signal is emitted by calling operator().
-     If a KTDataSlot is being used, and the Slot has been given a pointer to this signal, the Slot will emit the Signal.
+     If a KTSlot is being used, and the Slot has been given a pointer to this signal, the Slot will emit the Signal.
 
      Usage:
-     In your Processor's header add a member variable of type KTDataSignal< ArgumentType >.
+     In your Processor's header add a member variable of type KTSignal< ArgumentTypes >.
 
      Initialize the signal with the processor's 'this' pointer and the name of the signal.
 
      To use the signal, call it as: fSignalObject(arg);
     */
-    template< class XSignalArgument >
-    class KTSignalOneArg
+    template< class... XSignalArguments >
+    class KTSignal
     {
         public:
-            typedef void (signature)(XSignalArgument);
+            typedef void (signature)( XSignalArguments... );
             typedef boost::signals2::signal< signature > boost_signal;
             typedef typename boost::signals2::signal< signature >::slot_type slot_type;
 
         public:
-            KTSignalOneArg();
-            KTSignalOneArg(const std::string& name, KTProcessor* proc);
-            virtual ~KTSignalOneArg();
+            KTSignal();
+            KTSignal( const std::string& name, KTProcessor* proc );
+            virtual ~KTSignal();
 
         protected:
-            KTSignalOneArg(const KTSignalOneArg&);
+            KTSignal( const KTSignal& );
 
         public:
-            void operator()(XSignalArgument arg);
+            void operator()( XSignalArguments... args );
 
             boost_signal* Signal();
+
+            const std::string& GetName() const;
 
         protected:
             boost_signal fSignal;
 
+            std::string fName;
     };
 
+    /// Convenience typedef for done signals
+    typedef KTSignal<> KTSignalDone;
 
-    template<>
-    class KTSignalOneArg< void >
-    {
-        public:
-            typedef void (signature)(void);
-            typedef boost::signals2::signal< signature > boost_signal;
-            // the following line is, technically, not valid C++03 code because the 'typename' keyword
-            // is appearing outside of a template (since the template here is fully specified, this counts).
-            // It should compiler with most new-ish compilers, even when compiling under C++03 mode.
-            // It has been tested successfully with GCC 4.6 and Clang 3.1
-            typedef typename boost::signals2::signal< signature >::slot_type slot_type;
-
-        public:
-            KTSignalOneArg();
-            KTSignalOneArg(const std::string& name, KTProcessor* proc);
-            virtual ~KTSignalOneArg();
-
-        protected:
-            KTSignalOneArg(const KTSignalOneArg&);
-
-        public:
-            void operator()();
-
-            boost_signal* Signal();
-
-        protected:
-            boost_signal fSignal;
-
-    };
-
-    // convenience typedef for KTSignalDone
-    typedef KTSignalOneArg<void> KTSignalDone;
-
-
+    // Convenience typedef for backwards compatibility
+    template< typename XDataType >
+    using KTSignalOneArg = KTSignal< XDataType >;
 
     /*!
      @class KTSignalData
@@ -115,92 +89,54 @@ namespace Nymph
 
      That's it!
     */
-
-    class KTSignalData : public KTSignalOneArg< KTDataPtr >
-    {
-        public:
-            typedef void (signature)(KTDataPtr);
-            typedef boost::signals2::signal< signature > boost_signal;
-            typedef boost::signals2::signal< signature >::slot_type slot_type;
-
-            typedef void (ref_signature)(KTDataPtr&);
-            typedef boost::signals2::signal< ref_signature > ref_boost_signal;
-            typedef boost::signals2::signal< ref_signature >::slot_type ref_slot_type;
-
-        public:
-            KTSignalData();
-            KTSignalData(const std::string& name, KTProcessor* proc);
-            virtual ~KTSignalData();
-
-        protected:
-            KTSignalData(const KTSignalData&);
-
-        public:
-            void operator()(KTDataPtr arg);
-
-            ref_boost_signal* RefSignal();
-
-        protected:
-            ref_boost_signal fRefSignal;
-    };
+    typedef KTSignal< KTDataPtr > KTSignalData;
 
 
+    //*******************
+    // Implementations
+    //*******************
 
-    template< class XSignalArgument >
-    KTSignalOneArg< XSignalArgument >::KTSignalOneArg(const std::string& name, KTProcessor* proc) :
-            fSignal()
+    template< class... XSignalArguments >
+    KTSignal< XSignalArguments... >::KTSignal( const std::string& name, KTProcessor* proc ) :
+            fSignal(),
+            fName( name )
     {
         proc->RegisterSignal(name, &fSignal);
     }
 
-    template< class XSignalArgument >
-    KTSignalOneArg< XSignalArgument >::KTSignalOneArg() :
-            fSignal()
+    template< class... XSignalArguments >
+    KTSignal< XSignalArguments... >::KTSignal() :
+            fSignal(),
+            fName("none")
     {}
 
-    template< class XSignalArgument >
-    KTSignalOneArg< XSignalArgument >::KTSignalOneArg(const KTSignalOneArg&) :
-            fSignal()
+    template< class... XSignalArguments >
+    KTSignal< XSignalArguments... >::KTSignal( const KTSignal& signal ) :
+            fSignal(),
+            fName( signal.fName )
     {}
 
-    template< class XSignalArgument >
-    KTSignalOneArg< XSignalArgument >::~KTSignalOneArg()
+    template< class... XSignalArguments >
+    KTSignal< XSignalArguments... >::~KTSignal()
     {
     }
 
-    template< class XSignalArgument >
-    inline void KTSignalOneArg< XSignalArgument >::operator()(XSignalArgument arg)
+    template< class... XSignalArguments >
+    inline void KTSignal< XSignalArguments... >::operator()( XSignalArguments... args )
     {
-        fSignal(arg);
+        fSignal( args... );
     }
 
-    template< class XSignalArgument >
-    inline typename KTSignalOneArg< XSignalArgument >::boost_signal* KTSignalOneArg< XSignalArgument >::Signal()
+    template< class... XSignalArguments >
+    inline typename KTSignal< XSignalArguments... >::boost_signal* KTSignal< XSignalArguments... >::Signal()
     {
         return &fSignal;
     }
 
-
-    inline void KTSignalOneArg< void >::operator()()
+    template< class... XSignalArguments >
+    inline const std::string& KTSignal< XSignalArguments... >::GetName() const
     {
-        fSignal();
-    }
-
-    inline typename KTSignalOneArg< void >::boost_signal* KTSignalOneArg< void >::Signal()
-    {
-        return &fSignal;
-    }
-
-
-    inline void KTSignalData::operator()(KTDataPtr arg)
-    {
-        fSignal(arg);
-        fRefSignal(arg);
-    }
-
-    inline typename KTSignalData::ref_boost_signal* KTSignalData::RefSignal()
-    {
-        return &fRefSignal;
+        return fName;
     }
 
 } /* namespace Nymph */

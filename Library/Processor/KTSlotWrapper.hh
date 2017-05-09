@@ -10,8 +10,8 @@
 
 #include "KTConnection.hh"
 #include "KTSignalWrapper.hh"
+#include "KTThreadReference.hh"
 
-#include <boost/function.hpp>
 #include <boost/signals2.hpp>
 
 namespace Nymph
@@ -38,14 +38,13 @@ namespace Nymph
             class KTSpecifiedInternalSlotWrapper : public KTInternalSlotWrapper, public boost::noncopyable
             {
                 public:
-                    KTSpecifiedInternalSlotWrapper(XSignature* funcPtr, XTypeContainer* typeCont=NULL) :
+                    KTSpecifiedInternalSlotWrapper(XSignature funcPtr, XTypeContainer* typeCont=NULL) :
                             fSlot(funcPtr)
                     {
                         (void)typeCont; // to suppress warnings
                     }
                     virtual ~KTSpecifiedInternalSlotWrapper()
                     {
-                        delete fSlot;
                     }
 
                     virtual KTConnection Connect(KTSignalWrapper* signalWrap, int groupNum=-1)
@@ -61,18 +60,18 @@ namespace Nymph
                         }
                         if (groupNum >= 0)
                         {
-                            return derivedSignalWrapper->GetSignal()->connect(groupNum, *fSlot);
+                            return derivedSignalWrapper->GetSignal()->connect(groupNum, fSlot);
                         }
-                        return derivedSignalWrapper->GetSignal()->connect(*fSlot);
+                        return derivedSignalWrapper->GetSignal()->connect(fSlot);
                     }
 
                 private:
-                    XSignature* fSlot; // is owned by this KTSlot
+                    XSignature fSlot;
             };
 
         public:
             template< typename XSignature, typename XTypeContainer >
-            KTSlotWrapper(XSignature* signalPtr, XTypeContainer* typeCont);
+            KTSlotWrapper(XSignature signalPtr, XTypeContainer* typeCont);
             ~KTSlotWrapper();
 
         private:
@@ -88,12 +87,25 @@ namespace Nymph
         private:
             KTConnection fConnection;
 
+        public:
+            KTThreadReference* GetThreadRef() const;
+            void SetThreadRef(KTThreadReference* ref);
+
+            bool GetDoBreakpoint() const;
+            void SetDoBreakpoint(bool flag);
+
+        private:
+            KTThreadReference* fThreadRef;
+            bool fDoBreakpoint;
+
     };
 
     template< typename XSignature, typename XTypeContainer >
-    KTSlotWrapper::KTSlotWrapper(XSignature* signalPtr, XTypeContainer* typeCont) :
+    KTSlotWrapper::KTSlotWrapper(XSignature signalPtr, XTypeContainer* typeCont) :
             fSlotWrapper(new KTSpecifiedInternalSlotWrapper< XSignature, XTypeContainer >(signalPtr, typeCont)),
-            fConnection()
+            fConnection(),
+            fThreadRef(),
+            fDoBreakpoint(false)
     {}
 
     inline void KTSlotWrapper::SetConnection(KTConnection conn)
@@ -113,6 +125,29 @@ namespace Nymph
         fConnection.disconnect();
         return;
     }
+
+    inline KTThreadReference* KTSlotWrapper::GetThreadRef() const
+    {
+        return fThreadRef;
+    }
+
+    inline void KTSlotWrapper::SetThreadRef(KTThreadReference* ref)
+    {
+        fThreadRef = ref;
+        return;
+    }
+
+    inline bool KTSlotWrapper::GetDoBreakpoint() const
+    {
+        return fDoBreakpoint;
+    }
+
+    inline void KTSlotWrapper::SetDoBreakpoint(bool flag)
+    {
+        fDoBreakpoint = flag;
+        return;
+    }
+
 
 } /* namespace Nymph */
 #endif /* KTSLOTWRAPPER_HH_ */

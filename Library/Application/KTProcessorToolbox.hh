@@ -10,14 +10,27 @@
 #define KTPROCESSORTOOLBOX_HH_
 
 #include "KTConfigurable.hh"
-//#include "KTNOFactory.hh"
+#include "KTMemberVariable.hh"
+#include "KTThreadReference.hh"
 
 #include "factory.hh"
+
+#define BOOST_THREAD_PROVIDES_FUTURE
+#include <boost/thread/future.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+
+//#include <boost/multi_index_container.hpp>
+//#include <boost/multi_index/random_access_index.hpp>
+//#include <boost/multi_index/ordered_index.hpp>
+//#include <boost/multi_index/member.hpp>
 
 #include <deque>
 #include <initializer_list>
 #include <limits>
 #include <set>
+
+//namespace bmi = boost::multi_index;
 
 namespace Nymph
 {
@@ -47,6 +60,7 @@ namespace Nymph
 
      Available (nested) configuration values:
      <ul>
+         <li>run-single-threaded (bool) -- specify whether to run in single-threaded mode (will be ignored if the application has been compiled with the SINGLETHREADED flag set)
          <li>processors (array of objects) -- create a processor; each object in the array should consist of:
              <ul>
                  <li>type -- string specifying the processor type (matches the string given to the Registrar, which should be specified before the class implementation in each processor's .cc file).</li>
@@ -90,12 +104,7 @@ namespace Nymph
             /// Configure processors from a json-encoding of their configurations
             bool ConfigureProcessors(const std::string& config);
 
-
-        public:
-            /// Process the run queue.
-            /// This will call Run() on all of the processors in the queue.
-            bool Run();
-
+            MEMBERVARIABLE( bool, RunSingleThreaded );
 
         private:
             struct ProcessorInfo
@@ -143,6 +152,18 @@ namespace Nymph
             /// Both processors should already have been added to the Toolbox
             bool MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName, int order = std::numeric_limits< int >::min());
 
+            /// Set a breakpoint on a slot
+            /// Slot string should be formatted as: [processor name]:[slot name]
+            bool SetBreakpoint(const std::string& slot);
+            /// Set a breakpoint on a slot
+            bool SetBreakpoint(const std::string& slotProcName, const std::string& slotName);
+
+            /// Remove a breakpoint from a slot
+            /// Slot string should be formatted as: [processor name]:[slot name]
+            bool RemoveBreakpoint(const std::string& slot);
+            /// Remove a breakpoint from a slot
+            bool RemoveBreakpoint(const std::string& slotProcName, const std::string& slotName);
+
         private:
             bool ParseSignalSlotName(const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot) const;
             static const char fSigSlotNameSep = ':';
@@ -171,12 +192,11 @@ namespace Nymph
                     Thread(KTPrimaryProcessor* proc, const std::string& name) : fProc(proc), fName(name)
                     {}
             };
-            //typedef std::set< KTPrimaryProcessor* > ThreadGroup;
             struct CompareThread
             {
                 bool operator() (const Thread& lhs, const Thread& rhs)
                 {
-                    return lhs.fName < rhs.fName;
+                    return lhs.fProc < rhs.fProc;
                 }
             };
             typedef std::set< Thread, CompareThread > ThreadGroup;
@@ -184,6 +204,71 @@ namespace Nymph
             bool AddProcessorToThreadGroup(const std::string& name, ThreadGroup& group);
 
             RunQueue fRunQueue;
+
+        public:
+            /// Process the run queue.
+            /// This will call Run() on all of the processors in the queue.
+            bool Run();
+
+            void AsyncRun();
+
+            void WaitForContinue();
+
+            /// Returns when processing is completed or a breakpoint is reached
+            /// Throws an exception if an error occurred during processing
+            /// If the return is true, processing can continue after the break
+            bool WaitForBreak();
+
+            void WaitForEndOfRun();
+
+            void Continue();
+
+            void CancelThreads();
+
+            void JoinRunThread();
+
+        private:
+            friend class KTThreadReference;
+
+            typedef boost::unique_future< KTDataPtr > Future;
+            //typedef std::future< KTDataPtr > Future;
+
+            // called from ThreadPacket::Break
+            void InitiateBreak();
+            // called from ThreadPacket::Break
+            void TakeFuture( const std::string& name, Future&& future );
+
+            //struct LabeledFuture
+            //{
+            //    std::string fName;
+            //    std::future< KTDataPtr > fFuture;
+            //};
+            //typedef std::vector< LabeledFuture > ThreadFutures;
+            typedef std::vector< Future > ThreadFutures;
+            typedef std::vector< std::string > ThreadNames;
+            //typedef std::map< std::string, std::future< KTDataPtr > > ThreadFutures;
+            //typedef boost::multi_index_container<
+            //    LabeledFuture,
+            //    bmi::indexed_by<
+            //        bmi::random_access<>,
+            //        bmi::ordered_unique< bmi::member< KTProcessorToolbox::LabeledFuture, std::string, &KTProcessorToolbox::LabeledFuture::fName > >
+            //    >
+            //> ThreadFutures;
+
+            ThreadFutures fThreadFutures;
+            ThreadNames fThreadNames;
+
+            typedef std::vector< std::shared_ptr< KTThreadIndicator > > ThreadIndicators;
+            ThreadIndicators fThreadIndicators;
+
+            boost::promise< void > fContinueSignaler;
+            boost::shared_future< void > fMasterContSignal;
+            boost::mutex fBreakContMutex;
+
+            boost::thread* fDoRunThread;
+            boost::promise< void > fDoRunPromise;
+            boost::shared_future< void > fDoRunFuture;
+            bool fDoRunBreakFlag;
 
     };
 
@@ -199,7 +284,28 @@ namespace Nymph
         return;
     }
 
+    inline void KTProcessorToolbox::WaitForContinue()
+    {
+        fMasterContSignal.wait();
+        return;
+    }
 
+    inline void KTProcessorToolbox::TakeFuture( const std::string& name, Future&& future )
+    {
+        //fThreadFutures.get<1>().insert( LabeledFuture{ name, std::move( future ) } );
+        //fThreadFutures.push_back( LabeledFuture{ name, std::move( future ) } );
+        fThreadFutures.push_back( std::move( future ) );
+        fThreadNames.push_back( name );
+        return;
+    }
+
+    inline void KTProcessorToolbox::JoinRunThread()
+    {
+        if( fDoRunThread == nullptr ) return;
+        fDoRunThread->join();
+        delete fDoRunThread;
+        fDoRunThread = nullptr;
+    }
 
 } /* namespace Nymph */
 #endif /* KTPROCESSORTOOLBOX_HH_ */
