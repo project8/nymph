@@ -257,6 +257,7 @@ namespace Nymph
 
             ThreadFutures fThreadFutures;
             ThreadNames fThreadNames;
+            boost::mutex fThreadFuturesMutex;
 
             typedef std::vector< std::shared_ptr< KTThreadIndicator > > ThreadIndicators;
             ThreadIndicators fThreadIndicators;

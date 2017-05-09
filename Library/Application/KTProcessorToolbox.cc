@@ -789,6 +789,7 @@ namespace Nymph
                         bool stillRunning = true; // determines behavior that depends on whether a return from the thread was temporary or from the thread completing
                         do
                         {
+                            boost::unique_lock< boost::mutex > threadFuturesLock( fThreadFuturesMutex );
                             //auto finishedFuturePtr = boost::wait_for_any( futureIndex.begin(), futureIndex.end() );
                             auto finishedFuturePtr = boost::wait_for_any( fThreadFutures.begin(), fThreadFutures.end() );
                             size_t iThread = finishedFuturePtr - fThreadFutures.begin();
@@ -798,9 +799,11 @@ namespace Nymph
                             if( fDoRunBreakFlag )
                             {
                                 // a breakpoint has been reached
+                                threadFuturesLock.unlock();
                                 KTDEBUG( proclog, "Breakpoint reached (seen first in thread <" << threadName << ">; may not be where breakpoint is set)" );
                                 continueSignal.wait();
                                 KTDEBUG( proclog, "Breakpoint finished" );
+                                boost::unique_lock< boost::mutex > breakContLock( fBreakContMutex );
                                 stillRunning = true;
                                 continueSignal = fMasterContSignal; // refresh the local copy of the shared future
                             }
@@ -827,8 +830,10 @@ namespace Nymph
                             }
                         } while( stillRunning );
 
+                        KTDEBUG( proclog, "Joining threads" );
                         threads.join_all();
                         fThreadIndicators.clear();
+                        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadFuturesMutex );
                         fThreadFutures.clear();
                         fThreadNames.clear();
                     } // end for loop over the run-queue
@@ -897,6 +902,7 @@ namespace Nymph
     void KTProcessorToolbox::Continue()
     {
         boost::unique_lock< boost::mutex > breakContLock( fBreakContMutex );
+        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadFuturesMutex );
 
         // futures have been used; clear them to be replaced
         fThreadFutures.clear();

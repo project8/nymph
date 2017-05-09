@@ -31,9 +31,6 @@ namespace Nymph
     {
         fThreadRef = std::move( ref );
 
-        startedFlag = true;
-        startedCV.notify_all();
-
         // pass updated thread reference to downstream slots
         for( auto sigIt = fSignalsEmitted.begin(); sigIt != fSignalsEmitted.end(); ++sigIt )
         {
@@ -45,6 +42,9 @@ namespace Nymph
                 sigConnIt->second.first->PassThreadRefUpdate( sigConnIt->second.second, &fThreadRef );
             }
         }
+
+        startedFlag = true;
+        startedCV.notify_all();
 
         // go!
         try
