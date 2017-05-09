@@ -13,7 +13,9 @@
 #include "KTData.hh"
 #include "KTThreadReference.hh"
 
-#include <future>
+#include <boost/thread/condition_variable.hpp>
+
+#include <atomic>
 
 namespace Nymph
 {
@@ -26,7 +28,7 @@ namespace Nymph
 
         public:
             /// Callable function used by std::thread
-            void operator()( KTThreadReference&& ref );
+            void operator()( KTThreadReference&& ref, boost::condition_variable& startedCV, bool& startedFlag );
 
             /// Starts the  main action of the processor
             virtual bool Run() = 0;

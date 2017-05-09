@@ -27,7 +27,7 @@ namespace Nymph
     {
     }
 
-    void KTPrimaryProcessor::operator ()( KTThreadReference&& ref )
+    void KTPrimaryProcessor::operator ()( KTThreadReference&& ref, boost::condition_variable& startedCV, bool& startedFlag )
     {
         fThreadRef = std::move( ref );
 
@@ -42,6 +42,9 @@ namespace Nymph
                 sigConnIt->second.first->PassThreadRefUpdate( sigConnIt->second.second, &fThreadRef );
             }
         }
+
+        startedFlag = true;
+        startedCV.notify_all();
 
         // go!
         try

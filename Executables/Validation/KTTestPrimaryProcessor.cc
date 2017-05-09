@@ -37,7 +37,7 @@ namespace Nymph
         for( unsigned iIteration = 0; iIteration < fIterations; ++iIteration )
         {
             // e.g. for a real processor, do some work here instead of sleeping
-            std::this_thread::sleep_for( std::chrono::milliseconds(1) );
+            boost::this_thread::sleep_for( boost::chrono::milliseconds(1) );
 
             if( fThreadRef.fThreadIndicator->fCanceled ) break;
 

@@ -1,5 +1,5 @@
 /*
- * TestProcessorToolbox.cc
+ * TestProcessorToolboxSinglethreaded.cc
  *
  *  Created on: May 4, 2017
  *      Author: N.S. Oblath
@@ -11,13 +11,16 @@
 
 using namespace Nymph;
 
-KTLOGGER( testptlog, "TestProcessorToolbox" )
+KTLOGGER( testptlog, "TestProcessorToolboxSinglethreaded" )
 
 int main()
 {
     KTINFO( testptlog, "Preparing to run" );
 
     KTProcessorToolbox ptb;
+
+    // set for single-threaded running
+    ptb.SetRunSingleThreaded( true );
 
     // add the primary processor
     if( ! ptb.AddProcessor( "test-p-proc", "tpp" ) )
