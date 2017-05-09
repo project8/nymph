@@ -11,6 +11,7 @@
 #include "KTLogger.hh"
 
 #include <thread>
+#include <atomic>
 
 using namespace Nymph;
 
