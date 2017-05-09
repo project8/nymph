@@ -85,11 +85,13 @@ void export_ProcessorToolbox()
         .def("Run", &KTProcessorToolbox::Run, "Call Run() on all processors in the run queue")
         .def("AsyncRun", &KTProcessorToolbox::AsyncRun, "Non-blocking call to Run()")
         .def("WaitForContinue", &KTProcessorToolbox::WaitForContinue)
-        .def("WaitForBreak", &KTProcessorToolbox::WaitForBreak, "Resume execution until reaching next breakpoint")
-        .def("WaitForEndOfRun", &KTProcessorToolbox::WaitForEndOfRun, "Resume execution until reaching end of run, skipping breakpoints")
-        .def("Continue", &KTProcessorToolbox::Continue, "Resume runqueue execution")
-        .def("CancelThreads", &KTProcessorToolbox::CancelThreads)
+        .def("WaitForBreak", &KTProcessorToolbox::WaitForBreak, "blocking call that waits until a breakpoint is reached, you must manually Continue()")
+        .def("WaitForEndOfRun", &KTProcessorToolbox::WaitForEndOfRun, "blocking call to Continue() execution until end of run is reached, you must manually Continue()")
+        .def("Continue", &KTProcessorToolbox::Continue, "non-blocking call to resume execution")
+        .def("CancelThreads", &KTProcessorToolbox::CancelThreads, "kill any running thread at the next breakpoint check")
         .def("JoinRunThread", &KTProcessorToolbox::JoinRunThread)
+
+        .def("GetData", &KTProcessorToolbox::GetData)
         ;
 }
 
