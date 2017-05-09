@@ -131,7 +131,7 @@ namespace Nymph
         return iter->second;
     }
 
-    inline bool KTProcessor::GetDoBreakpoint(const std::string& slotName)
+    bool KTProcessor::GetDoBreakpoint(const std::string& slotName)
     {
         KTSlotWrapper* slot = GetSlot(slotName);
         if (slot != nullptr)
