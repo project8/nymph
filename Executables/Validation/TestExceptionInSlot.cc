@@ -10,7 +10,7 @@
 #include "KTTestProcessor.hh"
 #include "KTLogger.hh"
 
-#include <thread>
+#include <boost/thread.hpp>
 #include <atomic>
 
 using namespace Nymph;
@@ -44,7 +44,7 @@ int main()
     auto exeFunc = [&]() {
         try
         {
-            std::this_thread::sleep_for( std::chrono::milliseconds(1) ); // delay to let the main thread get to the std::future::wait() call
+            boost::this_thread::sleep_for( boost::chrono::milliseconds(1) ); // delay to let the main thread get to the std::future::wait() call
 
             KTINFO( testexclog, "Emitting signals" );
 
@@ -52,7 +52,7 @@ int main()
             KTINFO( testexclog, "First test signal: 5" );
             tpA.EmitSignals( 5 );
 
-            std::this_thread::sleep_for( std::chrono::milliseconds(1) ); // delay to let the main thread react to the exception
+            boost::this_thread::sleep_for( boost::chrono::milliseconds(1) ); // delay to let the main thread react to the exception
 
             if( canceled.load() ) return;
             KTINFO( testexclog, "Second test signal: 18" );
@@ -67,7 +67,7 @@ int main()
     };
 
     // run the thread
-    std::thread thread( exeFunc );
+    boost::thread thread( exeFunc );
 
     // wait for a result to be set
     exeThreadFuture.wait();
