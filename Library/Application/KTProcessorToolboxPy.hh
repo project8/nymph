@@ -13,9 +13,19 @@
 #include "KTPythonMacros.hh"
 
 // Make connection overloads
-   /* default values here? */
-bool (Nymph::KTProcessorToolbox::*MakeConnection_3args)(const std::string&, const std::string&, int order) = &Nymph::KTProcessorToolbox::MakeConnection;
-bool (Nymph::KTProcessorToolbox::*MakeConnection_4args)(const std::string&, const std::string&, const std::string&, const std::string&, int order) = &Nymph::KTProcessorToolbox::MakeConnection;
+   /* need two macros to cover all signatures*/
+bool (Nymph::KTProcessorToolbox::*MakeConnection_2names)(const std::string&, const std::string&, int order) = &Nymph::KTProcessorToolbox::MakeConnection;
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(MakeConnection_2names_overloads, Nymph::KTProcessorToolbox::MakeConnection, 2, 3)
+bool (Nymph::KTProcessorToolbox::*MakeConnection_4names)(const std::string&, const std::string&, const std::string&, const std::string&, int order) = &Nymph::KTProcessorToolbox::MakeConnection;
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(MakeConnection_4names_overloads, Nymph::KTProcessorToolbox::MakeConnection, 4, 5)
+
+// Set and Remove breakpoint overloads
+bool (Nymph::KTProcessorToolbox::*SetBreakpoint_1arg)(const std::string&) = &Nymph::KTProcessorToolbox::SetBreakpoint;
+bool (Nymph::KTProcessorToolbox::*SetBreakpoint_2arg)(const std::string&, const std::string&) = &Nymph::KTProcessorToolbox::SetBreakpoint;
+bool (Nymph::KTProcessorToolbox::*RemoveBreakpoint_1arg)(const std::string&) = &Nymph::KTProcessorToolbox::RemoveBreakpoint;
+bool (Nymph::KTProcessorToolbox::*RemoveBreakpoint_2arg)(const std::string&, const std::string&) = &Nymph::KTProcessorToolbox::RemoveBreakpoint;
+//BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(SetBreakpoint_overloads, Nymph::KTProcessorToolbox::SetBreakpoint, 1, 2)
+//BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(RemoveBreakpoint_overloads, Nymph::KTProcessorToolbox::SetBreakpoint, 1, 2)
 
 // Run queue pushback overloads
 bool (Nymph::KTProcessorToolbox::*PushBackToRunQueue_string)(const std::string& name) = &Nymph::KTProcessorToolbox::PushBackToRunQueue;
@@ -53,11 +63,13 @@ void export_ProcessorToolbox()
         .def("ClearProcessors", &KTProcessorToolbox::ClearProcessors, "Remove all processors and clear run queue")
 
         // Processor connections
-        .def("MakeConnection", MakeConnection_3args, "Make a signal-slot connection")
-        .def("MakeConnection", MakeConnection_4args)
+        .def("MakeConnection", MakeConnection_2names, MakeConnection_2names_overloads())
+        .def("MakeConnection", MakeConnection_4names, MakeConnection_4names_overloads())
         /* TODO use macro for arg counts?*/
-        //.def("SetBreakpoint", &KTProcessorToolbox::SetBreakpoint, "set breakpoint on a slot")
-        //.def("RemoveBreakpoint", &KTProcessorToolbox::RemoveBreakpoint, "remove breakpoint from a slot")
+        .def("SetBreakpoint", SetBreakpoint_1arg, "add breakpoint to 'procName:slotName'")
+        .def("SetBreakpoint", SetBreakpoint_2arg, "add breakpoint to 'procName, slotName'")
+        .def("RemoveBreakpoint", RemoveBreakpoint_1arg, "add breakpoint to 'procName:slotName'")
+        .def("RemoveBreakpoint", RemoveBreakpoint_2arg, "add breakpoint to 'procName, slotName'")
 
         // Run Queue
         // Push new processor(s) to back of run queue
