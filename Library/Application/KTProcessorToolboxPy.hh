@@ -10,6 +10,7 @@
 #define KTPROCESSORTOOLBOXPY_HH_
 
 #include "KTProcessorToolbox.hh"
+#include "KTPythonMacros.hh"
 
 // Make connection overloads
    /* default values here? */
@@ -36,23 +37,29 @@ void export_ProcessorToolbox()
     using namespace Nymph;
     using namespace boost::python;
     class_<KTProcessorToolbox, boost::noncopyable>("KTProcessorToolbox", init<std::string>())
-        .def("Run", &KTProcessorToolbox::Run, "Call Run() on all processors in the run queue")
 
-        .def("GetProcessor", GetProcessor_wrap, return_value_policy<reference_existing_object>(), "Get a pointer to a processor in the toolbox")
+        // members related to configuration
         .def("ConfigureProcessors", ConfigureProcessors_JsonStr, "Configure processors from a json dictionary. Top-level keys are processor names, values are dictionaries with their configurations")
+        PROPERTYMEMBER(KTProcessorToolbox, RunSingleThreaded)
+
+
+        // Processor access
+        .def("GetProcessor", GetProcessor_wrap, return_value_policy<reference_existing_object>(), "Get a pointer to a processor in the toolbox")
         .def("AddProcessor", AddProcessor_Ref, "add a processor to the toolbox, toolbox takes ownership")
         .def("AddProcessor", AddProcessor_TypeStr, "add a processor to the toolbox, toolbox takes ownership")
         .def("RemoveProcessor", &KTProcessorToolbox::RemoveProcessor, "remove a processor from the toolbox")
-
-        //TODO: Not 100% certain that the reference count for this processor is now correct, given the return_value_policy
+        /* TODO: Not 100% certain that the reference count for this processor is now correct, given the return_value_policy */
         .def("ReleaseProcessor", &KTProcessorToolbox::ReleaseProcessor, return_value_policy<reference_existing_object>(), "Remove a processor from the toolbox and return it to the user, ownership is passed")
-
         .def("ClearProcessors", &KTProcessorToolbox::ClearProcessors, "Remove all processors and clear run queue")
 
-        // make signal-slot connection
+        // Processor connections
         .def("MakeConnection", MakeConnection_3args, "Make a signal-slot connection")
         .def("MakeConnection", MakeConnection_4args)
+        /* TODO use macro for arg counts?*/
+        //.def("SetBreakpoint", &KTProcessorToolbox::SetBreakpoint, "set breakpoint on a slot")
+        //.def("RemoveBreakpoint", &KTProcessorToolbox::RemoveBreakpoint, "remove breakpoint from a slot")
 
+        // Run Queue
         // Push new processor(s) to back of run queue
         .def("PushBackToRunQueue", PushBackToRunQueue_string, "Push processor(s) to the back of the run queue")
         .def("PushBackToRunQueue", PushBackToRunQueue_init_list)
@@ -61,6 +68,16 @@ void export_ProcessorToolbox()
         // Remove items from run queue
         .def("PopBackOfRunQueue", &KTProcessorToolbox::PopBackOfRunQueue, "Remove the last item in the run queue, whether it's a single processor or a group of processors")
         .def("ClearRunQueue", &KTProcessorToolbox::ClearRunQueue, "Clear the run queue")
+
+        // Run methods
+        .def("Run", &KTProcessorToolbox::Run, "Call Run() on all processors in the run queue")
+        .def("AsyncRun", &KTProcessorToolbox::AsyncRun, "Non-blocking call to Run()")
+        .def("WaitForContinue", &KTProcessorToolbox::WaitForContinue)
+        .def("WaitForBreak", &KTProcessorToolbox::WaitForBreak, "Resume execution until reaching next breakpoint")
+        .def("WaitForEndOfRun", &KTProcessorToolbox::WaitForEndOfRun, "Resume execution until reaching end of run, skipping breakpoints")
+        .def("Continue", &KTProcessorToolbox::Continue, "Resume runqueue execution")
+        .def("CancelThreads", &KTProcessorToolbox::CancelThreads)
+        .def("JoinRunThread", &KTProcessorToolbox::JoinRunThread)
         ;
 }
 
