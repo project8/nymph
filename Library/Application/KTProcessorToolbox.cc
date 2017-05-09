@@ -615,14 +615,10 @@ namespace Nymph
 
                             KTThreadReference thisThreadRef;
 
-                            //fThreadFutures.get<1>().insert( LabeledFuture{ procName, thisThreadRef.fDataPtrRet.get_future() } );
-                            //fThreadFutures.push_back( LabeledFuture{ procName, thisThreadRef.fDataPtrRet.get_future() } );
                             fThreadFutures.push_back( std::move( thisThreadRef.fDataPtrRet.get_future() ) );
                             fThreadNames.push_back( procName );
                             //auto& futureNameIndex = fThreadFutures.get<1>();
 
-                            //auto thisFuturePtr = futureNameIndex.find( procName );
-                            //if( ! thisFuturePtr->fFuture.valid() )
                             if( ! fThreadFutures.back().valid() )
                             {
                                 KTERROR( proclog, "Invalid thread future created" );
@@ -640,7 +636,6 @@ namespace Nymph
                             boost::mutex threadStartedMutex;
                             bool threadStartedFlag = false;
 
-                            //boost::thread thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( thisThreadRef ) );
                             boost::unique_lock< boost::mutex > threadStartedLock( threadStartedMutex );
                             boost::thread thread( [&](){ tgIter->fProc->operator()( std::move( thisThreadRef ), threadStartedCV, threadStartedFlag ); } );
                             KTDEBUG( proclog, "Thread ID is <" << thread.get_id() << ">; waiting for thread start" );
@@ -658,7 +653,6 @@ namespace Nymph
                                 boost::future_status status;
                                 do
                                 {
-                                    //status = thisFuturePtr->fFuture.wait_for( std::chrono::milliseconds(500) );
                                     status = fThreadFutures.back().wait_for( boost::chrono::milliseconds(500) );
                                 } while (status != boost::future_status::ready);
 
@@ -675,7 +669,6 @@ namespace Nymph
                                 {
                                     try
                                     {
-                                        //futureNameIndex.modify( thisFuturePtr, [](LabeledFuture& lFuture){ lFuture.fFuture.get(); } );
                                         fThreadFutures.back().get();
                                         KTINFO( proclog, "Thread <" << fThreadNames.back() << "> has finished" );
                                         fThreadFutures.pop_back();
@@ -737,8 +730,6 @@ namespace Nymph
                     {
                         boost::thread_group threads;
 
-                        //auto& futureNameIndex = fThreadFutures.get<1>();
-
                         for (ThreadGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
                         {
                             std::string procName( tgIter->fName );
@@ -746,13 +737,9 @@ namespace Nymph
 
                             KTThreadReference thisThreadRef;
 
-                            //futureNameIndex.insert( LabeledFuture{ procName, thisThreadRef.fDataPtrRet.get_future() } );
-                            //fThreadFutures.push_back( LabeledFuture{ procName, thisThreadRef.fDataPtrRet.get_future() } );
                             fThreadFutures.push_back( std::move( thisThreadRef.fDataPtrRet.get_future() ) );
                             fThreadNames.push_back( procName );
 
-                            //auto thisFuturePtr = futureNameIndex.find( procName );
-                            //if( ! thisFuturePtr->fFuture.valid() )
                             if( ! fThreadFutures.back().valid() )
                             {
                                 KTERROR( proclog, "Invalid thread future created" );
@@ -770,7 +757,6 @@ namespace Nymph
                             boost::mutex threadStartedMutex;
                             bool threadStartedFlag = false;
 
-                            //threads.emplace_back( boost::thread( &KTPrimaryProcessor::operator(), tgIter->fProc, std::move( thisThreadRef ) ) );
                             boost::unique_lock< boost::mutex > threadStartedLock( threadStartedMutex );
                             boost::thread* thisThread = new boost::thread( [&](){ tgIter->fProc->operator()( std::move( thisThreadRef ), threadStartedCV, threadStartedFlag ); } );
                             KTDEBUG( proclog, "Thread ID is <" << thisThread->get_id() << ">; waiting for thread start" );
@@ -783,8 +769,6 @@ namespace Nymph
                             threads.add_thread( thisThread );
 
                         }// end for loop over the thread group
-
-                        //auto& futureIndex = fThreadFutures.get<0>();
 
                         bool stillRunning = true; // determines behavior that depends on whether a return from the thread was temporary or from the thread completing
                         do
@@ -861,11 +845,6 @@ namespace Nymph
         boost::shared_future< void > doRunFuture = fDoRunFuture;
 
         doRunFuture.wait();
-        //boost::future_status doRunStatus;
-        //do
-        //{
-        //    doRunStatus = doRunFuture.wait_for( boost::chrono::milliseconds( 500 ) );
-        //} while( doRunStatus != boost::future_status::ready );
 
         if( fDoRunBreakFlag )
         {

@@ -20,17 +20,11 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 
-//#include <boost/multi_index_container.hpp>
-//#include <boost/multi_index/random_access_index.hpp>
-//#include <boost/multi_index/ordered_index.hpp>
-//#include <boost/multi_index/member.hpp>
-
 #include <deque>
 #include <initializer_list>
 #include <limits>
 #include <set>
 
-//namespace bmi = boost::multi_index;
 
 namespace Nymph
 {
@@ -231,29 +225,14 @@ namespace Nymph
             friend class KTThreadReference;
 
             typedef boost::unique_future< KTDataPtr > Future;
-            //typedef std::future< KTDataPtr > Future;
 
             // called from ThreadPacket::Break
             void InitiateBreak();
             // called from ThreadPacket::Break
             void TakeFuture( const std::string& name, Future&& future );
 
-            //struct LabeledFuture
-            //{
-            //    std::string fName;
-            //    std::future< KTDataPtr > fFuture;
-            //};
-            //typedef std::vector< LabeledFuture > ThreadFutures;
             typedef std::vector< Future > ThreadFutures;
             typedef std::vector< std::string > ThreadNames;
-            //typedef std::map< std::string, std::future< KTDataPtr > > ThreadFutures;
-            //typedef boost::multi_index_container<
-            //    LabeledFuture,
-            //    bmi::indexed_by<
-            //        bmi::random_access<>,
-            //        bmi::ordered_unique< bmi::member< KTProcessorToolbox::LabeledFuture, std::string, &KTProcessorToolbox::LabeledFuture::fName > >
-            //    >
-            //> ThreadFutures;
 
             ThreadFutures fThreadFutures;
             ThreadNames fThreadNames;
@@ -293,8 +272,6 @@ namespace Nymph
 
     inline void KTProcessorToolbox::TakeFuture( const std::string& name, Future&& future )
     {
-        //fThreadFutures.get<1>().insert( LabeledFuture{ name, std::move( future ) } );
-        //fThreadFutures.push_back( LabeledFuture{ name, std::move( future ) } );
         fThreadFutures.push_back( std::move( future ) );
         fThreadNames.push_back( name );
         return;
