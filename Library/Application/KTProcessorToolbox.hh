@@ -221,6 +221,8 @@ namespace Nymph
 
             void JoinRunThread();
 
+            KTDataPtr GetData( const std::string& threadName );
+
         private:
             friend class KTThreadReference;
 

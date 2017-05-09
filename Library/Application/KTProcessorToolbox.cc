@@ -913,6 +913,31 @@ namespace Nymph
         return;
     }
 
+    KTDataPtr KTProcessorToolbox::GetData( const std::string& threadName )
+    {
+        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadFuturesMutex );
+
+        auto tnIt = fThreadNames.begin();
+        for( ; tnIt != fThreadNames.end(); ++tnIt )
+        {
+            if( *tnIt == threadName ) break;
+        }
+        if( tnIt == fThreadNames.end() )
+        {
+            KTWARN( proclog, "Did not find thread <" << threadName << ">" );
+            throw KTException() << "Did not find thread <" << threadName << ">" ;
+        }
+
+        size_t iThread = tnIt - fThreadNames.begin();
+        if( iThread >= fThreadFutures.size() )
+        {
+            KTERROR( proclog, "Thread futures and thread names are unsynchronized" );
+            throw KTException() << "Thread futures and thread names are unsynchronized; found thread name <" << threadName << "> at position <" << iThread << ">, but there are only <" << fThreadFutures.size() << "> futures.";
+        }
+
+        return fThreadFutures[ iThread ].get();
+    }
+
     void KTProcessorToolbox::InitiateBreak()
     {
         boost::unique_lock< boost::mutex > breakContLock( fBreakContMutex );
