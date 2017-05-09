@@ -9,6 +9,7 @@
 
 #include "KTLogger.hh"
 
+
 using namespace Nymph;
 
 KTLOGGER( testptlog, "TestUseBreakpoint" )
@@ -58,7 +59,7 @@ int main()
     ptb.AsyncRun();
 
     KTINFO( testptlog, "Starting asynchronous breakpoint user" );
-    auto buFuture = std::async( std::launch::async, [&](){
+    auto buFuture = boost::async( boost::launch::async, [&](){
         KTINFO( testptlog, "In breakpoint user thread" );
         while( ptb.WaitForBreak() )
         {

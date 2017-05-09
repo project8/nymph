@@ -54,6 +54,7 @@ if (Nymph_ENABLE_TESTING)
         TestPrimaryProcessorNoThreading
         TestPrintData
         TestProcessorToolbox
+        TestProcessorToolboxMultithreaded
         TestSignalsAndSlots
         TestThroughputProfiler
         TestUseBreakpoint

@@ -28,8 +28,9 @@ namespace Nymph
     {
         KTDataPtrReturn fDataPtrRet;
         std::function< void() > fInitiateBreakFunc;
-        std::function< void(std::future< KTDataPtr >&&) > fRefreshFutureFunc;
+        std::function< void(const std::string&, boost::unique_future< KTDataPtr >&&) > fRefreshFutureFunc;
         std::shared_ptr< KTThreadIndicator > fThreadIndicator;
+        std::string fPrimaryProcName;
 
         KTThreadReference();
         KTThreadReference( const KTThreadReference& ) = delete;

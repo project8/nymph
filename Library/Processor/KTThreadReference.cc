@@ -23,14 +23,16 @@ namespace Nymph
             fDataPtrRet(),
             fInitiateBreakFunc(),
             fRefreshFutureFunc(),
-            fThreadIndicator( new KTThreadIndicator() )
+            fThreadIndicator( new KTThreadIndicator() ),
+            fPrimaryProcName()
     {}
 
     KTThreadReference::KTThreadReference( KTThreadReference&& orig ) :
             fDataPtrRet( std::move( orig.fDataPtrRet ) ),
             fInitiateBreakFunc( std::move( orig.fInitiateBreakFunc ) ),
             fRefreshFutureFunc( std::move( orig.fRefreshFutureFunc ) ),
-            fThreadIndicator( orig.fThreadIndicator )
+            fThreadIndicator( orig.fThreadIndicator ),
+            fPrimaryProcName( std::move( orig.fPrimaryProcName ) )
     {
         orig.fThreadIndicator = nullptr;
     }
@@ -41,6 +43,7 @@ namespace Nymph
         fInitiateBreakFunc = std::move( orig.fInitiateBreakFunc );
         fRefreshFutureFunc = std::move( orig.fRefreshFutureFunc );
         fThreadIndicator = orig.fThreadIndicator;
+        fPrimaryProcName = std::move( orig.fPrimaryProcName );
 
         orig.fThreadIndicator = nullptr;
 
@@ -64,7 +67,7 @@ namespace Nymph
             // reset the promise
             fDataPtrRet = KTDataPtrReturn();
             // pass the future back to the processor toolbox (if it's in use)
-            fRefreshFutureFunc( fDataPtrRet.get_future() );
+            fRefreshFutureFunc( fPrimaryProcName, std::move( fDataPtrRet.get_future() ) );
         }
         return;
     }
