@@ -20,11 +20,27 @@ void export_Processor()
 
     // KTProcessor base class
     class_<KTProcessor, boost::noncopyable>("KTProcessor", no_init)
+        //.def("RegisterProcessor", pure_virtual(&KTProcessor::RegisterProcessor), return_value_policy<manage_new_object>(), "register a processor")
+        
+        // PassThreadRefUpdate... needs KTThreadReference
+        //.def("PassThreadRefUpdate", &KTProcessor::PassThreadRefUpdate) 
         .def("ConnectASlot", &KTProcessor::ConnectASlot)
         .def("ConnectASignal", &KTProcessor::ConnectASignal)
-        .def("ConnectSignalToSlot", &KTProcessor::ConnectSignalToSlot)
+
+        // these next four need wrappers for return types (KT[Signal,Slot]Wrapper)
+        //.def("RegisterSignal", &KTProcessor::RegisterSignal)
+        //.def("RegisterSlot", &KTProcessor::RegisterSlot)
+        //.def("GetSignal", &KTProcessor::GetSignal)
+        //.def("GetSlot", &KTProcessor::GetSlot)
+
+        /* now protected */
+        //.def("ConnectSignalToSlot", &KTProcessor::ConnectSignalToSlot)
+
+        .def("GetDoBreakpoint", &KTProcessor::GetDoBreakpoint)
+        .def("SetDoBreakpoint", &KTProcessor::SetDoBreakpoint)
+
+        /* Inherited methods from unwrapped bases */
         .def("Configure", Configure_JsonStr, "Configure from json encoded configuration")
-        //.def("RegisterProcessor", &KTProcessor::RegisterProcessor, return_value_policy<manage_new_object>())
         ;
 }
 
