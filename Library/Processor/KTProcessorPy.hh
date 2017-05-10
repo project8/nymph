@@ -20,90 +20,28 @@ void export_Processor()
 
     // KTProcessor base class
     class_<KTProcessor, boost::noncopyable>("KTProcessor", no_init)
+        //.def("RegisterProcessor", pure_virtual(&KTProcessor::RegisterProcessor), return_value_policy<manage_new_object>(), "register a processor")
+        
+        // PassThreadRefUpdate... needs KTThreadReference
+        //.def("PassThreadRefUpdate", &KTProcessor::PassThreadRefUpdate) 
         .def("ConnectASlot", &KTProcessor::ConnectASlot)
         .def("ConnectASignal", &KTProcessor::ConnectASignal)
-        .def("ConnectSignalToSlot", &KTProcessor::ConnectSignalToSlot)
-        .def("Configure", Configure_JsonStr, "Configure from json encoded configuration")
-        //.def("GetSignal", KTProcessor::GetSignal)
+
+        // these next four need wrappers for return types (KT[Signal,Slot]Wrapper)
         //.def("RegisterSignal", &KTProcessor::RegisterSignal)
+        //.def("RegisterSlot", &KTProcessor::RegisterSlot)
+        //.def("GetSignal", &KTProcessor::GetSignal)
+        //.def("GetSlot", &KTProcessor::GetSlot)
+
+        /* now protected */
+        //.def("ConnectSignalToSlot", &KTProcessor::ConnectSignalToSlot)
+
+        .def("GetDoBreakpoint", &KTProcessor::GetDoBreakpoint)
+        .def("SetDoBreakpoint", &KTProcessor::SetDoBreakpoint)
+
+        /* Inherited methods from unwrapped bases */
+        .def("Configure", Configure_JsonStr, "Configure from json encoded configuration")
         ;
 }
 
-/*{
-    class KTProcessor : public KTConfigurable
-    {
-        public:
-
-            template< class XProcessor >
-            void RegisterSignal(std::string name, XProcessor* signalPtr);
-
-            template< class XTarget, typename XReturn >
-            void RegisterSlot(std::string name, XTarget* target, XReturn (XTarget::* funcPtr)());
-
-            template< class XTarget, typename XReturn, typename XArg1 >
-            void RegisterSlot(std::string name, XTarget* target, XReturn (XTarget::* funcPtr)(XArg1));
-
-            template< class XTarget, typename XReturn, typename XArg1, typename XArg2 >
-            void RegisterSlot(std::string name, XTarget* target, XReturn (XTarget::* funcPtr)(XArg1, XArg2));
-
-            KTSignalWrapper* GetSignal(const std::string& name);
-
-            KTSlotWrapper* GetSlot(const std::string& name);
-
-    };
-
-
-    template< typename XSignalSig >
-    void KTProcessor::RegisterSignal(std::string name, XSignalSig* signalPtr)
-    {
-        KTDEBUG(processorlog, "Registering signal <" << name << "> in processor <" << fConfigName << ">");
-        KTSignalWrapper* sig = new KTSignalWrapper(signalPtr);
-        fSignalMap.insert(SigMapVal(name, sig));
-        return;
-    }
-
-    template< class XTarget, typename XReturn >
-    void KTProcessor::RegisterSlot(std::string name, XTarget* target, XReturn (XTarget::* funcPtr)())
-    {
-        KTDEBUG(processorlog, "Registering slot <" << name << "> in processor <" << fConfigName << ">");
-
-        KTSignalConcept< XReturn () > signalConcept;
-
-        boost::function< XReturn () > *func = new boost::function< XReturn () >(boost::bind(funcPtr, target));
-
-        KTSlotWrapper* slot = new KTSlotWrapper(func, &signalConcept);
-        fSlotMap.insert(SlotMapVal(name, slot));
-        return;
-    }
-
-    template< class XTarget, typename XReturn, typename XArg1 >
-    void KTProcessor::RegisterSlot(std::string name, XTarget* target, XReturn (XTarget::* funcPtr)(XArg1))
-    {
-        KTDEBUG(processorlog, "Registering slot <" << name << "> in processor <" << fConfigName << ">");
-
-        KTSignalConcept< XReturn (XArg1) > signalConcept;
-
-        boost::function< XReturn (XArg1) > *func = new boost::function< XReturn (XArg1) >(boost::bind(funcPtr, target, _1));
-
-        KTSlotWrapper* slot = new KTSlotWrapper(func, &signalConcept);
-        fSlotMap.insert(SlotMapVal(name, slot));
-        return;
-    }
-
-    template< class XTarget, typename XReturn, typename XArg1, typename XArg2 >
-    void KTProcessor::RegisterSlot(std::string name, XTarget* target, XReturn (XTarget::* funcPtr)(XArg1, XArg2))
-    {
-        KTDEBUG(processorlog, "Registering slot <" << name << "> in processor <" << fConfigName << ">");
-
-        KTSignalConcept< XReturn (XArg1, XArg2) > signalConcept;
-
-        boost::function< XReturn (XArg1, XArg2) > *func = new boost::function< XReturn (XArg1, XArg2) >(boost::bind(funcPtr, target, _1, _2));
-
-        KTSlotWrapper* slot = new KTSlotWrapper(func, &signalConcept);
-        fSlotMap.insert(SlotMapVal(name, slot));
-        return;
-    }
-
-
-}*/
 #endif /* KTPROCESSORPY_HH_ */
