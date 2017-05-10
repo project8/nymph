@@ -843,6 +843,10 @@ namespace Nymph
     bool KTProcessorToolbox::WaitForBreak()
     {
         boost::shared_future< void > doRunFuture = fDoRunFuture;
+        if( ! doRunFuture.valid() )
+        {
+            throw KTException() << "Cannot wait for a break in the current state (the \"DoRun\" future does not have a valid shared state)";
+        }
 
         doRunFuture.wait();
 
@@ -867,19 +871,32 @@ namespace Nymph
 
     void KTProcessorToolbox::WaitForEndOfRun()
     {
-        KTDEBUG( proclog, "Waiting for end-of-run" );
-        while( WaitForBreak() )
+        try
         {
-            KTDEBUG( proclog, "Reached breakpoint; waiting for continue" );
-            WaitForContinue();
-            KTDEBUG( proclog, "Processing resuming; waiting for end-of-run" );
+            KTDEBUG( proclog, "Waiting for end-of-run" );
+            while( WaitForBreak() )
+            {
+                KTDEBUG( proclog, "Reached breakpoint; waiting for continue" );
+                WaitForContinue();
+                KTDEBUG( proclog, "Processing resuming; waiting for end-of-run" );
+            }
+            KTDEBUG( proclog, "End-of-run reached" );
         }
-        KTDEBUG( proclog, "End-of-run reached" );
+        catch( std::exception& e )
+        {
+            throw;
+        }
         return;
     }
 
     void KTProcessorToolbox::Continue()
     {
+        if( ! fDoRunBreakFlag )
+        {
+            KTWARN( proclog, "Not currently at a breakpoint" );
+            return;
+        }
+
         boost::unique_lock< boost::mutex > breakContLock( fBreakContMutex );
         boost::unique_lock< boost::mutex > threadFuturesLock( fThreadFuturesMutex );
 
@@ -969,12 +986,18 @@ namespace Nymph
 
     bool KTProcessorToolbox::Run()
     {
-        AsyncRun();
+        try
+        {
+            AsyncRun();
 
-        WaitForEndOfRun();
+            WaitForEndOfRun();
 
-        JoinRunThread();
-
+            JoinRunThread();
+        }
+        catch( std::exception& e )
+        {
+            throw;
+        }
         return true;
     }
 
