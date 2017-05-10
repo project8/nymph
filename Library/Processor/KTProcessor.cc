@@ -47,23 +47,9 @@ namespace Nymph
 
     void KTProcessor::PassThreadRefUpdate(const std::string& slotName, KTThreadReference* threadRef)
     {
-        // update the thread reference pointer for this slot
-        GetSlot(slotName)->SetThreadRef(threadRef);
-
-        // get the list of slot-to-signal connections for this slot
-        auto stsRange = fSlotToSigMap.equal_range(slotName);
-
-        // loop over signals called in the performance of slot slotName
-        for (SlotToSigMapCIt stsIt = stsRange.first; stsIt != stsRange.second; ++stsIt)
-        {
-            // loop over all processor:slots called by this signal
-            auto sigConnRange = fSigConnMap.equal_range(stsIt->second);
-            for (SigConnMapCIt sigConnIt = sigConnRange.first; sigConnIt != sigConnRange.second; ++sigConnIt)
-            {
-                // pass the update on to the connected-to processor
-                sigConnIt->second.first->PassThreadRefUpdate(sigConnIt->second.second, threadRef);
-            }
-        }
+        std::function< void(KTThreadReference*) > funcObj = [this, &slotName](KTThreadReference* ref){ GetSlot(slotName)->SetThreadRef(ref); };
+        PassToConnProcs(slotName, funcObj, threadRef);
+        return;
     }
 
     void KTProcessor::ConnectASlot(const std::string& signalName, KTProcessor* processor, const std::string& slotName, int groupNum)

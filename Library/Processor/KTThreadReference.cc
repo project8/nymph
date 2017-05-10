@@ -21,8 +21,8 @@ namespace Nymph
 
     KTThreadReference::KTThreadReference() :
             fDataPtrRet(),
-            fInitiateBreakFunc(),
-            fRefreshFutureFunc(),
+            fInitiateBreakFunc( [](){return;} ),
+            fRefreshFutureFunc( [](const std::string&, boost::shared_future< KTDataPtr >&&){return;} ),
             fThreadIndicator( new KTThreadIndicator() ),
             fPrimaryProcName()
     {}
@@ -67,7 +67,7 @@ namespace Nymph
             // reset the promise
             fDataPtrRet = KTDataPtrReturn();
             // pass the future back to the processor toolbox (if it's in use)
-            fRefreshFutureFunc( fPrimaryProcName, std::move( fDataPtrRet.get_future() ) );
+            fRefreshFutureFunc( fPrimaryProcName, std::move( fDataPtrRet.get_future().share() ) );
         }
         return;
     }

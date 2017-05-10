@@ -87,6 +87,9 @@ namespace Nymph
             void SetDoBreakpoint(const std::string& slotName, bool flag);
 
         protected:
+            template< typename XReturn, typename... XArgs >
+            void PassToConnProcs(const std::string& slotName, std::function< XReturn(XArgs...) > function, XArgs... args);
+
             void ConnectSignalToSlot(KTSignalWrapper* signal, KTSlotWrapper* slot, int groupNum=-1);
 
             SignalMap fSignalMap;
@@ -131,6 +134,29 @@ namespace Nymph
     inline void KTProcessor::ConnectASignal(KTProcessor* processor, const std::string& signalName, const std::string& slotName, int groupNum)
     {
         processor->ConnectASlot(signalName, this, slotName, groupNum);
+        return;
+    }
+
+    template< typename XReturn, typename... XArgs >
+    void KTProcessor::PassToConnProcs(const std::string& slotName, std::function< XReturn(XArgs...) > function, XArgs... args)
+    {
+        // update this slot
+        function(args...);
+
+        // get the list of slot-to-signal connections for this slot
+        auto stsRange = fSlotToSigMap.equal_range(slotName);
+
+        // loop over signals called in the performance of slot slotName
+        for (SlotToSigMapCIt stsIt = stsRange.first; stsIt != stsRange.second; ++stsIt)
+        {
+            // loop over all processor:slots called by this signal
+            auto sigConnRange = fSigConnMap.equal_range(stsIt->second);
+            for (SigConnMapCIt sigConnIt = sigConnRange.first; sigConnIt != sigConnRange.second; ++sigConnIt)
+            {
+                // pass the update on to the connected-to processor
+                sigConnIt->second.first->PassToConnProcs(sigConnIt->second.second, function, args...);
+            }
+        }
         return;
     }
 

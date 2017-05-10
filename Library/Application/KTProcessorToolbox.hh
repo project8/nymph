@@ -226,7 +226,7 @@ namespace Nymph
         private:
             friend class KTThreadReference;
 
-            typedef boost::unique_future< KTDataPtr > Future;
+            typedef boost::shared_future< KTDataPtr > Future;
 
             // called from ThreadPacket::Break
             void InitiateBreak();
