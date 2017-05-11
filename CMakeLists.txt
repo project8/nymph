@@ -14,6 +14,8 @@ project( Nymph VERSION 1.2.6 )
 list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Scarab/cmake )
 include( PackageBuilder )
 
+include (PythonPackage)
+
 pbuilder_prepare_project()
 
 # Nymph CMake files
@@ -87,8 +89,10 @@ pbuilder_add_ext_libraries (${Boost_LIBRARIES})
 
 # python deps
 if (Nymph_ENABLE_PYTHON)
-    include (PythonPackage)
+    SET( Scarab_BUILD_PYTHON ON CACHE BOOL "" FORCE )
     python_package_find_python( 2.7 )
+else (Nymph_ENABLE_PYTHON)
+    SET( Scarab_BUILD_PYTHON OFF CACHE BOOL "" FORCE )
 endif (Nymph_ENABLE_PYTHON)
 
 
