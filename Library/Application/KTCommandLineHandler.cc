@@ -273,19 +273,19 @@ namespace Nymph
 
                 size_t t_node_start_pos = 0;
                 size_t t_node_sep_pos = t_full_name.find_first_of( fNodeSeparator );
-                scarab::param_node* parentNode = &fConfigOverrideValues;
+                scarab::param_node& parentNode = fConfigOverrideValues;
                 while (t_node_sep_pos != string::npos)
                 {
                     string nodeName(t_full_name.substr(t_node_start_pos, t_node_sep_pos));
-                    if (parentNode->has(nodeName))
+                    if (parentNode.has(nodeName))
                     {
-                        parentNode = parentNode->node_at(nodeName);
+                        parentNode = parentNode.node_at(nodeName);
                     }
                     else
                     {
                         scarab::param_node* newChildNode = new scarab::param_node();
-                        parentNode->add(nodeName, newChildNode);
-                        parentNode = newChildNode;
+                        parentNode.add(nodeName, newChildNode);
+                        parentNode = *newChildNode;
                     }
                     t_node_start_pos = t_node_sep_pos + 1;
                     t_node_sep_pos = t_full_name.find_first_of(fNodeSeparator, t_node_start_pos);
@@ -298,7 +298,7 @@ namespace Nymph
 
                 //std::cout << "(parser) adding < " << t_name << "<" << t_type << "> > = <" << new_value.value() << ">" << std::endl;
 
-                parentNode->replace( valueName, new_value );
+                parentNode.replace( valueName, new_value );
 
                 continue;
             }

@@ -57,14 +57,14 @@ namespace Nymph
         SetRunSingleThreaded( node->get_value( "single-threaded", fRunSingleThreaded ) );
 
         // Deal with "processor" blocks
-        const scarab::param_array* procArray = node->array_at( "processors" );
-        if (procArray == NULL)
+        if (! node->has("processors"))
         {
             KTWARN(proclog, "No processors were specified");
         }
         else
         {
-            for( scarab::param_array::const_iterator procIt = procArray->begin(); procIt != procArray->end(); ++procIt )
+            const scarab::param_array& procArray = node->array_at( "processors" );
+            for( scarab::param_array::const_iterator procIt = procArray.begin(); procIt != procArray.end(); ++procIt )
             {
                 if( ! (*procIt)->is_node() )
                 {
@@ -108,14 +108,14 @@ namespace Nymph
 
 
         // Then deal with connections"
-        const scarab::param_array* connArray = node->array_at( "connections" );
-        if (connArray == NULL)
+        if (! node->has("connections"))
         {
             KTWARN(proclog, "No connections were specified");
         }
         else
         {
-            for( scarab::param_array::const_iterator connIt = connArray->begin(); connIt != connArray->end(); ++connIt )
+            const scarab::param_array& connArray = node->array_at( "connections" );
+            for( scarab::param_array::const_iterator connIt = connArray.begin(); connIt != connArray.end(); ++connIt )
             {
                 if( ! (*connIt)->is_node() )
                 {
@@ -180,14 +180,14 @@ namespace Nymph
         // The run queue is an array of processor names, or groups of names, which will be run sequentially.
         // If names are grouped (in another array), those in that group will be run in parallel.
         // In single threaded mode all threads will be run sequentially in the order they were specified.
-        const scarab::param_array* rqArray = node->array_at( "run-queue" );
-        if (rqArray == NULL)
+        if (! node->has("run-queue"))
         {
             KTWARN(proclog, "Run queue was not specified");
         }
         else
         {
-            for (scarab::param_array::const_iterator rqIt = rqArray->begin(); rqIt != rqArray->end(); ++rqIt)
+            const scarab::param_array& rqArray = node->array_at( "run-queue" );
+            for (scarab::param_array::const_iterator rqIt = rqArray.begin(); rqIt != rqArray.end(); ++rqIt)
             {
                 if ((*rqIt)->is_value())
                 {
@@ -235,29 +235,21 @@ namespace Nymph
         {
             KTDEBUG(proclog, "Attempting to configure processor <" << iter->first << ">");
             string procName = iter->first;
-            string nameUsed;
-            const scarab::param_node* subNode = node->node_at(procName);
-            if (subNode == NULL)
+            string nameUsed(procName);
+            if (! node->has(nameUsed))
             {
-                string configName = iter->second.fProc->GetConfigName();
-                KTWARN(proclog, "Did not find a parameter node <" << procName << ">\n"
-                        "\tWill check using the generic name of the processor, <" << configName << ">.");
-                subNode = node->node_at(configName);
-                if (subNode == NULL)
+                nameUsed = iter->second.fProc->GetConfigName();
+                if (! node->has(nameUsed))
                 {
-                    KTWARN(proclog, "Did not find a parameter node <" << configName << ">\n"
-                            "\tProcessor <" << iter->first << "> was not configured.");
+                    KTWARN(proclog, "Did not find a parameter node <" << procName << "> or <" << nameUsed << ">\n"
+                            "\tProcessor <" << procName << "> was not configured.");
                     continue;
                 }
-                nameUsed = configName;
             }
-            else
+            const scarab::param_node& subNode = node->node_at(nameUsed);
+            if (! iter->second.fProc->Configure(&subNode))
             {
-                nameUsed = procName;
-            }
-            if (! iter->second.fProc->Configure(subNode))
-            {
-                KTERROR(proclog, "An error occurred while configuring processor <" << iter->first << "> with parameter node <" << nameUsed << ">");
+                KTERROR(proclog, "An error occurred while configuring processor <" << procName << "> with parameter node <" << nameUsed << ">");
                 return false;
             }
         }
