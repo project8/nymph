@@ -213,8 +213,9 @@ namespace Nymph
             void WaitForContinue();
 
             /// Returns when processing is completed or a breakpoint is reached
-            /// Throws an exception if an error occurred during processing
+            /// Throws a boost::exception if there's an error with the future object in use
             /// If the return is true, processing can continue after the break
+            /// If the return is false, processing has ended (either normally or due to an error)
             bool WaitForBreak();
 
             void WaitForEndOfRun();

@@ -19,61 +19,56 @@ KTLOGGER( testpplog, "TestPrimaryProcessor" )
 int main()
 {
 
-    KTTestPrimaryProcessor tpp;
-    KTTestProcessorB tp;
-
-    KTINFO( testpplog, "Connecting the-signal to first-slot" );
     try
     {
+        KTTestPrimaryProcessor tpp;
+        KTTestProcessorB tp;
+
+        KTINFO( testpplog, "Connecting the-signal to first-slot" );
         tpp.ConnectASlot( "the-signal", &tp, "first-slot", 20 );
-    }
-    catch( std::exception& e )
-    {
-        KTERROR( testpplog, "A problem occurred while connecting the signal and slots:\n" << e.what() );
-        return -1;
-    }
 
-    // setup to execute processors asynchronously
-    //KTThreadReference exeThreadRef;
-    //auto exeThreadFuture = exeThreadRef.fDataPtrRet.get_future();
-    std::shared_ptr< KTThreadReference > exeThreadRef = std::make_shared< KTThreadReference >();
-    exeThreadRef->fName = std::string( "tpp" );
+        // setup to execute processors asynchronously
+        //KTThreadReference exeThreadRef;
+        //auto exeThreadFuture = exeThreadRef.fDataPtrRet.get_future();
+        std::shared_ptr< KTThreadReference > exeThreadRef = std::make_shared< KTThreadReference >();
+        exeThreadRef->fName = std::string( "tpp" );
 
-    // run the thread
-    boost::condition_variable threadStartedCV;
-    boost::mutex threadStartedMutex;
-    bool threadStartedFlag = false;
+        // run the thread
+        boost::condition_variable threadStartedCV;
+        boost::mutex threadStartedMutex;
+        bool threadStartedFlag = false;
 
-    boost::unique_lock< boost::mutex > threadStartedLock( threadStartedMutex );
-    boost::thread thread( [&](){ tpp( exeThreadRef, threadStartedCV, threadStartedFlag ); } );
+        boost::unique_lock< boost::mutex > threadStartedLock( threadStartedMutex );
+        boost::thread thread( [&](){ tpp( exeThreadRef, threadStartedCV, threadStartedFlag ); } );
 
-    while( ! threadStartedFlag )
-    {
-        threadStartedCV.wait( threadStartedLock );
-    }
-    KTDEBUG( testpplog, "Thread has started" );
+        while( ! threadStartedFlag )
+        {
+            threadStartedCV.wait( threadStartedLock );
+        }
+        KTDEBUG( testpplog, "Thread has started" );
 
-    // wait for a result to be set
-    exeThreadRef->fDataPtrRetFuture.wait();
+        // wait for a result to be set
+        exeThreadRef->fDataPtrRetFuture.wait();
 
-    try
-    {
-        exeThreadRef->fDataPtrRetFuture.get();
-    }
-    catch( std::exception& e )
-    {
-        exeThreadRef->fCanceled = true;
-        KTERROR( testpplog, "An error occurred while running a processor: " << e.what() );
+        try
+        {
+            exeThreadRef->fDataPtrRetFuture.get();
+        }
+        catch( boost::exception& e )
+        {
+            exeThreadRef->fCanceled = true;
+            KTERROR( testpplog, "An error occurred while running a processor: " << diagnostic_information( e ) );
+        }
+
+        thread.join();
+
+        KTINFO( testpplog, "Tests complete" );
     }
     catch( boost::exception& e )
     {
-        exeThreadRef->fCanceled = true;
-        KTERROR( testpplog, "An error occurred while running a processor: " << diagnostic_information( e ) );
+        KTERROR( testpplog, "Exception caught: " << diagnostic_information( e ) );
+        return -1;
     }
-
-    thread.join();
-
-    KTINFO( testpplog, "Tests complete" );
 
     return 0;
 }

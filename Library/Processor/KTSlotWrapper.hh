@@ -9,6 +9,7 @@
 #define KTSLOTWRAPPER_HH_
 
 #include "KTConnection.hh"
+#include "KTException.hh"
 #include "KTSignalWrapper.hh"
 #include "KTThreadReference.hh"
 
@@ -16,11 +17,8 @@
 
 namespace Nymph
 {
-    class SlotException : public std::logic_error
-    {
-        public:
-            SlotException(std::string const& why);
-    };
+    struct KTConnectionException : public KTException
+    {};
 
     class KTSlotWrapper : public boost::noncopyable
     {
@@ -56,7 +54,7 @@ namespace Nymph
                         SignalWrapper* derivedSignalWrapper = dynamic_cast< SignalWrapper* >(internalSignalWrap);
                         if (derivedSignalWrapper == NULL)
                         {
-                            throw SignalException("In KTSpecifiedInternalSlotWrapper::Connect:\nUnable to cast from KTInternalSignalWrapper* to derived type.");
+                            BOOST_THROW_EXCEPTION( KTConnectionException() << "Cannot make connection: unable to cast from KTInternalSignalWrapper* to this slot's derived type." << eom );
                         }
                         if (groupNum >= 0)
                         {
@@ -81,7 +79,7 @@ namespace Nymph
 
         public:
             void SetConnection(KTConnection conn);
-            void SetConnection(KTSignalWrapper* signalWrap, int groupNum=-1);
+            void SetConnection(KTSignalWrapper* signalWrap, int groupNum=-1); // can throw KTConnectionException
             void Disconnect();
 
         private:

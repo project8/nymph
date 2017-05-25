@@ -410,12 +410,12 @@ namespace Nymph
                 signalProc->ConnectASlot(signalName, slotProc, slotName);
             }
         }
-        catch (std::exception& e)
+        catch (boost::exception& e)
         {
             KTERROR(proclog, "An error occurred while connecting signals and slots:\n"
                     << "\tSignal " << signalName << " from processor " << signalProcName << " (a.k.a. " << signalProc->GetConfigName() << ")" << '\n'
                     << "\tSlot " << slotName << " from processor " << slotProcName << " (a.k.a. " << slotProc->GetConfigName() << ")" << '\n'
-                    << '\t' << e.what());
+                    << '\t' << diagnostic_information( e ));
             return false;
         }
 
@@ -448,9 +448,9 @@ namespace Nymph
             slotProc->SetDoBreakpoint(slotName, true);
             return true;
         }
-        catch (std::exception& e)
+        catch (boost::exception& e)
         {
-            KTERROR(proclog, "Unable to set breakpoint: " << e.what());
+            KTERROR(proclog, "Unable to set breakpoint: " << diagnostic_information( e ));
             return false;
         }
     }
@@ -481,9 +481,9 @@ namespace Nymph
             slotProc->SetDoBreakpoint(slotName, false);
             return true;
         }
-        catch (std::exception& e)
+        catch (boost::exception& e)
         {
-            KTERROR(proclog, "Unable to set breakpoint: " << e.what());
+            KTERROR(proclog, "Unable to set breakpoint: " << diagnostic_information( e ));
             return false;
         }
     }
@@ -606,7 +606,7 @@ namespace Nymph
                 if( ! fMasterContSignal.valid() )
                 {
                     KTERROR( proclog, "Invalid master continue-signal created" );
-                    throw KTException() << "Invalid master continue-signal created";
+                    BOOST_THROW_EXCEPTION( KTException() << "Invalid master continue-signal created" << eom );
                 }
                 // copy for use in this function
                 boost::shared_future< void > continueSignal = fMasterContSignal;
@@ -633,7 +633,7 @@ namespace Nymph
                         //if( ! fThreadFutures.back().valid() )
                         //{
                         //    KTERROR( proclog, "Invalid thread future created" );
-                        //    throw KTException() << "Invalid thread future created";
+                        //    BOOST_THROW_EXCEPTION( KTException() << "Invalid thread future created";
                         //}
 
                         //fThreadIndicators.emplace_back( new KTThreadIndicator() );
@@ -691,9 +691,8 @@ namespace Nymph
                                 }
                                 catch( boost::exception& e )
                                 {
-                                    KTERROR( proclog, "Thread <" << fThreadReferences.back()->fName << "> threw an error: " << diagnostic_information( e ) );
-                                    // this transfers an exception thrown by a processor to the outer catch block in this function
-                                    throw KTException() << "An error occurred while running processor <" << procName << ">: " << diagnostic_information( e );
+                                    e << KTErrorMsgInfo( "There was an error while finishing thread <" + procName + "> and retrieving its results" );
+                                    throw;
                                 }
                                 stillRunning = false;
                             }
@@ -712,15 +711,19 @@ namespace Nymph
             }
             catch( std::exception& e )
             {
-                KTDEBUG( proclog, "Caught exception thrown in a processor or in the single-threaded run function: " << e.what() );
                 // exceptions thrown in this function or from within processors will end up here
-                fDoRunPromise.set_exception( std::current_exception() );
+                KTERROR( proclog, "Caught std::exception thrown in a processor or in the single-threaded run function: " << e.what() );
+                KTWARN( proclog, "Setting boost::exception of do-run-promise in StartSingleThreadedRun" );
+                fDoRunPromise.set_exception( boost::current_exception() );
+                return;
             }
             catch( boost::exception& e )
             {
-                KTDEBUG( proclog, "Caught exception thrown in a processor or in the single-threaded run function: " << diagnostic_information( e ) );
                 // exceptions thrown in this function or from within processors will end up here
-                fDoRunPromise.set_exception( std::current_exception() );
+                KTERROR( proclog, "Caught boost::exception thrown in a processor or in the single-threaded run function" );
+                KTWARN( proclog, "Setting boost::exception of do-run-promise in StartSingleThreadedRun" );
+                fDoRunPromise.set_exception( boost::current_exception() );
+                return;
             }
             fDoRunPromise.set_value();
             return;
@@ -741,7 +744,7 @@ namespace Nymph
                 if( ! fMasterContSignal.valid() )
                 {
                     KTERROR( proclog, "Invalid master continue-signal created" );
-                    throw KTException() << "Invalid master continue-signal created";
+                    BOOST_THROW_EXCEPTION( KTException() << "Invalid master continue-signal created" << eom );
                 }
                 // copy for use in this function
                 boost::shared_future< void > continueSignal = fMasterContSignal;
@@ -837,9 +840,8 @@ namespace Nymph
                             }
                             catch( boost::exception& e )
                             {
-                                KTERROR( proclog, "Thread <" << threadName << "> threw an error: " << diagnostic_information( e ) );
-                                // this transfers an exception thrown by a processor to the outer catch block in this function
-                                throw KTException() << "An error occurred while running processor <" << threadName << ">: " << diagnostic_information( e );
+                                e << KTErrorMsgInfo( "There was an error while finishing thread <" + threadName + "> and retrieving its results" );
+                                throw;
                             }
 
                             if( fThreadReferences.empty() ) stillRunning = false;
@@ -869,7 +871,7 @@ namespace Nymph
             catch( boost::exception& e )
             {
                 // exceptions thrown in this function or from within processors will end up here
-                KTERROR( proclog, "Caught std::exception thrown in a processor or in the multi-threaded run function: " << diagnostic_information( e ) );
+                KTERROR( proclog, "Caught boost::exception thrown in a processor or in the multi-threaded run function" );
                 KTWARN( proclog, "Setting boost::exception of do-run-promise in StartMultiThreadedRun" );
                 fDoRunPromise.set_exception( boost::current_exception() );
                 return;
@@ -897,11 +899,12 @@ namespace Nymph
         boost::shared_future< void > doRunFuture = fDoRunFuture;
         if( ! doRunFuture.valid() )
         {
-            throw KTException() << "Cannot wait for a break in the current state (the \"DoRun\" future does not have a valid shared state)";
+            BOOST_THROW_EXCEPTION( KTException() << "Cannot wait for a break in the current state (the \"DoRun\" future does not have a valid shared state)" << eom );
         }
 
         breakContLock.unlock();
 
+        // block here until there's a break
         doRunFuture.wait();
 
         if( fDoRunBreakFlag )
@@ -912,34 +915,30 @@ namespace Nymph
 
         try
         {
-            doRunFuture.get(); // TODO: do we really need this?  NSO, 5/23/17
+            doRunFuture.get();
             KTDEBUG( proclog, "End-of-run reached (the wait-for-break is over)" );
             return false;
         }
-        catch( std::exception& e )
+        catch( boost::exception& e )
         {
-            KTERROR( proclog, "An error occurred during processing: " << e.what() );
+            KTERROR( proclog, "An error occurred during processing: " << boost::diagnostic_information( e ) );
             return false;
         }
     }
 
     void KTProcessorToolbox::WaitForEndOfRun()
     {
-        try
+        // WaitForBreak() and WaitForContinue() throw boost::exception for problems with the future or promise objects
+
+        KTDEBUG( proclog, "Waiting for end-of-run" );
+        while( WaitForBreak() )
         {
-            KTDEBUG( proclog, "Waiting for end-of-run" );
-            while( WaitForBreak() )
-            {
-                KTDEBUG( proclog, "Reached breakpoint; waiting for continue" );
-                WaitForContinue();
-                KTDEBUG( proclog, "Processing resuming; waiting for end-of-run" );
-            }
-            KTDEBUG( proclog, "End-of-run reached" );
+            KTDEBUG( proclog, "Reached breakpoint; waiting for continue" );
+            WaitForContinue();
+            KTDEBUG( proclog, "Processing resuming; waiting for end-of-run" );
         }
-        catch( std::exception& e )
-        {
-            throw;
-        }
+        KTDEBUG( proclog, "End-of-run reached" );
+
         return;
     }
 
@@ -998,7 +997,7 @@ namespace Nymph
         if( tnIt == fThreadReferences.end() )
         {
             KTWARN( proclog, "Did not find thread <" << threadName << ">" );
-            throw KTException() << "Did not find thread <" << threadName << ">" ;
+            BOOST_THROW_EXCEPTION( KTException() << "Did not find thread <" << threadName << ">" << eom );
         }
 
         return (*tnIt)->fDataPtrRetFuture.get();
@@ -1037,18 +1036,14 @@ namespace Nymph
 
     bool KTProcessorToolbox::Run()
     {
-        try
-        {
-            AsyncRun();
+        // can throw boost::exception
 
-            WaitForEndOfRun();
+        AsyncRun();
 
-            JoinRunThread();
-        }
-        catch( std::exception& e )
-        {
-            throw;
-        }
+        WaitForEndOfRun();
+
+        JoinRunThread();
+
         return true;
     }
 

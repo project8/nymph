@@ -84,10 +84,6 @@ int main()
 
         KTINFO( testptlog, "Tests complete" );
     }
-    catch( std::exception& e )
-    {
-        KTERROR( testptlog, "Caught exception: " << e.what() );
-    }
     catch( boost::exception& e )
     {
         KTERROR( testptlog, "Caught exception: " << diagnostic_information( e ) );

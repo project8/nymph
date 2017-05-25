@@ -95,7 +95,7 @@ namespace Nymph
         std::shared_ptr< KTThreadReference > ref = fSlot1.GetSlotWrapper()->GetThreadRef();
 
         KTINFO(testsiglog, "Slot1: input is " << input);
-        throw KTException() << "A HUGE problem occurred!!!! (just kidding, this is the expected result)";
+        BOOST_THROW_EXCEPTION( KTException() << "A HUGE problem occurred!!!! (just kidding, this is the expected result)" << eom );
 
         return;
     }

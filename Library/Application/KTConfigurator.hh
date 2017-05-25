@@ -60,7 +60,7 @@ namespace Nymph
         }
         catch( std::exception& e )
         {}
-        throw KTException() << "configurator does not have a value for <" << aName << ">";
+        BOOST_THROW_EXCEPTION( KTException() << "configurator does not have a value for <" << aName << ">" << eom );
     }
 
     template< typename XReturnType >

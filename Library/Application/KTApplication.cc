@@ -70,11 +70,11 @@ namespace Nymph
             scarab::param* configFromFile = translator.read_file( configFilePath.native() );
             if( configFromFile == NULL )
             {
-                throw KTException() << "[KTApplication] error parsing config file";
+                BOOST_THROW_EXCEPTION( KTException() << "[KTApplication] error parsing config file" << eom );
             }
             if( ! configFromFile->is_node() )
             {
-                throw KTException() << "[KTApplication] configuration file must consist of an object/node";
+                BOOST_THROW_EXCEPTION( KTException() << "[KTApplication] configuration file must consist of an object/node" << eom );
             }
             fConfigurator->Merge( configFromFile->as_node() );
             delete configFromFile;
@@ -87,7 +87,7 @@ namespace Nymph
             scarab::param* configFromJSON = inputJSON.read_string( clJSON );
             if( ! configFromJSON->is_node() )
             {
-                throw KTException() << "[KTApplication] command line json must be an object";
+                BOOST_THROW_EXCEPTION( KTException() << "[KTApplication] command line json must be an object" << eom );
             }
             fConfigurator->Merge( configFromJSON->as_node() );
             delete configFromJSON;

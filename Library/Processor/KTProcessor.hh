@@ -30,11 +30,11 @@ namespace Nymph
 {
     KTLOGGER(processorlog, "KTProcessor.hh");
 
-    class ProcessorException : public std::logic_error
-    {
-        public:
-            ProcessorException(std::string const& why);
-    };
+    struct KTProcessorException : virtual public KTException
+    {};
+
+    struct KTSignalException : virtual public KTException {};
+    struct KTSlotException : virtual public KTException {};
 
     class KTThreadReference;
 

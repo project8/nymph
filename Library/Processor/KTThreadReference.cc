@@ -35,7 +35,7 @@ namespace Nymph
         if( ! fDataPtrRetFuture.valid() )
         {
             KTERROR( trlog, "Invalid data-pointer-return future created" );
-            throw KTException() << "Invalid data-pointer-return future created";
+            BOOST_THROW_EXCEPTION( KTException() << "Invalid data-pointer-return future created" << eom );
         }
     }
 
