@@ -35,9 +35,9 @@ int main()
     }
 
     // setup to execute processors asynchronously
-    KTThreadReference exeThreadRef;
-    auto exeThreadFuture = exeThreadRef.fDataPtrRet.get_future();
-    tpC.GetSlot( "first-slot" )->SetThreadRef (&exeThreadRef );
+    std::shared_ptr< KTThreadReference > exeThreadRef = std::make_shared< KTThreadReference >();
+    //boost::shared_future< KTDataPtr > exeThreadFuture = exeThreadRef->fDataPtrRetFuture;
+    tpC.GetSlot( "first-slot" )->SetThreadRef( exeThreadRef );
 
     std::atomic< bool > canceled( false );
 
@@ -60,7 +60,7 @@ int main()
         }
         catch( ... )
         {
-            exeThreadRef.fDataPtrRet.set_exception( std::current_exception() );
+            exeThreadRef->fDataPtrRet.set_exception( boost::current_exception() );
         }
 
         return;
@@ -70,16 +70,21 @@ int main()
     boost::thread thread( exeFunc );
 
     // wait for a result to be set
-    exeThreadFuture.wait();
+    exeThreadRef->fDataPtrRetFuture.wait();
 
     try
     {
-        exeThreadFuture.get();
+        exeThreadRef->fDataPtrRetFuture.get();
     }
-    catch( std::exception& e )
+    //catch( std::exception& e )
+    //{
+    //    canceled = true;
+    //    KTERROR( testexclog, "An error occurred while running a processor: " << e.what() );
+    //}
+    catch( boost::exception& e )
     {
         canceled = true;
-        KTERROR( testexclog, "An error occurred while running a processor: " << e.what() );
+        KTERROR( testexclog, "An error occurred while running a processor: " << diagnostic_information( e ) );
     }
 
     thread.join();

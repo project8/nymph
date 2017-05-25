@@ -39,7 +39,7 @@ namespace Nymph
             // e.g. for a real processor, do some work here instead of sleeping
             boost::this_thread::sleep_for( boost::chrono::milliseconds(1) );
 
-            if( fThreadRef.fThreadIndicator->fCanceled ) break;
+            if( fThreadRef->fCanceled ) break;
 
             fTheSignal( iIteration );
         }

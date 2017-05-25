@@ -76,7 +76,7 @@ namespace Nymph
 
     void KTCutFilter::FilterData(KTDataPtr dataPtr)
     {
-        KTThreadReference* ref = fFilterDataSW->GetThreadRef();
+        std::shared_ptr< KTThreadReference > ref = fFilterDataSW->GetThreadRef();
 
         // all KTDataPtr's have KTData, so we won't bother checking
 

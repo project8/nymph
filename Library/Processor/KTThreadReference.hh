@@ -16,20 +16,25 @@
 
 namespace Nymph
 {
-    struct KTThreadIndicator
-    {
-        bool fBreakFlag; // only use outside of blocks protected by a mutex are reads, so we shouldn't need to make this an atomic
-        boost::shared_future< void > fContinueSignal;
-        bool fCanceled;
-        KTThreadIndicator();
-    };
+    //struct KTThreadIndicator
+    //{
+    //    bool fBreakFlag; // only use outside of blocks protected by a mutex are reads, so we shouldn't need to make this an atomic
+    //    boost::shared_future< void > fContinueSignal;
+    //    bool fCanceled;
+    //    KTThreadIndicator();
+    //};
 
     struct KTThreadReference
     {
+        std::string fName;
         KTDataPtrReturn fDataPtrRet;
+        boost::unique_future< KTDataPtr > fDataPtrRetFuture;
         std::function< void() > fInitiateBreakFunc;
         std::function< void(const std::string&, boost::shared_future< KTDataPtr >&&) > fRefreshFutureFunc;
-        std::shared_ptr< KTThreadIndicator > fThreadIndicator;
+        //std::shared_ptr< KTThreadIndicator > fThreadIndicator;
+        bool fBreakFlag; // only use outside of blocks protected by a mutex are reads, so we shouldn't need to make this an atomic
+        boost::shared_future< void > fContinueSignal;
+        bool fCanceled;
         std::string fPrimaryProcName;
 
         KTThreadReference();
@@ -40,6 +45,8 @@ namespace Nymph
         KTThreadReference& operator=( KTThreadReference&& );
 
         void Break( const KTDataPtr& dataPtr, bool doBreakpoint  );
+
+        void RefreshDataPtrRet();
     };
 
 } /* namespace Nymph */

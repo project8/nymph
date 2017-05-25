@@ -45,9 +45,9 @@ namespace Nymph
         }
     }
 
-    void KTProcessor::PassThreadRefUpdate(const std::string& slotName, KTThreadReference* threadRef)
+    void KTProcessor::PassThreadRefUpdate(const std::string& slotName, std::shared_ptr< KTThreadReference > threadRef)
     {
-        std::function< void(KTThreadReference*) > funcObj = [this, &slotName](KTThreadReference* ref){ GetSlot(slotName)->SetThreadRef(ref); };
+        std::function< void(std::shared_ptr< KTThreadReference >) > funcObj = [this, &slotName](std::shared_ptr< KTThreadReference > ref){ GetSlot(slotName)->SetThreadRef(ref); };
         PassToConnProcs(slotName, funcObj, threadRef);
         return;
     }

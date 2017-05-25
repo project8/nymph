@@ -88,14 +88,14 @@ namespace Nymph
             KTConnection fConnection;
 
         public:
-            KTThreadReference* GetThreadRef() const;
-            void SetThreadRef(KTThreadReference* ref);
+            std::shared_ptr< KTThreadReference > GetThreadRef() const;
+            void SetThreadRef(std::shared_ptr< KTThreadReference > ref);
 
             bool GetDoBreakpoint() const;
             void SetDoBreakpoint(bool flag);
 
         private:
-            KTThreadReference* fThreadRef;
+            std::shared_ptr< KTThreadReference > fThreadRef;
             bool fDoBreakpoint;
 
     };
@@ -126,12 +126,12 @@ namespace Nymph
         return;
     }
 
-    inline KTThreadReference* KTSlotWrapper::GetThreadRef() const
+    inline std::shared_ptr< KTThreadReference > KTSlotWrapper::GetThreadRef() const
     {
         return fThreadRef;
     }
 
-    inline void KTSlotWrapper::SetThreadRef(KTThreadReference* ref)
+    inline void KTSlotWrapper::SetThreadRef(std::shared_ptr< KTThreadReference > ref)
     {
         fThreadRef = ref;
         return;

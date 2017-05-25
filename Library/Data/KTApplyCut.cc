@@ -85,7 +85,7 @@ namespace Nymph
 
     void KTApplyCut::ApplyCut(KTDataPtr dataPtr)
     {
-        KTThreadReference* ref = fApplyCutSW->GetThreadRef();
+        std::shared_ptr< KTThreadReference > ref = fApplyCutSW->GetThreadRef();
 
         if (fCut == NULL)
         {

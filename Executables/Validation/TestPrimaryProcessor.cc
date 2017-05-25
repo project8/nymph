@@ -34,8 +34,10 @@ int main()
     }
 
     // setup to execute processors asynchronously
-    KTThreadReference exeThreadRef;
-    auto exeThreadFuture = exeThreadRef.fDataPtrRet.get_future();
+    //KTThreadReference exeThreadRef;
+    //auto exeThreadFuture = exeThreadRef.fDataPtrRet.get_future();
+    std::shared_ptr< KTThreadReference > exeThreadRef = std::make_shared< KTThreadReference >();
+    exeThreadRef->fName = std::string( "tpp" );
 
     // run the thread
     boost::condition_variable threadStartedCV;
@@ -43,7 +45,7 @@ int main()
     bool threadStartedFlag = false;
 
     boost::unique_lock< boost::mutex > threadStartedLock( threadStartedMutex );
-    boost::thread thread( [&](){ tpp( std::move( exeThreadRef ), threadStartedCV, threadStartedFlag ); } );
+    boost::thread thread( [&](){ tpp( exeThreadRef, threadStartedCV, threadStartedFlag ); } );
 
     while( ! threadStartedFlag )
     {
@@ -52,16 +54,21 @@ int main()
     KTDEBUG( testpplog, "Thread has started" );
 
     // wait for a result to be set
-    exeThreadFuture.wait();
+    exeThreadRef->fDataPtrRetFuture.wait();
 
     try
     {
-        exeThreadFuture.get();
+        exeThreadRef->fDataPtrRetFuture.get();
     }
     catch( std::exception& e )
     {
-        exeThreadRef.fThreadIndicator->fCanceled = true;
+        exeThreadRef->fCanceled = true;
         KTERROR( testpplog, "An error occurred while running a processor: " << e.what() );
+    }
+    catch( boost::exception& e )
+    {
+        exeThreadRef->fCanceled = true;
+        KTERROR( testpplog, "An error occurred while running a processor: " << diagnostic_information( e ) );
     }
 
     thread.join();

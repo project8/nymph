@@ -92,7 +92,7 @@ namespace Nymph
 
     void KTTestProcessorC::SlotFunc1(int input)
     {
-        KTThreadReference* ref = fSlot1.GetSlotWrapper()->GetThreadRef();
+        std::shared_ptr< KTThreadReference > ref = fSlot1.GetSlotWrapper()->GetThreadRef();
 
         KTINFO(testsiglog, "Slot1: input is " << input);
         throw KTException() << "A HUGE problem occurred!!!! (just kidding, this is the expected result)";

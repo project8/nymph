@@ -20,6 +20,10 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 
+#include <boost/iterator/iterator_adaptor.hpp>
+#include <boost/type_traits/is_convertible.hpp>
+#include <boost/utility/enable_if.hpp>
+
 #include <deque>
 #include <initializer_list>
 #include <limits>
@@ -228,20 +232,25 @@ namespace Nymph
 
             typedef boost::shared_future< KTDataPtr > Future;
 
+            void StartSingleThreadedRun();
+            void StartMultiThreadedRun();
+
             // called from ThreadPacket::Break
             void InitiateBreak();
             // called from ThreadPacket::Break
-            void TakeFuture( const std::string& name, Future&& future );
+            //void TakeFuture( const std::string& name, Future&& future );
 
-            typedef std::vector< Future > ThreadFutures;
-            typedef std::vector< std::string > ThreadNames;
+            std::vector< std::shared_ptr< KTThreadReference > > fThreadReferences;
 
-            ThreadFutures fThreadFutures;
-            ThreadNames fThreadNames;
+            //typedef std::vector< Future > ThreadFutures;
+            //typedef std::vector< std::string > ThreadNames;
+
+            //ThreadFutures fThreadFutures;
+            //ThreadNames fThreadNames;
             boost::mutex fThreadFuturesMutex;
 
-            typedef std::vector< std::shared_ptr< KTThreadIndicator > > ThreadIndicators;
-            ThreadIndicators fThreadIndicators;
+            //typedef std::vector< std::shared_ptr< KTThreadIndicator > > ThreadIndicators;
+            //ThreadIndicators fThreadIndicators;
 
             boost::promise< void > fContinueSignaler;
             boost::shared_future< void > fMasterContSignal;
@@ -253,6 +262,40 @@ namespace Nymph
             bool fDoRunBreakFlag;
 
     };
+
+    template< class Value, class IIterator >
+    class KTThreadRefFutureIter : public boost::iterator_adaptor< KTThreadRefFutureIter< Value, IIterator >, IIterator, Value, boost::random_access_traversal_tag >
+    {
+        private:
+            // used for the conversion constructor below
+            struct enabler {};
+
+        public:
+            KTThreadRefFutureIter() :
+                    KTThreadRefFutureIter::iterator_adaptor_()
+            {}
+            KTThreadRefFutureIter( const IIterator& other ) :
+                    KTThreadRefFutureIter::iterator_adaptor_( other )
+            {}
+
+            // converts from Iterator to ConstIterator, but the enable_if business prevents converting from ConstIterator to Iterator
+            template< class OtherValue, class OtherIIterator >
+            KTThreadRefFutureIter( const KTThreadRefFutureIter< OtherValue, OtherIIterator > & other, typename boost::enable_if< boost::is_convertible< OtherValue, Value >, enabler >::type = enabler() ) :
+                    KTThreadRefFutureIter::iterator_adaptor_( other.base )
+            {}
+
+        private:
+            friend class boost::iterator_core_access;
+
+            Value& dereference() const
+            {
+                return (*(this->base_reference()))->fDataPtrRetFuture;
+            }
+    };
+
+    typedef KTThreadRefFutureIter< boost::unique_future< KTDataPtr >, std::vector< std::shared_ptr< KTThreadReference > >::iterator > KTThreadRefFutureIterator;
+    typedef KTThreadRefFutureIter< const boost::unique_future< KTDataPtr >, std::vector< std::shared_ptr< KTThreadReference > >::const_iterator > KTThreadRefFutureConstIterator;
+
 
     inline void KTProcessorToolbox::PopBackOfRunQueue()
     {
@@ -272,12 +315,12 @@ namespace Nymph
         return;
     }
 
-    inline void KTProcessorToolbox::TakeFuture( const std::string& name, Future&& future )
-    {
-        fThreadFutures.push_back( std::move( future ) );
-        fThreadNames.push_back( name );
-        return;
-    }
+    //inline void KTProcessorToolbox::TakeFuture( const std::string& name, Future&& future )
+    //{
+    //    fThreadFutures.push_back( std::move( future ) );
+    //    fThreadNames.push_back( name );
+    //    return;
+    //}
 
     inline void KTProcessorToolbox::JoinRunThread()
     {

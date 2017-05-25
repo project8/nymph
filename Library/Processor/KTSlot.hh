@@ -269,7 +269,7 @@ namespace Nymph
     {
         // Standard data slot pattern:
 
-        KTThreadReference* ref = fSlotWrapper->GetThreadRef();
+        std::shared_ptr< KTThreadReference > ref = fSlotWrapper->GetThreadRef();
 
         // Check to ensure that the required data type is present
         if( ! DataPresent< XDataTypes... >( dataPtr ) )
