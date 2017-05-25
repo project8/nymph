@@ -28,8 +28,6 @@ int main()
         tpp.ConnectASlot( "the-signal", &tp, "first-slot", 20 );
 
         // setup to execute processors asynchronously
-        //KTThreadReference exeThreadRef;
-        //auto exeThreadFuture = exeThreadRef.fDataPtrRet.get_future();
         std::shared_ptr< KTThreadReference > exeThreadRef( std::make_shared< KTThreadReference >() );
         exeThreadRef->Name() = std::string( "tpp" );
 

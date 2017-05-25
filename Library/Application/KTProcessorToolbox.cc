@@ -33,8 +33,7 @@ namespace Nymph
             fRunQueue(),
             fProcMap(),
             fThreadReferences(),
-            fThreadFuturesMutex(),
-            //fThreadFutures(),
+            fThreadReferencesMutex(),
             fContinueSignaler(),
             fMasterContSignal(),
             fBreakContMutex(),
@@ -617,32 +616,17 @@ namespace Nymph
                 {
                     for (ThreadGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
                     {
-                        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadFuturesMutex );
+                        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadReferencesMutex );
 
                         std::string procName( tgIter->fName );
                         KTINFO( proclog, "Starting processor <" << procName << ">" );
 
-                        //KTThreadReference thisThreadRef;
                         std::shared_ptr< KTThreadReference > thisThreadRef = std::make_shared< KTThreadReference >();
                         thisThreadRef->Name() = procName;
 
-                        //fThreadFutures.push_back( std::move( thisThreadRef.fDataPtrRet.get_future() ) );
-                        //fThreadNames.push_back( procName );
-                        //auto& futureNameIndex = fThreadFutures.get<1>();
-
-                        //if( ! fThreadFutures.back().valid() )
-                        //{
-                        //    KTERROR( proclog, "Invalid thread future created" );
-                        //    BOOST_THROW_EXCEPTION( KTException() << "Invalid thread future created";
-                        //}
-
-                        //fThreadIndicators.emplace_back( new KTThreadIndicator() );
-                        //fThreadIndicators.back()->fContinueSignal = fMasterContSignal;
                         thisThreadRef->SetContinueSignal( fMasterContSignal );
 
-                        //thisThreadRef->fThreadIndicator = fThreadIndicators.back();
                         thisThreadRef->SetInitiateBreakFunc( [&](){ this->InitiateBreak(); } );
-                        //thisThreadRef->fRefreshFutureFunc = [&]( const std::string& name, Future&& ret ){ this->TakeFuture( name, std::move(ret) ); };
 
                         fThreadReferences.push_back( thisThreadRef );
 
@@ -702,8 +686,6 @@ namespace Nymph
 
                         thread.join();
                         fThreadReferences.clear();
-                        //fThreadFutures.clear();
-                        //fThreadNames.clear();
                     } // end for loop over the thread group
                 } // end for loop over the run-queue
 
@@ -756,27 +738,19 @@ namespace Nymph
                     boost::thread_group threads;
 
                     { // scope for threadFuturesLock
-                        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadFuturesMutex );
+                        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadReferencesMutex );
 
                         for (ThreadGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
                         {
                             std::string procName( tgIter->fName );
                             KTINFO( proclog, "Starting processor <" << procName << ">" );
 
-                            //KTThreadReference thisThreadRef;
                             std::shared_ptr< KTThreadReference > thisThreadRef = std::make_shared< KTThreadReference >();
                             thisThreadRef->Name() = procName;
 
-                            //fThreadFutures.push_back( std::move( thisThreadRef.fDataPtrRet.get_future() ) );
-                            //fThreadNames.push_back( procName );
-
-                            //fThreadIndicators.emplace_back( new KTThreadIndicator() );
-                            //fThreadIndicators.back()->fContinueSignal = fMasterContSignal;
                             thisThreadRef->SetContinueSignal( fMasterContSignal );
 
-                            //thisThreadRef->fThreadIndicator = fThreadIndicators.back();
                             thisThreadRef->SetInitiateBreakFunc( [&](){ this->InitiateBreak(); } );
-                            //thisThreadRef->fRefreshFutureFunc = [&]( const std::string& name, Future&& ret ){ this->TakeFuture( name, std::move(ret) ); };
                             boost::condition_variable threadStartedCV;
                             boost::mutex threadStartedMutex;
                             bool threadStartedFlag = false;
@@ -800,10 +774,7 @@ namespace Nymph
                     bool stillRunning = true; // determines behavior that depends on whether a return from the thread was temporary or from the thread completing
                     do
                     {
-                        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadFuturesMutex );
-                        //KTThreadRefFutureIterator finishedFuturePtr( fThreadReferences.begin());
-                        //auto finishedFuturePtr = boost::wait_for_any( futureIndex.begin(), futureIndex.end() );
-                        //auto finishedFuturePtr = boost::wait_for_any( fThreadFutures.begin(), fThreadFutures.end() );
+                        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadReferencesMutex );
                         auto finishedFuturePtr = boost::wait_for_any( KTThreadRefFutureIterator(fThreadReferences.begin()), KTThreadRefFutureIterator(fThreadReferences.end()) );
                         size_t iThread = finishedFuturePtr - KTThreadRefFutureIterator(fThreadReferences.begin());
                         auto finishedReferencePtr = fThreadReferences.begin() + iThread;
@@ -830,13 +801,10 @@ namespace Nymph
                             // we're finished a thread; get its results
                             try
                             {
-                                //futureIndex.modify( finishedFuturePtr, [](LabeledFuture& lFuture){ lFuture.fFuture.get(); } );
                                 //KTINFO( proclog, "Thread <" << threadName << "> has finished" );
                                 KTWARN( proclog, "Thread <" << threadName << "> has finished" ); // TODO: switch this back to INFO
                                 finishedFuturePtr->get();
                                 fThreadReferences.erase( finishedReferencePtr );
-                                //fThreadFutures.erase( finishedFuturePtr );
-                                //fThreadNames.erase( fThreadNames.begin() + iThread );
                             }
                             catch( boost::exception& e )
                             {
@@ -851,11 +819,8 @@ namespace Nymph
 
                     KTDEBUG( proclog, "Joining threads" );
                     threads.join_all();
-                    //fThreadIndicators.clear();
-                    boost::unique_lock< boost::mutex > threadFuturesLock( fThreadFuturesMutex );
+                    boost::unique_lock< boost::mutex > threadFuturesLock( fThreadReferencesMutex );
                     fThreadReferences.clear();
-                    //fThreadFutures.clear();
-                    //fThreadNames.clear();
                 } // end for loop over the run-queue
 
                 KTPROG( proclog, "Processing is complete (multi-threaded)" );
@@ -951,10 +916,7 @@ namespace Nymph
         }
 
         boost::unique_lock< boost::mutex > breakContLock( fBreakContMutex );
-        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadFuturesMutex );
-
-        // futures have been used; clear them to be replaced
-        //fThreadFutures.clear();
+        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadReferencesMutex );
 
         // reset all break flags
         fDoRunBreakFlag = false;
@@ -987,7 +949,7 @@ namespace Nymph
 
     KTDataPtr KTProcessorToolbox::GetData( const std::string& threadName )
     {
-        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadFuturesMutex );
+        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadReferencesMutex );
 
         auto tnIt = fThreadReferences.begin();
         for( ; tnIt != fThreadReferences.end(); ++tnIt )

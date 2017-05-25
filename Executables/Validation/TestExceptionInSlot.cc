@@ -30,7 +30,6 @@ int main()
 
         // setup to execute processors asynchronously
         std::shared_ptr< KTThreadReference > exeThreadRef = std::make_shared< KTThreadReference >();
-        //boost::shared_future< KTDataPtr > exeThreadFuture = exeThreadRef->fDataPtrRetFuture;
         tpC.GetSlot( "first-slot" )->SetThreadRef( exeThreadRef );
 
         std::atomic< bool > canceled( false );
@@ -70,11 +69,6 @@ int main()
         {
             exeThreadRef->GetReturnValue();
         }
-        //catch( std::exception& e )
-        //{
-        //    canceled = true;
-        //    KTERROR( testexclog, "An error occurred while running a processor: " << e.what() );
-        //}
         catch( boost::exception& e )
         {
             canceled = true;

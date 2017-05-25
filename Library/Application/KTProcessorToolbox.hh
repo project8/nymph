@@ -239,19 +239,9 @@ namespace Nymph
             // called from ThreadPacket::Break
             void InitiateBreak();
             // called from ThreadPacket::Break
-            //void TakeFuture( const std::string& name, Future&& future );
 
             std::vector< std::shared_ptr< KTThreadReference > > fThreadReferences;
-
-            //typedef std::vector< Future > ThreadFutures;
-            //typedef std::vector< std::string > ThreadNames;
-
-            //ThreadFutures fThreadFutures;
-            //ThreadNames fThreadNames;
-            boost::mutex fThreadFuturesMutex;
-
-            //typedef std::vector< std::shared_ptr< KTThreadIndicator > > ThreadIndicators;
-            //ThreadIndicators fThreadIndicators;
+            boost::mutex fThreadReferencesMutex;
 
             boost::promise< void > fContinueSignaler;
             boost::shared_future< void > fMasterContSignal;
@@ -315,13 +305,6 @@ namespace Nymph
         fMasterContSignal.wait();
         return;
     }
-
-    //inline void KTProcessorToolbox::TakeFuture( const std::string& name, Future&& future )
-    //{
-    //    fThreadFutures.push_back( std::move( future ) );
-    //    fThreadNames.push_back( name );
-    //    return;
-    //}
 
     inline void KTProcessorToolbox::JoinRunThread()
     {
