@@ -16,38 +16,111 @@
 
 namespace Nymph
 {
-    //struct KTThreadIndicator
-    //{
-    //    bool fBreakFlag; // only use outside of blocks protected by a mutex are reads, so we shouldn't need to make this an atomic
-    //    boost::shared_future< void > fContinueSignal;
-    //    bool fCanceled;
-    //    KTThreadIndicator();
-    //};
+    typedef boost::promise< KTDataPtr > KTDataPtrReturn;
 
-    struct KTThreadReference
+    class KTThreadReference
     {
-        std::string fName;
-        KTDataPtrReturn fDataPtrRet;
-        boost::unique_future< KTDataPtr > fDataPtrRetFuture;
-        std::function< void() > fInitiateBreakFunc;
-        std::function< void(const std::string&, boost::shared_future< KTDataPtr >&&) > fRefreshFutureFunc;
-        //std::shared_ptr< KTThreadIndicator > fThreadIndicator;
-        bool fBreakFlag; // only use outside of blocks protected by a mutex are reads, so we shouldn't need to make this an atomic
-        boost::shared_future< void > fContinueSignal;
-        bool fCanceled;
-        std::string fPrimaryProcName;
+        public:
+            KTThreadReference();
+            KTThreadReference( const KTThreadReference& ) = delete;
+            KTThreadReference( KTThreadReference&& orig );
 
-        KTThreadReference();
-        KTThreadReference( const KTThreadReference& ) = delete;
-        KTThreadReference( KTThreadReference&& orig );
+            KTThreadReference& operator=( const KTThreadReference& ) = delete;
+            KTThreadReference& operator=( KTThreadReference&& );
 
-        KTThreadReference& operator=( const KTThreadReference& ) = delete;
-        KTThreadReference& operator=( KTThreadReference&& );
+        public:
+            //**************************
+            // for use within the thread
+            //**************************
 
-        void Break( const KTDataPtr& dataPtr, bool doBreakpoint  );
+            void Break( const KTDataPtr& dataPtr, bool doBreakpoint  );
 
-        void RefreshDataPtrRet();
+            void SetReturnException( boost::exception_ptr excPtr );
+            void SetReturnValue( KTDataPtr dataPtr );
+
+        public:
+            //******************************
+            // for use outside of the thread
+            //******************************
+
+            KTDataPtr GetReturnValue();
+            boost::unique_future< KTDataPtr >& GetDataPtrRetFuture();
+            const boost::unique_future< KTDataPtr >& GetDataPtrRetFuture() const;
+
+            void RefreshDataPtrRet();
+
+            void SetContinueSignal( const boost::shared_future< void >& contSig );
+            void SetInitiateBreakFunc( const std::function< void() >& initBreakFunc );
+
+        public:
+            MEMBERVARIABLEREF( std::string, Name );
+            MEMBERVARIABLE( bool, BreakFlag );
+            MEMBERVARIABLE( bool, Canceled );
+
+        private:
+            KTDataPtrReturn fDataPtrRet;
+            boost::unique_future< KTDataPtr > fDataPtrRetFuture;
+            std::function< void() > fInitiateBreakFunc;
+            boost::shared_future< void > fContinueSignal;
     };
+
+    inline void KTThreadReference::SetReturnException( boost::exception_ptr excPtr )
+    {
+        fDataPtrRet.set_exception( excPtr );
+        return;
+    }
+
+    inline void KTThreadReference::SetReturnValue( KTDataPtr dataPtr )
+    {
+        fDataPtrRet.set_value( dataPtr );
+        return;
+    }
+
+    inline KTDataPtr KTThreadReference::GetReturnValue()
+    {
+        return fDataPtrRetFuture.get();
+    }
+
+    inline boost::unique_future< KTDataPtr >& KTThreadReference::GetDataPtrRetFuture()
+    {
+        return fDataPtrRetFuture;
+    }
+
+    inline const boost::unique_future< KTDataPtr >& KTThreadReference::GetDataPtrRetFuture() const
+    {
+        return fDataPtrRetFuture;
+    }
+
+    inline void KTThreadReference::RefreshDataPtrRet()
+    {
+        fDataPtrRet = KTDataPtrReturn();
+        fDataPtrRetFuture = fDataPtrRet.get_future();
+        return;
+    }
+
+    inline void KTThreadReference::SetContinueSignal( const boost::shared_future< void >& contSig )
+    {
+        fContinueSignal = contSig;
+        return;
+    }
+
+    inline void KTThreadReference::SetInitiateBreakFunc( const std::function< void() >& initBreakFunc )
+    {
+        fInitiateBreakFunc = initBreakFunc;
+        return;
+    }
+
+#ifndef THROW_THREADREF_EXCEPTION
+#define THROW_THREADREF_EXCEPTION( ref, exc ) \
+        try \
+        { \
+            BOOST_THROW_EXCEPTION( exc ); \
+        } \
+        catch( ::boost::exception& e ) \
+        { \
+            ref->SetReturnException( ::boost::current_exception() ); \
+        }
+#endif // THROW_THREADREF_EXCEPTION
 
 } /* namespace Nymph */
 

@@ -102,9 +102,10 @@ namespace Nymph
     KTSlotWrapper::KTSlotWrapper(XSignature signalPtr, XTypeContainer* typeCont) :
             fSlotWrapper(new KTSpecifiedInternalSlotWrapper< XSignature, XTypeContainer >(signalPtr, typeCont)),
             fConnection(),
-            fThreadRef(),
+            fThreadRef( std::make_shared< KTThreadReference >() ),
             fDoBreakpoint(false)
-    {}
+    {
+    }
 
     inline void KTSlotWrapper::SetConnection(KTConnection conn)
     {

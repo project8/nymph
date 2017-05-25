@@ -54,7 +54,7 @@ int main()
             }
             catch( boost::exception& e )
             {
-                exeThreadRef->fDataPtrRet.set_exception( boost::current_exception() );
+                exeThreadRef->SetReturnException( boost::current_exception() );
             }
 
             return;
@@ -64,11 +64,11 @@ int main()
         boost::thread thread( exeFunc );
 
         // wait for a result to be set
-        exeThreadRef->fDataPtrRetFuture.wait();
+        exeThreadRef->GetDataPtrRetFuture().wait();
 
         try
         {
-            exeThreadRef->fDataPtrRetFuture.get();
+            exeThreadRef->GetReturnValue();
         }
         //catch( std::exception& e )
         //{

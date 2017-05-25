@@ -52,16 +52,16 @@ namespace Nymph
             if( ! Run() )
             {
                 KTERROR( proclog, "An error occurred during processor running." );
-                THROW_RETURN_EXCEPTION( fThreadRef->fDataPtrRet, KTException() << "An error occurred during processor running" );
+                THROW_THREADREF_EXCEPTION( fThreadRef, KTException() << "An error occurred during processor running" );
             }
             else
             {
-                fThreadRef->fDataPtrRet.set_value( KTDataPtr() );
+                fThreadRef->SetReturnValue( KTDataPtr() );
             }
         }
-        catch( ... )
+        catch( boost::exception& e )
         {
-            fThreadRef->fDataPtrRet.set_exception( std::current_exception() );
+            fThreadRef->SetReturnException( boost::current_exception() );
         }
         return;
     }

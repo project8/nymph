@@ -14,23 +14,15 @@ KTLOGGER( trlog, "KTThreadReference" );
 
 namespace Nymph
 {
-    //KTThreadIndicator::KTThreadIndicator() :
-    //        fBreakFlag( false ),
-    //        fContinueSignal(),
-    //        fCanceled( false )
-    //{}
 
     KTThreadReference::KTThreadReference() :
             fName(),
+            fBreakFlag( false ),
+            fCanceled( false ),
             fDataPtrRet(),
             fDataPtrRetFuture( fDataPtrRet.get_future() ),
             fInitiateBreakFunc( [](){return;} ),
-            fRefreshFutureFunc( [](const std::string&, boost::shared_future< KTDataPtr >&&){return;} ),
-            //fThreadIndicator( new KTThreadIndicator() ),
-            fBreakFlag( false ),
-            fContinueSignal(),
-            fCanceled( false ),
-            fPrimaryProcName()
+            fContinueSignal()
     {
         if( ! fDataPtrRetFuture.valid() )
         {
@@ -41,17 +33,13 @@ namespace Nymph
 
     KTThreadReference::KTThreadReference( KTThreadReference&& orig ) :
             fName( std::move( orig.fName ) ),
+            fBreakFlag( orig.fBreakFlag ),
+            fCanceled( orig.fCanceled ),
             fDataPtrRet( std::move( orig.fDataPtrRet ) ),
             fDataPtrRetFuture( std::move( orig.fDataPtrRetFuture ) ),
             fInitiateBreakFunc( std::move( orig.fInitiateBreakFunc ) ),
-            fRefreshFutureFunc( std::move( orig.fRefreshFutureFunc ) ),
-            //fThreadIndicator( orig.fThreadIndicator ),
-            fBreakFlag( orig.fBreakFlag ),
-            fContinueSignal( std::move( orig.fContinueSignal ) ),
-            fCanceled( orig.fCanceled ),
-            fPrimaryProcName( std::move( orig.fPrimaryProcName ) )
+            fContinueSignal( std::move( orig.fContinueSignal ) )
     {
-        //orig.fThreadIndicator = nullptr;
         orig.fBreakFlag = false;
         orig.fCanceled = false;
     }
@@ -59,17 +47,13 @@ namespace Nymph
     KTThreadReference& KTThreadReference::operator=( KTThreadReference&& orig )
     {
         fName = std::move( orig.fName );
+        fBreakFlag = orig.fBreakFlag;
+        fCanceled = orig.fCanceled;
         fDataPtrRet = std::move( orig.fDataPtrRet );
         fDataPtrRetFuture = std::move( orig.fDataPtrRetFuture );
         fInitiateBreakFunc = std::move( orig.fInitiateBreakFunc );
-        fRefreshFutureFunc = std::move( orig.fRefreshFutureFunc );
-        //fThreadIndicator = orig.fThreadIndicator;
-        fBreakFlag = orig.fBreakFlag;
         fContinueSignal = std::move( orig.fContinueSignal );
-        fCanceled = orig.fCanceled;
-        fPrimaryProcName = std::move( orig.fPrimaryProcName );
 
-        //orig.fThreadIndicator = nullptr;
         orig.fBreakFlag = false;
         orig.fCanceled = false;
 
@@ -90,21 +74,10 @@ namespace Nymph
             KTWARN( trlog, "Setting value of data-ptr-ret promise (" << fName << ")" );
             fDataPtrRet.set_value( dataPtr );
             // wait for continue signal
-            //fThreadIndicator->fContinueSignal.wait();
             fContinueSignal.wait();
-            // reset the promise
-            //fDataPtrRet = KTDataPtrReturn();
-            // pass the future back to the processor toolbox (if it's in use)
-            //fRefreshFutureFunc( fPrimaryProcName, std::move( fDataPtrRet.get_future().share() ) );
         }
         return;
     }
 
-    void KTThreadReference::RefreshDataPtrRet()
-    {
-        fDataPtrRet = KTDataPtrReturn();
-        fDataPtrRetFuture = fDataPtrRet.get_future();
-        return;
-    }
 
 } /* namespace Nymph */

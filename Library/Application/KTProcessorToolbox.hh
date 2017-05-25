@@ -290,7 +290,7 @@ namespace Nymph
 
             Value& dereference() const
             {
-                return (*(this->base_reference()))->fDataPtrRetFuture;
+                return (*(this->base_reference()))->GetDataPtrRetFuture();
             }
     };
 
