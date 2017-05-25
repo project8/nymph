@@ -19,7 +19,7 @@ int main()
     KTData data;
     KTTestData& testData = data.Of< KTTestData >();
 
-    KTCutStatus& cutStatus = data.GetCutStatus();
+    KTCutStatus& cutStatus = data.CutStatus();
     KTINFO(testlog, "Initial cut state: " << cutStatus.IsCut());
 
     KTINFO(testlog, "Applying awesome cut");

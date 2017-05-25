@@ -54,8 +54,8 @@
 
 
 /**
- * Creates a member variable with type TYPE name f[NAME], plus getters and setters.
- * MEMBERVARIABLEREF_NOSET will provide the variable and getter, but no setter, allowing you to provide a custom setter.
+ * Creates a member variable with type TYPE name f[NAME], const and non-const access functions.
+ * MEMBERVARIABLEREF_CONST will provide the variable and the const access function, but no non-const access function.
  *
  * Usage example, in a class header file:
  *     MEMBERVARIABLEREF(std::string, MyVar)
@@ -66,36 +66,36 @@
  *     private:
  *         TYPE f[NAME];
  *     public:
- *         inline const TYPE& Get[NAME]() const
+ *         inline const TYPE& [NAME]() const
  *         {
  *             return f[NAME];
  *         }
- *         inline void Set[NAME](const TYPE& var)
+ *         inline TYPE& [NAME]()
  *         {
- *             f[NAME] = var;
+ *             return f[NAME];
  *         }
  */
-#define MEMBERVARIABLEREF_NOSET(TYPE, NAME) \
+#define MEMBERVARIABLEREF_CONST(TYPE, NAME) \
         private: \
             TYPE f##NAME; \
         public: \
-            inline const TYPE& Get##NAME() const {return f##NAME;} \
-            inline TYPE& GET##NAME() {return f##NAME;}
+            inline const TYPE& NAME() const {return f##NAME;} \
+            inline TYPE& NAME() {return f##NAME;}
 
 #define MEMBERVARIABLEREF(TYPE, NAME) \
-        MEMBERVARIABLEREF_NOSET(TYPE, NAME) \
-            inline void Set##NAME(const TYPE& var) {f##NAME = var; return;}
+        MEMBERVARIABLEREF_CONST(TYPE, NAME) \
+            inline TYPE& NAME(const TYPE& var) {return f##NAME;}
 
 #define MEMBERVARIABLEREF_PROTECTED_NOSET(TYPE, NAME) \
         protected: \
             TYPE f##NAME; \
         public: \
-            inline const TYPE& Get##NAME() const {return f##NAME;} \
-            inline TYPE& GET##NAME() {return f##NAME;}
+            inline const TYPE& NAME() const {return f##NAME;} \
+            inline TYPE& NAME() {return f##NAME;}
 
 #define MEMBERVARIABLEREF_PROTECTED(TYPE, NAME) \
         MEMBERVARIABLEREF_PROTECTED_NOSET(TYPE, NAME) \
-            inline void Set##NAME(const TYPE& var) {f##NAME = var; return;}
+            inline TYPE& NAME() {return f##NAME;}
 
 
 #endif /* KTMEMBERVARIABLE_HH_ */

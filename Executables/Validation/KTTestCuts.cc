@@ -48,7 +48,7 @@ namespace Nymph
         bool isCut = ! testData.GetIsAwesome();
         KTDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
         KTDEBUG(testlog, "Is data cut? " << isCut);
-        data.GetCutStatus().AddCutResult< KTAwesomeCut::Result >(isCut);
+        data.CutStatus().AddCutResult< KTAwesomeCut::Result >(isCut);
         return isCut;
     }
 
@@ -71,7 +71,7 @@ namespace Nymph
         KTDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
         KTDEBUG(testlog, "Is data cut? " << isCut);
         // use the name-based AddCutResult
-        data.GetCutStatus().AddCutResult("not-awesome-cut", isCut);
+        data.CutStatus().AddCutResult("not-awesome-cut", isCut);
         return isCut;
     }
 

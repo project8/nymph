@@ -60,10 +60,10 @@ namespace Nymph
     {
         if (fAllBits)
         {
-            return data.GetCutStatus().IsCut();
+            return data.CutStatus().IsCut();
         }
 
-        KTCutStatus& cutStatus = data.GetCutStatus();
+        KTCutStatus& cutStatus = data.CutStatus();
         if (fConvertToBitset)
         {
             fCutMask = cutStatus.ToBitset(fCutMaskInt);
