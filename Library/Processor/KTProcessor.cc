@@ -60,25 +60,25 @@ namespace Nymph
         }
         catch( KTSignalException& e )
         {
-            e << KTErrorMsgInfo( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the signal." );
-            e << KTErrorMsgInfo( "You may have the signal name wrong." );
+            e << KTErrorMsgInfo< struct proc_Sig_0 >( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the signal." );
+            e << KTErrorMsgInfo< struct proc_Sig_1 >( "You may have the signal name wrong." );
             throw;
         }
         catch( KTSlotException& e )
         {
-            e << KTErrorMsgInfo( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the slot." );
-            e << KTErrorMsgInfo( "You may have the slot name wrong." );
+            e << KTErrorMsgInfo< struct proc_Slot_0 >( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the slot." );
+            e << KTErrorMsgInfo< struct proc_Slot_1 >( "You may have the slot name wrong." );
             throw;
         }
         catch( KTConnectionException& e )
         {
-            e << KTErrorMsgInfo( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem making the connection." );
-            e << KTErrorMsgInfo( "Check that the signatures of the signal and slot match exactly." );
+            e << KTErrorMsgInfo< struct proc_Conn_0 >( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem making the connection." );
+            e << KTErrorMsgInfo< struct proc_Conn_1 >( "Check that the signatures of the signal and slot match exactly." );
             throw;
         }
         catch( boost::exception& e )
         {
-            e << KTErrorMsgInfo( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> for an unknown reason." );
+            e << KTErrorMsgInfo< struct proc_Unkn >( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> for an unknown reason." );
             throw;
         }
 

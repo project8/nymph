@@ -20,6 +20,9 @@ namespace Nymph
 
     class KTThreadReference
     {
+        private:
+            typedef boost::unique_lock< boost::mutex > boost_unique_lock;
+
         public:
             KTThreadReference();
             KTThreadReference( const KTThreadReference& ) = delete;
@@ -49,8 +52,11 @@ namespace Nymph
 
             void RefreshDataPtrRet();
 
-            void SetContinueSignal( const boost::shared_future< void >& contSig );
             void SetInitiateBreakFunc( const std::function< void() >& initBreakFunc );
+            void SetWaitForContinueFunc( const std::function< void( boost_unique_lock& ) >& waitForContFunc );
+
+            boost::mutex& Mutex();
+            const boost::mutex& Mutex() const;
 
         public:
             MEMBERVARIABLEREF( std::string, Name );
@@ -61,7 +67,8 @@ namespace Nymph
             KTDataPtrReturn fDataPtrRet;
             boost::unique_future< KTDataPtr > fDataPtrRetFuture;
             std::function< void() > fInitiateBreakFunc;
-            boost::shared_future< void > fContinueSignal;
+            std::function< void( boost_unique_lock& ) > fWaitForContinueFunc;
+            boost::mutex fMutex;
     };
 
     inline void KTThreadReference::SetReturnException( boost::exception_ptr excPtr )
@@ -98,17 +105,28 @@ namespace Nymph
         return;
     }
 
-    inline void KTThreadReference::SetContinueSignal( const boost::shared_future< void >& contSig )
-    {
-        fContinueSignal = contSig;
-        return;
-    }
-
     inline void KTThreadReference::SetInitiateBreakFunc( const std::function< void() >& initBreakFunc )
     {
         fInitiateBreakFunc = initBreakFunc;
         return;
     }
+
+    inline void KTThreadReference::SetWaitForContinueFunc( const std::function< void( boost_unique_lock& ) >& waitForContFunc )
+    {
+        fWaitForContinueFunc = waitForContFunc;
+        return;
+    }
+
+    inline boost::mutex& KTThreadReference::Mutex()
+    {
+        return fMutex;
+    }
+
+    inline const boost::mutex& KTThreadReference::Mutex() const
+    {
+        return fMutex;
+    }
+
 
 #ifndef THROW_THREADREF_EXCEPTION
 #define THROW_THREADREF_EXCEPTION( ref, exc ) \

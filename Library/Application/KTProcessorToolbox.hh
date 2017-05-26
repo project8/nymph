@@ -85,6 +85,9 @@ namespace Nymph
     */
     class KTProcessorToolbox : public KTConfigurable
     {
+        private:
+            typedef boost::unique_lock< boost::mutex > boost_unique_lock;
+
         public:
             KTProcessorToolbox(const std::string& name = "processor-toolbox");
             virtual ~KTProcessorToolbox();
@@ -210,7 +213,7 @@ namespace Nymph
 
             void AsyncRun();
 
-            void WaitForContinue();
+            void WaitForContinue( boost_unique_lock& lock );
 
             /// Returns when processing is completed or a breakpoint is reached
             /// Throws a boost::exception if there's an error with the future object in use
@@ -236,15 +239,13 @@ namespace Nymph
             void StartSingleThreadedRun();
             void StartMultiThreadedRun();
 
-            // called from ThreadPacket::Break
+            // called from KTThreadReference::Break
             void InitiateBreak();
-            // called from ThreadPacket::Break
 
             std::vector< std::shared_ptr< KTThreadReference > > fThreadReferences;
-            boost::mutex fThreadReferencesMutex;
 
-            boost::promise< void > fContinueSignaler;
-            boost::shared_future< void > fMasterContSignal;
+            boost::condition_variable fContinueCV;
+            bool fDoContinue;
             boost::mutex fBreakContMutex;
 
             boost::thread* fDoRunThread;
@@ -300,9 +301,13 @@ namespace Nymph
         return;
     }
 
-    inline void KTProcessorToolbox::WaitForContinue()
+    inline void KTProcessorToolbox::WaitForContinue( boost_unique_lock& lock )
     {
-        fMasterContSignal.wait();
+        //fMasterContSignal.wait();
+        while( ! fDoContinue )
+        {
+            fContinueCV.wait( lock );
+        }
         return;
     }
 

@@ -9,6 +9,8 @@
 #ifndef KTEXCEPTION_HH_
 #define KTEXCEPTION_HH_
 
+#include "macros.hh"
+
 #include <boost/exception/all.hpp>
 
 #include <exception>
@@ -20,7 +22,10 @@ namespace Nymph
     struct KTMessageEnd {};
     static const KTMessageEnd eom = KTMessageEnd();
 
-    typedef boost::error_info<struct tag_errmsg, std::string> KTErrorMsgInfo;
+    //typedef boost::error_info<struct tag_errmsg, std::string> KTErrorMsgInfo;
+
+    template< class XLabel >
+    using KTErrorMsgInfo = boost::error_info< XLabel, std::string>;
 
     /*!
      @class KTException
@@ -47,7 +52,7 @@ namespace Nymph
       }
       catch( boost::exception& e )
       {
-          e << KTErrorMsgInfo( "Here's some information about the context in which the exception was thrown" );
+          e << KTErrorMsgInfo< struct UniqueLocationTag >( "Here's some information about the context in which the exception was thrown" );
           throw;
       }
 
@@ -82,11 +87,6 @@ namespace Nymph
             // adds the current contents of the message buffer as a KTErrorMsgInfo
             KTException& operator<<( const KTMessageEnd& eom );
 
-            // overload for KTErrorMsgInfo to make sure error messages are streamed correctly, and not via the template function
-            const KTException& operator<<( KTErrorMsgInfo& emi );
-
-            virtual const char* what() const throw();
-
         private:
             mutable std::string fMsgBuffer;
     };
@@ -116,15 +116,10 @@ namespace Nymph
     {
         if( ! fMsgBuffer.empty() )
         {
-            boost::operator<<( *this, KTErrorMsgInfo{ fMsgBuffer } );
+            boost::operator<<( *this, KTErrorMsgInfo< struct ExcpMsg >{ fMsgBuffer } );
             fMsgBuffer.clear();
         }
         return *this;
-    }
-
-    inline const KTException& KTException::operator<<( KTErrorMsgInfo& emi )
-    {
-        return boost::operator<<( *this, emi );
     }
 
 }

@@ -22,7 +22,8 @@ namespace Nymph
             fDataPtrRet(),
             fDataPtrRetFuture( fDataPtrRet.get_future() ),
             fInitiateBreakFunc( [](){return;} ),
-            fContinueSignal()
+            fWaitForContinueFunc( []( boost_unique_lock& ){return;} ),
+            fMutex()
     {
         if( ! fDataPtrRetFuture.valid() )
         {
@@ -38,7 +39,8 @@ namespace Nymph
             fDataPtrRet( std::move( orig.fDataPtrRet ) ),
             fDataPtrRetFuture( std::move( orig.fDataPtrRetFuture ) ),
             fInitiateBreakFunc( std::move( orig.fInitiateBreakFunc ) ),
-            fContinueSignal( std::move( orig.fContinueSignal ) )
+            fWaitForContinueFunc( std::move( orig.fWaitForContinueFunc ) ),
+            fMutex()
     {
         orig.fBreakFlag = false;
         orig.fCanceled = false;
@@ -52,7 +54,7 @@ namespace Nymph
         fDataPtrRet = std::move( orig.fDataPtrRet );
         fDataPtrRetFuture = std::move( orig.fDataPtrRetFuture );
         fInitiateBreakFunc = std::move( orig.fInitiateBreakFunc );
-        fContinueSignal = std::move( orig.fContinueSignal );
+        fWaitForContinueFunc = std::move( orig.fWaitForContinueFunc );
 
         orig.fBreakFlag = false;
         orig.fCanceled = false;
@@ -67,6 +69,7 @@ namespace Nymph
             KTDEBUG( trlog, "Initiating break (" << fName << ")" );
             fInitiateBreakFunc();
         }
+        boost_unique_lock lock( fMutex );
         if( fBreakFlag || doBreakpoint )
         {
             KTDEBUG( trlog, "Reacting to break (" << fName << ")" );
@@ -74,7 +77,7 @@ namespace Nymph
             KTWARN( trlog, "Setting value of data-ptr-ret promise (" << fName << ")" );
             fDataPtrRet.set_value( dataPtr );
             // wait for continue signal
-            fContinueSignal.wait();
+            fWaitForContinueFunc( lock );
         }
         return;
     }

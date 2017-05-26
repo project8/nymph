@@ -33,9 +33,8 @@ namespace Nymph
             fRunQueue(),
             fProcMap(),
             fThreadReferences(),
-            fThreadReferencesMutex(),
-            fContinueSignaler(),
-            fMasterContSignal(),
+            fContinueCV(),
+            fDoContinue( false ),
             fBreakContMutex(),
             fDoRunThread( nullptr ),
             fDoRunPromise(),
@@ -599,24 +598,13 @@ namespace Nymph
         {
             try
             {
-                // reset the continue signaler
-                fContinueSignaler = boost::promise< void >();
-                fMasterContSignal = fContinueSignaler.get_future().share();
-                if( ! fMasterContSignal.valid() )
-                {
-                    KTERROR( proclog, "Invalid master continue-signal created" );
-                    BOOST_THROW_EXCEPTION( KTException() << "Invalid master continue-signal created" << eom );
-                }
-                // copy for use in this function
-                boost::shared_future< void > continueSignal = fMasterContSignal;
-
                 KTPROG( proclog, "Starting single-threaded processing" );
 
                 for (RunQueue::iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
                 {
                     for (ThreadGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
                     {
-                        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadReferencesMutex );
+                        boost_unique_lock breakContLock( fBreakContMutex );
 
                         std::string procName( tgIter->fName );
                         KTINFO( proclog, "Starting processor <" << procName << ">" );
@@ -624,9 +612,8 @@ namespace Nymph
                         std::shared_ptr< KTThreadReference > thisThreadRef = std::make_shared< KTThreadReference >();
                         thisThreadRef->Name() = procName;
 
-                        thisThreadRef->SetContinueSignal( fMasterContSignal );
-
                         thisThreadRef->SetInitiateBreakFunc( [&](){ this->InitiateBreak(); } );
+                        thisThreadRef->SetWaitForContinueFunc( [&]( boost_unique_lock& lock ){ this->WaitForContinue( lock ); } );
 
                         fThreadReferences.push_back( thisThreadRef );
 
@@ -634,7 +621,7 @@ namespace Nymph
                         boost::mutex threadStartedMutex;
                         bool threadStartedFlag = false;
 
-                        boost::unique_lock< boost::mutex > threadStartedLock( threadStartedMutex );
+                        boost_unique_lock threadStartedLock( threadStartedMutex );
                         boost::thread thread( [&](){ tgIter->fProc->operator()( thisThreadRef, threadStartedCV, threadStartedFlag ); } );
                         KTDEBUG( proclog, "Thread ID is <" << thread.get_id() << ">; waiting for thread start" );
                         while( ! threadStartedFlag )
@@ -644,8 +631,6 @@ namespace Nymph
                         KTDEBUG( proclog, "Thread has started" );
 
                         KTDEBUG( proclog, "Thread ID is <" << thread.get_id() << ">" );
-
-                        threadFuturesLock.unlock();
 
                         bool stillRunning = true; // determines behavior that depends on whether a return from the thread was temporary or from the thread completing
                         do
@@ -660,10 +645,11 @@ namespace Nymph
                             if( fThreadReferences.back()->GetBreakFlag() )
                             {
                                 KTDEBUG( proclog, "Breakpoint reached (seen first in thread <" << procName << ">; may not be where breakpoint is set)" );
-                                continueSignal.wait();
+
+                                WaitForContinue( breakContLock );
+
                                 KTDEBUG( proclog, "Breakpoint finished" );
                                 stillRunning = true;
-                                continueSignal = fMasterContSignal; // refresh the local copy of the shared future
                             }
                             else
                             {
@@ -675,7 +661,7 @@ namespace Nymph
                                 }
                                 catch( boost::exception& e )
                                 {
-                                    e << KTErrorMsgInfo( "There was an error while finishing thread <" + procName + "> and retrieving its results" );
+                                    e << KTErrorMsgInfo< struct procTB_STRFinishing >( "There was an error while finishing thread <" + procName + "> and retrieving its results" );
                                     throw;
                                 }
                                 stillRunning = false;
@@ -720,17 +706,6 @@ namespace Nymph
         {
             try
             {
-                // reset the continue signaler
-                fContinueSignaler = boost::promise< void >();
-                fMasterContSignal = fContinueSignaler.get_future().share();
-                if( ! fMasterContSignal.valid() )
-                {
-                    KTERROR( proclog, "Invalid master continue-signal created" );
-                    BOOST_THROW_EXCEPTION( KTException() << "Invalid master continue-signal created" << eom );
-                }
-                // copy for use in this function
-                boost::shared_future< void > continueSignal = fMasterContSignal;
-
                 KTPROG( proclog, "Starting multi-threaded processing" );
 
                 for (RunQueue::iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
@@ -738,7 +713,8 @@ namespace Nymph
                     boost::thread_group threads;
 
                     { // scope for threadFuturesLock
-                        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadReferencesMutex );
+                        boost_unique_lock breakContLock( fBreakContMutex );
+                        //boost_unique_lock threadFuturesLock( fThreadReferencesMutex );
 
                         for (ThreadGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
                         {
@@ -748,16 +724,15 @@ namespace Nymph
                             std::shared_ptr< KTThreadReference > thisThreadRef = std::make_shared< KTThreadReference >();
                             thisThreadRef->Name() = procName;
 
-                            thisThreadRef->SetContinueSignal( fMasterContSignal );
-
                             thisThreadRef->SetInitiateBreakFunc( [&](){ this->InitiateBreak(); } );
+                            thisThreadRef->SetWaitForContinueFunc( [&]( boost_unique_lock& lock ){ this->WaitForContinue( lock ); } );
+                            fThreadReferences.push_back( thisThreadRef );
+
                             boost::condition_variable threadStartedCV;
                             boost::mutex threadStartedMutex;
                             bool threadStartedFlag = false;
 
-                            fThreadReferences.push_back( thisThreadRef );
-
-                            boost::unique_lock< boost::mutex > threadStartedLock( threadStartedMutex );
+                            boost_unique_lock threadStartedLock( threadStartedMutex );
                             boost::thread* thisThread = new boost::thread( [&](){ tgIter->fProc->operator()( thisThreadRef, threadStartedCV, threadStartedFlag ); } );
                             KTDEBUG( proclog, "Thread ID is <" << thisThread->get_id() << ">; waiting for thread start" );
                             while( ! threadStartedFlag )
@@ -774,41 +749,39 @@ namespace Nymph
                     bool stillRunning = true; // determines behavior that depends on whether a return from the thread was temporary or from the thread completing
                     do
                     {
-                        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadReferencesMutex );
                         auto finishedFuturePtr = boost::wait_for_any( KTThreadRefFutureIterator(fThreadReferences.begin()), KTThreadRefFutureIterator(fThreadReferences.end()) );
+                        boost_unique_lock breakContLock( fBreakContMutex );
+
                         size_t iThread = finishedFuturePtr - KTThreadRefFutureIterator(fThreadReferences.begin());
                         auto finishedReferencePtr = fThreadReferences.begin() + iThread;
                         std::string threadName( (*finishedReferencePtr)->Name() );
-                        //KTDEBUG( proclog, "Thread <" << iThread << " (" << threadName << ") > has stopped for some reason" );
-                        KTWARN( proclog, "Thread <" << iThread << " (" << threadName << ") > has stopped for some reason" ); // TODO: switch this back to DEBUG
+                        KTDEBUG( proclog, "Thread <" << iThread << " (" << threadName << ") > has stopped for some reason" );
 
                         stillRunning = false;
                         if( fDoRunBreakFlag )
                         {
                             // a breakpoint has been reached
-                            //KTDEBUG( proclog, "Breakpoint reached (seen first in thread <" << threadName << ">; may not be where breakpoint is set)" );
-                            KTWARN( proclog, "Breakpoint reached (seen first in thread <" << threadName << ">; may not be where breakpoint is set)" ); //TODO: switch this back to debug
-                            threadFuturesLock.unlock();
+                            KTDEBUG( proclog, "Breakpoint reached (seen first in thread <" << threadName << ">; may not be where breakpoint is set)" );
+
                             // wait here for the user to continue
-                            continueSignal.wait();
+                            WaitForContinue( breakContLock );
+
                             KTDEBUG( proclog, "Breakpoint finished" );
-                            boost::unique_lock< boost::mutex > breakContLock( fBreakContMutex );
                             stillRunning = true;
-                            continueSignal = fMasterContSignal; // refresh the local copy of the shared future
+                            //continueSignal = fMasterContSignal; // refresh the local copy of the shared future
                         }
                         else
                         {
                             // we're finished a thread; get its results
                             try
                             {
-                                //KTINFO( proclog, "Thread <" << threadName << "> has finished" );
-                                KTWARN( proclog, "Thread <" << threadName << "> has finished" ); // TODO: switch this back to INFO
+                                KTINFO( proclog, "Thread <" << threadName << "> has finished" );
                                 finishedFuturePtr->get();
                                 fThreadReferences.erase( finishedReferencePtr );
                             }
                             catch( boost::exception& e )
                             {
-                                e << KTErrorMsgInfo( "There was an error while finishing thread <" + threadName + "> and retrieving its results" );
+                                e << KTErrorMsgInfo< struct procTB_MTRFinishing >( "There was an error while finishing thread <" + threadName + "> and retrieving its results" );
                                 throw;
                             }
 
@@ -819,7 +792,7 @@ namespace Nymph
 
                     KTDEBUG( proclog, "Joining threads" );
                     threads.join_all();
-                    boost::unique_lock< boost::mutex > threadFuturesLock( fThreadReferencesMutex );
+                    boost_unique_lock breakContLock( fBreakContMutex );
                     fThreadReferences.clear();
                 } // end for loop over the run-queue
 
@@ -853,7 +826,7 @@ namespace Nymph
 
     bool KTProcessorToolbox::WaitForBreak()
     {
-        boost::unique_lock< boost::mutex > breakContLock( fBreakContMutex );
+        boost_unique_lock breakContLock( fBreakContMutex );
 
         if( fDoRunBreakFlag )
         {
@@ -899,7 +872,9 @@ namespace Nymph
         while( WaitForBreak() )
         {
             KTDEBUG( proclog, "Reached breakpoint; waiting for continue" );
-            WaitForContinue();
+            boost::mutex localMutex;
+            boost_unique_lock localLock( localMutex );
+            WaitForContinue( localLock );
             KTDEBUG( proclog, "Processing resuming; waiting for end-of-run" );
         }
         KTDEBUG( proclog, "End-of-run reached" );
@@ -915,15 +890,16 @@ namespace Nymph
             return;
         }
 
-        boost::unique_lock< boost::mutex > breakContLock( fBreakContMutex );
-        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadReferencesMutex );
+        boost_unique_lock breakContLock( fBreakContMutex );
 
         // reset all break flags
         fDoRunBreakFlag = false;
-        for( auto tiIt = fThreadReferences.begin(); tiIt != fThreadReferences.end(); ++tiIt )
+        std::vector< boost_unique_lock > trLocks;
+        for( auto trIt = fThreadReferences.begin(); trIt != fThreadReferences.end(); ++trIt )
         {
-            (*tiIt)->SetBreakFlag( false );
-            (*tiIt)->RefreshDataPtrRet();
+            trLocks.emplace_back( (*trIt)->Mutex() );
+            (*trIt)->SetBreakFlag( false );
+            (*trIt)->RefreshDataPtrRet();
         }
 
         // reset the do-run promise and future
@@ -932,51 +908,48 @@ namespace Nymph
 
         KTINFO( proclog, "Continuing from breakpoint" );
         // signal everything to resume
-        KTWARN( proclog, "Setting value of continue-signaler promise" );
-        fContinueSignaler.set_value();
-
-        // reset the signaler and all signals
-        // hopefully the delay of creating the new signaler and starting the for loop is enough that anything waiting on the old signal has already seen that signal and moved on
-        fContinueSignaler = boost::promise< void >();
-        fMasterContSignal = fContinueSignaler.get_future().share();
-        for( auto tiIt = fThreadReferences.begin(); tiIt != fThreadReferences.end(); ++tiIt )
-        {
-            (*tiIt)->SetContinueSignal( fMasterContSignal );
-        }
+        fDoContinue = true;
+        fContinueCV.notify_all();
 
         return;
     }
 
     KTDataPtr KTProcessorToolbox::GetData( const std::string& threadName )
     {
-        boost::unique_lock< boost::mutex > threadFuturesLock( fThreadReferencesMutex );
+        //boost_unique_lock threadFuturesLock( fThreadReferencesMutex );
+        boost_unique_lock breakContLock( fBreakContMutex );
 
-        auto tnIt = fThreadReferences.begin();
-        for( ; tnIt != fThreadReferences.end(); ++tnIt )
+        auto trIt = fThreadReferences.begin();
+        for( ; trIt != fThreadReferences.end(); ++trIt )
         {
-            if( (*tnIt)->Name() == threadName ) break;
+            if( (*trIt)->Name() == threadName ) break;
         }
-        if( tnIt == fThreadReferences.end() )
+        if( trIt == fThreadReferences.end() )
         {
             KTWARN( proclog, "Did not find thread <" << threadName << ">" );
             BOOST_THROW_EXCEPTION( KTException() << "Did not find thread <" << threadName << ">" << eom );
         }
 
-        return (*tnIt)->GetReturnValue();
+        boost_unique_lock lock( (*trIt)->Mutex() );
+        return (*trIt)->GetReturnValue();
     }
 
     void KTProcessorToolbox::InitiateBreak()
     {
-        boost::unique_lock< boost::mutex > breakContLock( fBreakContMutex );
+        boost_unique_lock breakContLock( fBreakContMutex );
         if( fDoRunBreakFlag ) return;
+
+        // set the continue flag to false so that things will wait for the continue
+        fDoContinue = false;
 
         // set all break flags
         // master break flag
         fDoRunBreakFlag = true;
         // thread break flags
-        for( auto tiIt = fThreadReferences.begin(); tiIt != fThreadReferences.end(); ++tiIt )
+        for( auto trIt = fThreadReferences.begin(); trIt != fThreadReferences.end(); ++trIt )
         {
-            (*tiIt)->SetBreakFlag( true );
+            boost_unique_lock lock( (*trIt)->Mutex() );
+            (*trIt)->SetBreakFlag( true );
         }
 
         // use the do-run promise to signal the break
@@ -988,10 +961,11 @@ namespace Nymph
 
     void KTProcessorToolbox::CancelThreads()
     {
-        boost::unique_lock< boost::mutex > breakContLock( fBreakContMutex );
-        for( auto tiIt = fThreadReferences.begin(); tiIt != fThreadReferences.end(); ++tiIt )
+        boost_unique_lock breakContLock( fBreakContMutex );
+        for( auto trIt = fThreadReferences.begin(); trIt != fThreadReferences.end(); ++trIt )
         {
-            (*tiIt)->SetCanceled( true );
+            boost_unique_lock lock( (*trIt)->Mutex() );
+            (*trIt)->SetCanceled( true );
         }
         return;
     }

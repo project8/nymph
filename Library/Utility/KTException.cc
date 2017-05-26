@@ -13,7 +13,7 @@ namespace Nymph
     KTException::KTException() :
             boost::exception(),
             std::exception(),
-            fMsgBuffer( "" )
+            fMsgBuffer()
     {
     }
     KTException::KTException( const KTException& an_exception ) :
@@ -25,16 +25,6 @@ namespace Nymph
 
     KTException::~KTException() throw ()
     {
-    }
-
-    const char* KTException::what() const throw ()
-    {
-        if( ! fMsgBuffer.empty() )
-        {
-            *this << KTErrorMsgInfo{ fMsgBuffer };
-            fMsgBuffer.clear();
-        }
-        return this->std::exception::what();
     }
 
 }

@@ -8,6 +8,8 @@
  */
 
 #include "KTTestProcessor.hh"
+
+#include "KTException.hh"
 #include "KTLogger.hh"
 
 #include <boost/thread.hpp>
@@ -72,6 +74,8 @@ int main()
         catch( boost::exception& e )
         {
             canceled = true;
+            //ADD_ERROR_MSG( e, "Added error message!" );
+            e << KTErrorMsgInfo< struct testEIS_GetRetVal >( "Added error message!" );
             KTERROR( testexclog, "An error occurred while running a processor: " << diagnostic_information( e ) );
         }
 
