@@ -9,9 +9,6 @@
 
 namespace Nymph
 {
-    SignalException::SignalException (std::string const& why)
-      : std::logic_error(why)
-    {}
 
     KTSignalWrapper::KTSignalWrapper() :
             fSignalWrapper(NULL)

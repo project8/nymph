@@ -28,9 +28,9 @@ namespace Nymph
             fTimeEnd(),
             fNDataProcessed(0)
     {
-        RegisterSlot("start", this, &KTThroughputProfiler::StartProfiling);
-        RegisterSlot("data", this, &KTThroughputProfiler::Data);
-        RegisterSlot("stop", this, &KTThroughputProfiler::Finish);
+        RegisterSlot("start", this, &KTThroughputProfiler::StartProfiling, {});
+        RegisterSlot("data", this, &KTThroughputProfiler::Data, {});
+        RegisterSlot("stop", this, &KTThroughputProfiler::Finish, {});
     };
 
     KTThroughputProfiler::~KTThroughputProfiler()

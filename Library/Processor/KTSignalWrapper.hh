@@ -23,12 +23,6 @@ namespace Nymph
         typedef typename boost::signals2::signal< Signature >::slot_type slot_type;
     };
 
-    class SignalException : public std::logic_error
-    {
-        public:
-            SignalException(std::string const& why);
-    };
-
     class KTSignalWrapper : public boost::noncopyable
     {
         public:
@@ -55,7 +49,7 @@ namespace Nymph
                         return fSignal;
                     }
                 private:
-                    XSignature* fSignal; //not owned by this KTSignalWrapper
+                    XSignature* fSignal; //not owned by this KTSpecifiedInternalSignalWrapper
             };
 
         public:

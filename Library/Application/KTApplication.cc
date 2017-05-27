@@ -70,11 +70,11 @@ namespace Nymph
             scarab::param* configFromFile = translator.read_file( configFilePath.native() );
             if( configFromFile == NULL )
             {
-                throw KTException() << "[KTApplication] error parsing config file";
+                BOOST_THROW_EXCEPTION( KTException() << "[KTApplication] error parsing config file" << eom );
             }
             if( ! configFromFile->is_node() )
             {
-                throw KTException() << "[KTApplication] configuration file must consist of an object/node";
+                BOOST_THROW_EXCEPTION( KTException() << "[KTApplication] configuration file must consist of an object/node" << eom );
             }
             fConfigurator->Merge( configFromFile->as_node() );
             delete configFromFile;
@@ -87,7 +87,7 @@ namespace Nymph
             scarab::param* configFromJSON = inputJSON.read_string( clJSON );
             if( ! configFromJSON->is_node() )
             {
-                throw KTException() << "[KTApplication] command line json must be an object";
+                BOOST_THROW_EXCEPTION( KTException() << "[KTApplication] command line json must be an object" << eom );
             }
             fConfigurator->Merge( configFromJSON->as_node() );
             delete configFromJSON;
@@ -99,7 +99,7 @@ namespace Nymph
             fConfigurator->Merge( *clConfigOverride );
         }
 
-        KTINFO( applog, "Final configuration:\n" << *(fConfigurator->Config()) );
+        KTINFO( applog, "Final configuration:\n" << fConfigurator->Config() );
 
         AddConfigOptionsToCLHandler(fConfigurator->Config(), "");
         fCLHandler->FinalizeNewOptionGroups();
@@ -122,37 +122,37 @@ namespace Nymph
         }
     }
 
-    void KTApplication::AddConfigOptionsToCLHandler(const scarab::param* param, const std::string& rootName)
+    void KTApplication::AddConfigOptionsToCLHandler(const scarab::param& param, const std::string& rootName)
     {
-    	if (param->is_null())
+    	if (param.is_null())
     	{
     		fCLHandler->AddOption("Config File Options", "Configuration flag: " + rootName, rootName, false);
     	}
-    	else if (param->is_value())
+    	else if (param.is_value())
     	{
     		fCLHandler->AddOption< string >("Config File Options", "Configuration value: " + rootName, rootName, false);
     	}
-    	else if (param->is_array())
+    	else if (param.is_array())
     	{
         	string nextRootName(rootName);
         	if (! rootName.empty() && rootName.back() != '.') nextRootName += ".";
 
-        	const scarab::param_array* paramArray = &param->as_array();
-    		unsigned arraySize = paramArray->size();
+        	const scarab::param_array& paramArray = param.as_array();
+    		unsigned arraySize = paramArray.size();
     		for (unsigned iParam = 0; iParam < arraySize; ++iParam)
     		{
-    			AddConfigOptionsToCLHandler(paramArray->at(iParam), nextRootName + std::to_string(iParam));
+    			AddConfigOptionsToCLHandler(paramArray.at(iParam), nextRootName + std::to_string(iParam));
     		}
     	}
-    	else if (param->is_node())
+    	else if (param.is_node())
     	{
         	string nextRootName(rootName);
         	if (! rootName.empty()) nextRootName += ".";
 
-        	const scarab::param_node* paramNode = &param->as_node();
-    		for (scarab::param_node::const_iterator nodeIt = paramNode->begin(); nodeIt != paramNode->end(); ++nodeIt)
+        	const scarab::param_node& paramNode = param.as_node();
+    		for (scarab::param_node::const_iterator nodeIt = paramNode.begin(); nodeIt != paramNode.end(); ++nodeIt)
     		{
-    			AddConfigOptionsToCLHandler(nodeIt->second, nextRootName + nodeIt->first);
+    			AddConfigOptionsToCLHandler(*nodeIt->second, nextRootName + nodeIt->first);
     		}
     	}
 

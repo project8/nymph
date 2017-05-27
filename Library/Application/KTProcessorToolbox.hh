@@ -10,14 +10,25 @@
 #define KTPROCESSORTOOLBOX_HH_
 
 #include "KTConfigurable.hh"
-//#include "KTNOFactory.hh"
+#include "KTMemberVariable.hh"
+#include "KTThreadReference.hh"
 
 #include "factory.hh"
+
+#define BOOST_THREAD_PROVIDES_FUTURE
+#include <boost/thread/future.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+
+#include <boost/iterator/iterator_adaptor.hpp>
+#include <boost/type_traits/is_convertible.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <deque>
 #include <initializer_list>
 #include <limits>
 #include <set>
+
 
 namespace Nymph
 {
@@ -47,6 +58,7 @@ namespace Nymph
 
      Available (nested) configuration values:
      <ul>
+         <li>run-single-threaded (bool) -- specify whether to run in single-threaded mode (will be ignored if the application has been compiled with the SINGLETHREADED flag set)
          <li>processors (array of objects) -- create a processor; each object in the array should consist of:
              <ul>
                  <li>type -- string specifying the processor type (matches the string given to the Registrar, which should be specified before the class implementation in each processor's .cc file).</li>
@@ -73,6 +85,9 @@ namespace Nymph
     */
     class KTProcessorToolbox : public KTConfigurable
     {
+        private:
+            typedef boost::unique_lock< boost::mutex > boost_unique_lock;
+
         public:
             KTProcessorToolbox(const std::string& name = "processor-toolbox");
             virtual ~KTProcessorToolbox();
@@ -90,12 +105,7 @@ namespace Nymph
             /// Configure processors from a json-encoding of their configurations
             bool ConfigureProcessors(const std::string& config);
 
-
-        public:
-            /// Process the run queue.
-            /// This will call Run() on all of the processors in the queue.
-            bool Run();
-
+            MEMBERVARIABLE( bool, RunSingleThreaded );
 
         private:
             struct ProcessorInfo
@@ -143,6 +153,18 @@ namespace Nymph
             /// Both processors should already have been added to the Toolbox
             bool MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName, int order = std::numeric_limits< int >::min());
 
+            /// Set a breakpoint on a slot
+            /// Slot string should be formatted as: [processor name]:[slot name]
+            bool SetBreakpoint(const std::string& slot);
+            /// Set a breakpoint on a slot
+            bool SetBreakpoint(const std::string& slotProcName, const std::string& slotName);
+
+            /// Remove a breakpoint from a slot
+            /// Slot string should be formatted as: [processor name]:[slot name]
+            bool RemoveBreakpoint(const std::string& slot);
+            /// Remove a breakpoint from a slot
+            bool RemoveBreakpoint(const std::string& slotProcName, const std::string& slotName);
+
         private:
             bool ParseSignalSlotName(const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot) const;
             static const char fSigSlotNameSep = ':';
@@ -171,12 +193,11 @@ namespace Nymph
                     Thread(KTPrimaryProcessor* proc, const std::string& name) : fProc(proc), fName(name)
                     {}
             };
-            //typedef std::set< KTPrimaryProcessor* > ThreadGroup;
             struct CompareThread
             {
                 bool operator() (const Thread& lhs, const Thread& rhs)
                 {
-                    return lhs.fName < rhs.fName;
+                    return lhs.fProc < rhs.fProc;
                 }
             };
             typedef std::set< Thread, CompareThread > ThreadGroup;
@@ -185,7 +206,88 @@ namespace Nymph
 
             RunQueue fRunQueue;
 
+        public:
+            /// Process the run queue.
+            /// This will call Run() on all of the processors in the queue.
+            bool Run();
+
+            void AsyncRun();
+
+            void WaitForContinue( boost_unique_lock& lock );
+
+            /// Returns when processing is completed or a breakpoint is reached
+            /// Throws a boost::exception if there's an error with the future object in use
+            /// If the return is true, processing can continue after the break
+            /// If the return is false, processing has ended (either normally or due to an error)
+            bool WaitForBreak();
+
+            void WaitForEndOfRun();
+
+            void Continue();
+
+            void CancelThreads();
+
+            void JoinRunThread();
+
+            KTDataPtr GetData( const std::string& threadName );
+
+        private:
+            friend class KTThreadReference;
+
+            typedef boost::shared_future< KTDataPtr > Future;
+
+            void StartSingleThreadedRun();
+            void StartMultiThreadedRun();
+
+            // called from KTThreadReference::Break
+            void InitiateBreak();
+
+            std::vector< std::shared_ptr< KTThreadReference > > fThreadReferences;
+
+            boost::condition_variable fContinueCV;
+            bool fDoContinue;
+            boost::mutex fBreakContMutex;
+
+            boost::thread* fDoRunThread;
+            boost::promise< void > fDoRunPromise;
+            boost::shared_future< void > fDoRunFuture;
+            bool fDoRunBreakFlag;
+
     };
+
+    template< class Value, class IIterator >
+    class KTThreadRefFutureIter : public boost::iterator_adaptor< KTThreadRefFutureIter< Value, IIterator >, IIterator, Value, boost::random_access_traversal_tag >
+    {
+        private:
+            // used for the conversion constructor below
+            struct enabler {};
+
+        public:
+            KTThreadRefFutureIter() :
+                    KTThreadRefFutureIter::iterator_adaptor_()
+            {}
+            KTThreadRefFutureIter( const IIterator& other ) :
+                    KTThreadRefFutureIter::iterator_adaptor_( other )
+            {}
+
+            // converts from Iterator to ConstIterator, but the enable_if business prevents converting from ConstIterator to Iterator
+            template< class OtherValue, class OtherIIterator >
+            KTThreadRefFutureIter( const KTThreadRefFutureIter< OtherValue, OtherIIterator > & other, typename boost::enable_if< boost::is_convertible< OtherValue, Value >, enabler >::type = enabler() ) :
+                    KTThreadRefFutureIter::iterator_adaptor_( other.base )
+            {}
+
+        private:
+            friend class boost::iterator_core_access;
+
+            Value& dereference() const
+            {
+                return (*(this->base_reference()))->GetDataPtrRetFuture();
+            }
+    };
+
+    typedef KTThreadRefFutureIter< boost::unique_future< KTDataPtr >, std::vector< std::shared_ptr< KTThreadReference > >::iterator > KTThreadRefFutureIterator;
+    typedef KTThreadRefFutureIter< const boost::unique_future< KTDataPtr >, std::vector< std::shared_ptr< KTThreadReference > >::const_iterator > KTThreadRefFutureConstIterator;
+
 
     inline void KTProcessorToolbox::PopBackOfRunQueue()
     {
@@ -199,7 +301,23 @@ namespace Nymph
         return;
     }
 
+    inline void KTProcessorToolbox::WaitForContinue( boost_unique_lock& lock )
+    {
+        //fMasterContSignal.wait();
+        while( ! fDoContinue )
+        {
+            fContinueCV.wait( lock );
+        }
+        return;
+    }
 
+    inline void KTProcessorToolbox::JoinRunThread()
+    {
+        if( fDoRunThread == nullptr ) return;
+        fDoRunThread->join();
+        delete fDoRunThread;
+        fDoRunThread = nullptr;
+    }
 
 } /* namespace Nymph */
 #endif /* KTPROCESSORTOOLBOX_HH_ */

@@ -25,7 +25,7 @@ namespace Nymph
             fAfterCutPassSignal("pass", this),
             fAfterCutFailSignal("fail", this)
     {
-        RegisterSlot("apply", this, &KTApplyCut::ApplyCut);
+        fApplyCutSW = RegisterSlot("apply", this, &KTApplyCut::ApplyCut, {"all", "pass", "fail"});
     }
 
     KTApplyCut::~KTApplyCut()
@@ -85,13 +85,17 @@ namespace Nymph
 
     void KTApplyCut::ApplyCut(KTDataPtr dataPtr)
     {
+        std::shared_ptr< KTThreadReference > ref = fApplyCutSW->GetThreadRef();
+
         if (fCut == NULL)
         {
-            KTERROR(cutlog, "No cut was specified");
+            THROW_THREADREF_EXCEPTION( ref, KTException() << "No cut was specified" );
             return;
         }
 
         bool cutFailed = fCut->Apply(dataPtr);
+
+        ref->Break( dataPtr, fApplyCutSW->GetDoBreakpoint() );
 
         if (cutFailed)
         {

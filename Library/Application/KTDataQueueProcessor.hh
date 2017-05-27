@@ -46,10 +46,12 @@ namespace Nymph
     class KTDataQueueProcessorTemplate : public KTPrimaryProcessor
     {
         public:
+            typedef void (XProcessorType::*FuncPtrType)(KTDataPtr);
+
             struct DataAndFunc
             {
                 KTDataPtr fData;
-                void (XProcessorType::*fFuncPtr)(KTDataPtr);
+                FuncPtrType fFuncPtr;
             };
 
             typedef KTConcurrentQueue< DataAndFunc > Queue;
@@ -76,14 +78,14 @@ namespace Nymph
         protected:
             Status fStatus;
 
-            //**************************************
-            // Derived Processor function pointer
-            //**************************************
+            //**********************************************
+            // Derived Processor function pointer (optional)
+            //**********************************************
         public:
-            void SetFuncPtr(void (XProcessorType::*ptr)(KTDataPtr));
+            void SetFuncPtr(FuncPtrType ptr);
 
         protected:
-            void (XProcessorType::*fFuncPtr)(KTDataPtr);
+            FuncPtrType fFuncPtr;
 
 
             //*********
@@ -109,9 +111,13 @@ namespace Nymph
             // Queueing functions for slots
             //*********
         protected:
-            /// Queue an data object
+            /// Queue an data object with a provided function
             /// Assumes ownership of the data; original shared pointer will be nullified
-            void DoQueueData(KTDataPtr& data, void (XProcessorType::*func)(KTDataPtr));
+            void DoQueueData(KTDataPtr& data, FuncPtrType func);
+
+            /// Queue an data object with fFuncPtr
+            /// Assumes ownership of the data; original shared pointer will be nullified
+            void DoQueueData(KTDataPtr& data);
 
             /// Queue a list of data objects
             /// Assumes ownership of all data objects and the list; original shared pointers will be nullified
@@ -129,7 +135,7 @@ namespace Nymph
             // Signals
             //*********
         protected:
-            KTSignalOneArg< void > fQueueDoneSignal;
+            KTSignalDone fQueueDoneSignal;
 
     };
 
@@ -145,6 +151,8 @@ namespace Nymph
      @brief Generic data queue for asynchronous processing
 
      @details
+     Asynchronously emits a signal for each data object it receives.
+     Allows the user to start an asynchronous chain of processors.
 
      Configuration name: "data-queue"
 
@@ -182,6 +190,7 @@ namespace Nymph
             /// Queue an data object; will emit data signal
             /// Assumes ownership of the data; original shared pointer will be nullified
             void QueueData(KTDataPtr& data);
+            KTSlotWrapper* fQueueDataSW;
 
             /// Queue a list of data objects; will emit data signal
             /// Assumes ownership of all data objects and the list; original shared pointers will be nullified
@@ -197,16 +206,16 @@ namespace Nymph
 
     template< class XProcessorType >
     KTDataQueueProcessorTemplate< XProcessorType >::KTDataQueueProcessorTemplate(const std::string& name) :
-            KTPrimaryProcessor(name),
+            KTPrimaryProcessor({"queue-done"}, name),
             fStatus(kStopped),
             fFuncPtr(NULL),
             fQueue(),
             fPopFromQueue(&KTConcurrentQueue< DataAndFunc >::wait_and_pop),
             fQueueDoneSignal("queue-done", this)
     {
-        RegisterSlot("use-timed-pop", this, &KTDataQueueProcessorTemplate< XProcessorType >::SwitchToTimedPop);
-        RegisterSlot("use-untimed-pop", this, &KTDataQueueProcessorTemplate< XProcessorType >::SwitchToUntimedPop);
-        RegisterSlot("use-single-pop", this, &KTDataQueueProcessorTemplate< XProcessorType >::SwitchToSinglePop);
+        RegisterSlot("use-timed-pop", this, &KTDataQueueProcessorTemplate< XProcessorType >::SwitchToTimedPop, {});
+        RegisterSlot("use-untimed-pop", this, &KTDataQueueProcessorTemplate< XProcessorType >::SwitchToUntimedPop, {});
+        RegisterSlot("use-single-pop", this, &KTDataQueueProcessorTemplate< XProcessorType >::SwitchToSinglePop, {});
     }
 
     template< class XProcessorType >
@@ -242,7 +251,7 @@ namespace Nymph
     }
 
     template< class XProcessorType >
-    void KTDataQueueProcessorTemplate< XProcessorType >::SetFuncPtr(void (XProcessorType::*ptr)(KTDataPtr))
+    void KTDataQueueProcessorTemplate< XProcessorType >::SetFuncPtr(FuncPtrType ptr)
     {
         fFuncPtr = ptr;
         return;
@@ -294,7 +303,7 @@ namespace Nymph
 
 
     template< class XProcessorType >
-    void KTDataQueueProcessorTemplate< XProcessorType >::DoQueueData(KTDataPtr& data, void (XProcessorType::*func)(KTDataPtr))
+    void KTDataQueueProcessorTemplate< XProcessorType >::DoQueueData(KTDataPtr& data, FuncPtrType func)
     {
         KTDEBUG(eqplog, "Queueing data");
         DataAndFunc daf;
@@ -302,6 +311,13 @@ namespace Nymph
         data.reset();
         daf.fFuncPtr = func;
         fQueue.push(daf);
+        return;
+    }
+
+    template< class XProcessorType >
+    void KTDataQueueProcessorTemplate< XProcessorType >::DoQueueData(KTDataPtr& data)
+    {
+        DoQueueData(data, fFuncPtr);
         return;
     }
 /*

@@ -23,9 +23,9 @@ namespace Nymph
     KTPrintDataStructure::KTPrintDataStructure(const std::string& name) :
             KTProcessor(name),
             fDataSignal("data", this),
-            fDataStructSlot("print-data", this, &KTPrintDataStructure::PrintDataStructure),
-            fCutStructSlot("print-cuts", this, &KTPrintDataStructure::PrintCutStructure),
-            fDataAndCutStructSlot("print-data-and-cuts", this, &KTPrintDataStructure::PrintDataAndCutStructure)
+            fDataStructSlot("print-data", this, &KTPrintDataStructure::PrintDataStructure, {"data"}),
+            fCutStructSlot("print-cuts", this, &KTPrintDataStructure::PrintCutStructure, {"data"}),
+            fDataAndCutStructSlot("print-data-and-cuts", this, &KTPrintDataStructure::PrintDataAndCutStructure, {"data"})
     {
     }
 
@@ -42,6 +42,9 @@ namespace Nymph
     {
         DoPrintDataStructure(dataPtr);
 
+        KTSlotWrapper* slotWrap = fDataStructSlot.GetSlotWrapper();
+        slotWrap->GetThreadRef()->Break( dataPtr, slotWrap->GetDoBreakpoint() );
+
         fDataSignal(dataPtr);
 
         return;
@@ -50,6 +53,9 @@ namespace Nymph
     void KTPrintDataStructure::PrintCutStructure(KTDataPtr dataPtr)
     {
         DoPrintCutStructure(dataPtr);
+
+        KTSlotWrapper* slotWrap = fCutStructSlot.GetSlotWrapper();
+        fCutStructSlot.GetSlotWrapper()->GetThreadRef()->Break( dataPtr, slotWrap->GetDoBreakpoint() );
 
         fDataSignal(dataPtr);
 
@@ -61,6 +67,9 @@ namespace Nymph
     {
         DoPrintDataStructure(dataPtr);
         DoPrintCutStructure(dataPtr);
+
+        KTSlotWrapper* slotWrap = fDataAndCutStructSlot.GetSlotWrapper();
+        fDataAndCutStructSlot.GetSlotWrapper()->GetThreadRef()->Break( dataPtr, slotWrap->GetDoBreakpoint() );
 
         fDataSignal(dataPtr);
 
@@ -91,7 +100,7 @@ namespace Nymph
     {
         std::stringstream printbuf;
 
-        KTCutStatus& cutStatus = dataPtr->GetCutStatus();
+        KTCutStatus& cutStatus = dataPtr->CutStatus();
         printbuf << "\n" << cutStatus;
 
         const KTCutResult* cutResult = cutStatus.CutResults();

@@ -9,6 +9,7 @@
 #ifndef KTCOMMANDLINEHANDLER_H_
 #define KTCOMMANDLINEHANDLER_H_
 
+#include "KTException.hh"
 #include "KTLogger.hh"
 
 #include "param.hh"
@@ -19,20 +20,12 @@ namespace po = boost::program_options;
 
 #include <map>
 #include <set>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace Nymph
 {
     KTLOGGER(utillog_clh, "KTCommandLineHandler.hh");
-
-    class CommandLineHandlerException : public std::logic_error
-    {
-        public:
-            CommandLineHandlerException(std::string const& why);
-    };
-
 
     /*!
      @class KTCommandLineHandler
@@ -287,7 +280,7 @@ namespace Nymph
         {
             KTWARN(utillog_clh, "Command line option <" << aCLOption << "> was not set!\n"
                    "Next time check whether it's set before calling this function.");
-            throw CommandLineHandlerException("Command line option " + aCLOption + " was not set!");
+            BOOST_THROW_EXCEPTION( KTException() << "Command line option " + aCLOption + " was not set!" << eom );
         }
         return fCommandLineVarMap[aCLOption].as< XReturnType >();
     }

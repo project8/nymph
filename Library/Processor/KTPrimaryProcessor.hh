@@ -10,7 +10,12 @@
 
 #include "KTProcessor.hh"
 
-#include "KTLogger.hh"
+#include "KTData.hh"
+#include "KTThreadReference.hh"
+
+#include <boost/thread/condition_variable.hpp>
+
+#include <atomic>
 
 namespace Nymph
 {
@@ -18,18 +23,31 @@ namespace Nymph
     class KTPrimaryProcessor : public KTProcessor
     {
         public:
-            KTPrimaryProcessor(const std::string& name = "default-primary-processor-name");
+            KTPrimaryProcessor( std::initializer_list< std::string > signals, const std::string& name = "default-primary-processor-name" );
             virtual ~KTPrimaryProcessor();
 
         public:
-            /// Callable function used by boost::thread
-            virtual void operator()();
+            /// Callable function used by std::thread
+            void operator()( std::shared_ptr< KTThreadReference > ref, boost::condition_variable& startedCV, bool& startedFlag );
 
-        public:
             /// Starts the  main action of the processor
             virtual bool Run() = 0;
 
+            std::shared_ptr< KTThreadReference > GetThreadRef();
+
+            MEMBERVARIABLE( bool, DoBreakpoint );
+
+        protected:
+            std::vector< std::string > fSignalsEmitted;
+
+            std::shared_ptr< KTThreadReference > fThreadRef;
+
     };
+
+    inline std::shared_ptr< KTThreadReference > KTPrimaryProcessor::GetThreadRef()
+    {
+        return fThreadRef;
+    }
 
 } /* namespace Nymph */
 #endif /* KTPRIMARYPROCESSOR_HH_ */

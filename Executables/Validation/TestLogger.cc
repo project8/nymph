@@ -10,14 +10,13 @@
 #include <exception>
 #include <iostream>
 
-using namespace Nymph;
-
 KTLOGGER(logger, "TestLogger")
 
 int main()
 {
     try
     {
+        KTTRACE(logger, "This is a TRACE message from Nymph");
         KTDEBUG(logger, "This is a DEBUG message from Nymph");
         KTINFO(logger, "This is an INFO message from Nymph");
         KTPROG(logger, "This is a PROG message from Nymph");

@@ -11,23 +11,20 @@ namespace Nymph
 {
 
     KTException::KTException() :
+            boost::exception(),
             std::exception(),
-            fException( "" )
+            fMsgBuffer()
     {
     }
     KTException::KTException( const KTException& an_exception ) :
-            std::exception(),
-            fException( an_exception.fException )
+            boost::exception( an_exception ),
+            std::exception( an_exception ),
+            fMsgBuffer( an_exception.fMsgBuffer )
     {
     }
 
     KTException::~KTException() throw ()
     {
-    }
-
-    const char* KTException::what() const throw ()
-    {
-        return fException.c_str();
     }
 
 }

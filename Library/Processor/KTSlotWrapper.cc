@@ -9,13 +9,12 @@
 
 namespace Nymph
 {
-    SlotException::SlotException (std::string const& why)
-      : std::logic_error(why)
-    {}
 
     KTSlotWrapper::KTSlotWrapper() :
             fSlotWrapper(NULL),
-            fConnection()
+            fConnection(),
+            fThreadRef(),
+            fDoBreakpoint(false)
     {
     }
 

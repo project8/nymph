@@ -61,8 +61,7 @@ namespace Nymph
     {
         if (fIsConfigured) return true;
 
-        scarab::param_node* node = KTConfigurator::get_instance()->Config();
-        if (! this->Configure(node))
+        if (! this->Configure(&KTConfigurator::get_instance()->Config()))
         {
             KTERROR(conflog, "An error occurred while configuring <" << fConfigName << ">");
             return false;
