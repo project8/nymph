@@ -26,7 +26,7 @@ namespace Nymph
 
             virtual const std::string& Name() const = 0;
 
-            MEMBERVARIABLE_PROTECTED(bool, State);
+            MEMBERVARIABLE(bool, State);
     };
 
     typedef KTExtensibleStructCore< KTCutResultCore > KTCutResult;

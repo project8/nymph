@@ -57,7 +57,7 @@ namespace Nymph
             MEMBERVARIABLE(unsigned, Counter);
             MEMBERVARIABLE(bool, LastData);
 
-            MEMBERVARIABLEREF(KTCutStatus, CutStatus);
+            MEMBERVARIABLE_REF(KTCutStatus, CutStatus);
 
         public:
             static const std::string sName;

@@ -59,7 +59,7 @@ namespace Nymph
             const boost::mutex& Mutex() const;
 
         public:
-            MEMBERVARIABLEREF( std::string, Name );
+            MEMBERVARIABLE_REF( std::string, Name );
             MEMBERVARIABLE( bool, BreakFlag );
             MEMBERVARIABLE( bool, Canceled );
 
