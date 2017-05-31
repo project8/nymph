@@ -77,7 +77,7 @@ namespace Nymph
             KTSignalWrapper* RegisterSignal(std::string name, XProcessor* signalPtr);
 
             template< class XTarget, typename XReturn, typename... XArgs >
-            KTSlotWrapper* RegisterSlot(std::string name, XTarget* target, XReturn (XTarget::* funcPtr)(XArgs...), std::initializer_list< std::string > signals);
+            KTSlotWrapper* RegisterSlot(std::string name, XTarget* target, XReturn (XTarget::* funcPtr)(XArgs...), std::initializer_list< std::string > signals = {});
 
             KTSignalWrapper* GetSignal(const std::string& name);
 
