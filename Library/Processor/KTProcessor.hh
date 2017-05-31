@@ -70,6 +70,8 @@ namespace Nymph
             /// For a slot that is called, update the slot's ThreadRef, and pass the update to any slots that get called by signals emitted by this slot
             void PassThreadRefUpdate(const std::string& slotName, std::shared_ptr< KTThreadReference > threadRef);
 
+            static void ConnectSignalToSlot(KTSignalWrapper* signal, KTSlotWrapper* slot, int groupNum=-1);
+
             void ConnectASlot(const std::string& signalName, KTProcessor* processor, const std::string& slotName, int groupNum=-1);
             void ConnectASignal(KTProcessor* processor, const std::string& signalName, const std::string& slotName, int groupNum=-1);
 
@@ -89,8 +91,6 @@ namespace Nymph
         protected:
             template< typename XReturn, typename... XArgs >
             void PassToConnProcs(const std::string& slotName, std::function< XReturn(XArgs...) > function, XArgs... args);
-
-            void ConnectSignalToSlot(KTSignalWrapper* signal, KTSlotWrapper* slot, int groupNum=-1);
 
             SignalMap fSignalMap;
 
