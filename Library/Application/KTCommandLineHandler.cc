@@ -26,10 +26,6 @@ namespace Nymph
 {
     KTLOGGER(utillog, "KTCommandLineHandler");
 
-    CommandLineHandlerException::CommandLineHandlerException (std::string const& why)
-      : std::logic_error(why)
-    {}
-
     KTCommandLineHandler::KTCommandLineHandler() :
             fExecutableName("NONE"),
             fPackageString(STRINGIFY_2(PACKAGE_STRING)),
@@ -273,19 +269,19 @@ namespace Nymph
 
                 size_t t_node_start_pos = 0;
                 size_t t_node_sep_pos = t_full_name.find_first_of( fNodeSeparator );
-                scarab::param_node* parentNode = &fConfigOverrideValues;
+                scarab::param_node& parentNode = fConfigOverrideValues;
                 while (t_node_sep_pos != string::npos)
                 {
                     string nodeName(t_full_name.substr(t_node_start_pos, t_node_sep_pos));
-                    if (parentNode->has(nodeName))
+                    if (parentNode.has(nodeName))
                     {
-                        parentNode = parentNode->node_at(nodeName);
+                        parentNode = parentNode.node_at(nodeName);
                     }
                     else
                     {
                         scarab::param_node* newChildNode = new scarab::param_node();
-                        parentNode->add(nodeName, newChildNode);
-                        parentNode = newChildNode;
+                        parentNode.add(nodeName, newChildNode);
+                        parentNode = *newChildNode;
                     }
                     t_node_start_pos = t_node_sep_pos + 1;
                     t_node_sep_pos = t_full_name.find_first_of(fNodeSeparator, t_node_start_pos);
@@ -298,7 +294,7 @@ namespace Nymph
 
                 //std::cout << "(parser) adding < " << t_name << "<" << t_type << "> > = <" << new_value.value() << ">" << std::endl;
 
-                parentNode->replace( valueName, new_value );
+                parentNode.replace( valueName, new_value );
 
                 continue;
             }
@@ -389,7 +385,7 @@ namespace Nymph
         {
             KTERROR(utillog, "Exception caught while performing initial CL parsing:\n"
                     << '\t' << e.what());
-            throw std::logic_error(e.what());
+            BOOST_THROW_EXCEPTION( KTException() << e.what() << eom );
         }
         // Save the remaining command-line options for later parsing (after the full option list has been populated)
         fCommandLineParseLater = po::collect_unrecognized(tParsedOpts.options, po::include_positional);

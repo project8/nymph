@@ -30,8 +30,8 @@ namespace Nymph
         public:
             void Merge(const scarab::param_node& aNode);
 
-            scarab::param_node* Config();
-            const scarab::param_node* Config() const;
+            scarab::param_node& Config();
+            const scarab::param_node& Config() const;
 
             template< typename XReturnType >
             XReturnType Get( const std::string& aName ) const;
@@ -50,25 +50,51 @@ namespace Nymph
     template< typename XReturnType >
     XReturnType KTConfigurator::Get( const std::string& aName ) const
     {
-        fParamBuffer = const_cast< scarab::param* >( fMasterConfig->at( aName ) );
-        if( fParamBuffer != NULL && fParamBuffer->is_value() )
+        try
         {
-            return fParamBuffer->as_value().get< XReturnType >();
+            fParamBuffer = &const_cast< scarab::param& >( fMasterConfig->at( aName ) );
+            if( fParamBuffer->is_value() )
+            {
+                return fParamBuffer->as_value().get< XReturnType >();
+            }
         }
-        throw KTException() << "configurator does not have a value for <" << aName << ">";
+        catch( std::exception& e )
+        {}
+        BOOST_THROW_EXCEPTION( KTException() << "configurator does not have a value for <" << aName << ">" << eom );
     }
 
     template< typename XReturnType >
     XReturnType KTConfigurator::Get( const std::string& aName, XReturnType aDefault ) const
     {
-        fParamBuffer = const_cast< scarab::param* >( fMasterConfig->at( aName ) );
-        if( fParamBuffer != NULL && fParamBuffer->is_value() )
+        try
         {
-            return fParamBuffer->as_value().get< XReturnType >();
+            fParamBuffer = &const_cast< scarab::param& >( fMasterConfig->at( aName ) );
+            if( fParamBuffer->is_value() )
+            {
+                return fParamBuffer->as_value().get< XReturnType >();
+            }
         }
+        catch( std::exception& e )
+        {}
         return aDefault;
-
     }
+
+    inline void KTConfigurator::Merge(const scarab::param_node& aNode)
+    {
+        fMasterConfig->merge(aNode);
+        return;
+    }
+
+    inline scarab::param_node& KTConfigurator::Config()
+    {
+        return *fMasterConfig;
+    }
+
+    inline const scarab::param_node& KTConfigurator::Config() const
+    {
+        return *fMasterConfig;
+    }
+
 
 
 } /* namespace Nymph */

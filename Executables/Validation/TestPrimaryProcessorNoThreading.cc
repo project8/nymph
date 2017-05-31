@@ -17,29 +17,29 @@ KTLOGGER( testpplog, "TestPrimaryProcessorNoThreading" )
 int main()
 {
 
-    KTTestPrimaryProcessor tpp;
-    KTTestProcessorB tp;
-
-    KTINFO( testpplog, "Connecting the-signal to first-slot" );
     try
     {
+        KTTestPrimaryProcessor tpp;
+        KTTestProcessorB tp;
+
+        KTINFO( testpplog, "Connecting the-signal to first-slot" );
         tpp.ConnectASlot( "the-signal", &tp, "first-slot", 20 );
+
+        KTINFO( testpplog, "Running the primary processor" )
+
+        if( ! tpp.Run() )
+        {
+            KTERROR( testpplog, "Something went wrong while running the primary processor" );
+            return -1;
+        }
+
+        KTINFO( testpplog, "Tests complete" );
     }
-    catch( std::exception& e )
+    catch( boost::exception& e )
     {
-        KTERROR( testpplog, "A problem occurred while connecting the signal and slots:\n" << e.what() );
+        KTERROR( testpplog, "An unexpected exception was caught: " << diagnostic_information( e ) );
         return -1;
     }
-
-    KTINFO( testpplog, "Running the primary processor" )
-
-    if( ! tpp.Run() )
-    {
-        KTERROR( testpplog, "Something went wrong while running the primary processor" );
-        return -1;
-    }
-
-    KTINFO( testpplog, "Tests complete" );
 
     return 0;
 }

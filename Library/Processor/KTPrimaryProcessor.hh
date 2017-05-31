@@ -28,25 +28,25 @@ namespace Nymph
 
         public:
             /// Callable function used by std::thread
-            void operator()( KTThreadReference&& ref, boost::condition_variable& startedCV, bool& startedFlag );
+            void operator()( std::shared_ptr< KTThreadReference > ref, boost::condition_variable& startedCV, bool& startedFlag );
 
             /// Starts the  main action of the processor
             virtual bool Run() = 0;
 
-            KTThreadReference* GetThreadRef();
+            std::shared_ptr< KTThreadReference > GetThreadRef();
 
             MEMBERVARIABLE( bool, DoBreakpoint );
 
         protected:
             std::vector< std::string > fSignalsEmitted;
 
-            KTThreadReference fThreadRef;
+            std::shared_ptr< KTThreadReference > fThreadRef;
 
     };
 
-    inline KTThreadReference* KTPrimaryProcessor::GetThreadRef()
+    inline std::shared_ptr< KTThreadReference > KTPrimaryProcessor::GetThreadRef()
     {
-        return &fThreadRef;
+        return fThreadRef;
     }
 
 } /* namespace Nymph */

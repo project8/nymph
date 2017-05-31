@@ -85,11 +85,11 @@ namespace Nymph
 
     void KTApplyCut::ApplyCut(KTDataPtr dataPtr)
     {
-        KTThreadReference* ref = fApplyCutSW->GetThreadRef();
+        std::shared_ptr< KTThreadReference > ref = fApplyCutSW->GetThreadRef();
 
         if (fCut == NULL)
         {
-            ref->fDataPtrRet.set_exception( std::make_exception_ptr( KTException() << "No cut was specified" ) );
+            THROW_THREADREF_EXCEPTION( ref, KTException() << "No cut was specified" );
             return;
         }
 

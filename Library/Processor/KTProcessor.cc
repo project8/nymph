@@ -18,11 +18,6 @@ namespace Nymph
 {
     //KTLOGGER(proclog, "KTProcessor");
 
-    ProcessorException::ProcessorException (std::string const& why)
-      : std::logic_error(why)
-    {}
-
-
     KTProcessor::KTProcessor(const string& name) :
             KTConfigurable(name),
             fSignalMap(),
@@ -45,25 +40,11 @@ namespace Nymph
         }
     }
 
-    void KTProcessor::PassThreadRefUpdate(const std::string& slotName, KTThreadReference* threadRef)
+    void KTProcessor::PassThreadRefUpdate(const std::string& slotName, std::shared_ptr< KTThreadReference > threadRef)
     {
-        // update the thread reference pointer for this slot
-        GetSlot(slotName)->SetThreadRef(threadRef);
-
-        // get the list of slot-to-signal connections for this slot
-        auto stsRange = fSlotToSigMap.equal_range(slotName);
-
-        // loop over signals called in the performance of slot slotName
-        for (SlotToSigMapCIt stsIt = stsRange.first; stsIt != stsRange.second; ++stsIt)
-        {
-            // loop over all processor:slots called by this signal
-            auto sigConnRange = fSigConnMap.equal_range(stsIt->second);
-            for (SigConnMapCIt sigConnIt = sigConnRange.first; sigConnIt != sigConnRange.second; ++sigConnIt)
-            {
-                // pass the update on to the connected-to processor
-                sigConnIt->second.first->PassThreadRefUpdate(sigConnIt->second.second, threadRef);
-            }
-        }
+        std::function< void(std::shared_ptr< KTThreadReference >) > funcObj = [this, &slotName](std::shared_ptr< KTThreadReference > ref){ GetSlot(slotName)->SetThreadRef(ref); };
+        PassToConnProcs(slotName, funcObj, threadRef);
+        return;
     }
 
     void KTProcessor::ConnectASlot(const std::string& signalName, KTProcessor* processor, const std::string& slotName, int groupNum)
@@ -77,14 +58,28 @@ namespace Nymph
             // make the connection
             ConnectSignalToSlot(signal, slot, groupNum);
         }
-        catch (std::exception& e)
+        catch( KTSignalException& e )
         {
-            string errorMsg = string("Exception caught in KTProcessor::ConnectASignal; signal: ") +
-                    signalName + string(", slot: ") + slotName + string("\n") + e.what() + string("\n") +
-                    string("\tIf the signal wrapper cannot be cast correctly, check that the signatures of the signal and slot match exactly.\n") +
-                    string("\tIf the signal pointer is NULL, you may have the signal name wrong.\n") +
-                    string("\tIf the slot pointer is NULL, you may have the slot name wrong.");
-            throw std::logic_error(errorMsg);
+            e << KTErrorMsgInfo< struct proc_Sig_0 >( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the signal." );
+            e << KTErrorMsgInfo< struct proc_Sig_1 >( "You may have the signal name wrong." );
+            throw;
+        }
+        catch( KTSlotException& e )
+        {
+            e << KTErrorMsgInfo< struct proc_Slot_0 >( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the slot." );
+            e << KTErrorMsgInfo< struct proc_Slot_1 >( "You may have the slot name wrong." );
+            throw;
+        }
+        catch( KTConnectionException& e )
+        {
+            e << KTErrorMsgInfo< struct proc_Conn_0 >( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem making the connection." );
+            e << KTErrorMsgInfo< struct proc_Conn_1 >( "Check that the signatures of the signal and slot match exactly." );
+            throw;
+        }
+        catch( boost::exception& e )
+        {
+            e << KTErrorMsgInfo< struct proc_Unkn >( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> for an unknown reason." );
+            throw;
         }
 
         // record the connection in the signal-connection map
@@ -97,13 +92,13 @@ namespace Nymph
 
     void KTProcessor::ConnectSignalToSlot(KTSignalWrapper* signal, KTSlotWrapper* slot, int groupNum)
     {
-        if (signal == NULL)
+        if (signal == nullptr)
         {
-            throw ProcessorException("Signal pointer was NULL");
+            BOOST_THROW_EXCEPTION( KTSignalException() << "Signal pointer was NULL" << eom );
         }
-        if (slot == NULL)
+        if (slot == nullptr)
         {
-            throw ProcessorException("Slot pointer was NULL");
+            BOOST_THROW_EXCEPTION( KTSlotException() << "Slot pointer was NULL" << eom );
         }
 
         slot->SetConnection(signal, groupNum);
@@ -138,7 +133,8 @@ namespace Nymph
         {
             return slot->GetDoBreakpoint();
         }
-        throw KTException() << "Slot <" << slotName << "> was not found";
+        BOOST_THROW_EXCEPTION( KTException() << "Slot <" << slotName << "> was not found" << eom );
+        return false;
     }
 
     void KTProcessor::SetDoBreakpoint(const std::string& slotName, bool flag)
@@ -148,7 +144,7 @@ namespace Nymph
         {
             return slot->SetDoBreakpoint(flag);
         }
-        throw KTException() << "Slot <" << slotName << "> was not found";
+        BOOST_THROW_EXCEPTION( KTException() << "Slot <" << slotName << "> was not found" << eom );
         return;
     }
 

@@ -30,11 +30,11 @@ namespace Nymph
 {
     KTLOGGER(processorlog, "KTProcessor.hh");
 
-    class ProcessorException : public std::logic_error
-    {
-        public:
-            ProcessorException(std::string const& why);
-    };
+    struct KTProcessorException : virtual public KTException
+    {};
+
+    struct KTSignalException : virtual public KTException {};
+    struct KTSlotException : virtual public KTException {};
 
     class KTThreadReference;
 
@@ -68,7 +68,9 @@ namespace Nymph
 
         public:
             /// For a slot that is called, update the slot's ThreadRef, and pass the update to any slots that get called by signals emitted by this slot
-            void PassThreadRefUpdate(const std::string& slotName, KTThreadReference* threadRef);
+            void PassThreadRefUpdate(const std::string& slotName, std::shared_ptr< KTThreadReference > threadRef);
+
+            static void ConnectSignalToSlot(KTSignalWrapper* signal, KTSlotWrapper* slot, int groupNum=-1);
 
             void ConnectASlot(const std::string& signalName, KTProcessor* processor, const std::string& slotName, int groupNum=-1);
             void ConnectASignal(KTProcessor* processor, const std::string& signalName, const std::string& slotName, int groupNum=-1);
@@ -77,7 +79,7 @@ namespace Nymph
             KTSignalWrapper* RegisterSignal(std::string name, XProcessor* signalPtr);
 
             template< class XTarget, typename XReturn, typename... XArgs >
-            KTSlotWrapper* RegisterSlot(std::string name, XTarget* target, XReturn (XTarget::* funcPtr)(XArgs...), std::initializer_list< std::string > signals);
+            KTSlotWrapper* RegisterSlot(std::string name, XTarget* target, XReturn (XTarget::* funcPtr)(XArgs...), std::initializer_list< std::string > signals = {});
 
             KTSignalWrapper* GetSignal(const std::string& name);
 
@@ -87,7 +89,8 @@ namespace Nymph
             void SetDoBreakpoint(const std::string& slotName, bool flag);
 
         protected:
-            void ConnectSignalToSlot(KTSignalWrapper* signal, KTSlotWrapper* slot, int groupNum=-1);
+            template< typename XReturn, typename... XArgs >
+            void PassToConnProcs(const std::string& slotName, std::function< XReturn(XArgs...) > function, XArgs... args);
 
             SignalMap fSignalMap;
 
@@ -131,6 +134,29 @@ namespace Nymph
     inline void KTProcessor::ConnectASignal(KTProcessor* processor, const std::string& signalName, const std::string& slotName, int groupNum)
     {
         processor->ConnectASlot(signalName, this, slotName, groupNum);
+        return;
+    }
+
+    template< typename XReturn, typename... XArgs >
+    void KTProcessor::PassToConnProcs(const std::string& slotName, std::function< XReturn(XArgs...) > function, XArgs... args)
+    {
+        // update this slot
+        function(args...);
+
+        // get the list of slot-to-signal connections for this slot
+        auto stsRange = fSlotToSigMap.equal_range(slotName);
+
+        // loop over signals called in the performance of slot slotName
+        for (SlotToSigMapCIt stsIt = stsRange.first; stsIt != stsRange.second; ++stsIt)
+        {
+            // loop over all processor:slots called by this signal
+            auto sigConnRange = fSigConnMap.equal_range(stsIt->second);
+            for (SigConnMapCIt sigConnIt = sigConnRange.first; sigConnIt != sigConnRange.second; ++sigConnIt)
+            {
+                // pass the update on to the connected-to processor
+                sigConnIt->second.first->PassToConnProcs(sigConnIt->second.second, function, args...);
+            }
+        }
         return;
     }
 

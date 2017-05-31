@@ -100,7 +100,7 @@ namespace Nymph
     {
         std::stringstream printbuf;
 
-        KTCutStatus& cutStatus = dataPtr->GetCutStatus();
+        KTCutStatus& cutStatus = dataPtr->CutStatus();
         printbuf << "\n" << cutStatus;
 
         const KTCutResult* cutResult = cutStatus.CutResults();

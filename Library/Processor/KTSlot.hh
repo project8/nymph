@@ -269,13 +269,13 @@ namespace Nymph
     {
         // Standard data slot pattern:
 
-        KTThreadReference* ref = fSlotWrapper->GetThreadRef();
+        std::shared_ptr< KTThreadReference > ref = fSlotWrapper->GetThreadRef();
 
         // Check to ensure that the required data type is present
         if( ! DataPresent< XDataTypes... >( dataPtr ) )
         {
             KTERROR( slotlog, "Failed to find all of the necessary data types in slot <" << fName << ">. Aborting." );
-            THROW_RETURN_EXCEPTION( ref->fDataPtrRet, KTException() << "Failed to find all of the necessary data types in slot <" << fName << ">. Aborting." );
+            THROW_THREADREF_EXCEPTION( ref, KTException() << "Failed to find all of the necessary data types in slot <" << fName << ">. Aborting." );
             return;
         }
 
@@ -283,7 +283,7 @@ namespace Nymph
         if( ! fFunc( dataPtr->Of< XDataTypes >()... ) )
         {
             KTERROR( slotlog, "Something went wrong in slot <" << fName << ">. Aborting." );
-            THROW_RETURN_EXCEPTION( ref->fDataPtrRet, KTException() << "Something went wrong in slot <" << fName << ">. Aborting." );
+            THROW_THREADREF_EXCEPTION( ref, KTException() << "Something went wrong in slot <" << fName << ">. Aborting." );
             return;
         }
 

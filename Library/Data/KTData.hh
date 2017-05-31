@@ -13,9 +13,6 @@
 #include "KTCutStatus.hh"
 #include "KTMemberVariable.hh"
 
-#include <boost/thread/future.hpp>
-
-//#include <future>
 #include <memory>
 #include <string>
 
@@ -60,25 +57,13 @@ namespace Nymph
             MEMBERVARIABLE(unsigned, Counter);
             MEMBERVARIABLE(bool, LastData);
 
-            MEMBERVARIABLEREF_NOSET(KTCutStatus, CutStatus);
-            // additional non-const get function
-            KTCutStatus& GetCutStatus();
+            MEMBERVARIABLE_REF(KTCutStatus, CutStatus);
 
         public:
             static const std::string sName;
     };
 
-    inline KTCutStatus& KTData::GetCutStatus()
-    {
-        return fCutStatus;
-    }
-
     typedef std::shared_ptr< KTData > KTDataPtr;
-
-    typedef boost::promise< KTDataPtr > KTDataPtrReturn;
-
-#define THROW_RETURN_EXCEPTION( ret_promise, exception ) \
-    ret_promise.set_exception( std::make_exception_ptr( exception ) );
 
 } /* namespace Nymph */
 #endif /* KTDATA_HH_ */

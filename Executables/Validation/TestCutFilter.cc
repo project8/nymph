@@ -21,7 +21,7 @@ int main()
     KTDataPtr dataPtr(new KTData());
     KTTestData& testData = dataPtr->Of< KTTestData >();
 
-    KTCutStatus& cutStatus = dataPtr->GetCutStatus();
+    KTCutStatus& cutStatus = dataPtr->CutStatus();
     KTINFO(testlog, "Initial cut state: " << cutStatus.IsCut());
 
     KTApplyCut applyCut;

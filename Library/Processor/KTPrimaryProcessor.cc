@@ -27,9 +27,9 @@ namespace Nymph
     {
     }
 
-    void KTPrimaryProcessor::operator ()( KTThreadReference&& ref, boost::condition_variable& startedCV, bool& startedFlag )
+    void KTPrimaryProcessor::operator ()( std::shared_ptr< KTThreadReference > ref, boost::condition_variable& startedCV, bool& startedFlag )
     {
-        fThreadRef = std::move( ref );
+        fThreadRef = ref;
 
         // pass updated thread reference to downstream slots
         for( auto sigIt = fSignalsEmitted.begin(); sigIt != fSignalsEmitted.end(); ++sigIt )
@@ -39,7 +39,7 @@ namespace Nymph
             for( SigConnMapCIt sigConnIt = sigConnRange.first; sigConnIt != sigConnRange.second; ++sigConnIt )
             {
                 // pass the update on to the connected-to processor
-                sigConnIt->second.first->PassThreadRefUpdate( sigConnIt->second.second, &fThreadRef );
+                sigConnIt->second.first->PassThreadRefUpdate( sigConnIt->second.second, fThreadRef );
             }
         }
 
@@ -52,16 +52,16 @@ namespace Nymph
             if( ! Run() )
             {
                 KTERROR( proclog, "An error occurred during processor running." );
-                THROW_RETURN_EXCEPTION( fThreadRef.fDataPtrRet, KTException() << "An error occurred during processor running" );
+                THROW_THREADREF_EXCEPTION( fThreadRef, KTException() << "An error occurred during processor running" );
             }
             else
             {
-                fThreadRef.fDataPtrRet.set_value( KTDataPtr() );
+                fThreadRef->SetReturnValue( KTDataPtr() );
             }
         }
-        catch( ... )
+        catch( boost::exception& e )
         {
-            fThreadRef.fDataPtrRet.set_exception( std::current_exception() );
+            fThreadRef->SetReturnException( boost::current_exception() );
         }
         return;
     }

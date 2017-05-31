@@ -20,6 +20,10 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 
+#include <boost/iterator/iterator_adaptor.hpp>
+#include <boost/type_traits/is_convertible.hpp>
+#include <boost/utility/enable_if.hpp>
+
 #include <deque>
 #include <initializer_list>
 #include <limits>
@@ -81,6 +85,9 @@ namespace Nymph
     */
     class KTProcessorToolbox : public KTConfigurable
     {
+        private:
+            typedef boost::unique_lock< boost::mutex > boost_unique_lock;
+
         public:
             KTProcessorToolbox(const std::string& name = "processor-toolbox");
             virtual ~KTProcessorToolbox();
@@ -206,11 +213,12 @@ namespace Nymph
 
             void AsyncRun();
 
-            void WaitForContinue();
+            void WaitForContinue( boost_unique_lock& lock );
 
             /// Returns when processing is completed or a breakpoint is reached
-            /// Throws an exception if an error occurred during processing
+            /// Throws a boost::exception if there's an error with the future object in use
             /// If the return is true, processing can continue after the break
+            /// If the return is false, processing has ended (either normally or due to an error)
             bool WaitForBreak();
 
             void WaitForEndOfRun();
@@ -226,25 +234,18 @@ namespace Nymph
         private:
             friend class KTThreadReference;
 
-            typedef boost::unique_future< KTDataPtr > Future;
+            typedef boost::shared_future< KTDataPtr > Future;
 
-            // called from ThreadPacket::Break
+            void StartSingleThreadedRun();
+            void StartMultiThreadedRun();
+
+            // called from KTThreadReference::Break
             void InitiateBreak();
-            // called from ThreadPacket::Break
-            void TakeFuture( const std::string& name, Future&& future );
 
-            typedef std::vector< Future > ThreadFutures;
-            typedef std::vector< std::string > ThreadNames;
+            std::vector< std::shared_ptr< KTThreadReference > > fThreadReferences;
 
-            ThreadFutures fThreadFutures;
-            ThreadNames fThreadNames;
-            boost::mutex fThreadFuturesMutex;
-
-            typedef std::vector< std::shared_ptr< KTThreadIndicator > > ThreadIndicators;
-            ThreadIndicators fThreadIndicators;
-
-            boost::promise< void > fContinueSignaler;
-            boost::shared_future< void > fMasterContSignal;
+            boost::condition_variable fContinueCV;
+            bool fDoContinue;
             boost::mutex fBreakContMutex;
 
             boost::thread* fDoRunThread;
@@ -253,6 +254,40 @@ namespace Nymph
             bool fDoRunBreakFlag;
 
     };
+
+    template< class Value, class IIterator >
+    class KTThreadRefFutureIter : public boost::iterator_adaptor< KTThreadRefFutureIter< Value, IIterator >, IIterator, Value, boost::random_access_traversal_tag >
+    {
+        private:
+            // used for the conversion constructor below
+            struct enabler {};
+
+        public:
+            KTThreadRefFutureIter() :
+                    KTThreadRefFutureIter::iterator_adaptor_()
+            {}
+            KTThreadRefFutureIter( const IIterator& other ) :
+                    KTThreadRefFutureIter::iterator_adaptor_( other )
+            {}
+
+            // converts from Iterator to ConstIterator, but the enable_if business prevents converting from ConstIterator to Iterator
+            template< class OtherValue, class OtherIIterator >
+            KTThreadRefFutureIter( const KTThreadRefFutureIter< OtherValue, OtherIIterator > & other, typename boost::enable_if< boost::is_convertible< OtherValue, Value >, enabler >::type = enabler() ) :
+                    KTThreadRefFutureIter::iterator_adaptor_( other.base )
+            {}
+
+        private:
+            friend class boost::iterator_core_access;
+
+            Value& dereference() const
+            {
+                return (*(this->base_reference()))->GetDataPtrRetFuture();
+            }
+    };
+
+    typedef KTThreadRefFutureIter< boost::unique_future< KTDataPtr >, std::vector< std::shared_ptr< KTThreadReference > >::iterator > KTThreadRefFutureIterator;
+    typedef KTThreadRefFutureIter< const boost::unique_future< KTDataPtr >, std::vector< std::shared_ptr< KTThreadReference > >::const_iterator > KTThreadRefFutureConstIterator;
+
 
     inline void KTProcessorToolbox::PopBackOfRunQueue()
     {
@@ -266,16 +301,13 @@ namespace Nymph
         return;
     }
 
-    inline void KTProcessorToolbox::WaitForContinue()
+    inline void KTProcessorToolbox::WaitForContinue( boost_unique_lock& lock )
     {
-        fMasterContSignal.wait();
-        return;
-    }
-
-    inline void KTProcessorToolbox::TakeFuture( const std::string& name, Future&& future )
-    {
-        fThreadFutures.push_back( std::move( future ) );
-        fThreadNames.push_back( name );
+        //fMasterContSignal.wait();
+        while( ! fDoContinue )
+        {
+            fContinueCV.wait( lock );
+        }
         return;
     }
 

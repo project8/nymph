@@ -53,7 +53,7 @@ namespace Nymph
             bool Apply(KTData& data, KTTestData& testData)
             {
                 bool isCut = ! testData.GetIsAwesome();
-                data.GetCutStatus().AddCutResult< KTAwesomeCut::Result >(isCut);
+                data.CutStatus().AddCutResult< KTAwesomeCut::Result >(isCut);
                 return isCut;
             }
 
@@ -90,7 +90,7 @@ namespace Nymph
             {
                 bool isCut = testData.GetIsAwesome();
                 // use the name-based AddCutResult
-                data.GetCutStatus().AddCutResult("not-awesome-cut", isCut);
+                data.CutStatus().AddCutResult("not-awesome-cut", isCut);
                 return isCut;
             }
 
