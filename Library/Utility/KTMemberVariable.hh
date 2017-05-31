@@ -66,25 +66,31 @@
 #define MEMBERVARIABLE_NOSET                   mv_accessible_noset
 #define MEMBERVARIABLE_STATIC                  mv_accessible_static
 #define MEMBERVARIABLE_STATIC_NOSET            mv_accessible_static_noset
+#define MEMBERVARIABLE_MUTABLE                 mv_accessible_mutable
+#define MEMBERVARIABLE_MUTABLE_NOSET           mv_accessible_mutable_noset
 
 #define MEMBERVARIABLE_REF                     mv_referrable
 #define MEMBERVARIABLE_REF_CONST               mv_referrable_const
 #define MEMBERVARIABLE_REF_STATIC              mv_referrable_static
-#define MEMBERVARIABLE_REF_STATIC_CONST        mv_referrable_static_const
+#define MEMBERVARIABLE_REF_MUTABLE             mv_referrable_mutable
 
 #define MEMBERVARIABLE_PTR                     mv_assignable
 #define MEMBERVARIABLE_PTR_NOSET               mv_assignable_noset
 #define MEMBERVARIABLE_PTR_STATIC              mv_assignable_static
 #define MEMBERVARIABLE_PTR_STATIC_NOSET        mv_assignable_static_noset
+#define MEMBERVARIABLE_PTR_MUTABLE             mv_assignable_mutable
+#define MEMBERVARIABLE_PTR_MUTABLE_NOSET       mv_assignable_mutable_noset
 
 #define MEMBERVARIABLE_SHARED_PTR              mv_shared_ptr
-#define MEMBERVARIABLE_SHARED_PTR_NOSET        mv_shared_ptr_noset
+#define MEMBERVARIABLE_SHARED_PTR_CONST        mv_shared_ptr_const
 #define MEMBERVARIABLE_SHARED_PTR_STATIC       mv_shared_ptr_static
-#define MEMBERVARIABLE_SHARED_PTR_STATIC_NOSET mv_shared_ptr_static_noset
+#define MEMBERVARIABLE_SHARED_PTR_MUTABLE      mv_shared_ptr_mutable
 
 #define MEMBERVARIABLE_ATOMIC                  mv_atomic
 #define MEMBERVARIABLE_ATOMIC_NOSET            mv_atomic_noset
 #define MEMBERVARIABLE_ATOMIC_STATIC           mv_atomic_static
 #define MEMBERVARIABLE_ATOMIC_STATIC_NOSET     mv_atomic_static_noset
+#define MEMBERVARIABLE_ATOMIC_MUTABLE          mv_atomic_mutable
+#define MEMBERVARIABLE_ATOMIC_MUTABLE_NOSET    mv_atomic_mutable_noset
 
 #endif /* KTMEMBERVARIABLE_HH_ */
