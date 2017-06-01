@@ -45,11 +45,11 @@ namespace Nymph
 
             // any remaining should be cut names
             // ignore any that don't work
-            if (SelectCut(nodeIt->first))
+            if (SelectCut(nodeIt.name()))
             {
-                if (nodeIt->second->is_node())
+                if (nodeIt->is_node())
                 {
-                    fCut->Configure(&nodeIt->second->as_node());
+                    fCut->Configure(&nodeIt->as_node());
                 }
                 continue;
             }

@@ -67,12 +67,12 @@ namespace Nymph
             const scarab::param_array& procArray = node->array_at( "processors" );
             for( scarab::param_array::const_iterator procIt = procArray.begin(); procIt != procArray.end(); ++procIt )
             {
-                if( ! (*procIt)->is_node() )
+                if( ! procIt->is_node() )
                 {
                     KTERROR( proclog, "Invalid processor entry: not a node" );
                     return false;
                 }
-                const scarab::param_node* procNode = &( (*procIt)->as_node() );
+                const scarab::param_node* procNode = &( procIt->as_node() );
 
                 if (! procNode->has("type"))
                 {
@@ -118,12 +118,12 @@ namespace Nymph
             const scarab::param_array& connArray = node->array_at( "connections" );
             for( scarab::param_array::const_iterator connIt = connArray.begin(); connIt != connArray.end(); ++connIt )
             {
-                if( ! (*connIt)->is_node() )
+                if( ! connIt->is_node() )
                 {
                     KTERROR( proclog, "Invalid connection entry: not a node" );
                     return false;
                 }
-                const scarab::param_node* connNode = &( (*connIt)->as_node() );
+                const scarab::param_node* connNode = &( connIt->as_node() );
 
                 if ( ! connNode->has("signal") || ! connNode->has("slot") )
                 {
@@ -190,27 +190,27 @@ namespace Nymph
             const scarab::param_array& rqArray = node->array_at( "run-queue" );
             for (scarab::param_array::const_iterator rqIt = rqArray.begin(); rqIt != rqArray.end(); ++rqIt)
             {
-                if ((*rqIt)->is_value())
+                if (rqIt->is_value())
                 {
-                    if (! PushBackToRunQueue((*rqIt)->as_value().as_string()))
+                    if (! PushBackToRunQueue(rqIt->as_value().as_string()))
                     {
                         KTERROR(proclog, "Unable to process run-queue entry: could not add processor to the queue");
                         return false;
                     }
                 }
-                else if ((*rqIt)->is_array())
+                else if (rqIt->is_array())
                 {
-                    const scarab::param_array* rqNode = &( (*rqIt)->as_array() );
+                    const scarab::param_array* rqNode = &( rqIt->as_array() );
                     std::vector< std::string > names;
 
                     for (scarab::param_array::const_iterator rqArrayIt = rqNode->begin(); rqArrayIt != rqNode->end(); ++rqArrayIt)
                     {
-                        if (! (*rqArrayIt)->is_value())
+                        if (! rqArrayIt->is_value())
                         {
                             KTERROR(proclog, "Invalid run-queue array entry: not a value");
                             return false;
                         }
-                        names.push_back((*rqArrayIt)->as_value().as_string());
+                        names.push_back(rqArrayIt->as_value().as_string());
                     }
 
                     if (! PushBackToRunQueue(names))
