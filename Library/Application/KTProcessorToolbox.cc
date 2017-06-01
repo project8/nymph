@@ -192,7 +192,7 @@ namespace Nymph
             {
                 if (rqIt->is_value())
                 {
-                    if (! PushBackToRunQueue(rqIt->as_value().as_string()))
+                    if (! PushBackToRunQueue((*rqIt)().as_string()))
                     {
                         KTERROR(proclog, "Unable to process run-queue entry: could not add processor to the queue");
                         return false;
@@ -210,7 +210,7 @@ namespace Nymph
                             KTERROR(proclog, "Invalid run-queue array entry: not a value");
                             return false;
                         }
-                        names.push_back(rqArrayIt->as_value().as_string());
+                        names.push_back((*rqArrayIt)().as_string());
                     }
 
                     if (! PushBackToRunQueue(names))
