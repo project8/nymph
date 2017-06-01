@@ -15,6 +15,7 @@ if (Nymph_ENABLE_TESTING)
     set (VALIDATION_HEADERFILES
         KTTestConfigurable.hh
         KTTestCuts.hh
+        KTTestData.hh
         KTTestPrimaryProcessor.hh
         KTTestProcessor.hh
     )
@@ -22,6 +23,7 @@ if (Nymph_ENABLE_TESTING)
     set (VALIDATION_SOURCEFILES
         KTTestConfigurable.cc
         KTTestCuts.cc
+        KTTestData.cc
         KTTestPrimaryProcessor.cc
         KTTestProcessor.cc
     )

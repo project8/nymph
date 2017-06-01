@@ -9,6 +9,7 @@
 
 #include "KTApplyCut.hh"
 #include "KTLogger.hh"
+#include "KTTestData.hh"
 
 KTLOGGER(testlog, "TestApplyCut");
 

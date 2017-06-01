@@ -10,6 +10,8 @@
 #include "KTException.hh"
 #include "KTLogger.hh"
 
+#include "KTTestData.hh"
+
 namespace Nymph
 {
     KTLOGGER(testsiglog, "KTTestProcessor")
@@ -100,5 +102,28 @@ namespace Nymph
         return;
     }
 
+
+    KT_REGISTER_PROCESSOR(KTTestProcessorD, "test-proc-d");
+
+    KTTestProcessorD::KTTestProcessorD( const std::string& name ) :
+            KTProcessor( name ),
+            fSlot("test-data", this, &KTTestProcessorD::SlotFunc, {})
+    {
+    }
+
+    KTTestProcessorD::~KTTestProcessorD()
+    {
+    }
+
+    bool KTTestProcessorD::Configure(const scarab::param_node*)
+    {
+        return true;
+    }
+
+    bool KTTestProcessorD::SlotFunc(KTTestData& data)
+    {
+        KTINFO(testsiglog, "Is the data awesome? " << data.GetIsAwesome());
+        return true;
+    }
 
 } /* namespace Nymph */

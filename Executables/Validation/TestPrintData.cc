@@ -7,30 +7,14 @@
 
 #include "KTCut.hh"
 #include "KTLogger.hh"
-#include "KTMemberVariable.hh"
 #include "KTPrintDataStructure.hh"
+#include "KTTestData.hh"
 
 #include "param.hh"
 
 namespace Nymph
 {
     KTLOGGER(testlog, "TestPrintData");
-
-    class KTTestData : public KTExtensibleData< KTTestData >
-    {
-        public:
-            KTTestData() :
-                KTExtensibleData< KTTestData >(),
-                fIsAwesome(false)
-            {}
-            virtual ~KTTestData() {}
-
-            MEMBERVARIABLE(bool, IsAwesome);
-
-        public:
-            static const std::string sName;
-
-    };
 
     // Cuts data that is NOT awesome
     class KTAwesomeCut : public KTCut
@@ -105,8 +89,6 @@ namespace Nymph
             }
     };
 
-
-    const std::string KTTestData::sName = "test-data";
 
     const std::string KTAwesomeCut::Result::sName = "awesome-cut";
     const std::string KTNotAwesomeCut::Result::sName = "not-awesome-cut";

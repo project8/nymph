@@ -10,6 +10,7 @@
 #include "KTApplyCut.hh"
 #include "KTCutFilter.hh"
 #include "KTLogger.hh"
+#include "KTTestData.hh"
 
 KTLOGGER(testlog, "TestCutFilter");
 

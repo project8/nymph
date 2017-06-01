@@ -73,5 +73,25 @@ namespace Nymph
     };
 
 
+    class KTTestData;
+
+    /*!
+     * A simple test processor that has a slot for KTTestData
+     */
+    class KTTestProcessorD : public KTProcessor
+    {
+        public:
+            KTTestProcessorD( const std::string& name = "test-proc-d" );
+            virtual ~KTTestProcessorD();
+
+            bool Configure(const scarab::param_node* node);
+
+            bool SlotFunc(KTTestData& data);
+
+        private:
+            KTSlotData< KTTestData > fSlot;
+    };
+
+
 } /* namespace Nymph */
 #endif /* KTTESTPROCESSOR_HH_ */

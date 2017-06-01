@@ -8,27 +8,17 @@
 #include "KTTestCuts.hh"
 
 #include "KTLogger.hh"
+#include "KTTestData.hh"
 
 namespace Nymph
 {
     KTLOGGER(testlog, "KTTestCuts");
-
-    const std::string KTTestData::sName = "test-data";
 
     const std::string KTAwesomeCut::Result::sName = "awesome-cut";
     const std::string KTNotAwesomeCut::Result::sName = "not-awesome-cut";
 
     KT_REGISTER_CUT(KTAwesomeCut);
     KT_REGISTER_CUT(KTNotAwesomeCut);
-
-
-    KTTestData::KTTestData() :
-            KTExtensibleData< KTTestData >(),
-            fIsAwesome(false)
-    {}
-
-    KTTestData::~KTTestData()
-    {}
 
 
     KTAwesomeCut::KTAwesomeCut(const std::string& name) :

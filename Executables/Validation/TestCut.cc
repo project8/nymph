@@ -8,6 +8,7 @@
 #include "KTTestCuts.hh"
 
 #include "KTLogger.hh"
+#include "KTTestData.hh"
 
 KTLOGGER(testlog, "TestCut");
 
