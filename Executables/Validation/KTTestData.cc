@@ -22,7 +22,9 @@ namespace Nymph
 
     KTTestDerived1Data::KTTestDerived1Data() :
             KTTestPolyDataBase< KTTestDerived1Data >()
-    {}
+    {
+        fFunniness = 500;
+    }
 
     KTTestDerived1Data::~KTTestDerived1Data()
     {}
@@ -31,7 +33,9 @@ namespace Nymph
 
     KTTestDerived2Data::KTTestDerived2Data() :
             KTTestPolyDataBase< KTTestDerived2Data >()
-    {}
+    {
+        fFunniness = 1000000000000;
+    }
 
     KTTestDerived2Data::~KTTestDerived2Data()
     {}

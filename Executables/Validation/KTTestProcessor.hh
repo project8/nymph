@@ -9,9 +9,9 @@
 #define KTTESTPROCESSOR_HH_
 
 #include "KTProcessor.hh"
-
-#include "KTSignal.hh"
 #include "KTSlot.hh"
+
+#include "KTTestData.hh"
 
 namespace Nymph
 {
@@ -73,7 +73,7 @@ namespace Nymph
     };
 
 
-    class KTTestData;
+//    class KTTestData;
 
     /*!
      * A simple test processor that has a slot for KTTestData
@@ -86,11 +86,56 @@ namespace Nymph
 
             bool Configure(const scarab::param_node* node);
 
+            // Creates a KTTestData object, sets the awesomeness to the given value, and emits fSignal
+            void EmitSignal(bool isAwesome = true);
+
             bool SlotFunc(KTTestData& data);
 
         private:
-            KTSlotData< KTTestData > fSlot;
+            KTSlotData< KTTestData > fDataSlot;
+
+            KTSignalData fDataSignal;
     };
+
+
+//    template< class XDerivedDataType >
+//    class KTTestPolyDataBase< XDerivedDataType >;
+//    class KTTestDerived1Data;
+//    class KTTestDerived2Data;
+
+    /*!
+     * A simple test processor for testing polymorphic data, signals, and slots
+     */
+    class KTTestProcessorE : public KTProcessor
+    {
+        public:
+            KTTestProcessorE( const std::string& name = "test-proc-d" );
+            virtual ~KTTestProcessorE();
+
+            bool Configure(const scarab::param_node* node);
+
+            void EmitSignals();
+
+            template< class XDerivedDataType >
+            bool BaseSlotFunc(KTTestPolyDataBase< XDerivedDataType >& data);
+
+        private:
+            KTSlotData< KTTestDerived1Data > fDerived1DataSlot;
+            KTSlotData< KTTestDerived2Data > fDerived2DataSlot;
+
+            KTSignalData fDerived1DataSignal;
+            KTSignalData fDerived2DataSignal;
+
+            // utility function to avoid putting a logger in the header
+            void PrintFunniness( unsigned funniness );
+    };
+
+    template< class XDerivedDataType >
+    bool KTTestProcessorE::BaseSlotFunc(KTTestPolyDataBase< XDerivedDataType >& data)
+    {
+        PrintFunniness( data.GetFunniness() );
+        return true;
+    }
 
 
 } /* namespace Nymph */

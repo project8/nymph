@@ -42,11 +42,11 @@ namespace Nymph
         public:
             /// Constructor for the case where the processor has the function that will be called by the slot
             template< class XFuncOwnerType >
-            KTSlot( const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( Args... ), std::initializer_list< std::string > signals );
+            KTSlot( const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( Args... ), std::initializer_list< std::string > signals = {} );
 
             /// Constructor for the case where the processor and the object with the function that will be called are different
             template< class XFuncOwnerType >
-            KTSlot( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( Args... ), std::initializer_list< std::string > signals );
+            KTSlot( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( Args... ), std::initializer_list< std::string > signals = {} );
 
             virtual ~KTSlot();
 
@@ -93,19 +93,22 @@ namespace Nymph
     template< class... XDataTypes >
     class KTSlotData : public KTSlot< KTDataPtr  >
     {
-        //public:
-            //typedef XDataType data_type;
-            //typedef std::function< bool( KTDataPtr ) > function_signature;
-            //typedef typename function_signature::result_type return_type;
-
         public:
             /// Constructor for the case where the processor has the function that will be called by the slot
             template< class XFuncOwnerType, class... XFuncDataTypes >
-            KTSlotData( const std::string& name, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( XFuncDataTypes&... ), KTSignalData* signalPtr=nullptr );
+            KTSlotData( const std::string& name, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( XFuncDataTypes&... ), KTSignalData* signalPtr );
+
+            /// Constructor for the case where the processor has the function that will be called by the slot
+            template< class XFuncOwnerType, class... XFuncDataTypes >
+            KTSlotData( const std::string& name, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( XFuncDataTypes&... ) );
 
             /// Constructor for the case where the processor and the object with the function that will be called are different
             template< class XFuncOwnerType, class... XFuncDataTypes >
-            KTSlotData( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( XFuncDataTypes&... ), KTSignalData* signalPtr=nullptr );
+            KTSlotData( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( XFuncDataTypes&... ), KTSignalData* signalPtr );
+
+            /// Constructor for the case where the processor and the object with the function that will be called are different
+            template< class XFuncOwnerType, class... XFuncDataTypes >
+            KTSlotData( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( XFuncDataTypes&... ) );
 
             virtual ~KTSlotData();
 
@@ -114,11 +117,6 @@ namespace Nymph
         protected:
             template< typename... DataTypes >
             bool DataPresent( KTDataPtr data );
-
-            //template<  >
-            //bool DataPresent( KTDataPtr data );
-            //template< typename DataType, typename... DataTypes >
-            //bool DataPresent( KTDataPtr data );
 
             //function_signature fFunc;
             std::function< bool (XDataTypes&...) > fFunc;
@@ -252,10 +250,28 @@ namespace Nymph
 
     template< class... XDataTypes >
     template< class XFuncOwnerType, class... XFuncDataTypes >
+    KTSlotData< XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( XFuncDataTypes&... )) :
+            KTSlot( name, owner, this, &KTSlotData::operator() ),
+            fFunc( [func, owner]( XDataTypes... args ){ return (owner->*func)(args...);} ),
+            fSignalPtr( nullptr )
+    {
+    }
+
+    template< class... XDataTypes >
+    template< class XFuncOwnerType, class... XFuncDataTypes >
     KTSlotData< XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( XFuncDataTypes&... ), KTSignalData* signalPtr) :
             KTSlot( name, proc, this, &KTSlotData::operator(), { signalPtr->GetName()} ),
             fFunc( [func, owner]( XDataTypes... args ){return (owner->*func) (args... );} ),
             fSignalPtr( signalPtr )
+    {
+    }
+
+    template< class... XDataTypes >
+    template< class XFuncOwnerType, class... XFuncDataTypes >
+    KTSlotData< XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( XFuncDataTypes&... )) :
+            KTSlot( name, proc, this, &KTSlotData::operator() ),
+            fFunc( [func, owner]( XDataTypes... args ){return (owner->*func) (args... );} ),
+            fSignalPtr( nullptr )
     {
     }
 

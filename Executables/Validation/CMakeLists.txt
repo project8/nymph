@@ -52,6 +52,7 @@ if (Nymph_ENABLE_TESTING)
         TestCutFilter
         TestExceptionInSlot
         TestLogger
+        TestPolymorphicSlotData
         TestPrimaryProcessor
         TestPrimaryProcessorNoThreading
         TestPrintData
@@ -59,6 +60,7 @@ if (Nymph_ENABLE_TESTING)
         TestProcessorToolboxMultithreaded
         TestProcessorToolboxSinglethreaded
         TestSignalsAndSlots
+        TestSlotData
         TestThroughputProfiler
         TestUseBreakpoint
     )
