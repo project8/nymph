@@ -9,25 +9,13 @@
 #define NYMPH_KTTESTCUTS_HH_
 
 #include "KTCut.hh"
-#include "KTData.hh"
 #include "KTMemberVariable.hh"
+#include "KTData.hh"
 
 
 namespace Nymph
 {
-
-    class KTTestData : public KTExtensibleData< KTTestData >
-    {
-        public:
-            KTTestData();
-            virtual ~KTTestData();
-
-            MEMBERVARIABLE(bool, IsAwesome);
-
-        public:
-            static const std::string sName;
-
-    };
+    class KTTestData;
 
     // Cuts data that is NOT awesome
     class KTAwesomeCut : public KTCutOneArg< KTTestData >

@@ -15,6 +15,7 @@ if (Nymph_ENABLE_TESTING)
     set (VALIDATION_HEADERFILES
         KTTestConfigurable.hh
         KTTestCuts.hh
+        KTTestData.hh
         KTTestPrimaryProcessor.hh
         KTTestProcessor.hh
     )
@@ -22,6 +23,7 @@ if (Nymph_ENABLE_TESTING)
     set (VALIDATION_SOURCEFILES
         KTTestConfigurable.cc
         KTTestCuts.cc
+        KTTestData.cc
         KTTestPrimaryProcessor.cc
         KTTestProcessor.cc
     )
@@ -50,6 +52,7 @@ if (Nymph_ENABLE_TESTING)
         TestCutFilter
         TestExceptionInSlot
         TestLogger
+        TestPolymorphicSlotData
         TestPrimaryProcessor
         TestPrimaryProcessorNoThreading
         TestPrintData
@@ -57,6 +60,7 @@ if (Nymph_ENABLE_TESTING)
         TestProcessorToolboxMultithreaded
         TestProcessorToolboxSinglethreaded
         TestSignalsAndSlots
+        TestSlotData
         TestThroughputProfiler
         TestUseBreakpoint
     )

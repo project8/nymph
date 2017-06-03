@@ -10,6 +10,8 @@
 #include "KTException.hh"
 #include "KTLogger.hh"
 
+//#include "KTTestData.hh"
+
 namespace Nymph
 {
     KTLOGGER(testsiglog, "KTTestProcessor")
@@ -42,8 +44,8 @@ namespace Nymph
 
     KTTestProcessorB::KTTestProcessorB( const std::string& name ) :
             KTProcessor( name ),
-            fSlot1("first-slot", this, &KTTestProcessorB::SlotFunc1, {}),
-            fSlot2("second-slot", this, &KTTestProcessorB::SlotFunc2, {})
+            fSlot1("first-slot", this, &KTTestProcessorB::SlotFunc1),
+            fSlot2("second-slot", this, &KTTestProcessorB::SlotFunc2)
     {
         fSlot1Wrapper = GetSlot( "first-slot" );
         fSlot2Wrapper = GetSlot( "second-slot" );
@@ -77,7 +79,7 @@ namespace Nymph
 
     KTTestProcessorC::KTTestProcessorC( const std::string& name ) :
             KTProcessor( name ),
-            fSlot1("first-slot", this, &KTTestProcessorC::SlotFunc1, {})
+            fSlot1("first-slot", this, &KTTestProcessorC::SlotFunc1)
     {
     }
 
@@ -97,6 +99,84 @@ namespace Nymph
         KTINFO(testsiglog, "Slot1: input is " << input);
         BOOST_THROW_EXCEPTION( KTException() << "A HUGE problem occurred!!!! (just kidding, this is the expected result)" << eom );
 
+        return;
+    }
+
+
+    KT_REGISTER_PROCESSOR(KTTestProcessorD, "test-proc-d");
+
+    KTTestProcessorD::KTTestProcessorD( const std::string& name ) :
+            KTProcessor( name ),
+            fDataSlot("test-data-slot", this, &KTTestProcessorD::SlotFunc),
+            fDataSignal("test-data-signal", this)
+    {
+    }
+
+    KTTestProcessorD::~KTTestProcessorD()
+    {
+    }
+
+    bool KTTestProcessorD::Configure(const scarab::param_node*)
+    {
+        return true;
+    }
+
+    void KTTestProcessorD::EmitSignal(bool isAwesome)
+    {
+        KTDataPtr dataPtr = std::make_shared< KTData >();
+        KTTestData& data = dataPtr->Of< KTTestData >();
+        data.SetIsAwesome(isAwesome);
+        fDataSignal(dataPtr);
+        return;
+    }
+
+    bool KTTestProcessorD::SlotFunc(KTTestData& data)
+    {
+        KTINFO(testsiglog, "Is the data awesome? " << data.GetIsAwesome());
+        return true;
+    }
+
+
+    KT_REGISTER_PROCESSOR(KTTestProcessorE, "test-proc-e");
+
+    KTTestProcessorE::KTTestProcessorE( const std::string& name ) :
+            KTProcessor( name ),
+            fDerived1DataSlot("derived-1", this, &KTTestProcessorE::BaseSlotFunc< KTTestDerived1Data >),
+            fDerived2DataSlot("derived-2", this, &KTTestProcessorE::BaseSlotFunc< KTTestDerived2Data >),
+            fDerived1DataSignal("derived-1", this),
+            fDerived2DataSignal("derived-2", this)
+    {
+    }
+
+    KTTestProcessorE::~KTTestProcessorE()
+    {
+    }
+
+    bool KTTestProcessorE::Configure(const scarab::param_node*)
+    {
+        return true;
+    }
+
+    void KTTestProcessorE::EmitSignals()
+    {
+        KTDataPtr dataPtr = std::make_shared< KTData >();
+
+        KTINFO(testsiglog, "Creating data objects");
+        KTTestDerived1Data& data1 = dataPtr->Of< KTTestDerived1Data >();
+        KTTestDerived2Data& data2 = dataPtr->Of< KTTestDerived2Data >();
+
+        KTINFO(testsiglog, "Emitting data-1 signal");
+        fDerived1DataSignal( dataPtr );
+
+        KTINFO(testsiglog, "Emitting data-2 signal");
+        fDerived2DataSignal( dataPtr );
+
+        return;
+    }
+
+    void KTTestProcessorE::PrintFunniness( unsigned funniness)
+    {
+        KTINFO(testsiglog, "Data funniness measured to be: <" << funniness << ">");
         return;
     }
 
