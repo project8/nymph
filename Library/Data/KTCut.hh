@@ -10,7 +10,7 @@
 
 #include "KTConfigurable.hh"
 #include "KTCutResult.hh"
-#include "KTData.hh"
+#include "KTCoreData.hh"
 #include "KTExtensibleStructFactory.hh"
 #include "KTLogger.hh"
 #include "KTMemberVariable.hh"
@@ -33,13 +33,13 @@ namespace Nymph
      - Public nested class called Result, inheriting from KTExtensibleCutResult< Result >, and containing a public static std::string name sName.
      - Cut registration using the macro KT_REGISTER_CUT([class name])
      - Implementation of bool Configure(const scarab::param_node*)
-     - Implementation of bool Apply(KTData&, <DataType(s)>)
+     - Implementation of bool Apply(KTCoreData&, <DataType(s)>)
 
      Your cut class should inherit from KTCutOneArg or KTCutTwoArgs, depending on the number of data types involved in your cut.
 
      The existence of [class name]::Result and [class name]::Result::sName are enforces at compile time by the KT_REGISTER_CUT macro.
 
-     The functions bool Configure(const scarab::param_node*) and void Apply(KTData&, <DataType(s)>) are abstract in the base classes, and therefore must be implemented.
+     The functions bool Configure(const scarab::param_node*) and void Apply(KTCoreData&, <DataType(s)>) are abstract in the base classes, and therefore must be implemented.
 
      Boolean return value interpretation:
      - TRUE means the cut was failed
@@ -69,7 +69,7 @@ namespace Nymph
              MEMBERVARIABLE(double, AwesomenessThreshold);
 
          public:
-             bool Apply(KTData& data, KTSomeData& data);
+             bool Apply(KTCoreData& data, KTSomeData& data);
 
      };
 
@@ -96,7 +96,7 @@ namespace Nymph
          return true;
      }
 
-     bool KTAwesomenessCut::Apply(KTData& data, KTSomeData& someData)
+     bool KTAwesomenessCut::Apply(KTCoreData& data, KTSomeData& someData)
      {
          bool isCut = someData.Awesomeness() < fAwesomenessThreshold;
          data.GetCutStatus().AddCutResult< KTAwesomenessCut::Result >(isCut);
@@ -115,7 +115,7 @@ namespace Nymph
             KTCut(const std::string& name = "default-cut-name");
             virtual ~KTCut();
 
-            virtual bool Apply(KTDataPtr) = 0;
+            virtual bool Apply(KTDataHandle) = 0;
     };
 
 
@@ -130,9 +130,9 @@ namespace Nymph
             KTCutOneArg(const std::string& name = "default-cut-name");
             virtual ~KTCutOneArg();
 
-            virtual bool Apply(KTData& data, XDataType& dataType) = 0;
+            virtual bool Apply(KTCoreData& data, XDataType& dataType) = 0;
 
-            virtual bool Apply(KTDataPtr dataPtr);
+            virtual bool Apply(KTDataHandle dataHandle);
     };
 
 
@@ -147,9 +147,9 @@ namespace Nymph
             KTCutTwoArgs(const std::string& name = "default-cut-name");
             virtual ~KTCutTwoArgs();
 
-            virtual bool Apply(KTData& data, XDataType1& dataType1, XDataType2& dataType2) = 0;
+            virtual bool Apply(KTCoreData& data, XDataType1& dataType1, XDataType2& dataType2) = 0;
 
-            virtual bool Apply(KTDataPtr dataPtr);
+            virtual bool Apply(KTDataHandle dataHandle);
     };
 
 
@@ -168,14 +168,14 @@ namespace Nymph
     {}
 
     template< class XDataType >
-    bool KTCutOneArg< XDataType >::Apply(KTDataPtr dataPtr)
+    bool KTCutOneArg< XDataType >::Apply(KTDataHandle dataHandle)
     {
-        if (! dataPtr->Has< XDataType >())
+        if (! dataHandle->Has< XDataType >())
         {
             KTERROR(cutlog_h, "Data type <" << scarab::type(XDataType()) << "> was not present");
             return false;
         }
-        return Apply(dataPtr->Of< KTData >(), dataPtr->Of< XDataType >());
+        return Apply(dataHandle->Of< KTCoreData >(), dataHandle->Of< XDataType >());
     }
 
 
@@ -190,23 +190,23 @@ namespace Nymph
     {}
 
     template< class XDataType1, class XDataType2 >
-    bool KTCutTwoArgs< XDataType1, XDataType2 >::Apply(KTDataPtr dataPtr)
+    bool KTCutTwoArgs< XDataType1, XDataType2 >::Apply(KTDataHandle dataHandle)
     {
-        if (! dataPtr->Has< XDataType1 >())
+        if (! dataHandle->Has< XDataType1 >())
         {
             KTERROR(cutlog_h, "Data type <" << scarab::type(XDataType1()) << "> was not present");
             return false;
         }
-        if (! dataPtr->Has< XDataType2 >())
+        if (! dataHandle->Has< XDataType2 >())
         {
             KTERROR(cutlog_h, "Data type <" << scarab::type(XDataType2()) << "> was not present");
             return false;
         }
-        return Apply(dataPtr->Of< KTData >(), dataPtr->Of< XDataType1 >(), dataPtr->Of< XDataType2 >());
+        return Apply(dataHandle->Of< KTCoreData >(), dataHandle->Of< XDataType1 >(), dataHandle->Of< XDataType2 >());
     }
 
 /* Playing around: wouldn't it be cool if this could be done with variadic tmeplates?
- * Unfortunately we'll need to be able to iterate over the types in the template pack in the Apply(KTDataPtr) function.
+ * Unfortunately we'll need to be able to iterate over the types in the template pack in the Apply(KTDataHandle) function.
  *
     template< class ... DataTypes >
     class KTCutOnData : public KTCut
@@ -217,7 +217,7 @@ namespace Nymph
 
             virtual bool Apply(DataTypes ...) = 0;
 
-            virtual bool Apply(KTDataPtr dataPtr);
+            virtual bool Apply(KTDataHandle dataHandle);
     };
 
     template< class ... DataTypes >
@@ -231,7 +231,7 @@ namespace Nymph
     {}
 
     template< class ... DataTypes >
-    bool KTCutOnData< DataTypes... >::Apply(KTDataPtr dataPtr)
+    bool KTCutOnData< DataTypes... >::Apply(KTDataHandle dataHandle)
     {
 
     }

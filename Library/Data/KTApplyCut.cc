@@ -83,7 +83,7 @@ namespace Nymph
     }
 
 
-    void KTApplyCut::ApplyCut(KTDataPtr dataPtr)
+    void KTApplyCut::ApplyCut(KTDataHandle dataHandle)
     {
         std::shared_ptr< KTThreadReference > ref = fApplyCutSW->GetThreadRef();
 
@@ -93,19 +93,19 @@ namespace Nymph
             return;
         }
 
-        bool cutFailed = fCut->Apply(dataPtr);
+        bool cutFailed = fCut->Apply(dataHandle);
 
-        ref->Break( dataPtr, fApplyCutSW->GetDoBreakpoint() );
+        ref->Break( dataHandle, fApplyCutSW->GetDoBreakpoint() );
 
         if (cutFailed)
         {
-            fAfterCutFailSignal(dataPtr);
+            fAfterCutFailSignal(dataHandle);
         }
         else
         {
-            fAfterCutPassSignal(dataPtr);
+            fAfterCutPassSignal(dataHandle);
         }
-        fAfterCutSignal(dataPtr);
+        fAfterCutSignal(dataHandle);
         return;
     }
 

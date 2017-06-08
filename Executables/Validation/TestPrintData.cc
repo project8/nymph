@@ -34,21 +34,21 @@ namespace Nymph
             bool Configure(const scarab::param_node* node)
             {return true;}
 
-            bool Apply(KTData& data, KTTestData& testData)
+            bool Apply(KTCoreData& data, KTTestData& testData)
             {
                 bool isCut = ! testData.GetIsAwesome();
                 data.CutStatus().AddCutResult< KTAwesomeCut::Result >(isCut);
                 return isCut;
             }
 
-            bool Apply(KTDataPtr dataPtr)
+            bool Apply(KTDataHandle dataHandle)
             {
-                if (! dataPtr->Has< KTTestData >())
+                if (! dataHandle->Has< KTTestDataExt >())
                 {
                     KTERROR(testlog, "Data type <KTTestData> was not present");
                     return false;
                 }
-                return Apply(dataPtr->Of< KTData >(), dataPtr->Of< KTTestData >());
+                return Apply(dataHandle->Of< KTCoreData >(), dataHandle->Of< KTTestDataExt >());
             }
     };
 
@@ -70,7 +70,7 @@ namespace Nymph
             bool Configure(const scarab::param_node* node)
             {return true;}
 
-            bool Apply(KTData& data, KTTestData& testData)
+            bool Apply(KTCoreData& data, KTTestData& testData)
             {
                 bool isCut = testData.GetIsAwesome();
                 // use the name-based AddCutResult
@@ -78,14 +78,14 @@ namespace Nymph
                 return isCut;
             }
 
-            bool Apply(KTDataPtr dataPtr)
+            bool Apply(KTDataHandle dataHandle)
             {
-                if (! dataPtr->Has< KTTestData >())
+                if (! dataHandle->Has< KTTestData >())
                 {
                     KTERROR(testlog, "Data type <KTTestData> was not present");
                     return false;
                 }
-                return Apply(dataPtr->Of< KTData >(), dataPtr->Of< KTTestData >());
+                return Apply(dataHandle->Of< KTCoreData >(), dataHandle->Of< KTTestData >());
             }
     };
 
@@ -103,9 +103,9 @@ using namespace std;
 
 int main()
 {
-    KTDataPtr dataPtr(new KTData());
-    KTData& data = dataPtr->Of< KTData >();
-    KTTestData& testData = dataPtr->Of< KTTestData >();
+    KTDataHandle dataHandle(new KTCoreData());
+    KTCoreDataExt& data = dataHandle->Of< KTCoreDataExt >();
+    KTTestDataExt& testData = dataHandle->Of< KTTestDataExt >();
 
     KTINFO(testlog, "Applying awesome cut");
     KTAwesomeCut cut;
@@ -118,10 +118,10 @@ int main()
     KTPrintDataStructure printer;
 
     KTINFO(testlog, "Printing data structure");
-    printer.PrintDataStructure(dataPtr);
+    printer.PrintDataStructure(dataHandle);
 
     KTINFO(testlog, "Printing cut structure");
-    printer.PrintCutStructure(dataPtr);
+    printer.PrintCutStructure(dataHandle);
 
     return 0;
 }

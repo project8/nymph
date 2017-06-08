@@ -17,7 +17,7 @@ using namespace std;
 
 int main()
 {
-    KTData data;
+    KTCoreData data;
     KTTestData& testData = data.Of< KTTestData >();
 
     KTCutStatus& cutStatus = data.CutStatus();

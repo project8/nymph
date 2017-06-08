@@ -10,7 +10,7 @@
 
 #include "KTProcessor.hh"
 
-#include "KTData.hh"
+#include "KTCoreData.hh"
 #include "KTThreadReference.hh"
 
 #include <boost/thread/condition_variable.hpp>

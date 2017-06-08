@@ -10,60 +10,53 @@
 
 #include "KTExtensibleStruct.hh"
 
-#include "KTCutStatus.hh"
 #include "KTMemberVariable.hh"
 
-#include <memory>
 #include <string>
 
 namespace Nymph
 {
-    class KTDataCore
+
+    class KTData
     {
         public:
-            KTDataCore() {}
-            virtual ~KTDataCore() {}
+            KTData() = delete;
+            KTData( const std::string& name );
+            KTData( const KTData& orig );
+            KTData( KTData&& orig );
+            virtual ~KTData();
 
-            virtual const std::string& Name() const = 0;
+            MEMBERVARIABLE_REF( std::string, Name );
+    };
+
+    class KTDataRider
+    {
+        public:
+            KTDataRider() {}
+            virtual ~KTDataRider() {}
 
     };
 
     template< class XDerivedType >
-    class KTExtensibleData : public KTExtensibleStruct< XDerivedType, KTDataCore >
+    class KTExtensibleDataRider : public KTExtensibleStruct< XDerivedType, KTDataRider >
     {
         public:
-            KTExtensibleData() {}
-            virtual ~KTExtensibleData() {}
-
-            const std::string& Name() const;
+            KTExtensibleDataRider() {}
+            virtual ~KTExtensibleDataRider() {}
 
     };
 
-    template< class XDerivedType >
-    inline const std::string& KTExtensibleData< XDerivedType >::Name() const
-    {
-        return XDerivedType::sName;
-    }
+#define DEFINE_EXT_DATA_2( ex_data_class_name, data_class_name ) \
+        class ex_data_class_name : public data_class_name, public KTExtensibleDataRider< ex_data_class_name > \
+        { \
+            public: \
+                ex_data_class_name() : data_class_name(), KTExtensibleDataRider< ex_data_class_name >() {} \
+                ex_data_class_name( const ex_data_class_name& orig ) : data_class_name( orig ), KTExtensibleDataRider< ex_data_class_name >( orig ) {} \
+                ex_data_class_name( ex_data_class_name&& orig ) : data_class_name( orig ), KTExtensibleDataRider< ex_data_class_name >( orig ) {} \
+                virtual ~ex_data_class_name() {} \
+        };
 
-
-
-    class KTData : public KTExtensibleData< KTData >
-    {
-        public:
-            KTData();
-            KTData(const KTData& orig);
-            ~KTData();
-
-            MEMBERVARIABLE(unsigned, Counter);
-            MEMBERVARIABLE(bool, LastData);
-
-            MEMBERVARIABLE_REF(KTCutStatus, CutStatus);
-
-        public:
-            static const std::string sName;
-    };
-
-    typedef std::shared_ptr< KTData > KTDataPtr;
+#define DEFINE_EXT_DATA( data_class_name ) DEFINE_EXT_DATA_2( PASTE(data_class_name, Ext), data_class_name )
 
 } /* namespace Nymph */
 #endif /* KTDATA_HH_ */

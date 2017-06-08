@@ -38,52 +38,52 @@ namespace Nymph
         return true;
     }
 
-    void KTPrintDataStructure::PrintDataStructure(KTDataPtr dataPtr)
+    void KTPrintDataStructure::PrintDataStructure(KTDataHandle dataHandle)
     {
-        DoPrintDataStructure(dataPtr);
+        DoPrintDataStructure(dataHandle);
 
         KTSlotWrapper* slotWrap = fDataStructSlot.GetSlotWrapper();
-        slotWrap->GetThreadRef()->Break( dataPtr, slotWrap->GetDoBreakpoint() );
+        slotWrap->GetThreadRef()->Break( dataHandle, slotWrap->GetDoBreakpoint() );
 
-        fDataSignal(dataPtr);
+        fDataSignal(dataHandle);
 
         return;
     }
 
-    void KTPrintDataStructure::PrintCutStructure(KTDataPtr dataPtr)
+    void KTPrintDataStructure::PrintCutStructure(KTDataHandle dataHandle)
     {
-        DoPrintCutStructure(dataPtr);
+        DoPrintCutStructure(dataHandle);
 
         KTSlotWrapper* slotWrap = fCutStructSlot.GetSlotWrapper();
-        fCutStructSlot.GetSlotWrapper()->GetThreadRef()->Break( dataPtr, slotWrap->GetDoBreakpoint() );
+        fCutStructSlot.GetSlotWrapper()->GetThreadRef()->Break( dataHandle, slotWrap->GetDoBreakpoint() );
 
-        fDataSignal(dataPtr);
+        fDataSignal(dataHandle);
 
         return;
     }
 
 
-    void KTPrintDataStructure::PrintDataAndCutStructure(KTDataPtr dataPtr)
+    void KTPrintDataStructure::PrintDataAndCutStructure(KTDataHandle dataHandle)
     {
-        DoPrintDataStructure(dataPtr);
-        DoPrintCutStructure(dataPtr);
+        DoPrintDataStructure(dataHandle);
+        DoPrintCutStructure(dataHandle);
 
         KTSlotWrapper* slotWrap = fDataAndCutStructSlot.GetSlotWrapper();
-        fDataAndCutStructSlot.GetSlotWrapper()->GetThreadRef()->Break( dataPtr, slotWrap->GetDoBreakpoint() );
+        fDataAndCutStructSlot.GetSlotWrapper()->GetThreadRef()->Break( dataHandle, slotWrap->GetDoBreakpoint() );
 
-        fDataSignal(dataPtr);
+        fDataSignal(dataHandle);
 
         return;
     }
 
-    void KTPrintDataStructure::DoPrintDataStructure(KTDataPtr dataPtr)
+    void KTPrintDataStructure::DoPrintDataStructure(KTDataHandle dataHandle)
     {
         std::stringstream printbuf;
 
         printbuf << "\nData Structure:\n";
-        printbuf << "\t- " << dataPtr->Name() << '\n';
-        KTDEBUG(datalog, "Found data type " << dataPtr->Name());
-        KTExtensibleStructCore< KTDataCore >* nextData = dataPtr->Next();
+        printbuf << "\t- " << dataHandle->Name() << '\n';
+        KTDEBUG(datalog, "Found data type " << dataHandle->Name());
+        KTExtensibleStructCore< KTDataCore >* nextData = dataHandle->Next();
         while (nextData != NULL)
         {
             printbuf << "\t- " << nextData->Name() << '\n';
@@ -96,11 +96,11 @@ namespace Nymph
         return;
     }
 
-    void KTPrintDataStructure::DoPrintCutStructure(KTDataPtr dataPtr)
+    void KTPrintDataStructure::DoPrintCutStructure(KTDataHandle dataHandle)
     {
         std::stringstream printbuf;
 
-        KTCutStatus& cutStatus = dataPtr->CutStatus();
+        KTCutStatus& cutStatus = dataHandle->CutStatus();
         printbuf << "\n" << cutStatus;
 
         const KTCutResult* cutResult = cutStatus.CutResults();

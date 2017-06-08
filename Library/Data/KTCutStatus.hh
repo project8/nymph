@@ -25,7 +25,7 @@ namespace Nymph
      @brief Provides easy access to cut information.
 
      @details
-     KTCutStatus is typically used as a member variable of KTData, the top-level data object.
+     KTCutStatus is typically used as a member variable of KTCoreData, the top-level data object.
 
      KTCutStatus owns the set of cut results that have been added to a data object.
      It also owns a summary of those cuts (implemented with boost::dynamic_bitset).

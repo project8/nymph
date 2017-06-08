@@ -8,15 +8,15 @@
  #ifndef KTDATAPY_HH_
  #define KTDATAPY_HH_
 
-#include "KTData.hh"
+#include "KTCoreData.hh"
 
 void export_DataPy()
 {
     using namespace Nymph;
     using namespace boost::python;
-    class_<KTData, KTDataPtr, boost::noncopyable>("KTData", init<>())
-        .add_property("Counter", &KTData::GetCounter, &KTData::SetCounter)
-        .add_property("LastData", &KTData::GetLastData, &KTData::SetLastData)
+    class_<KTCoreData, KTDataHandle, boost::noncopyable>("KTCoreData", init<>())
+        .add_property("Counter", &KTCoreData::GetCounter, &KTCoreData::SetCounter)
+        .add_property("LastData", &KTCoreData::GetLastData, &KTCoreData::SetLastData)
         ;
 }
 

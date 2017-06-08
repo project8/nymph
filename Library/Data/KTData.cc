@@ -9,21 +9,16 @@
 
 namespace Nymph
 {
-    const std::string KTData::sName("data");
+    KTData::KTData( const std::string& name ) :
+            fName( name )
+    {}
 
-    KTData::KTData() :
-            KTExtensibleData< KTData >(),
-            fCounter(0),
-            fLastData(false),
-            fCutStatus()
-    {
-    }
+    KTData::KTData( const KTData& orig ) :
+            fName( orig.fName )
+    {}
 
-    KTData::KTData(const KTData& orig) :
-            KTExtensibleData< KTData >(orig),
-            fCounter(orig.fCounter),
-            fLastData(orig.fLastData),
-            fCutStatus(orig.fCutStatus)
+    KTData::KTData( KTData&& orig ) :
+            fName( std::move( orig.fName ) )
     {}
 
     KTData::~KTData()

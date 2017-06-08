@@ -8,59 +8,39 @@
 #ifndef NYMPH_KTTESTDATA_HH_
 #define NYMPH_KTTESTDATA_HH_
 
-#include "KTData.hh"
+#include "KTCoreData.hh"
 #include "KTMemberVariable.hh"
 
 
 namespace Nymph
 {
 
-    class KTTestData : public KTExtensibleData< KTTestData >
+    class KTTestData : public KTData
     {
         public:
             KTTestData();
             virtual ~KTTestData();
 
             MEMBERVARIABLE(bool, IsAwesome);
-
-        public:
-            static const std::string sName;
-
     };
 
+    DEFINE_EXT_DATA( KTTestData ); // defines KTTestDataExt
 
-    template< class XDerivedDataType >
-    class KTTestPolyDataBase : public KTExtensibleData< XDerivedDataType >
+
+    class KTTestBaseData : public KTData
     {
         public:
-            KTTestPolyDataBase() :
-                KTExtensibleData< XDerivedDataType >(),
+            KTTestBaseData() :
+                KTData( "poly-data" ),
                 fFunniness(1000.)
             {}
-            virtual ~KTTestPolyDataBase() {}
+            virtual ~KTTestBaseData() {}
 
             MEMBERVARIABLE(double, Funniness);
     };
 
-    class KTTestDerived1Data : public KTTestPolyDataBase< KTTestDerived1Data >
-    {
-        public:
-            KTTestDerived1Data();
-            virtual ~KTTestDerived1Data();
-
-        public:
-            static const std::string sName;
-    };
-
-    class KTTestDerived2Data : public KTTestPolyDataBase< KTTestDerived2Data >
-    {
-        public:
-            KTTestDerived2Data();
-            virtual ~KTTestDerived2Data();
-
-        public:
-            static const std::string sName;
-    };
+    DEFINE_EXT_DATA_2( KTTestDerived1DataHandle, KTTestBaseData );
+    DEFINE_EXT_DATA_2( KTTestDerived2DataHandle, KTTestBaseData );
 
 } /* namespace Nymph */
 

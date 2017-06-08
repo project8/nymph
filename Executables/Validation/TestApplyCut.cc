@@ -18,17 +18,17 @@ using namespace std;
 
 int main()
 {
-    KTDataPtr dataPtr(new KTData());
-    KTTestData& testData = dataPtr->Of< KTTestData >();
+    KTDataHandle dataHandle(new KTCoreData());
+    KTTestData& testData = dataHandle->Of< KTTestData >();
 
-    KTCutStatus& cutStatus = dataPtr->CutStatus();
+    KTCutStatus& cutStatus = dataHandle->CutStatus();
     KTINFO(testlog, "Initial cut state: " << cutStatus.IsCut());
 
     KTApplyCut applyCut;
 
     KTINFO(testlog, "Applying awesome cut");
     applyCut.SetCut(new KTAwesomeCut());
-    applyCut.ApplyCut(dataPtr);
+    applyCut.ApplyCut(dataHandle);
 
     KTINFO(testlog, "Cuts present: " << cutStatus.CutResultsPresent())
     KTINFO(testlog, "Has cut result \"awesome-cut\"? " << cutStatus.HasCutResult("awesome-cut"));
@@ -40,7 +40,7 @@ int main()
 
     KTINFO(testlog, "Applying not-awesome cut");
     applyCut.SelectCut("not-awesome-cut");
-    applyCut.ApplyCut(dataPtr);
+    applyCut.ApplyCut(dataHandle);
 
     KTINFO(testlog, "Cuts present: " << cutStatus.CutResultsPresent())
     KTINFO(testlog, "Has cut result \"awesome-cut\"? " << cutStatus.HasCutResult("awesome-cut"));

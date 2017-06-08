@@ -10,7 +10,7 @@
 
 #include "KTCut.hh"
 #include "KTMemberVariable.hh"
-#include "KTData.hh"
+#include "KTCoreData.hh"
 
 
 namespace Nymph
@@ -32,7 +32,7 @@ namespace Nymph
 
             bool Configure(const scarab::param_node* node);
 
-            bool Apply(KTData& data, KTTestData& testData);
+            bool Apply(KTCoreData& data, KTTestData& testData);
     };
 
     // Cuts data that is IS awesome
@@ -50,7 +50,7 @@ namespace Nymph
 
             bool Configure(const scarab::param_node* node);
 
-            bool Apply(KTData& data, KTTestData& testData);
+            bool Apply(KTCoreData& data, KTTestData& testData);
     };
 
 }

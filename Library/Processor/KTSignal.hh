@@ -10,7 +10,7 @@
 
 #include "KTProcessor.hh"
 
-#include "KTData.hh"
+#include "KTCoreData.hh"
 
 #include <boost/signals2.hpp>
 
@@ -75,10 +75,10 @@ namespace Nymph
      @class KTSignalData
      @author N. S. Oblath
 
-     @brief Creates a signal that takes a KTDataPtr object as its argument.
+     @brief Creates a signal that takes a KTDataHandle object as its argument.
 
      @details
-     The purpose of the signal is for passing KTData pointers between Processors.
+     The purpose of the signal is for passing KTCoreData pointers between Processors.
      The signal is emitted by calling operator().
      If a KTDataSlot is being used, and the Slot has been given a pointer to this signal, the Slot will emit the Signal.
 
@@ -89,7 +89,7 @@ namespace Nymph
 
      That's it!
     */
-    typedef KTSignal< KTDataPtr > KTSignalData;
+    typedef KTSignal< KTDataHandle > KTSignalData;
 
 
     //*******************
