@@ -63,14 +63,14 @@ namespace Nymph
     void KTTestProcessorB::SlotFunc1(int input)
     {
         KTINFO(testsiglog, "Slot1: input is " << input);
-        fSlot1Wrapper->GetThreadRef()->Break( KTDataPtr(), fSlot1Wrapper->GetDoBreakpoint());
+        fSlot1Wrapper->GetThreadRef()->Break( KTDataHandle(), fSlot1Wrapper->GetDoBreakpoint());
         return;
     }
 
     void KTTestProcessorB::SlotFunc2(int input)
     {
         KTINFO(testsiglog, "Slot2: twice input is " << 2 * input);
-        fSlot2Wrapper->GetThreadRef()->Break( KTDataPtr(), fSlot2Wrapper->GetDoBreakpoint());
+        fSlot2Wrapper->GetThreadRef()->Break( KTDataHandle(), fSlot2Wrapper->GetDoBreakpoint());
         return;
     }
 
@@ -107,8 +107,8 @@ namespace Nymph
 
     KTTestProcessorD::KTTestProcessorD( const std::string& name ) :
             KTProcessor( name ),
-            fDataSlot("test-data-slot", this, &KTTestProcessorD::SlotFunc),
-            fDataSignal("test-data-signal", this)
+            fDataSlot("test", this, &KTTestProcessorD::AnalysisFunc),
+            fDataSignal("test", this)
     {
     }
 
@@ -123,17 +123,17 @@ namespace Nymph
 
     void KTTestProcessorD::EmitSignal(bool isAwesome)
     {
-        KTDataPtr dataPtr = std::make_shared< KTData >();
-        KTTestData& data = dataPtr->Of< KTTestData >();
+        KTDataHandle dataHandle = CreateNewDataHandle();
+        KTTestDataExt& data = dataHandle->Of< KTTestDataExt >();
         data.SetIsAwesome(isAwesome);
-        fDataSignal(dataPtr);
+        fDataSignal(dataHandle);
         return;
     }
 
-    bool KTTestProcessorD::SlotFunc(KTTestData& data)
+    void KTTestProcessorD::AnalysisFunc(const KTTestData& data)
     {
         KTINFO(testsiglog, "Is the data awesome? " << data.GetIsAwesome());
-        return true;
+        return;
     }
 
 
@@ -141,8 +141,8 @@ namespace Nymph
 
     KTTestProcessorE::KTTestProcessorE( const std::string& name ) :
             KTProcessor( name ),
-            fDerived1DataSlot("derived-1", this, &KTTestProcessorE::BaseSlotFunc< KTTestDerived1Data >),
-            fDerived2DataSlot("derived-2", this, &KTTestProcessorE::BaseSlotFunc< KTTestDerived2Data >),
+            fDerived1DataSlot("derived-1", this, &KTTestProcessorE::BaseAnalysisFunc),
+            fDerived2DataSlot("derived-2", this, &KTTestProcessorE::BaseAnalysisFunc),
             fDerived1DataSignal("derived-1", this),
             fDerived2DataSignal("derived-2", this)
     {
@@ -159,26 +159,25 @@ namespace Nymph
 
     void KTTestProcessorE::EmitSignals()
     {
-        KTDataPtr dataPtr = std::make_shared< KTData >();
+        KTDataHandle dataHandle = CreateNewDataHandle();
 
         KTINFO(testsiglog, "Creating data objects");
-        KTTestDerived1Data& data1 = dataPtr->Of< KTTestDerived1Data >();
-        KTTestDerived2Data& data2 = dataPtr->Of< KTTestDerived2Data >();
+        dataHandle->Of< KTTestDerived1DataExt >();
+        dataHandle->Of< KTTestDerived2DataExt >();
 
         KTINFO(testsiglog, "Emitting data-1 signal");
-        fDerived1DataSignal( dataPtr );
+        fDerived1DataSignal( dataHandle );
 
         KTINFO(testsiglog, "Emitting data-2 signal");
-        fDerived2DataSignal( dataPtr );
+        fDerived2DataSignal( dataHandle );
 
         return;
     }
 
-    void KTTestProcessorE::PrintFunniness( unsigned funniness)
+    void KTTestProcessorE::BaseAnalysisFunc(const KTTestBaseData& data)
     {
-        KTINFO(testsiglog, "Data funniness measured to be: <" << funniness << ">");
+        KTINFO(testsiglog, "Data funniness measured to be: <" << data.GetFunniness() << ">");
         return;
     }
-
 
 } /* namespace Nymph */

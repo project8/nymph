@@ -89,10 +89,10 @@ namespace Nymph
             // Creates a KTTestData object, sets the awesomeness to the given value, and emits fSignal
             void EmitSignal(bool isAwesome = true);
 
-            bool SlotFunc(KTTestData& data);
+            void AnalysisFunc(const KTTestData& data);
 
         private:
-            KTSlotData< KTTestData > fDataSlot;
+            KTSlotData< void, KTTestDataExt > fDataSlot;
 
             KTSignalData fDataSignal;
     };
@@ -116,27 +116,15 @@ namespace Nymph
 
             void EmitSignals();
 
-            template< class XDerivedDataType >
-            bool BaseSlotFunc(KTTestPolyDataBase< XDerivedDataType >& data);
+            void BaseAnalysisFunc(const KTTestBaseData& data);
 
         private:
-            KTSlotData< KTTestDerived1Data > fDerived1DataSlot;
-            KTSlotData< KTTestDerived2Data > fDerived2DataSlot;
+            KTSlotData< void, KTTestDerived1DataExt > fDerived1DataSlot;
+            KTSlotData< void, KTTestDerived2DataExt > fDerived2DataSlot;
 
             KTSignalData fDerived1DataSignal;
             KTSignalData fDerived2DataSignal;
-
-            // utility function to avoid putting a logger in the header
-            void PrintFunniness( unsigned funniness );
     };
-
-    template< class XDerivedDataType >
-    bool KTTestProcessorE::BaseSlotFunc(KTTestPolyDataBase< XDerivedDataType >& data)
-    {
-        PrintFunniness( data.GetFunniness() );
-        return true;
-    }
-
 
 } /* namespace Nymph */
 #endif /* KTTESTPROCESSOR_HH_ */

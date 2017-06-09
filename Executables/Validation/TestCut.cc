@@ -17,8 +17,8 @@ using namespace std;
 
 int main()
 {
-    KTData data;
-    KTTestData& testData = data.Of< KTTestData >();
+    KTCoreDataExt data;
+    KTTestDataExt& testData = data.Of< KTTestDataExt >();
 
     KTCutStatus& cutStatus = data.CutStatus();
     KTINFO(testlog, "Initial cut state: " << cutStatus.IsCut());

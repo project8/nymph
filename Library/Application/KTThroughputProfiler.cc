@@ -64,7 +64,7 @@ namespace Nymph
         return Diff(fTimeStart, fTimeEnd);
     }
 
-    void KTThroughputProfiler::StartProfiling(KTDataPtr header)
+    void KTThroughputProfiler::StartProfiling(KTDataHandle header)
     {
         KTINFO(proflog, "Profiling started");
         fNDataProcessed = 0;
@@ -72,7 +72,7 @@ namespace Nymph
         return;
     }
 
-    void KTThroughputProfiler::Data(KTDataPtr data)
+    void KTThroughputProfiler::Data(KTDataHandle data)
     {
         (void)data;
         fNDataProcessed++;

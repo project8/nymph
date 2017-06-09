@@ -56,7 +56,7 @@ namespace Nymph
             }
             else
             {
-                fThreadRef->SetReturnValue( KTDataPtr() );
+                fThreadRef->SetReturnValue( KTDataHandle() );
             }
         }
         catch( boost::exception& e )

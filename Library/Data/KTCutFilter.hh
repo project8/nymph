@@ -33,7 +33,7 @@ namespace Nymph
      KTCutFilter checks the status of cuts that have already been applied to a data.  If the bitwise AND of the cut status with
      the configurable cut mask is non-zero, than the data fails the filter.
 
-     Interpretation of the boolean returned by Filter(KTData&):
+     Interpretation of the boolean returned by Filter(KTCoreData&):
      - TRUE means the data failed the cut filter.
      - FALSE means the data passed the cut filter.
 
@@ -46,12 +46,12 @@ namespace Nymph
      - "cut-mask-int": unsigned int -- Set the cut mask with an unsigned integer's bit values.
 
      Slots:
-     - "filter": void (KTDataPtr) -- Checks the cut status of the received data ANDed with the cut mask; No data is added.
+     - "filter": void (KTDataHandle) -- Checks the cut status of the received data ANDed with the cut mask; No data is added.
 
      Signals:
-     - "all": void (KTDataPtr) -- Emitted after cut status is checked for all data.
-     - "pass": void (KTDataPtr) -- Emitted after cut status is checked if the cut filter passed.
-     - "fail": void (KTDataPtr) -- Emitted after cut status is checked if the cut filter failed.
+     - "all": void (KTDataHandle) -- Emitted after cut status is checked for all data.
+     - "pass": void (KTDataHandle) -- Emitted after cut status is checked if the cut filter passed.
+     - "fail": void (KTDataHandle) -- Emitted after cut status is checked if the cut filter failed.
     */
 
     class KTCutFilter : public KTProcessor
@@ -78,9 +78,9 @@ namespace Nymph
             bool fAllBits;
 
         public:
-            bool Filter(KTData& data);
+            bool Filter(const KTCoreData& data);
 
-            void FilterData(KTDataPtr dataPtr);
+            void FilterData(KTDataHandle dataHandle);
 
 
             //***************

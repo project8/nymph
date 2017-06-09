@@ -22,7 +22,7 @@ int main()
 
         KTINFO(testslotdata, "Connecting test-data-signal to test-data-slot");
         // for simplicity the signal and slot are in the same processor, but that need not be, of course
-        tpD.ConnectASlot("test-data-signal", &tpD, "test-data-slot" );
+        tpD.ConnectASlot("test", &tpD, "test" );
 
         KTINFO(testslotdata, "Emitting signals");
         KTINFO(testslotdata, "First test signal: true");

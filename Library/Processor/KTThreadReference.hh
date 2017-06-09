@@ -8,7 +8,7 @@
 #ifndef KTTHREADREFERENCE_HH_
 #define KTTHREADREFERENCE_HH_
 
-#include "KTData.hh"
+#include "KTCoreData.hh"
 
 #include <boost/thread/future.hpp>
 
@@ -16,7 +16,7 @@
 
 namespace Nymph
 {
-    typedef boost::promise< KTDataPtr > KTDataPtrReturn;
+    typedef boost::promise< KTDataHandle > KTDataPtrReturn;
 
     class KTThreadReference
     {
@@ -36,19 +36,19 @@ namespace Nymph
             // for use within the thread
             //**************************
 
-            void Break( const KTDataPtr& dataPtr, bool doBreakpoint  );
+            void Break( const KTDataHandle& dataHandle, bool doBreakpoint  );
 
             void SetReturnException( boost::exception_ptr excPtr );
-            void SetReturnValue( KTDataPtr dataPtr );
+            void SetReturnValue( KTDataHandle dataHandle );
 
         public:
             //******************************
             // for use outside of the thread
             //******************************
 
-            KTDataPtr GetReturnValue();
-            boost::unique_future< KTDataPtr >& GetDataPtrRetFuture();
-            const boost::unique_future< KTDataPtr >& GetDataPtrRetFuture() const;
+            KTDataHandle GetReturnValue();
+            boost::unique_future< KTDataHandle >& GetDataPtrRetFuture();
+            const boost::unique_future< KTDataHandle >& GetDataPtrRetFuture() const;
 
             void RefreshDataPtrRet();
 
@@ -65,7 +65,7 @@ namespace Nymph
 
         private:
             KTDataPtrReturn fDataPtrRet;
-            boost::unique_future< KTDataPtr > fDataPtrRetFuture;
+            boost::unique_future< KTDataHandle > fDataPtrRetFuture;
             std::function< void() > fInitiateBreakFunc;
             std::function< void( boost_unique_lock& ) > fWaitForContinueFunc;
             boost::mutex fMutex;
@@ -77,23 +77,23 @@ namespace Nymph
         return;
     }
 
-    inline void KTThreadReference::SetReturnValue( KTDataPtr dataPtr )
+    inline void KTThreadReference::SetReturnValue( KTDataHandle dataHandle )
     {
-        fDataPtrRet.set_value( dataPtr );
+        fDataPtrRet.set_value( dataHandle );
         return;
     }
 
-    inline KTDataPtr KTThreadReference::GetReturnValue()
+    inline KTDataHandle KTThreadReference::GetReturnValue()
     {
         return fDataPtrRetFuture.get();
     }
 
-    inline boost::unique_future< KTDataPtr >& KTThreadReference::GetDataPtrRetFuture()
+    inline boost::unique_future< KTDataHandle >& KTThreadReference::GetDataPtrRetFuture()
     {
         return fDataPtrRetFuture;
     }
 
-    inline const boost::unique_future< KTDataPtr >& KTThreadReference::GetDataPtrRetFuture() const
+    inline const boost::unique_future< KTDataHandle >& KTThreadReference::GetDataPtrRetFuture() const
     {
         return fDataPtrRetFuture;
     }

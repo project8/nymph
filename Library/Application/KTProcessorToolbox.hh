@@ -229,12 +229,12 @@ namespace Nymph
 
             void JoinRunThread();
 
-            KTDataPtr GetData( const std::string& threadName );
+            KTDataHandle GetData( const std::string& threadName );
 
         private:
             friend class KTThreadReference;
 
-            typedef boost::shared_future< KTDataPtr > Future;
+            typedef boost::shared_future< KTDataHandle > Future;
 
             void StartSingleThreadedRun();
             void StartMultiThreadedRun();
@@ -285,8 +285,8 @@ namespace Nymph
             }
     };
 
-    typedef KTThreadRefFutureIter< boost::unique_future< KTDataPtr >, std::vector< std::shared_ptr< KTThreadReference > >::iterator > KTThreadRefFutureIterator;
-    typedef KTThreadRefFutureIter< const boost::unique_future< KTDataPtr >, std::vector< std::shared_ptr< KTThreadReference > >::const_iterator > KTThreadRefFutureConstIterator;
+    typedef KTThreadRefFutureIter< boost::unique_future< KTDataHandle >, std::vector< std::shared_ptr< KTThreadReference > >::iterator > KTThreadRefFutureIterator;
+    typedef KTThreadRefFutureIter< const boost::unique_future< KTDataHandle >, std::vector< std::shared_ptr< KTThreadReference > >::const_iterator > KTThreadRefFutureConstIterator;
 
 
     inline void KTProcessorToolbox::PopBackOfRunQueue()

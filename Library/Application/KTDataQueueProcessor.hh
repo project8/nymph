@@ -11,7 +11,7 @@
 #include "KTPrimaryProcessor.hh"
 
 #include "KTConcurrentQueue.hh"
-#include "KTData.hh"
+#include "KTCoreData.hh"
 #include "KTLogger.hh"
 #include "KTSlot.hh"
 
@@ -46,11 +46,11 @@ namespace Nymph
     class KTDataQueueProcessorTemplate : public KTPrimaryProcessor
     {
         public:
-            typedef void (XProcessorType::*FuncPtrType)(KTDataPtr);
+            typedef void (XProcessorType::*FuncPtrType)(KTDataHandle);
 
             struct DataAndFunc
             {
-                KTDataPtr fData;
+                KTDataHandle fData;
                 FuncPtrType fFuncPtr;
             };
 
@@ -113,15 +113,15 @@ namespace Nymph
         protected:
             /// Queue an data object with a provided function
             /// Assumes ownership of the data; original shared pointer will be nullified
-            void DoQueueData(KTDataPtr& data, FuncPtrType func);
+            void DoQueueData(KTDataHandle& data, FuncPtrType func);
 
             /// Queue an data object with fFuncPtr
             /// Assumes ownership of the data; original shared pointer will be nullified
-            void DoQueueData(KTDataPtr& data);
+            void DoQueueData(KTDataHandle& data);
 
             /// Queue a list of data objects
             /// Assumes ownership of all data objects and the list; original shared pointers will be nullified
-            //void DoQueueDataList(std::list< KTDataPtr& >* dataList, void (XProcessorType::*fFuncPtr)(KTDataPtr));
+            //void DoQueueDataList(std::list< KTDataHandle& >* dataList, void (XProcessorType::*fFuncPtr)(KTDataHandle));
 
             //*********
             // Slots
@@ -159,10 +159,10 @@ namespace Nymph
      Available configuration values:
 
      Slots:
-     - "data": void (KTDataPtr) -- Queue a data object for asynchronous processing; use signal "data"
+     - "data": void (KTDataHandle) -- Queue a data object for asynchronous processing; use signal "data"
 
      Signals:
-     - "data": void (KTDataPtr) -- Emitted for each data object in the queue
+     - "data": void (KTDataHandle) -- Emitted for each data object in the queue
      - "queue-done": void () -- Emitted when queue is emptied (inherited from KTDataQueueProcessorTemplate)
     */
     class KTDataQueueProcessor : public KTDataQueueProcessorTemplate< KTDataQueueProcessor >
@@ -174,7 +174,7 @@ namespace Nymph
             bool ConfigureSubClass(const scarab::param_node* node);
 
         public:
-            void EmitDataSignal(KTDataPtr data);
+            void EmitDataSignal(KTDataHandle data);
 
             //***************
             // Signals
@@ -189,12 +189,12 @@ namespace Nymph
         public:
             /// Queue an data object; will emit data signal
             /// Assumes ownership of the data; original shared pointer will be nullified
-            void QueueData(KTDataPtr& data);
+            void QueueData(KTDataHandle& data);
             KTSlotWrapper* fQueueDataSW;
 
             /// Queue a list of data objects; will emit data signal
             /// Assumes ownership of all data objects and the list; original shared pointers will be nullified
-            //void QueueDataList(std::list< KTDataPtr >* dataList);
+            //void QueueDataList(std::list< KTDataHandle >* dataList);
 
     };
 
@@ -303,7 +303,7 @@ namespace Nymph
 
 
     template< class XProcessorType >
-    void KTDataQueueProcessorTemplate< XProcessorType >::DoQueueData(KTDataPtr& data, FuncPtrType func)
+    void KTDataQueueProcessorTemplate< XProcessorType >::DoQueueData(KTDataHandle& data, FuncPtrType func)
     {
         KTDEBUG(eqplog, "Queueing data");
         DataAndFunc daf;
@@ -315,16 +315,16 @@ namespace Nymph
     }
 
     template< class XProcessorType >
-    void KTDataQueueProcessorTemplate< XProcessorType >::DoQueueData(KTDataPtr& data)
+    void KTDataQueueProcessorTemplate< XProcessorType >::DoQueueData(KTDataHandle& data)
     {
         DoQueueData(data, fFuncPtr);
         return;
     }
 /*
     template< class XProcessorType >
-    void KTDataQueueProcessorTemplate< XProcessorType >::DoQueueDataList(std::list< KTDataPtr& >* dataList, void (XProcessorType::*func)(KTDataPtr))
+    void KTDataQueueProcessorTemplate< XProcessorType >::DoQueueDataList(std::list< KTDataHandle& >* dataList, void (XProcessorType::*func)(KTDataHandle))
     {
-        typedef std::list< KTDataPtr > DataList;
+        typedef std::list< KTDataHandle > DataList;
 
         KTDEBUG(eqplog, "Queueing data objects");
         DataAndFunc daf;

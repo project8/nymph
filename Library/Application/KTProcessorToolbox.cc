@@ -914,7 +914,7 @@ namespace Nymph
         return;
     }
 
-    KTDataPtr KTProcessorToolbox::GetData( const std::string& threadName )
+    KTDataHandle KTProcessorToolbox::GetData( const std::string& threadName )
     {
         //boost_unique_lock threadFuturesLock( fThreadReferencesMutex );
         boost_unique_lock breakContLock( fBreakContMutex );
