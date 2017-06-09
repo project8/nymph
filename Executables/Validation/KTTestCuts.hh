@@ -15,10 +15,10 @@
 
 namespace Nymph
 {
-    class KTTestData;
+    class KTTestDataExt;
 
     // Cuts data that is NOT awesome
-    class KTAwesomeCut : public KTCutOneArg< KTTestData >
+    class KTAwesomeCut : public KTCutOneArg< KTTestDataExt >
     {
         public:
             struct Result : KTExtensibleCutResult< Result >
@@ -32,11 +32,11 @@ namespace Nymph
 
             bool Configure(const scarab::param_node* node);
 
-            bool Apply(KTCoreData& data, KTTestData& testData);
+            bool Apply(KTCoreDataExt& data, KTTestDataExt& testData);
     };
 
     // Cuts data that is IS awesome
-    class KTNotAwesomeCut : public KTCutOneArg< KTTestData >
+    class KTNotAwesomeCut : public KTCutOneArg< KTTestDataExt >
     {
         public:
             struct Result : KTExtensibleCutResult< Result >
@@ -50,7 +50,7 @@ namespace Nymph
 
             bool Configure(const scarab::param_node* node);
 
-            bool Apply(KTCoreData& data, KTTestData& testData);
+            bool Apply(KTCoreDataExt& data, KTTestDataExt& testData);
     };
 
 }

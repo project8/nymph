@@ -83,7 +83,7 @@ namespace Nymph
         printbuf << "\nData Structure:\n";
         printbuf << "\t- " << dataHandle->Name() << '\n';
         KTDEBUG(datalog, "Found data type " << dataHandle->Name());
-        KTExtensibleStructCore< KTDataCore >* nextData = dataHandle->Next();
+        KTExtensibleStructCore< KTDataRider >* nextData = dataHandle->Next();
         while (nextData != NULL)
         {
             printbuf << "\t- " << nextData->Name() << '\n';

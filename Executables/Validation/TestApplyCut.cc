@@ -18,8 +18,8 @@ using namespace std;
 
 int main()
 {
-    KTDataHandle dataHandle(new KTCoreData());
-    KTTestData& testData = dataHandle->Of< KTTestData >();
+    KTDataHandle dataHandle = CreateNewDataHandle();
+    KTTestData& testData = dataHandle->Of< KTTestDataExt >();
 
     KTCutStatus& cutStatus = dataHandle->CutStatus();
     KTINFO(testlog, "Initial cut state: " << cutStatus.IsCut());

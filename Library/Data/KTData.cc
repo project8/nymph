@@ -9,19 +9,17 @@
 
 namespace Nymph
 {
-    KTData::KTData( const std::string& name ) :
-            fName( name )
-    {}
-
-    KTData::KTData( const KTData& orig ) :
-            fName( orig.fName )
-    {}
-
-    KTData::KTData( KTData&& orig ) :
-            fName( std::move( orig.fName ) )
+    KTData::KTData()
     {}
 
     KTData::~KTData()
+    {}
+
+    KTDataRider::KTDataRider() :
+            fName()
+    {}
+
+    KTDataRider::~KTDataRider()
     {}
 
 } /* namespace Nymph */

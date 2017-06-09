@@ -24,14 +24,14 @@ namespace Nymph
             MEMBERVARIABLE(bool, IsAwesome);
     };
 
-    DEFINE_EXT_DATA( KTTestData ); // defines KTTestDataExt
+    DEFINE_EXT_DATA( KTTestData, "test" ); // defines KTTestDataExt
 
 
     class KTTestBaseData : public KTData
     {
         public:
             KTTestBaseData() :
-                KTData( "poly-data" ),
+                KTData(),
                 fFunniness(1000.)
             {}
             virtual ~KTTestBaseData() {}
@@ -39,8 +39,8 @@ namespace Nymph
             MEMBERVARIABLE(double, Funniness);
     };
 
-    DEFINE_EXT_DATA_2( KTTestDerived1DataHandle, KTTestBaseData );
-    DEFINE_EXT_DATA_2( KTTestDerived2DataHandle, KTTestBaseData );
+    DEFINE_EXT_DATA_2( KTTestDerived1DataExt, KTTestBaseData, "test-derived-1" );
+    DEFINE_EXT_DATA_2( KTTestDerived2DataExt, KTTestBaseData, "test-derived-2" );
 
 } /* namespace Nymph */
 

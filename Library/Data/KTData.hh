@@ -20,43 +20,38 @@ namespace Nymph
     class KTData
     {
         public:
-            KTData() = delete;
-            KTData( const std::string& name );
-            KTData( const KTData& orig );
-            KTData( KTData&& orig );
+            KTData();
             virtual ~KTData();
-
-            MEMBERVARIABLE_REF( std::string, Name );
     };
 
     class KTDataRider
     {
         public:
-            KTDataRider() {}
-            virtual ~KTDataRider() {}
+            KTDataRider();
+            virtual ~KTDataRider();
 
+            MEMBERVARIABLE_REF( std::string, Name );
     };
 
     template< class XDerivedType >
     class KTExtensibleDataRider : public KTExtensibleStruct< XDerivedType, KTDataRider >
     {
         public:
-            KTExtensibleDataRider() {}
+            KTExtensibleDataRider() = delete;
+            KTExtensibleDataRider( const std::string& name ) { KTDataRider::fName = name; }
             virtual ~KTExtensibleDataRider() {}
 
     };
 
-#define DEFINE_EXT_DATA_2( ex_data_class_name, data_class_name ) \
+#define DEFINE_EXT_DATA_2( ex_data_class_name, data_class_name, label ) \
         class ex_data_class_name : public data_class_name, public KTExtensibleDataRider< ex_data_class_name > \
         { \
             public: \
-                ex_data_class_name() : data_class_name(), KTExtensibleDataRider< ex_data_class_name >() {} \
-                ex_data_class_name( const ex_data_class_name& orig ) : data_class_name( orig ), KTExtensibleDataRider< ex_data_class_name >( orig ) {} \
-                ex_data_class_name( ex_data_class_name&& orig ) : data_class_name( orig ), KTExtensibleDataRider< ex_data_class_name >( orig ) {} \
+                ex_data_class_name() : data_class_name(), KTExtensibleDataRider< ex_data_class_name >( label ) {} \
                 virtual ~ex_data_class_name() {} \
         };
 
-#define DEFINE_EXT_DATA( data_class_name ) DEFINE_EXT_DATA_2( PASTE(data_class_name, Ext), data_class_name )
+#define DEFINE_EXT_DATA( data_class_name, label ) DEFINE_EXT_DATA_2( PASTE(data_class_name, Ext), data_class_name, label )
 
 } /* namespace Nymph */
 #endif /* KTDATA_HH_ */

@@ -23,8 +23,6 @@ namespace Nymph
     {
         public:
             KTCoreData();
-            KTCoreData( const KTCoreData& orig );
-            KTCoreData( KTCoreData&& orig );
             virtual ~KTCoreData();
 
             MEMBERVARIABLE( unsigned, Counter );
@@ -34,9 +32,10 @@ namespace Nymph
 
     };
 
-    DEFINE_EXT_DATA( KTCoreData )
+    DEFINE_EXT_DATA( KTCoreData, "core" )
 
-    typedef std::shared_ptr< KTCoreData > KTDataHandle;
+    typedef std::shared_ptr< KTCoreDataExt > KTDataHandle;
+    KTDataHandle CreateNewDataHandle();
 
 } /* namespace Nymph */
 #endif /* KTCOREDATA_HH_ */

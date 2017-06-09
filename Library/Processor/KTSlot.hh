@@ -96,19 +96,19 @@ namespace Nymph
         public:
             /// Constructor for the case where the processor has the function that will be called by the slot
             template< class XFuncOwnerType, class... XFuncDataTypes >
-            KTSlotData( const std::string& name, XFuncOwnerType* owner, XReturnType (XFuncOwnerType::*func)( XFuncDataTypes&... ), KTSignalData* signalPtr );
+            KTSlotData( const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& ), KTSignalData* signalPtr );
 
             /// Constructor for the case where the processor has the function that will be called by the slot
             template< class XFuncOwnerType, class... XFuncDataTypes >
-            KTSlotData( const std::string& name, XFuncOwnerType* owner, XReturnType (XFuncOwnerType::*func)( XFuncDataTypes&... ) );
+            KTSlotData( const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& ) );
 
             /// Constructor for the case where the processor and the object with the function that will be called are different
             template< class XFuncOwnerType, class... XFuncDataTypes >
-            KTSlotData( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, XReturnType (XFuncOwnerType::*func)( XFuncDataTypes&... ), KTSignalData* signalPtr );
+            KTSlotData( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& ), KTSignalData* signalPtr );
 
             /// Constructor for the case where the processor and the object with the function that will be called are different
             template< class XFuncOwnerType, class... XFuncDataTypes >
-            KTSlotData( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, XReturnType (XFuncOwnerType::*func)( XFuncDataTypes&... ) );
+            KTSlotData( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& ) );
 
             virtual ~KTSlotData();
 
@@ -119,7 +119,42 @@ namespace Nymph
             bool DataPresent( KTDataHandle data );
 
             //function_signature fFunc;
-            std::function< XReturnType (XDataArgs&...) > fFunc;
+            std::function< XReturnType (const XDataArgs&..., XReturnType&) > fFunc;
+
+            KTSignalData* fSignalPtr;
+    };
+
+    // partial specialization for no new data type
+    template< class... XDataArgs >
+    class KTSlotData< void, XDataArgs... > : public KTSlot< KTDataHandle  >
+    {
+        public:
+            /// Constructor for the case where the processor has the function that will be called by the slot
+            template< class XFuncOwnerType, class... XFuncDataTypes >
+            KTSlotData( const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&... ), KTSignalData* signalPtr );
+
+            /// Constructor for the case where the processor has the function that will be called by the slot
+            template< class XFuncOwnerType, class... XFuncDataTypes >
+            KTSlotData( const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&... ) );
+
+            /// Constructor for the case where the processor and the object with the function that will be called are different
+            template< class XFuncOwnerType, class... XFuncDataTypes >
+            KTSlotData( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&... ), KTSignalData* signalPtr );
+
+            /// Constructor for the case where the processor and the object with the function that will be called are different
+            template< class XFuncOwnerType, class... XFuncDataTypes >
+            KTSlotData( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&... ) );
+
+            virtual ~KTSlotData();
+
+            void operator()( KTDataHandle data );
+
+        protected:
+            template< typename... DataTypes >
+            bool DataPresent( KTDataHandle data );
+
+            //function_signature fFunc;
+            std::function< void (XDataArgs&...) > fFunc;
 
             KTSignalData* fSignalPtr;
     };
@@ -241,7 +276,7 @@ namespace Nymph
 
     template< class XReturnType, class... XDataTypes >
     template< class XFuncOwnerType, class... XFuncDataTypes >
-    KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, XReturnType (XFuncOwnerType::*func)( XFuncDataTypes&... ), KTSignalData* signalPtr) :
+    KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& ), KTSignalData* signalPtr) :
             KTSlot( name, owner, this, &KTSlotData::operator(), {signalPtr->GetName()} ),
             fFunc( [func, owner]( XDataTypes... args ){ return (owner->*func)(args...);} ),
             fSignalPtr( signalPtr )
@@ -250,7 +285,7 @@ namespace Nymph
 
     template< class XReturnType, class... XDataTypes >
     template< class XFuncOwnerType, class... XFuncDataTypes >
-    KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, XReturnType (XFuncOwnerType::*func)( XFuncDataTypes&... )) :
+    KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& )) :
             KTSlot( name, owner, this, &KTSlotData::operator() ),
             fFunc( [func, owner]( XDataTypes... args ){ return (owner->*func)(args...);} ),
             fSignalPtr( nullptr )
@@ -259,7 +294,7 @@ namespace Nymph
 
     template< class XReturnType, class... XDataTypes >
     template< class XFuncOwnerType, class... XFuncDataTypes >
-    KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, XReturnType (XFuncOwnerType::*func)( XFuncDataTypes&... ), KTSignalData* signalPtr) :
+    KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& ), KTSignalData* signalPtr) :
             KTSlot( name, proc, this, &KTSlotData::operator(), { signalPtr->GetName()} ),
             fFunc( [func, owner]( XDataTypes... args ){return (owner->*func) (args... );} ),
             fSignalPtr( signalPtr )
@@ -268,7 +303,7 @@ namespace Nymph
 
     template< class XReturnType, class... XDataTypes >
     template< class XFuncOwnerType, class... XFuncDataTypes >
-    KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, XReturnType (XFuncOwnerType::*func)( XFuncDataTypes&... )) :
+    KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& )) :
             KTSlot( name, proc, this, &KTSlotData::operator() ),
             fFunc( [func, owner]( XDataTypes... args ){return (owner->*func) (args... );} ),
             fSignalPtr( nullptr )
@@ -298,17 +333,12 @@ namespace Nymph
         // Call the function
         try
         {
-            dataHandle->
+            fFunc( dataHandle->Of< XDataTypes >()... , dataHandle->Of< XReturnType >() );
         }
-        catch( ... )
+        catch( boost::exception& e )
         {
+            e << KTErrorMsgInfo< struct slotData_RunFunc >( "Something went wrong in slot <" + fName + ">. Aborting." );
             ref->SetReturnException( boost::current_exception() );
-        }
-        if( ! fFunc( dataHandle->Of< XDataTypes >()... ) )
-        {
-            KTERROR( slotlog, "Something went wrong in slot <" << fName << ">. Aborting." );
-            THROW_THREADREF_EXCEPTION( ref, KTException() << "Something went wrong in slot <" << fName << ">. Aborting." );
-            return;
         }
 
         // Perform breakpoint here if necessary (either if initiated here or if stopping here due to a breakpoint elsewhere)
@@ -326,6 +356,95 @@ namespace Nymph
     template< class XReturnType, class... XDataTypes >
     template< typename... DataTypes >
     bool KTSlotData< XReturnType, XDataTypes... >::DataPresent( KTDataHandle data )
+    {
+        return DataPresentHelper< DataTypes... >::DataPresent( data );
+    }
+
+
+    // KTSlotData with no return type
+
+    template< class... XDataTypes >
+    template< class XFuncOwnerType, class... XFuncDataTypes >
+    KTSlotData< void, XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&... ), KTSignalData* signalPtr) :
+            KTSlot( name, owner, this, &KTSlotData::operator(), {signalPtr->GetName()} ),
+            fFunc( [func, owner]( XDataTypes... args ){ return (owner->*func)(args...);} ),
+            fSignalPtr( signalPtr )
+    {
+    }
+
+    template< class... XDataTypes >
+    template< class XFuncOwnerType, class... XFuncDataTypes >
+    KTSlotData< void, XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&... )) :
+            KTSlot( name, owner, this, &KTSlotData::operator() ),
+            fFunc( [func, owner]( XDataTypes... args ){ return (owner->*func)(args...);} ),
+            fSignalPtr( nullptr )
+    {
+    }
+
+    template< class... XDataTypes >
+    template< class XFuncOwnerType, class... XFuncDataTypes >
+    KTSlotData< void, XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&... ), KTSignalData* signalPtr) :
+            KTSlot( name, proc, this, &KTSlotData::operator(), { signalPtr->GetName()} ),
+            fFunc( [func, owner]( XDataTypes... args ){return (owner->*func) (args... );} ),
+            fSignalPtr( signalPtr )
+    {
+    }
+
+    template< class... XDataTypes >
+    template< class XFuncOwnerType, class... XFuncDataTypes >
+    KTSlotData< void, XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&... )) :
+            KTSlot( name, proc, this, &KTSlotData::operator() ),
+            fFunc( [func, owner]( XDataTypes... args ){return (owner->*func) (args... );} ),
+            fSignalPtr( nullptr )
+    {
+    }
+
+    template< class... XDataTypes >
+    KTSlotData< void, XDataTypes... >::~KTSlotData()
+    {
+    }
+
+    template< class... XDataTypes >
+    void KTSlotData< void, XDataTypes... >::operator()( KTDataHandle dataHandle )
+    {
+        // Standard data slot pattern:
+
+        std::shared_ptr< KTThreadReference > ref = fSlotWrapper->GetThreadRef();
+
+        // Check to ensure that the required data type is present
+        if( ! DataPresent< XDataTypes... >( dataHandle ) )
+        {
+            KTERROR( slotlog, "Failed to find all of the necessary data types in slot <" << fName << ">. Aborting." );
+            THROW_THREADREF_EXCEPTION( ref, KTException() << "Failed to find all of the necessary data types in slot <" << fName << ">. Aborting." );
+            return;
+        }
+
+        // Call the function
+        try
+        {
+            fFunc( dataHandle->Of< XDataTypes >()... );
+        }
+        catch( boost::exception& e )
+        {
+            e << KTErrorMsgInfo< struct slotData_RunFunc >( "Something went wrong in slot <" + fName + ">. Aborting." );
+            ref->SetReturnException( boost::current_exception() );
+        }
+
+        // Perform breakpoint here if necessary (either if initiated here or if stopping here due to a breakpoint elsewhere)
+        // Sets the dataHandle into the return
+        ref->Break( dataHandle, fSlotWrapper->GetDoBreakpoint() );
+
+        // If there's a signal pointer, emit the signal
+        if( fSignalPtr != nullptr )
+        {
+            (*fSignalPtr)( dataHandle );
+        }
+        return;
+    }
+
+    template< class... XDataTypes >
+    template< typename... DataTypes >
+    bool KTSlotData< void, XDataTypes... >::DataPresent( KTDataHandle data )
     {
         return DataPresentHelper< DataTypes... >::DataPresent( data );
     }

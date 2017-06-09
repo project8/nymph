@@ -78,7 +78,7 @@ namespace Nymph
             bool fAllBits;
 
         public:
-            bool Filter(KTCoreData& data);
+            bool Filter(const KTCoreData& data);
 
             void FilterData(KTDataHandle dataHandle);
 

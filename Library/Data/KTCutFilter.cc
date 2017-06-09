@@ -56,14 +56,14 @@ namespace Nymph
         return true;
     }
 
-    bool KTCutFilter::Filter(KTCoreData& data)
+    bool KTCutFilter::Filter(const KTCoreData& data)
     {
         if (fAllBits)
         {
             return data.CutStatus().IsCut();
         }
 
-        KTCutStatus& cutStatus = data.CutStatus();
+        const KTCutStatus& cutStatus = data.CutStatus();
         if (fConvertToBitset)
         {
             fCutMask = cutStatus.ToBitset(fCutMaskInt);
@@ -80,7 +80,7 @@ namespace Nymph
 
         // all KTDataHandle's have KTCoreData, so we won't bother checking
 
-        bool failCut = Filter(dataHandle->Of< KTCoreData >());
+        bool failCut = Filter(dataHandle->Of< KTCoreDataExt >());
 
         ref->Break( dataHandle, fFilterDataSW->GetDoBreakpoint() );
 

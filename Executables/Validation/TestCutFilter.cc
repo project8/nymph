@@ -19,8 +19,8 @@ using namespace std;
 
 int main()
 {
-    KTDataHandle dataHandle(new KTCoreData());
-    KTTestData& testData = dataHandle->Of< KTTestData >();
+    KTDataHandle dataHandle = CreateNewDataHandle();
+    KTTestData& testData = dataHandle->Of< KTTestDataExt >();
 
     KTCutStatus& cutStatus = dataHandle->CutStatus();
     KTINFO(testlog, "Initial cut state: " << cutStatus.IsCut());
@@ -54,7 +54,7 @@ int main()
     KTINFO(testlog, "Cut state of <KTNotAwesomeCut::Result> is: " << cutStatus.GetCutState< KTNotAwesomeCut::Result >());
 
     KTCutFilter cutFilter;
-    KTCoreData& data = dataHandle->Of< KTCoreData >();
+    KTCoreDataExt& data = dataHandle->Of< KTCoreDataExt >();
 
     KTINFO(testlog, "Filtering with all cuts");
     cutFilter.SetCutMaskAll();

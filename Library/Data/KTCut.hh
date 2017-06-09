@@ -130,7 +130,7 @@ namespace Nymph
             KTCutOneArg(const std::string& name = "default-cut-name");
             virtual ~KTCutOneArg();
 
-            virtual bool Apply(KTCoreData& data, XDataType& dataType) = 0;
+            virtual bool Apply(KTCoreDataExt& data, XDataType& dataType) = 0;
 
             virtual bool Apply(KTDataHandle dataHandle);
     };
@@ -147,7 +147,7 @@ namespace Nymph
             KTCutTwoArgs(const std::string& name = "default-cut-name");
             virtual ~KTCutTwoArgs();
 
-            virtual bool Apply(KTCoreData& data, XDataType1& dataType1, XDataType2& dataType2) = 0;
+            virtual bool Apply(KTCoreDataExt& data, XDataType1& dataType1, XDataType2& dataType2) = 0;
 
             virtual bool Apply(KTDataHandle dataHandle);
     };
@@ -175,7 +175,7 @@ namespace Nymph
             KTERROR(cutlog_h, "Data type <" << scarab::type(XDataType()) << "> was not present");
             return false;
         }
-        return Apply(dataHandle->Of< KTCoreData >(), dataHandle->Of< XDataType >());
+        return Apply(dataHandle->Of< KTCoreDataExt >(), dataHandle->Of< XDataType >());
     }
 
 
@@ -202,7 +202,7 @@ namespace Nymph
             KTERROR(cutlog_h, "Data type <" << scarab::type(XDataType2()) << "> was not present");
             return false;
         }
-        return Apply(dataHandle->Of< KTCoreData >(), dataHandle->Of< XDataType1 >(), dataHandle->Of< XDataType2 >());
+        return Apply(dataHandle->Of< KTCoreDataExt >(), dataHandle->Of< XDataType1 >(), dataHandle->Of< XDataType2 >());
     }
 
 /* Playing around: wouldn't it be cool if this could be done with variadic tmeplates?

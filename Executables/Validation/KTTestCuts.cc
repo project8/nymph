@@ -33,7 +33,7 @@ namespace Nymph
         return true;
     }
 
-    bool KTAwesomeCut::Apply(KTCoreData& data, KTTestData& testData)
+    bool KTAwesomeCut::Apply(KTCoreDataExt& data, KTTestDataExt& testData)
     {
         bool isCut = ! testData.GetIsAwesome();
         KTDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
@@ -55,7 +55,7 @@ namespace Nymph
         return true;
     }
 
-    bool KTNotAwesomeCut::Apply(KTCoreData& data, KTTestData& testData)
+    bool KTNotAwesomeCut::Apply(KTCoreDataExt& data, KTTestDataExt& testData)
     {
         bool isCut = testData.GetIsAwesome();
         KTDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());

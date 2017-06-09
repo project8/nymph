@@ -10,7 +10,7 @@
 namespace Nymph
 {
     KTTestData::KTTestData() :
-        KTData( "test-data" ),
+        KTData(),
         fIsAwesome( false )
     {}
 
