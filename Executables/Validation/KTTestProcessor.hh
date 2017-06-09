@@ -89,7 +89,7 @@ namespace Nymph
             // Creates a KTTestData object, sets the awesomeness to the given value, and emits fSignal
             void EmitSignal(bool isAwesome = true);
 
-            void SlotFunc(const KTTestData& data);
+            void AnalysisFunc(const KTTestData& data);
 
         private:
             KTSlotData< void, KTTestDataExt > fDataSlot;
@@ -116,7 +116,7 @@ namespace Nymph
 
             void EmitSignals();
 
-            void BaseSlotFunc(const KTTestBaseData& data);
+            void BaseAnalysisFunc(const KTTestBaseData& data);
 
         private:
             KTSlotData< void, KTTestDerived1DataExt > fDerived1DataSlot;

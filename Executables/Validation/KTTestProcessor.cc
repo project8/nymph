@@ -107,7 +107,7 @@ namespace Nymph
 
     KTTestProcessorD::KTTestProcessorD( const std::string& name ) :
             KTProcessor( name ),
-            fDataSlot("test", this, &KTTestProcessorD::SlotFunc),
+            fDataSlot("test", this, &KTTestProcessorD::AnalysisFunc),
             fDataSignal("test", this)
     {
     }
@@ -130,7 +130,7 @@ namespace Nymph
         return;
     }
 
-    void KTTestProcessorD::SlotFunc(const KTTestData& data)
+    void KTTestProcessorD::AnalysisFunc(const KTTestData& data)
     {
         KTINFO(testsiglog, "Is the data awesome? " << data.GetIsAwesome());
         return;
@@ -141,8 +141,8 @@ namespace Nymph
 
     KTTestProcessorE::KTTestProcessorE( const std::string& name ) :
             KTProcessor( name ),
-            fDerived1DataSlot("derived-1", this, &KTTestProcessorE::BaseSlotFunc),
-            fDerived2DataSlot("derived-2", this, &KTTestProcessorE::BaseSlotFunc),
+            fDerived1DataSlot("derived-1", this, &KTTestProcessorE::BaseAnalysisFunc),
+            fDerived2DataSlot("derived-2", this, &KTTestProcessorE::BaseAnalysisFunc),
             fDerived1DataSignal("derived-1", this),
             fDerived2DataSignal("derived-2", this)
     {
@@ -174,7 +174,7 @@ namespace Nymph
         return;
     }
 
-    void KTTestProcessorE::BaseSlotFunc(const KTTestBaseData& data)
+    void KTTestProcessorE::BaseAnalysisFunc(const KTTestBaseData& data)
     {
         KTINFO(testsiglog, "Data funniness measured to be: <" << data.GetFunniness() << ">");
         return;
