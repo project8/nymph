@@ -24,7 +24,7 @@ namespace Nymph
     KTAwesomeCut::KTAwesomeCut(const std::string& name) :
             KTCutOnData(name)
     {
-        fFunc = [this]( KTCoreDataExt& data, const KTTestData& testData )->bool {return this->Apply(data, testData);};
+        SetApplyFunc( this, &KTAwesomeCut::Apply );
     }
 
     KTAwesomeCut::~KTAwesomeCut()
@@ -48,7 +48,7 @@ namespace Nymph
     KTNotAwesomeCut::KTNotAwesomeCut(const std::string& name) :
             KTCutOnData(name)
     {
-        fFunc = [this]( KTCoreDataExt& data, const KTTestData& testData )->bool {return this->Apply(data, testData);};
+        SetApplyFunc( this, &KTNotAwesomeCut::Apply );
     }
 
     KTNotAwesomeCut::~KTNotAwesomeCut()

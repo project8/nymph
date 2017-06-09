@@ -53,9 +53,10 @@ namespace Nymph
      --------------------------------------
 
      class KTSomeData;
+     class KTSomeDataExt;
 
      // Data must be at least as awesome as fAwesomenessThreshold to pass this cut
-     class KTAwesomenessCut : public KTCutOneArg< KTSomeData >
+     class KTAwesomenessCut : public KTCutOnData< KTSomeDataExt >
      {
          public:
              struct Result : KTExtensibleCutResult< Result >
@@ -80,14 +81,16 @@ namespace Nymph
      ------- Example Implementation -------
      --------------------------------------
 
-     const std::string KTExampleCut::Result::sName = "awesomeness-cut";
+     const std::string KTAwesomenessCut::Result::sName = "awesomeness-cut";
 
-     KT_REGISTER_CUT(KTExampleCut);
+     KT_REGISTER_CUT(KTAwesomenessCut);
 
      KTAwesomenessCut::KTAwesomenessCut(const std::string& name) :
-             KTCutOneArg(name),
+             KTCutOnData(name),
              fAwesomenessThreshold(1000000.)
-     {}
+     {
+         SetApplyFunc( this, &KTAwesomeCut::Apply );
+     }
 
      KTAwesomenessCut::~KTExampleCut()
      {}
@@ -122,101 +125,11 @@ namespace Nymph
 
     };
 
+    //*******************************************************
+    // KTCutOnData -- cut applied to one or more data objects
+    //*******************************************************
 
-    //*****************************************************************
-    // KTCutOneArg -- base class for cuts operating on one data type
-    //*****************************************************************
-
-    template< class XDataType >
-    class KTCutOneArg : public KTCut
-    {
-        public:
-            KTCutOneArg(const std::string& name = "default-cut-name");
-            virtual ~KTCutOneArg();
-
-            //virtual bool Apply(KTCoreData& data, XDataType& dataType) = 0;
-
-            virtual bool Apply(KTDataHandle dataHandle);
-
-        private:
-            std::function< bool (KTCoreData& data, const XDataType& dataType) > fFunc;
-    };
-
-
-    //*******************************************************************
-    // KTCutTwoArgs -- base class for cuts operating on two data types
-    //*******************************************************************
-
-    template< class XDataType1, class XDataType2 >
-    class KTCutTwoArgs : public KTCut
-    {
-        public:
-            KTCutTwoArgs(const std::string& name = "default-cut-name");
-            virtual ~KTCutTwoArgs();
-
-            virtual bool Apply(KTCoreData& data, XDataType1& dataType1, XDataType2& dataType2) = 0;
-
-            virtual bool Apply(KTDataHandle dataHandle);
-    };
-
-
-    //*******************
-    // Implementations
-    //*******************
-
-    template< class XDataType >
-    KTCutOneArg< XDataType >::KTCutOneArg(const std::string& name) :
-            KTCut(name),
-            fFunc(nullptr)
-    {
-    }
-
-    template< class XDataType >
-    KTCutOneArg< XDataType >::~KTCutOneArg()
-    {}
-
-    template< class XDataType >
-    bool KTCutOneArg< XDataType >::Apply(KTDataHandle dataHandle)
-    {
-        if (! dataHandle->Has< XDataType >())
-        {
-            KTERROR(cutlog_h, "Data type <" << scarab::type(XDataType()) << "> was not present");
-            return false;
-        }
-        return fFunc(dataHandle->Of< KTCoreDataExt >(), dataHandle->Of< XDataType >());
-    }
-
-
-    template< class XDataType1, class XDataType2 >
-    KTCutTwoArgs< XDataType1, XDataType2 >::KTCutTwoArgs(const std::string& name) :
-            KTCut(name)
-    {
-    }
-
-    template< class XDataType1, class XDataType2 >
-    KTCutTwoArgs< XDataType1, XDataType2 >::~KTCutTwoArgs()
-    {}
-
-    template< class XDataType1, class XDataType2 >
-    bool KTCutTwoArgs< XDataType1, XDataType2 >::Apply(KTDataHandle dataHandle)
-    {
-        if (! dataHandle->Has< XDataType1 >())
-        {
-            KTERROR(cutlog_h, "Data type <" << scarab::type(XDataType1()) << "> was not present");
-            return false;
-        }
-        if (! dataHandle->Has< XDataType2 >())
-        {
-            KTERROR(cutlog_h, "Data type <" << scarab::type(XDataType2()) << "> was not present");
-            return false;
-        }
-        return Apply(dataHandle->Of< KTCoreDataExt >(), dataHandle->Of< XDataType1 >(), dataHandle->Of< XDataType2 >());
-    }
-
-/* Playing around: wouldn't it be cool if this could be done with variadic tmeplates?
- * Unfortunately we'll need to be able to iterate over the types in the template pack in the Apply(KTDataHandle) function.
- */
-    template< class ... XDataTypes >
+    template< class ... XExtDataTypes >
     class KTCutOnData : public KTCut
     {
         public:
@@ -226,28 +139,36 @@ namespace Nymph
             virtual bool Apply( KTDataHandle dataHandle );
 
         protected:
-            template< typename... SomeDataTypes >
+            template< class... SomeExtDataTypes >
             bool DataPresent( KTDataHandle data );
 
-            std::function< bool ( KTCoreDataExt& data, const XDataTypes&... dataType ) > fFunc;
+            template< class XFuncOwnerType, class... XFuncDataTypes >
+            void SetApplyFunc( XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( KTCoreData&, const XFuncDataTypes&... ) );
+
+            std::function< bool ( KTCoreDataExt& data, const XExtDataTypes&... dataType ) > fFunc;
 
     };
 
-    template< class ... XDataTypes >
-    KTCutOnData< XDataTypes... >::KTCutOnData( const std::string& name ) :
+
+    //*******************
+    // Implementations
+    //*******************
+
+    template< class ... XExtDataTypes >
+    KTCutOnData< XExtDataTypes... >::KTCutOnData( const std::string& name ) :
             KTCut(name)
     {
     }
 
-    template< class ... XDataTypes >
-    KTCutOnData< XDataTypes... >::~KTCutOnData()
+    template< class ... XExtDataTypes >
+    KTCutOnData< XExtDataTypes... >::~KTCutOnData()
     {}
 
-    template< class ... XDataTypes >
-    bool KTCutOnData< XDataTypes... >::Apply( KTDataHandle dataHandle )
+    template< class ... XExtDataTypes >
+    bool KTCutOnData< XExtDataTypes... >::Apply( KTDataHandle dataHandle )
     {
         // Check to ensure that the required data type is present
-        if( ! DataPresent< XDataTypes... >( dataHandle ) )
+        if( ! DataPresent< XExtDataTypes... >( dataHandle ) )
         {
             KTERROR( cutlog_h, "Failed to find all of the necessary data types in slot <" << fConfigName << ">. Aborting." );
             BOOST_THROW_EXCEPTION( KTException() << "Failed to find all of the necessary data types in slot <" << fConfigName << ">. Aborting." << eom );
@@ -255,7 +176,7 @@ namespace Nymph
 
         try
         {
-            return fFunc( dataHandle->Of< KTCoreDataExt >() , dataHandle->Of< XDataTypes >()... );
+            return fFunc( dataHandle->Of< KTCoreDataExt >() , dataHandle->Of< XExtDataTypes >()... );
         }
         catch( boost::exception& e )
         {
@@ -264,13 +185,19 @@ namespace Nymph
         }
     }
 
-    template< class... XDataTypes >
-    template< typename... SomeDataTypes >
-    bool KTCutOnData< XDataTypes... >::DataPresent( KTDataHandle data )
+    template< class... XExtDataTypes >
+    template< typename... SomeExtDataTypes >
+    bool KTCutOnData< XExtDataTypes... >::DataPresent( KTDataHandle data )
     {
-        return DataPresentHelper< SomeDataTypes... >::DataPresent( data );
+        return DataPresentHelper< SomeExtDataTypes... >::DataPresent( data );
     }
 
+    template< class... XExtDataTypes >
+    template< class XFuncOwnerType, class... XFuncDataTypes >
+    void KTCutOnData< XExtDataTypes... >::SetApplyFunc( XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( KTCoreData&, const XFuncDataTypes&... ) )
+    {
+        fFunc = [func, owner]( KTCoreDataExt& data, const XExtDataTypes&... testData )->bool {return (owner->*func)(data, testData...);};
+    }
 
 
     // this macro enforces the existence of cut_class::Result and cut_class::Result::sName at compile time
