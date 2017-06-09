@@ -154,35 +154,10 @@ namespace Nymph
             bool DataPresent( KTDataHandle data );
 
             //function_signature fFunc;
-            std::function< void (XDataArgs&...) > fFunc;
+            std::function< void (const XDataArgs&...) > fFunc;
 
             KTSignalData* fSignalPtr;
     };
-
-    // helper structs (have to be defined outside the templated KTSlot class to use specialization
-    template< typename... DataTypes >
-    struct DataPresentHelper
-    {
-        static bool DataPresent( KTDataHandle )
-        {
-            return true;
-        }
-    };
-
-    template< typename DataType, typename... DataTypes >
-    struct DataPresentHelper< DataType, DataTypes... >
-    {
-        static bool DataPresent( KTDataHandle data )
-        {
-            if( ! data->Has< DataType >() )
-            {
-                KTERROR( slotlog, "Data not found with type <" << typeid( DataType ).name() << ">" );
-                return false;
-            }
-            return DataPresentHelper< DataTypes... >::DataPresent( data );
-        }
-    };
-
 
     // Typedefs for backwards compatibility
 

@@ -26,4 +26,5 @@ namespace Nymph
         return std::make_shared< KTCoreDataExt >();
     }
 
+
 } /* namespace Nymph */
