@@ -22,8 +22,10 @@ namespace Nymph
 
 
     KTAwesomeCut::KTAwesomeCut(const std::string& name) :
-            KTCutOneArg(name)
-    {}
+            KTCutOnData(name)
+    {
+        fFunc = [this]( KTCoreDataExt& data, const KTTestData& testData )->bool {return this->Apply(data, testData);};
+    }
 
     KTAwesomeCut::~KTAwesomeCut()
     {}
@@ -33,7 +35,7 @@ namespace Nymph
         return true;
     }
 
-    bool KTAwesomeCut::Apply(KTCoreDataExt& data, KTTestDataExt& testData)
+    bool KTAwesomeCut::Apply(KTCoreData& data, const KTTestData& testData)
     {
         bool isCut = ! testData.GetIsAwesome();
         KTDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
@@ -44,8 +46,10 @@ namespace Nymph
 
 
     KTNotAwesomeCut::KTNotAwesomeCut(const std::string& name) :
-            KTCutOneArg(name)
-    {}
+            KTCutOnData(name)
+    {
+        fFunc = [this]( KTCoreDataExt& data, const KTTestData& testData )->bool {return this->Apply(data, testData);};
+    }
 
     KTNotAwesomeCut::~KTNotAwesomeCut()
     {}
@@ -55,7 +59,7 @@ namespace Nymph
         return true;
     }
 
-    bool KTNotAwesomeCut::Apply(KTCoreDataExt& data, KTTestDataExt& testData)
+    bool KTNotAwesomeCut::Apply(KTCoreData& data, const KTTestData& testData)
     {
         bool isCut = testData.GetIsAwesome();
         KTDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());

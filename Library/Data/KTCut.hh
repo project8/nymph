@@ -11,12 +11,15 @@
 #include "KTConfigurable.hh"
 #include "KTCutResult.hh"
 #include "KTCoreData.hh"
+#include "KTException.hh"
 #include "KTExtensibleStructFactory.hh"
 #include "KTLogger.hh"
 #include "KTMemberVariable.hh"
 
 #include "factory.hh"
 #include "typename.hh"
+
+#include <functional>
 
 namespace Nymph
 {
@@ -116,6 +119,7 @@ namespace Nymph
             virtual ~KTCut();
 
             virtual bool Apply(KTDataHandle) = 0;
+
     };
 
 
@@ -130,9 +134,12 @@ namespace Nymph
             KTCutOneArg(const std::string& name = "default-cut-name");
             virtual ~KTCutOneArg();
 
-            virtual bool Apply(KTCoreDataExt& data, XDataType& dataType) = 0;
+            //virtual bool Apply(KTCoreData& data, XDataType& dataType) = 0;
 
             virtual bool Apply(KTDataHandle dataHandle);
+
+        private:
+            std::function< bool (KTCoreData& data, const XDataType& dataType) > fFunc;
     };
 
 
@@ -147,7 +154,7 @@ namespace Nymph
             KTCutTwoArgs(const std::string& name = "default-cut-name");
             virtual ~KTCutTwoArgs();
 
-            virtual bool Apply(KTCoreDataExt& data, XDataType1& dataType1, XDataType2& dataType2) = 0;
+            virtual bool Apply(KTCoreData& data, XDataType1& dataType1, XDataType2& dataType2) = 0;
 
             virtual bool Apply(KTDataHandle dataHandle);
     };
@@ -159,7 +166,8 @@ namespace Nymph
 
     template< class XDataType >
     KTCutOneArg< XDataType >::KTCutOneArg(const std::string& name) :
-            KTCut(name)
+            KTCut(name),
+            fFunc(nullptr)
     {
     }
 
@@ -175,7 +183,7 @@ namespace Nymph
             KTERROR(cutlog_h, "Data type <" << scarab::type(XDataType()) << "> was not present");
             return false;
         }
-        return Apply(dataHandle->Of< KTCoreDataExt >(), dataHandle->Of< XDataType >());
+        return fFunc(dataHandle->Of< KTCoreDataExt >(), dataHandle->Of< XDataType >());
     }
 
 
@@ -207,35 +215,63 @@ namespace Nymph
 
 /* Playing around: wouldn't it be cool if this could be done with variadic tmeplates?
  * Unfortunately we'll need to be able to iterate over the types in the template pack in the Apply(KTDataHandle) function.
- *
-    template< class ... DataTypes >
+ */
+    template< class ... XDataTypes >
     class KTCutOnData : public KTCut
     {
         public:
-            KTCutOnData(const std::string& name = "default-cut-name");
+            KTCutOnData( const std::string& name = "default-cut-name" );
             virtual ~KTCutOnData();
 
-            virtual bool Apply(DataTypes ...) = 0;
+            virtual bool Apply( KTDataHandle dataHandle );
 
-            virtual bool Apply(KTDataHandle dataHandle);
+        protected:
+            template< typename... SomeDataTypes >
+            bool DataPresent( KTDataHandle data );
+
+            std::function< bool ( KTCoreDataExt& data, const XDataTypes&... dataType ) > fFunc;
+
     };
 
-    template< class ... DataTypes >
-    KTCutOnData< DataTypes... >::KTCutOnData(const std::string& name) :
+    template< class ... XDataTypes >
+    KTCutOnData< XDataTypes... >::KTCutOnData( const std::string& name ) :
             KTCut(name)
     {
     }
 
-    template< class ... DataTypes >
-    KTCutOnData< DataTypes... >::~KTCutOnData()
+    template< class ... XDataTypes >
+    KTCutOnData< XDataTypes... >::~KTCutOnData()
     {}
 
-    template< class ... DataTypes >
-    bool KTCutOnData< DataTypes... >::Apply(KTDataHandle dataHandle)
+    template< class ... XDataTypes >
+    bool KTCutOnData< XDataTypes... >::Apply( KTDataHandle dataHandle )
     {
+        // Check to ensure that the required data type is present
+        if( ! DataPresent< XDataTypes... >( dataHandle ) )
+        {
+            KTERROR( cutlog_h, "Failed to find all of the necessary data types in slot <" << fConfigName << ">. Aborting." );
+            BOOST_THROW_EXCEPTION( KTException() << "Failed to find all of the necessary data types in slot <" << fConfigName << ">. Aborting." << eom );
+        }
 
+        try
+        {
+            return fFunc( dataHandle->Of< KTCoreDataExt >() , dataHandle->Of< XDataTypes >()... );
+        }
+        catch( boost::exception& e )
+        {
+            e << KTErrorMsgInfo< struct slotData_RunFunc >( "Something went wrong in slot <" + fConfigName + ">. Aborting." );
+            throw;
+        }
     }
-*/
+
+    template< class... XDataTypes >
+    template< typename... SomeDataTypes >
+    bool KTCutOnData< XDataTypes... >::DataPresent( KTDataHandle data )
+    {
+        return DataPresentHelper< SomeDataTypes... >::DataPresent( data );
+    }
+
+
 
     // this macro enforces the existence of cut_class::Result and cut_class::Result::sName at compile time
 #define KT_REGISTER_CUT(cut_class) \
