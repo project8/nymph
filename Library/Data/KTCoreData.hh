@@ -12,7 +12,8 @@
 
 #include "KTCutStatus.hh"
 #include "KTLogger.hh"
-#include "KTMemberVariable.hh"
+
+#include <boost/serialization/base_object.hpp>
 
 #include <memory>
 #include <string>
@@ -32,6 +33,11 @@ namespace Nymph
 
             MEMBERVARIABLE_REF( KTCutStatus, CutStatus );
 
+        private:
+            friend class bs::access;
+
+            template< class Archive >
+            void Serialize( Archive& ar, const unsigned version );
     };
 
     DEFINE_EXT_DATA( KTCoreData, "core" )
@@ -56,6 +62,22 @@ namespace Nymph
     {
         static bool DataPresent( KTDataHandle data );
     };
+
+
+    //*******************
+    // Implementations
+    //*******************
+
+    template< class Archive >
+    void KTCoreData::Serialize( Archive& ar, const unsigned version )
+    {
+        ar & bs::base_object< KTData >( *this );
+        ar & fCounter;
+        ar & fLastData;
+        ar & fCutStatus;
+        return;
+    }
+
 
     template< class... NoOtherDataTypes >
     bool DataPresentHelper< NoOtherDataTypes... >::DataPresent( KTDataHandle )

@@ -12,21 +12,29 @@
 
 #include "KTMemberVariable.hh"
 
+#include <boost/serialization/serialization.hpp>
+
 #include <string>
+
+namespace bs = boost::serialization;
 
 namespace Nymph
 {
     class KTCutResultCore
     {
         public:
-            KTCutResultCore() :
-                    fState(false)
-            {}
-            virtual ~KTCutResultCore() {}
+            KTCutResultCore();
+            virtual ~KTCutResultCore();
 
             virtual const std::string& Name() const = 0;
 
             MEMBERVARIABLE(bool, State);
+
+        private:
+            friend class bs::access;
+
+            template< class Archive >
+            void Serialize( Archive& ar, const unsigned version );
     };
 
     typedef KTExtensibleStructCore< KTCutResultCore > KTCutResult;
@@ -39,7 +47,28 @@ namespace Nymph
             virtual ~KTExtensibleCutResult() {}
 
             const std::string& Name() const;
+
+        private:
+            friend class bs::access;
+
+            template< class Archive >
+            void Serialize( Archive& ar, const unsigned version );
     };
+
+    template< class Archive >
+    void KTCutResultCore::Serialize( Archive& ar, const unsigned version )
+    {
+        ar & fState;
+        return;
+    }
+
+    template< class XDerivedType >
+    template< class Archive >
+    void KTExtensibleCutResult< XDerivedType >::Serialize( Archive& ar, const unsigned version )
+    {
+        ar & bs::base_object< KTExtensibleStruct< XDerivedType, KTCutResultCore > >( *this );
+        return;
+    }
 
     template< class XDerivedType >
     inline const std::string& KTExtensibleCutResult< XDerivedType >::Name() const

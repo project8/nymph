@@ -14,6 +14,8 @@
 
 #include <string>
 
+namespace bs  = boost::serialization;
+
 namespace Nymph
 {
 
@@ -22,6 +24,13 @@ namespace Nymph
         public:
             KTData();
             virtual ~KTData();
+
+        private:
+            friend class bs::access;
+
+            template< class Archive >
+            void Serialize( Archive& ar, const unsigned version )
+            {}
     };
 
     class KTDataRider
@@ -31,6 +40,16 @@ namespace Nymph
             virtual ~KTDataRider();
 
             MEMBERVARIABLE_REF( std::string, Name );
+
+        private:
+            friend class bs::access;
+
+            template< class Archive >
+            void Serialize( Archive& ar, const unsigned version )
+            {
+                ar & fName;
+                return;
+            }
     };
 
     template< class XDerivedType >
@@ -41,6 +60,15 @@ namespace Nymph
             KTExtensibleDataRider( const std::string& name ) { KTDataRider::fName = name; }
             virtual ~KTExtensibleDataRider() {}
 
+        private:
+            friend class bs::access;
+
+            template< class Archive >
+            void Serialize( Archive& ar, const unsigned version )
+            {
+                ar & bs::base_object< KTExtensibleStruct< XDerivedType, KTDataRider > >( *this );
+                return;
+            }
     };
 
 #define DEFINE_EXT_DATA_2( ex_data_class_name, data_class_name, label ) \
@@ -49,6 +77,15 @@ namespace Nymph
             public: \
                 ex_data_class_name() : data_class_name(), KTExtensibleDataRider< ex_data_class_name >( label ) {} \
                 virtual ~ex_data_class_name() {} \
+            private: \
+                friend class bs::access; \
+                template< class Archive > \
+                void Serialize( Archive& ar, const unsigned version ) \
+                { \
+                    ar & bs::base_object< data_class_name >( *this ); \
+                    ar & bs::base_object< KTExtensibleDataRider< ex_data_class_name > >( *this ); \
+                    return; \
+                } \
         };
 
 #define DEFINE_EXT_DATA( data_class_name, label ) DEFINE_EXT_DATA_2( PASTE(data_class_name, Ext), data_class_name, label )

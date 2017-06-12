@@ -11,9 +11,11 @@
 
 #include "KTCutResult.hh"
 
-#include <boost/dynamic_bitset.hpp>
-#include <boost/scoped_ptr.hpp>
+#include "KTDynamicBitset.hh"
 
+#include <boost/serialization/unique_ptr.hpp>
+
+#include <memory>
 #include <string>
 
 namespace Nymph
@@ -66,6 +68,17 @@ namespace Nymph
                     ~KTCutResultHandle();
 
                     static const std::string sName;
+
+                private:
+                    friend class bs::access;
+
+                    template< class Archive >
+                    void Serialize( Archive& ar, const unsigned version )
+                    {
+                        ar & bs::base_object< KTExtensibleCutResult< KTCutResultHandle > >( *this );
+                        return;
+                    }
+
             };
 
         public:
@@ -119,7 +132,7 @@ namespace Nymph
         private:
             friend std::ostream& operator<<(std::ostream& out, const KTCutStatus& status);
 
-            boost::scoped_ptr< KTCutResultHandle > fCutResults;
+            std::unique_ptr< KTCutResultHandle > fCutResults;
 
             bitset_type fSummary;
 
@@ -131,6 +144,12 @@ namespace Nymph
 
             bitset_type ToBitset(unsigned long long mask) const;
             bitset_type ToBitset(const std::string& mask) const;
+
+        private:
+            friend class boost::serialization::access;
+
+            template< class Archive >
+            void Serialize( Archive& ar, const unsigned version );
 
     };
 
@@ -248,6 +267,14 @@ namespace Nymph
     inline KTCutStatus::bitset_type KTCutStatus::ToBitset(const std::string& mask) const
     {
         return bitset_type(mask);
+    }
+
+    template< class Archive >
+    void KTCutStatus::Serialize( Archive& ar, const unsigned version )
+    {
+        ar & fCutResults;
+        ar & fSummary;
+        return;
     }
 
 } /* namespace Nymph */

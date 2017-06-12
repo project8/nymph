@@ -14,6 +14,7 @@ set( NYMPH_HEADERFILES
     ${UTIL_DIR}/KTConcurrentQueue.hh
     ${UTIL_DIR}/KTConfigurable.hh
     ${UTIL_DIR}/KTDirectory.hh
+    ${UTIL_DIR}/KTDynamicBitset.hh
     ${UTIL_DIR}/KTEventLoop.hh
     ${UTIL_DIR}/KTException.hh
     ${UTIL_DIR}/KTExtensibleStruct.hh
@@ -62,6 +63,7 @@ set( NYMPH_SOURCEFILES
     ${DATA_DIR}/KTCoreData.cc
     ${DATA_DIR}/KTCut.cc
     ${DATA_DIR}/KTCutFilter.cc
+    ${DATA_DIR}/KTCutResult.cc
     ${DATA_DIR}/KTCutStatus.cc
     ${DATA_DIR}/KTData.cc
     ${PROC_DIR}/KTPrimaryProcessor.cc
