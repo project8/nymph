@@ -56,5 +56,8 @@ namespace Nymph
 
 }
 
+BOOST_CLASS_EXPORT_KEY( Nymph::KTAwesomeCut::Result );
+BOOST_CLASS_EXPORT_KEY( Nymph::KTNotAwesomeCut::Result );
+
 
 #endif /* NYMPH_KTTESTCUTS_HH_ */

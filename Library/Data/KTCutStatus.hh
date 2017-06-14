@@ -58,7 +58,7 @@ namespace Nymph
         public:
             typedef boost::dynamic_bitset< > bitset_type;
 
-        private:
+        public:
             // private class KTCutStatus::KTCutResultHandle
             // purposefully not registered with the cut factory
             class KTCutResultHandle : public KTExtensibleCutResult< KTCutResultHandle >
@@ -73,12 +73,11 @@ namespace Nymph
                     friend class bs::access;
 
                     template< class Archive >
-                    void Serialize( Archive& ar, const unsigned version )
+                    void serialize( Archive& ar, const unsigned version )
                     {
                         ar & bs::base_object< KTExtensibleCutResult< KTCutResultHandle > >( *this );
                         return;
                     }
-
             };
 
         public:
@@ -149,7 +148,7 @@ namespace Nymph
             friend class boost::serialization::access;
 
             template< class Archive >
-            void Serialize( Archive& ar, const unsigned version );
+            void serialize( Archive& ar, const unsigned version );
 
     };
 
@@ -270,7 +269,7 @@ namespace Nymph
     }
 
     template< class Archive >
-    void KTCutStatus::Serialize( Archive& ar, const unsigned version )
+    void KTCutStatus::serialize( Archive& ar, const unsigned version )
     {
         ar & fCutResults;
         ar & fSummary;
@@ -278,5 +277,8 @@ namespace Nymph
     }
 
 } /* namespace Nymph */
+
+
+BOOST_CLASS_EXPORT_KEY2( Nymph::KTCutStatus::KTCutResultHandle, "KTCutStatus-KTCutResultHandle" );
 
 #endif /* KTCUTSTATUS_HH_ */

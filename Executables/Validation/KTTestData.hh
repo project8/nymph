@@ -27,7 +27,7 @@ namespace Nymph
             friend class bs::access;
 
             template< class Archive >
-            void Serialize( Archive& ar, const unsigned version );
+            void serialize( Archive& ar, const unsigned version );
     };
 
     DEFINE_EXT_DATA( KTTestData, "test" ); // defines KTTestDataExt
@@ -48,7 +48,7 @@ namespace Nymph
             friend class bs::access;
 
             template< class Archive >
-            void Serialize( Archive& ar, const unsigned version );
+            void serialize( Archive& ar, const unsigned version );
     };
 
     DEFINE_EXT_DATA_2( KTTestDerived1DataExt, KTTestBaseData, "test-derived-1" );
@@ -56,7 +56,7 @@ namespace Nymph
 
 
     template< class Archive >
-    void KTTestData::Serialize( Archive& ar, const unsigned version )
+    void KTTestData::serialize( Archive& ar, const unsigned version )
     {
         ar & bs::base_object< KTData >( *this );
         ar & fIsAwesome;
@@ -64,7 +64,7 @@ namespace Nymph
     }
 
     template< class Archive >
-    void KTTestBaseData::Serialize( Archive& ar, const unsigned version )
+    void KTTestBaseData::serialize( Archive& ar, const unsigned version )
     {
         ar & bs::base_object< KTData >( *this );
         ar & fFunniness;
@@ -73,5 +73,11 @@ namespace Nymph
 
 
 } /* namespace Nymph */
+
+BOOST_CLASS_EXPORT_KEY( Nymph::KTTestBaseData );
+BOOST_CLASS_EXPORT_KEY( Nymph::KTTestDerived1DataExt );
+BOOST_CLASS_EXPORT_KEY( Nymph::KTTestDerived2DataExt );
+BOOST_CLASS_EXPORT_KEY( Nymph::KTTestData );
+BOOST_CLASS_EXPORT_KEY( Nymph::KTTestDataExt );
 
 #endif /* NYMPH_KTTESTDATA_HH_ */

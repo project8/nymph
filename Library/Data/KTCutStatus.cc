@@ -10,6 +10,8 @@
 #include "KTExtensibleStructFactory.hh"
 #include "KTLogger.hh"
 
+BOOST_CLASS_EXPORT_IMPLEMENT( Nymph::KTCutStatus::KTCutResultHandle )
+
 namespace Nymph
 {
     KTLOGGER(cutlog, "KTCut");

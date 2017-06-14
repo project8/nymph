@@ -75,7 +75,7 @@ set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
 #######
 
 # Boost (1.46 required for filesystem version 3)
-list (APPEND Boost_COMPONENTS chrono date_time filesystem program_options system thread)
+list (APPEND Boost_COMPONENTS serialization chrono date_time filesystem program_options system thread)
 if (Nymph_ENABLE_PYTHON)
     list(APPEND Boost_COMPONENTS python)
 endif (Nymph_ENABLE_PYTHON)

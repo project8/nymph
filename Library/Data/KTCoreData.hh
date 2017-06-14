@@ -37,7 +37,7 @@ namespace Nymph
             friend class bs::access;
 
             template< class Archive >
-            void Serialize( Archive& ar, const unsigned version );
+            void serialize( Archive& ar, const unsigned version );
     };
 
     DEFINE_EXT_DATA( KTCoreData, "core" )
@@ -69,12 +69,12 @@ namespace Nymph
     //*******************
 
     template< class Archive >
-    void KTCoreData::Serialize( Archive& ar, const unsigned version )
+    void KTCoreData::serialize( Archive& ar, const unsigned version )
     {
         ar & bs::base_object< KTData >( *this );
         ar & fCounter;
         ar & fLastData;
-        ar & fCutStatus;
+        //ar & fCutStatus;
         return;
     }
 

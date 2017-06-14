@@ -10,6 +10,9 @@
 #include "KTLogger.hh"
 #include "KTTestData.hh"
 
+BOOST_CLASS_EXPORT_IMPLEMENT( Nymph::KTAwesomeCut::Result );
+BOOST_CLASS_EXPORT_IMPLEMENT( Nymph::KTNotAwesomeCut::Result );
+
 namespace Nymph
 {
     KTLOGGER(testlog, "KTTestCuts");

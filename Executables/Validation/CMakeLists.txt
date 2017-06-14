@@ -59,6 +59,7 @@ if (Nymph_ENABLE_TESTING)
         TestProcessorToolbox2Threads
         TestProcessorToolboxMultithreaded
         TestProcessorToolboxSinglethreaded
+        TestSerialization
         TestSignalsAndSlots
         TestSlotData
         TestThroughputProfiler

@@ -29,7 +29,7 @@ namespace Nymph
             friend class bs::access;
 
             template< class Archive >
-            void Serialize( Archive& ar, const unsigned version )
+            void serialize( Archive& ar, const unsigned version )
             {}
     };
 
@@ -45,7 +45,7 @@ namespace Nymph
             friend class bs::access;
 
             template< class Archive >
-            void Serialize( Archive& ar, const unsigned version )
+            void serialize( Archive& ar, const unsigned version )
             {
                 ar & fName;
                 return;
@@ -64,7 +64,7 @@ namespace Nymph
             friend class bs::access;
 
             template< class Archive >
-            void Serialize( Archive& ar, const unsigned version )
+            void serialize( Archive& ar, const unsigned version )
             {
                 ar & bs::base_object< KTExtensibleStruct< XDerivedType, KTDataRider > >( *this );
                 return;
@@ -80,7 +80,7 @@ namespace Nymph
             private: \
                 friend class bs::access; \
                 template< class Archive > \
-                void Serialize( Archive& ar, const unsigned version ) \
+                void serialize( Archive& ar, const unsigned version ) \
                 { \
                     ar & bs::base_object< data_class_name >( *this ); \
                     ar & bs::base_object< KTExtensibleDataRider< ex_data_class_name > >( *this ); \

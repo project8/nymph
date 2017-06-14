@@ -10,6 +10,7 @@
 #define KTEXTENSIBLESTRUCT_HH_
 
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/export.hpp>
 #include <boost/serialization/serialization.hpp>
 
 namespace bs = boost::serialization;
@@ -65,7 +66,7 @@ namespace Nymph
             friend class boost::serialization::access;
 
             template< class Archive >
-            void Serialize( Archive& ar, const unsigned version );
+            void serialize( Archive& ar, const unsigned version );
 
             static bool fDoExtensibleSerialize;
     };
@@ -95,7 +96,7 @@ namespace Nymph
             friend class boost::serialization::access;
 
             template< class Archive >
-            void Serialize( Archive& ar, const unsigned version );
+            void serialize( Archive& ar, const unsigned version );
     };
 
 
@@ -252,7 +253,7 @@ namespace Nymph
 
     template< class XBaseType >
     template< class Archive >
-    void KTExtensibleStructCore< XBaseType >::Serialize( Archive& ar, const unsigned version )
+    void KTExtensibleStructCore< XBaseType >::serialize( Archive& ar, const unsigned version )
     {
         ar & bs::base_object< XBaseType >( *this );
         if( KTExtensibleStructCore< XBaseType >::fDoExtensibleSerialize ) ar & fNext;
@@ -360,7 +361,7 @@ namespace Nymph
 
     template< class XInstanceType, class XBaseType >
     template< class Archive >
-    void KTExtensibleStruct< XInstanceType, XBaseType >::Serialize( Archive& ar, const unsigned version )
+    void KTExtensibleStruct< XInstanceType, XBaseType >::serialize( Archive& ar, const unsigned version )
     {
         ar & bs::base_object< KTExtensibleStructCore< XBaseType > >( *this );
         return;

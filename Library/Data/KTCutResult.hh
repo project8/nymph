@@ -34,7 +34,7 @@ namespace Nymph
             friend class bs::access;
 
             template< class Archive >
-            void Serialize( Archive& ar, const unsigned version );
+            void serialize( Archive& ar, const unsigned version );
     };
 
     typedef KTExtensibleStructCore< KTCutResultCore > KTCutResult;
@@ -52,11 +52,11 @@ namespace Nymph
             friend class bs::access;
 
             template< class Archive >
-            void Serialize( Archive& ar, const unsigned version );
+            void serialize( Archive& ar, const unsigned version );
     };
 
     template< class Archive >
-    void KTCutResultCore::Serialize( Archive& ar, const unsigned version )
+    void KTCutResultCore::serialize( Archive& ar, const unsigned version )
     {
         ar & fState;
         return;
@@ -64,7 +64,7 @@ namespace Nymph
 
     template< class XDerivedType >
     template< class Archive >
-    void KTExtensibleCutResult< XDerivedType >::Serialize( Archive& ar, const unsigned version )
+    void KTExtensibleCutResult< XDerivedType >::serialize( Archive& ar, const unsigned version )
     {
         ar & bs::base_object< KTExtensibleStruct< XDerivedType, KTCutResultCore > >( *this );
         return;
