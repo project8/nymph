@@ -18,6 +18,8 @@
 
 #include <vector>
 
+#include "param_codec.hh"
+
 using std::deque;
 using std::set;
 using std::string;
@@ -134,56 +136,22 @@ namespace Nymph
                     return false;
                 }
 
-                string signalProcName, signalName;
-                if (! ParseSignalSlotName(connNode->get_value("signal"), signalProcName, signalName))
+                bool connReturn = false;
+                if (connNode->has("order"))
                 {
-                    KTERROR(proclog, "Unable to parse signal name: <" << connNode->get_value("signal") << ">");
+                    connReturn = MakeConnection(connNode->get_value("signal"), connNode->get_value("slot"), connNode->get_value< int >("order"));
+                }
+                else
+                {
+                    connReturn = MakeConnection(connNode->get_value("signal"), connNode->get_value("slot"));
+                }
+                if (! connReturn)
+                {
+                    KTERROR(proclog, "Unable to make connection <" << connNode->get_value("signal") << "> --> <" << connNode->get_value("slot") << ">");
                     return false;
                 }
 
-                string slotProcName, slotName;
-                if (! ParseSignalSlotName(connNode->get_value("slot"), slotProcName, slotName))
-                {
-                    KTERROR(proclog, "Unable to parse slot name: <" << connNode->get_value("slot") << ">");
-                    return false;
-                }
-
-
-                KTProcessor* signalProc = GetProcessor(signalProcName);
-                if (signalProc == NULL)
-                {
-                    KTERROR(proclog, "Processor named <" << signalProcName << "> was not found!");
-                    return false;
-                }
-
-                KTProcessor* slotProc = GetProcessor(slotProcName);
-                if (slotProc == NULL)
-                {
-                    KTERROR(proclog, "Processor named <" << slotProcName << "> was not found!");
-                    return false;
-                }
-
-                try
-                {
-                    if (connNode->has("order"))
-                    {
-                        signalProc->ConnectASlot(signalName, slotProc, slotName, connNode->get_value< int >("order"));
-                    }
-                    else
-                    {
-                        signalProc->ConnectASlot(signalName, slotProc, slotName);
-                    }
-                }
-                catch (std::exception& e)
-                {
-                    KTERROR(proclog, "An error occurred while connecting signals and slots:\n"
-                            << "\tSignal " << signalName << " from processor " << signalProcName << " (a.k.a. " << signalProc->GetConfigName() << ")" << '\n'
-                            << "\tSlot " << slotName << " from processor " << slotProcName << " (a.k.a. " << slotProc->GetConfigName() << ")" << '\n'
-                            << '\t' << e.what());
-                    return false;
-                }
-                KTINFO(proclog, "Signal <" << signalProcName << ":" << signalName << "> connected to slot <" << slotProcName << ":" << signalName << ">");
-
+                KTINFO(proclog, "Signal <" << connNode->get_value("signal") << "> connected to slot <" << connNode->get_value("slot") << ">");
             }
         }
 
@@ -201,16 +169,18 @@ namespace Nymph
         {
             for (scarab::param_array::const_iterator rqIt = rqArray->begin(); rqIt != rqArray->end(); ++rqIt)
             {
-                ThreadGroup threadGroup;
                 if ((*rqIt)->is_value())
                 {
-                    const scarab::param_value* rqValue = &( (*rqIt)->as_value() );
-
-                    if (! AddProcessorToThreadGroup(rqValue, threadGroup)) return false;
+                    if (! PushBackToRunQueue((*rqIt)->as_value().as_string()))
+                    {
+                        KTERROR(proclog, "Unable to process run-queue entry: could not add processor to the queue");
+                        return false;
+                    }
                 }
-                else if ((*rqIt)->is_node())
+                else if ((*rqIt)->is_array())
                 {
                     const scarab::param_array* rqNode = &( (*rqIt)->as_array() );
+                    std::vector< std::string > names;
 
                     for (scarab::param_array::const_iterator rqArrayIt = rqNode->begin(); rqArrayIt != rqNode->end(); ++rqArrayIt)
                     {
@@ -219,8 +189,13 @@ namespace Nymph
                             KTERROR(proclog, "Invalid run-queue array entry: not a value");
                             return false;
                         }
-                        const scarab::param_value* rqValue = &( (*rqArrayIt)->as_value() );
-                        if (! AddProcessorToThreadGroup(rqValue, threadGroup)) return false;
+                        names.push_back((*rqArrayIt)->as_value().as_string());
+                    }
+
+                    if (! PushBackToRunQueue(names))
+                    {
+                        KTERROR(proclog, "Unable to process run-queue entry: could not add list of processors to the queue");
+                        return false;
                     }
                 }
                 else
@@ -228,48 +203,11 @@ namespace Nymph
                     KTERROR(proclog, "Invalid run-queue entry: not a value or array");
                     return false;
                 }
-                fRunQueue.push_back(threadGroup);
             }
         }
 
         return true;
     }
-
-    bool KTProcessorToolbox::ParseSignalSlotName(const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot) const
-    {
-        size_t sepPos = toParse.find_first_of(fSigSlotNameSep);
-        if (sepPos == string::npos)
-        {
-            KTERROR(proclog, "Unable to find separator between processor and signal/slot name in <" << toParse << ">");
-            return false;
-        }
-        nameOfProc = toParse.substr(0, sepPos);
-        nameOfSigSlot = toParse.substr(sepPos + 1);
-        return true;
-    }
-
-    bool KTProcessorToolbox::AddProcessorToThreadGroup(const scarab::param_value* param, ThreadGroup& group)
-    {
-        string procName = param->as_string();//TODO BHL changed ->get() to as_string(), not sure if that is right...
-        KTProcessor* procForRunQueue = GetProcessor(procName);
-        KTDEBUG(proclog, "Adding processor of type " << procName << " to the run queue");
-        if (procForRunQueue == NULL)
-        {
-            KTERROR(proclog, "Unable to find processor <" << procName << "> requested for the run queue");
-            return false;
-        }
-
-        KTPrimaryProcessor* primaryProc = dynamic_cast< KTPrimaryProcessor* >(procForRunQueue);
-        if (primaryProc == NULL)
-        {
-            KTERROR(proclog, "Processor <" << procName << "> is not a primary processor.");
-            return false;
-        }
-        //group.insert(primaryProc);
-        group.insert(Thread(primaryProc, procName));
-        return true;
-    }
-
 
     bool KTProcessorToolbox::ConfigureProcessors(const scarab::param_node* node)
     {
@@ -304,6 +242,14 @@ namespace Nymph
             }
         }
         return true;
+    }
+
+    bool KTProcessorToolbox::ConfigureProcessors(const std::string& config)
+    {
+        scarab::param_translator translator;
+        scarab::param_node optNode;
+        optNode.add( "encoding", new scarab::param_value( "json" ) );
+        return ConfigureProcessors( &translator.read_string( config, &optNode )->as_node() );
     }
 
     bool KTProcessorToolbox::Run()
@@ -344,6 +290,7 @@ namespace Nymph
         return true;
     }
 
+
     KTProcessor* KTProcessorToolbox::GetProcessor(const std::string& procName)
     {
         ProcMapIt it = fProcMap.find(procName);
@@ -375,6 +322,29 @@ namespace Nymph
             pInfo.fProc = proc;
             fProcMap.insert(ProcMapValue(procName, pInfo));
             KTDEBUG(proclog, "Added processor <" << procName << "> (a.k.a. " << proc->GetConfigName() << ")");
+            return true;
+        }
+        KTWARN(proclog, "Processor <" << procName << "> already exists; new processor was not added.");
+        return false;
+    }
+
+    bool KTProcessorToolbox::AddProcessor(const std::string& procType, const std::string& procName)
+    {
+        ProcMapIt it = fProcMap.find(procName);
+        if (it == fProcMap.end())
+        {
+            KTProcessor* newProc = fProcFactory->create(procType, procType);
+            if (newProc == NULL)
+            {
+                KTERROR(proclog, "Unable to create processor of type <" << procType << ">");
+                return false;
+            }
+            if (! AddProcessor(procName, newProc))
+            {
+                KTERROR(proclog, "Unable to add processor <" << procName << ">");
+                delete newProc;
+                return false;
+            }
             return true;
         }
         KTWARN(proclog, "Processor <" << procName << "> already exists; new processor was not added.");
@@ -415,6 +385,143 @@ namespace Nymph
         fProcMap.clear();
         fRunQueue.clear();
         return;
+    }
+
+
+    bool KTProcessorToolbox::MakeConnection(const std::string& signal, const std::string& slot, int order)
+    {
+        string signalProcName, signalName;
+        if (! ParseSignalSlotName(signal, signalProcName, signalName))
+        {
+            KTERROR(proclog, "Unable to parse signal name: <" << signal << ">");
+            return false;
+        }
+
+        string slotProcName, slotName;
+        if (! ParseSignalSlotName(slot, slotProcName, slotName))
+        {
+            KTERROR(proclog, "Unable to parse slot name: <" << slot << ">");
+            return false;
+        }
+
+        return MakeConnection(signalProcName, signalName, slotProcName, slotName, order);
+    }
+
+    bool KTProcessorToolbox::MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName, int order)
+    {
+        KTProcessor* signalProc = GetProcessor(signalProcName);
+        if (signalProc == NULL)
+        {
+            KTERROR(proclog, "Processor named <" << signalProcName << "> was not found!");
+            return false;
+        }
+
+        KTProcessor* slotProc = GetProcessor(slotProcName);
+        if (slotProc == NULL)
+        {
+            KTERROR(proclog, "Processor named <" << slotProcName << "> was not found!");
+            return false;
+        }
+
+        try
+        {
+            if (order != std::numeric_limits< int >::min())
+            {
+                signalProc->ConnectASlot(signalName, slotProc, slotName, order);
+            }
+            else
+            {
+                signalProc->ConnectASlot(signalName, slotProc, slotName);
+            }
+        }
+        catch (std::exception& e)
+        {
+            KTERROR(proclog, "An error occurred while connecting signals and slots:\n"
+                    << "\tSignal " << signalName << " from processor " << signalProcName << " (a.k.a. " << signalProc->GetConfigName() << ")" << '\n'
+                    << "\tSlot " << slotName << " from processor " << slotProcName << " (a.k.a. " << slotProc->GetConfigName() << ")" << '\n'
+                    << '\t' << e.what());
+            return false;
+        }
+
+        return true;
+    }
+
+    bool KTProcessorToolbox::ParseSignalSlotName(const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot) const
+    {
+        size_t sepPos = toParse.find_first_of(fSigSlotNameSep);
+        if (sepPos == string::npos)
+        {
+            KTERROR(proclog, "Unable to find separator between processor and signal/slot name in <" << toParse << ">");
+            return false;
+        }
+        nameOfProc = toParse.substr(0, sepPos);
+        nameOfSigSlot = toParse.substr(sepPos + 1);
+        return true;
+    }
+
+
+    bool KTProcessorToolbox::PushBackToRunQueue(const std::string& name)
+    {
+        ThreadGroup threadGroup;
+
+        if (! AddProcessorToThreadGroup( name, threadGroup))
+        {
+            KTERROR(proclog, "Unable to add processor <" << name << "> to thread group");
+            return false;
+        }
+
+        fRunQueue.push_back(threadGroup);
+
+        KTINFO(proclog, "Added processor <" << name << "> to the run queue");
+        return true;
+    }
+
+    bool KTProcessorToolbox::PushBackToRunQueue(std::initializer_list< std::string > names)
+    {
+        return PushBackToRunQueue(std::vector< std::string >(names));
+    }
+
+    bool KTProcessorToolbox::PushBackToRunQueue(std::vector< std::string > names)
+    {
+        ThreadGroup threadGroup;
+
+        std::stringstream toPrint;
+        for (const std::string& name : names)
+        {
+            if (! AddProcessorToThreadGroup(name, threadGroup))
+            {
+                KTERROR(proclog, "Unable to add processor <" << name << "> to thread group");
+                return false;
+            }
+            toPrint << name << ", "; // the extra comma at the end is removed below
+        }
+
+        fRunQueue.push_back(threadGroup);
+        std::string toPrintString = toPrint.str();
+        toPrintString.resize(toPrintString.size()-2);
+        KTINFO(proclog, "Added processors <" << toPrintString << "> to the run queue");
+        return true;
+    }
+
+    bool KTProcessorToolbox::AddProcessorToThreadGroup(const std::string& name, ThreadGroup& group)
+    {
+        KTProcessor* procForRunQueue = GetProcessor(name);
+        KTDEBUG(proclog, "Attempting to add processor <" << name << "> to the run queue");
+        if (procForRunQueue == NULL)
+        {
+            KTERROR(proclog, "Unable to find processor <" << name << "> requested for the run queue");
+            return false;
+        }
+
+        KTPrimaryProcessor* primaryProc = dynamic_cast< KTPrimaryProcessor* >(procForRunQueue);
+        if (primaryProc == NULL)
+        {
+            KTERROR(proclog, "Processor <" << name << "> is not a primary processor.");
+            return false;
+        }
+        //group.insert(primaryProc);
+        group.insert(Thread(primaryProc, name));
+        return true;
     }
 
 } /* namespace Nymph */

@@ -15,6 +15,8 @@
 #include "factory.hh"
 
 #include <deque>
+#include <initializer_list>
+#include <limits>
 #include <set>
 
 namespace Nymph
@@ -78,18 +80,90 @@ namespace Nymph
         private:
             scarab::factory< KTProcessor, const std::string& >* fProcFactory; // singleton; not owned by KTProcessorToolbox
 
+
         public:
             /// Configure the toolbox: create the processors; connnect signals and slots; and setup the run queue.
             bool Configure(const scarab::param_node* node);
 
             /// Configure processors (only those specified in the toolbox)
             bool ConfigureProcessors(const scarab::param_node* node);
+            /// Configure processors from a json-encoding of their configurations
+            bool ConfigureProcessors(const std::string& config);
+
+
+        public:
+            /// Process the run queue.
+            /// This will call Run() on all of the processors in the queue.
+            bool Run();
+
+
+        private:
+            struct ProcessorInfo
+            {
+                KTProcessor* fProc;
+            };
+            typedef std::map< std::string, ProcessorInfo > ProcessorMap;
+            typedef ProcessorMap::iterator ProcMapIt;
+            typedef ProcessorMap::const_iterator ProcMapCIt;
+            typedef ProcessorMap::value_type ProcMapValue;
+
+        public:
+            /// Get a pointer to a processor in the toolbox
+            KTProcessor* GetProcessor(const std::string& procName);
+            /// Get a pointer to a processor in the toolbox
+            const KTProcessor* GetProcessor(const std::string& procName) const;
+
+            /// Add a processor to the toolbox
+            /// Toolbox takes ownership of the processor
+            bool AddProcessor(const std::string& procName, KTProcessor* proc);
+            bool AddProcessor(const std::string& procType, const std::string& procName);
+
+            /// Remove a processor from the toolbox
+            bool RemoveProcessor(const std::string& procName);
+
+            /// Remove a processor from the toolbox and return it to the user
+            /// Ownership is passed to the user
+            KTProcessor* ReleaseProcessor(const std::string& procName);
+
+            /// Remove all processors from the toolbox
+            /// Also clears the run queue
+            void ClearProcessors();
+
+        private:
+            ProcessorMap fProcMap;
+
+
+        public:
+            /// Make a connection between the signal from one processor and the slot from another processor
+            /// Both processors should already have been added to the Toolbox
+            /// Signal and slot strings should be formatted as: [processor name]:[signal/slot name]
+            bool MakeConnection(const std::string& signal, const std::string& slot, int order = std::numeric_limits< int >::min());
+
+            /// Make a connection between the signal from one processor and the slot from another processor
+            /// Both processors should already have been added to the Toolbox
+            bool MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName, int order = std::numeric_limits< int >::min());
 
         private:
             bool ParseSignalSlotName(const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot) const;
             static const char fSigSlotNameSep = ':';
 
 
+        public:
+            /// Push a single processor to the back of the run queue
+            bool PushBackToRunQueue(const std::string& name);
+
+            /// Push a set of processors to be run in parallel to the back of the run queue
+            bool PushBackToRunQueue(std::initializer_list< std::string > names);
+            /// Push a set of processors to be run in parallel to the back of the run queue
+            bool PushBackToRunQueue(std::vector< std::string > names);
+
+            /// Remove the last item in the run queue, whether it's a single processor or a group of processors
+            void PopBackOfRunQueue();
+
+            /// Clear the run queue
+            void ClearRunQueue();
+
+        private:
             struct Thread
             {
                     KTPrimaryProcessor* fProc;
@@ -107,38 +181,25 @@ namespace Nymph
             };
             typedef std::set< Thread, CompareThread > ThreadGroup;
             typedef std::deque< ThreadGroup > RunQueue;
-            bool AddProcessorToThreadGroup(const scarab::param_value* param, ThreadGroup& group);
+            bool AddProcessorToThreadGroup(const std::string& name, ThreadGroup& group);
 
-        public:
-            /// Process the run queue.
-            /// This will call Run() on all of the processors in the queue.
-            bool Run();
-
-        private:
             RunQueue fRunQueue;
 
-        private:
-            struct ProcessorInfo
-            {
-                KTProcessor* fProc;
-            };
-            typedef std::map< std::string, ProcessorInfo > ProcessorMap;
-            typedef ProcessorMap::iterator ProcMapIt;
-            typedef ProcessorMap::const_iterator ProcMapCIt;
-            typedef ProcessorMap::value_type ProcMapValue;
-
-        public:
-            KTProcessor* GetProcessor(const std::string& procName);
-            const KTProcessor* GetProcessor(const std::string& procName) const;
-            bool AddProcessor(const std::string& procName, KTProcessor* proc);
-            bool RemoveProcessor(const std::string& procName);
-            KTProcessor* ReleaseProcessor(const std::string& procName);
-            void ClearProcessors();
-
-        private:
-            ProcessorMap fProcMap;
-
     };
+
+    inline void KTProcessorToolbox::PopBackOfRunQueue()
+    {
+        fRunQueue.pop_back();
+        return;
+    }
+
+    inline void KTProcessorToolbox::ClearRunQueue()
+    {
+        fRunQueue.clear();
+        return;
+    }
+
+
 
 } /* namespace Nymph */
 #endif /* KTPROCESSORTOOLBOX_HH_ */

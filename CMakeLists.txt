@@ -9,7 +9,7 @@ cmake_minimum_required (VERSION 3.1)
 #########
 
 cmake_policy( SET CMP0048 NEW ) # version in project()
-project( Nymph VERSION 1.2.6 )
+project( Nymph VERSION 1.2.7 )
 
 list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Scarab/cmake )
 include( PackageBuilder )
@@ -30,6 +30,9 @@ set_option( USE_CPP11 TRUE )
 
 # Build the Nymph executable (also requires Nymph_ENABLE_EXECUTABLES)
 option( Nymph_BUILD_NYMPH_EXE "Flag to build the Nymph executable; also requires Nymph_ENABLE_EXECUTABLES" ON )
+
+# Build python bindings (requires boost::python)
+option( Nymph_ENABLE_PYTHON "Build python bindings (NymphPy)" OFF )
 
 # Add a "Standard" build type
 #set (CMAKE_BUILD_TYPE standard)
@@ -63,16 +66,30 @@ nymph_process_options()
 
 pbuilder_add_submodule( Scarab Scarab/library )
 
+# this is needed for anything that wants to read or write JSON files
+get_directory_property( RAPIDJSON_FILE_BUFFER_SIZE DIRECTORY Scarab/library DEFINITION RAPIDJSON_FILE_BUFFER_SIZE )
+set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
+
 #######
 # Boost
 #######
 
 # Boost (1.46 required for filesystem version 3)
-find_package (Boost 1.46.0 REQUIRED COMPONENTS date_time filesystem program_options system thread)
+list (APPEND Boost_COMPONENTS date_time filesystem program_options system thread)
+if (Nymph_ENABLE_PYTHON)
+    list(APPEND Boost_COMPONENTS python)
+endif (Nymph_ENABLE_PYTHON)
+find_package (Boost 1.46.0 REQUIRED COMPONENTS ${Boost_COMPONENTS})
 # make sure dynamic linking is assumed for all boost libraries
 add_definitions (-DBOOST_ALL_DYN_LINK)
 include_directories (${Boost_INCLUDE_DIRS})
 pbuilder_add_ext_libraries (${Boost_LIBRARIES})
+
+# python deps
+if (Nymph_ENABLE_PYTHON)
+    include (PythonPackage)
+    python_package_find_python( 2.7 )
+endif (Nymph_ENABLE_PYTHON)
 
 
 ###############

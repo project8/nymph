@@ -10,7 +10,8 @@
 #include "KTCommandLineHandler.hh"
 #include "KTLogger.hh"
 #include "KTConfigurator.hh"
-#include "param.hh"
+
+#include "param_codec.hh"
 
 using std::string;
 
@@ -33,6 +34,13 @@ namespace Nymph
     {
     }
 
+    bool KTConfigurable::Configure(const std::string& config)
+    {
+        scarab::param_translator translator;
+        scarab::param_node optNode;
+        optNode.add( "encoding", new scarab::param_value( "json" ) );
+        return Configure( &translator.read_string( config, &optNode )->as_node() );;
+    }
 
 
     //**********************
