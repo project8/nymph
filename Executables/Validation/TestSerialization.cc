@@ -5,14 +5,10 @@
  *      Author: obla999
  */
 
-#include "KTCut.hh"
 #include "KTLogger.hh"
 #include "KTPrintDataStructure.hh"
 
-#include "KTTestCuts.hh"
 #include "KTTestData.hh"
-
-#include "param.hh"
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -31,21 +27,17 @@ int main()
     KTCoreDataExt& data = dataHandle->Of< KTCoreDataExt >();
     KTTestDataExt& testData = dataHandle->Of< KTTestDataExt >();
 
-    KTINFO(testlog, "Applying awesome cut");
-    KTAwesomeCut cut;
-    cut.Apply(data, testData);
-
-    KTINFO(testlog, "Applying not-awesome cut");
-    KTNotAwesomeCut naCut;
-    naCut.Apply(data, testData);
+    // change data values from their defaults
+    data.SetCounter( 5 );
+    testData.SetIsAwesome( true );
 
     KTPrintDataStructure printer;
 
     KTINFO(testlog, "Printing data structure -- before saving");
     printer.PrintDataStructure(dataHandle);
 
-    KTINFO(testlog, "Printing cut structure -- before saving");
-    printer.PrintCutStructure(dataHandle);
+    KTINFO(testlog, "KTCoreData counter: " << data.GetCounter());
+    KTINFO(testlog, "KTTestData is-awesome: " << testData.GetIsAwesome());
 
     // save data to archive
     {
@@ -60,8 +52,8 @@ int main()
 
     // ... some time later restore the class instance to its original state
     KTDataHandle newDataHandle = CreateNewDataHandle();
-    KTCoreDataExt& newData = dataHandle->Of< KTCoreDataExt >();
-    KTTestDataExt& newTestData = dataHandle->Of< KTTestDataExt >();
+    KTCoreDataExt& newData = newDataHandle->Of< KTCoreDataExt >();
+    KTTestDataExt& newTestData = newDataHandle->Of< KTTestDataExt >();
     {
         // create and open an archive for input
         std::ifstream fileIn("test_serialization_output.txt");
@@ -75,8 +67,8 @@ int main()
     KTINFO(testlog, "Printing data structure -- after loading");
     printer.PrintDataStructure(newDataHandle);
 
-    KTINFO(testlog, "Printing cut structure -- after loading");
-    printer.PrintCutStructure(newDataHandle);
+    KTINFO(testlog, "KTCoreData counter: " << data.GetCounter());
+    KTINFO(testlog, "KTTestData is-awesome: " << testData.GetIsAwesome());
 
     return 0;
 }
