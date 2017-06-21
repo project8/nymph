@@ -74,7 +74,7 @@ namespace Nymph
         ar & bs::base_object< KTData >( *this );
         ar & fCounter;
         ar & fLastData;
-        //ar & fCutStatus;
+        ar & fCutStatus;
         return;
     }
 

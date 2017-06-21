@@ -58,6 +58,7 @@ namespace Nymph
     template< class Archive >
     void KTCutResultCore::serialize( Archive& ar, const unsigned version )
     {
+        std::cout << "### serialize for KTCutResultCore" << std::endl;
         ar & fState;
         return;
     }
@@ -66,6 +67,7 @@ namespace Nymph
     template< class Archive >
     void KTExtensibleCutResult< XDerivedType >::serialize( Archive& ar, const unsigned version )
     {
+        std::cout << "### serialize for KTExtensibleCutResult< XDerivedType >" << std::endl;
         ar & bs::base_object< KTExtensibleStruct< XDerivedType, KTCutResultCore > >( *this );
         return;
     }

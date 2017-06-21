@@ -12,12 +12,15 @@
 
 #include "KTMemberVariable.hh"
 
+#include "KTLogger.hh"
+
 #include <string>
 
 namespace bs  = boost::serialization;
 
 namespace Nymph
 {
+    LOGGER( logdata_hh, "KTData.hh" );
 
     class KTData
     {
@@ -82,6 +85,7 @@ namespace Nymph
                 template< class Archive > \
                 void serialize( Archive& ar, const unsigned version ) \
                 { \
+                    KTWARN( logdata_hh, "In extensible data " ); \
                     ar & bs::base_object< data_class_name >( *this ); \
                     ar & bs::base_object< KTExtensibleDataRider< ex_data_class_name > >( *this ); \
                     return; \

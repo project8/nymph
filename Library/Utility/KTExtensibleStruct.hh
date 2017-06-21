@@ -67,8 +67,6 @@ namespace Nymph
 
             template< class Archive >
             void serialize( Archive& ar, const unsigned version );
-
-            static bool fDoExtensibleSerialize;
     };
 
 
@@ -255,13 +253,12 @@ namespace Nymph
     template< class Archive >
     void KTExtensibleStructCore< XBaseType >::serialize( Archive& ar, const unsigned version )
     {
+        std::cout << "### serialize for KTExtensibleStructCore< XBaseType >" << std::endl;
         ar & bs::base_object< XBaseType >( *this );
-        if( KTExtensibleStructCore< XBaseType >::fDoExtensibleSerialize ) ar & fNext;
+        ar & fNext;
         return;
     }
 
-    //template< class XBaseType >
-    //bool KTExtensibleStructCore< XBaseType >::fDoExtensibleSerialize = true;
 
 
     template< class XInstanceType, class XBaseType >
@@ -363,6 +360,7 @@ namespace Nymph
     template< class Archive >
     void KTExtensibleStruct< XInstanceType, XBaseType >::serialize( Archive& ar, const unsigned version )
     {
+        std::cout << "### serialize for KTExtensibleStruct< XInstanceType, XBaseType >" << std::endl;
         ar & bs::base_object< KTExtensibleStructCore< XBaseType > >( *this );
         return;
     }

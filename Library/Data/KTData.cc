@@ -22,7 +22,4 @@ namespace Nymph
     KTDataRider::~KTDataRider()
     {}
 
-    template<>
-    bool KTExtensibleStructCore< KTDataRider >::fDoExtensibleSerialize = false;
-
 } /* namespace Nymph */

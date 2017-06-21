@@ -16,7 +16,4 @@ namespace Nymph
     KTCutResultCore::~KTCutResultCore()
     {}
 
-    template<>
-    bool KTExtensibleStructCore< KTCutResultCore >::fDoExtensibleSerialize = true;
-
 } /* namespace Nymph */
