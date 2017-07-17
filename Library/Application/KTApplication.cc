@@ -159,10 +159,8 @@ namespace Nymph
     	return;
     }
 
-    bool KTApplication::Configure(const scarab::param_node* node)
+    bool KTApplication::Configure(const scarab::param_node&)
     {
-        //if (node == NULL) return true;
-
         return true;
     }
 

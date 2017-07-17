@@ -27,7 +27,7 @@ namespace Nymph
         public:
             using KTSelfConfigurable::Configure;
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             bool IsReady() const;
 

@@ -31,7 +31,7 @@ namespace Nymph
             KTAwesomeCut(const std::string& name = "default-awesome-cut");
             virtual ~KTAwesomeCut();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             bool Apply(KTCoreData& data, const KTTestData& testData);
     };
@@ -49,7 +49,7 @@ namespace Nymph
             KTNotAwesomeCut(const std::string& name = "default-not-awesome-cut");
             virtual ~KTNotAwesomeCut();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             bool Apply(KTCoreData& data, const KTTestData& testData);
     };

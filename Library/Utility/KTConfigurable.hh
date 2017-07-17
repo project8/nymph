@@ -28,7 +28,7 @@ namespace Nymph
             virtual ~KTConfigurable();
 
             /// Should perform parameter store and command-line configurations
-            virtual bool Configure(const scarab::param_node* node) = 0;
+            virtual bool Configure(const scarab::param_node& node) = 0;
             /// Implement the option for calling Configure without passing a parameter store node.
             //virtual bool Configure();
             /// Configure from a JSON string
@@ -73,7 +73,7 @@ namespace Nymph
             virtual ~KTSelfConfigurable();
 
             /// Should perform parameter store and command-line configurations
-            virtual bool Configure(const scarab::param_node* node) = 0;
+            virtual bool Configure(const scarab::param_node& node) = 0;
             /// Configure by getting the top-level node from the parameter store
             virtual bool Configure();
 
