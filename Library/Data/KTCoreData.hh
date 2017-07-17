@@ -14,6 +14,7 @@
 #include "KTLogger.hh"
 
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 
 #include <memory>
 #include <string>
@@ -41,7 +42,6 @@ namespace Nymph
     };
 
     DEFINE_EXT_DATA( KTCoreData, "core" )
-
 
     // Define KTDataHandle and a convenience function to create new handles
     typedef std::shared_ptr< KTCoreDataExt > KTDataHandle;
@@ -96,6 +96,8 @@ namespace Nymph
         return DataPresentHelper< OtherDataTypes... >::DataPresent( data );
     }
 
-
 } /* namespace Nymph */
+
+//BOOST_CLASS_EXPORT_KEY( Nymph::KTCoreDataExt );
+
 #endif /* KTCOREDATA_HH_ */

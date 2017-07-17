@@ -7,6 +7,8 @@
 
 #include "KTCoreData.hh"
 
+BOOST_CLASS_EXPORT_IMPLEMENT( Nymph::KTCoreDataExt );
+
 namespace Nymph
 {
     KTCoreData::KTCoreData() :

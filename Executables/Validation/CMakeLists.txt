@@ -51,6 +51,7 @@ if (Nymph_ENABLE_TESTING)
         TestCut
         TestCutFilter
         TestExceptionInSlot
+        TestExtDataSerialization
         TestLogger
         TestPolymorphicSlotData
         TestPrimaryProcessor

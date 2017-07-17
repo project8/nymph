@@ -74,10 +74,10 @@ namespace Nymph
 
 } /* namespace Nymph */
 
-BOOST_CLASS_EXPORT_KEY( Nymph::KTTestBaseData );
-BOOST_CLASS_EXPORT_KEY( Nymph::KTTestDerived1DataExt );
-BOOST_CLASS_EXPORT_KEY( Nymph::KTTestDerived2DataExt );
-BOOST_CLASS_EXPORT_KEY( Nymph::KTTestData );
-BOOST_CLASS_EXPORT_KEY( Nymph::KTTestDataExt );
+//BOOST_CLASS_EXPORT_KEY( Nymph::KTTestBaseData );
+//BOOST_CLASS_EXPORT_KEY( Nymph::KTTestDerived1DataExt );
+//BOOST_CLASS_EXPORT_KEY( Nymph::KTTestDerived2DataExt );
+//BOOST_CLASS_EXPORT_KEY( Nymph::KTTestData );
+//BOOST_CLASS_EXPORT_KEY( Nymph::KTTestDataExt );
 
 #endif /* NYMPH_KTTESTDATA_HH_ */
