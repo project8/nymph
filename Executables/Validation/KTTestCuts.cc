@@ -30,7 +30,7 @@ namespace Nymph
     KTAwesomeCut::~KTAwesomeCut()
     {}
 
-    bool KTAwesomeCut::Configure(const scarab::param_node* node)
+    bool KTAwesomeCut::Configure(const scarab::param_node&)
     {
         return true;
     }
@@ -54,7 +54,7 @@ namespace Nymph
     KTNotAwesomeCut::~KTNotAwesomeCut()
     {}
 
-    bool KTNotAwesomeCut::Configure(const scarab::param_node* node)
+    bool KTNotAwesomeCut::Configure(const scarab::param_node&)
     {
         return true;
     }

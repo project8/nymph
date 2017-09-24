@@ -33,7 +33,7 @@ namespace Nymph
     {
     }
 
-    bool KTPrintDataStructure::Configure(const scarab::param_node* node)
+    bool KTPrintDataStructure::Configure(const scarab::param_node&)
     {
         return true;
     }

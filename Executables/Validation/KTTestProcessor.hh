@@ -25,7 +25,7 @@ namespace Nymph
             KTTestProcessorA( const std::string& name = "test-proc-a" );
             virtual ~KTTestProcessorA();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             void EmitSignals(int);
 
@@ -42,7 +42,7 @@ namespace Nymph
             KTTestProcessorB( const std::string& name = "test-proc-b" );
             virtual ~KTTestProcessorB();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             void SlotFunc1(int);
             void SlotFunc2(int);
@@ -64,7 +64,7 @@ namespace Nymph
             KTTestProcessorC( const std::string& name = "test-proc-c" );
             virtual ~KTTestProcessorC();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             void SlotFunc1(int);
 
@@ -84,7 +84,7 @@ namespace Nymph
             KTTestProcessorD( const std::string& name = "test-proc-d" );
             virtual ~KTTestProcessorD();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             // Creates a KTTestData object, sets the awesomeness to the given value, and emits fSignal
             void EmitSignal(bool isAwesome = true);
@@ -112,7 +112,7 @@ namespace Nymph
             KTTestProcessorE( const std::string& name = "test-proc-d" );
             virtual ~KTTestProcessorE();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             void EmitSignals();
 

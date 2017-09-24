@@ -98,10 +98,10 @@ namespace Nymph
 
         public:
             /// Configure the toolbox: create the processors; connnect signals and slots; and setup the run queue.
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             /// Configure processors (only those specified in the toolbox)
-            bool ConfigureProcessors(const scarab::param_node* node);
+            bool ConfigureProcessors(const scarab::param_node& node);
             /// Configure processors from a json-encoding of their configurations
             bool ConfigureProcessors(const std::string& config);
 

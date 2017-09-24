@@ -28,7 +28,7 @@ namespace Nymph
 
     }
 
-    bool KTDataQueueProcessor::ConfigureSubClass(const scarab::param_node*)
+    bool KTDataQueueProcessor::ConfigureSubClass(const scarab::param_node&)
     {
         return true;
     }

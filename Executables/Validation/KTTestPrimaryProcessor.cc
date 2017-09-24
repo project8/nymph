@@ -23,11 +23,9 @@ namespace Nymph
     {
     }
 
-    bool KTTestPrimaryProcessor::Configure( const scarab::param_node* node )
+    bool KTTestPrimaryProcessor::Configure( const scarab::param_node& node )
     {
-        if( node == nullptr ) return true;
-
-        SetIterations( node->get_value( "iterations", GetIterations() ) );
+        SetIterations( node.get_value( "iterations", GetIterations() ) );
 
         return true;
     }
