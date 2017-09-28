@@ -280,6 +280,33 @@ namespace Nymph
     };
 
 
+    template< class XDataType1, class XDataType2, class XDataType3 >
+    class KTSlotDataThreeTypes
+    {
+        public:
+            typedef XDataType1 first_data_type;
+            typedef XDataType2 second_data_type;
+            typedef XDataType3 third_data_type;
+            typedef boost::function< void (KTDataPtr) > function_signature;
+            typedef typename function_signature::result_type return_type;
+            typedef typename function_signature::argument_type argument_type;
+
+        public:
+            /// Constructor for the case where the processor has the function that will be called by the slot
+            template< class XFuncOwnerType >
+            KTSlotDataThreeTypes(const std::string& name, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)(first_data_type&, second_data_type&, third_data_type&), KTSignalData* signalPtr=NULL);
+            /// Constructor for the case where the processor and the object with the function that will be called are different
+            template< class XFuncOwnerType >
+            KTSlotDataThreeTypes(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)(first_data_type&, second_data_type&, third_data_type&), KTSignalData* signalPtr=NULL);
+            virtual ~KTSlotDataThreeTypes();
+
+            void operator()(KTDataPtr data);
+
+        protected:
+            boost::function< bool (first_data_type&, second_data_type&, third_data_type&) > fFunc;
+
+            KTSignalData* fSignalPtr;
+    };
 
 
 
@@ -374,6 +401,64 @@ namespace Nymph
         if (! fFunc(data->Of< first_data_type >(), data->Of< second_data_type >()))
         {
             KTERROR(slotlog, "Something went wrong while analyzing data with types <" << typeid(first_data_type).name() << "> and <" << typeid(second_data_type).name() << ">");
+            return;
+        }
+        // If there's a signal pointer, emit the signal
+        if (fSignalPtr != NULL)
+        {
+            (*fSignalPtr)(data);
+        }
+        return;
+    }
+
+
+    template< class XDataType1, class XDataType2, class XDataType3 >
+    template< class XFuncOwnerType >
+    KTSlotDataThreeTypes< XDataType1, XDataType2, XDataType3 >::KTSlotDataThreeTypes(const std::string& name, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)(first_data_type&, second_data_type&, third_data_type&), KTSignalData* signalPtr) :
+            fFunc(boost::bind(func, owner, _1, _2, _3)),
+            fSignalPtr(signalPtr)
+    {
+        owner->RegisterSlot(name, this, &KTSlotDataThreeTypes::operator());
+    }
+
+    template< class XDataType1, class XDataType2, class XDataType3 >
+    template< class XFuncOwnerType >
+    KTSlotDataThreeTypes< XDataType1, XDataType2, XDataType3 >::KTSlotDataThreeTypes(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, bool (XFuncOwnerType::*func)(first_data_type&, second_data_type&, third_data_type&), KTSignalData* signalPtr) :
+            fFunc(boost::bind(func, owner, _1, _2, _3)),
+            fSignalPtr(signalPtr)
+    {
+        proc->RegisterSlot(name, this, &KTSlotDataThreeTypes::operator());
+    }
+
+    template< class XDataType1, class XDataType2, class XDataType3 >
+    KTSlotDataThreeTypes< XDataType1, XDataType2, XDataType3 >::~KTSlotDataThreeTypes()
+    {
+    }
+
+    template< class XDataType1, class XDataType2, class XDataType3 >
+    void KTSlotDataThreeTypes< XDataType1, XDataType2, XDataType3 >::operator()(KTDataPtr data)
+    {
+        // Standard data slot pattern:
+        // Check to ensure that the required data type is present
+        if (! data->Has< first_data_type >())
+        {
+            KTERROR(slotlog, "Data not found with type <" << typeid(first_data_type).name() << ">");
+            return;
+        }
+        if (! data->Has< second_data_type >())
+        {
+            KTERROR(slotlog, "Data not found with type <" << typeid(second_data_type).name() << ">");
+            return;
+        }
+        if (! data->Has< third_data_type >())
+        {
+            KTERROR(slotlog, "Data not found with type <" << typeid(third_data_type).name() << ">");
+            return;
+        }
+        // Call the function
+        if (! fFunc(data->Of< first_data_type >(), data->Of< second_data_type >(), data->Of< third_data_type >()))
+        {
+            KTERROR(slotlog, "Something went wrong while analyzing data with types <" << typeid(first_data_type).name() << ">, <" << typeid(second_data_type).name() << ">, and <" << typeid(third_data_type).name() << ">");
             return;
         }
         // If there's a signal pointer, emit the signal
