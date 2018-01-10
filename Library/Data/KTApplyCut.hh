@@ -57,7 +57,7 @@ namespace Nymph
             KTApplyCut(const std::string& name = "apply-cut");
             virtual ~KTApplyCut();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             KTCut* GetCut() const;
             void SetCut(KTCut* cut);

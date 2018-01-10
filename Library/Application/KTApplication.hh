@@ -65,7 +65,7 @@ namespace Nymph
             void AddConfigOptionsToCLHandler(const scarab::param& param, const std::string& rootName);
 
         public:
-            virtual bool Configure(const scarab::param_node* node);
+            virtual bool Configure(const scarab::param_node& node);
 
         public:
             KTCommandLineHandler* GetCommandLineHandler() const;

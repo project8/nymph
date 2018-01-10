@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 
     const scarab::param_node& topNode = app->GetConfigurator()->Config();
 
-    if (testObj->Configure(&topNode.node_at(testObj->GetConfigName())))
+    if (testObj->Configure(topNode.node_at(testObj->GetConfigName())))
     {
         KTINFO(testapplog, "Configuration complete:\n"
                 << "\tInt data: " << testObj->GetIntData() << '\n'

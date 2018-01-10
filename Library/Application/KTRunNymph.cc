@@ -23,7 +23,7 @@ namespace Nymph
         {
             const scarab::param_node& parentConfigNode = app->GetConfigurator()->Config();
 
-            if( ! app->Configure(&parentConfigNode.node_at(app->GetConfigName() ) ) )
+            if( ! app->Configure(parentConfigNode.node_at(app->GetConfigName() ) ) )
             {
                 KTERROR( nlog, "Unable to configure the application. Aborting.");
                 return -2;
@@ -33,14 +33,14 @@ namespace Nymph
             // This will create all of the requested processors, connect their signals and slots, and fill the run queue.
             KTProcessorToolbox procTB;
 
-            if ( ! procTB.Configure( &parentConfigNode.node_at( procTB.GetConfigName() ) ) )
+            if ( ! procTB.Configure( parentConfigNode.node_at( procTB.GetConfigName() ) ) )
             {
                 KTERROR( nlog, "Unable to configure processor toolbox. Aborting." );
                 return -3;
             }
 
             // Configure the processors
-            if ( ! procTB.ConfigureProcessors( &parentConfigNode ) )
+            if ( ! procTB.ConfigureProcessors( parentConfigNode ) )
             {
                 KTERROR( nlog, "Unable to configure processors. Aborting." );
                 return -4;
