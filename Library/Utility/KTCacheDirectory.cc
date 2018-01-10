@@ -26,11 +26,9 @@ namespace Nymph
     {
     }
 
-    bool KTCacheDirectory::Configure(const scarab::param_node* node)
+    bool KTCacheDirectory::Configure(const scarab::param_node& node)
     {
-        if (node == NULL) return false;
-
-        return SetPath(node->get_value("path", fPath.string()));
+        return SetPath(node.get_value("path", fPath.string()));
     }
 
 } /* namespace Nymph */

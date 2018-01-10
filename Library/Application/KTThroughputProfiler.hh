@@ -14,7 +14,7 @@
 
 #include "KTProcessor.hh"
 
-#include "KTData.hh"
+#include "KTCoreData.hh"
 
 #include <string>
 #include <sys/time.h>
@@ -70,7 +70,7 @@ namespace Nymph
 
      Slots:
      - "start": void (KTEggHeader*) -- Start the timer
-     - "data": void (KTDataPtr) -- Increment the counter on the number of data slices
+     - "data": void (KTDataHandle) -- Increment the counter on the number of data slices
      - "stop": void () -- Stop the timer
 
     */
@@ -81,14 +81,14 @@ namespace Nymph
             KTThroughputProfiler(const std::string& name = "throughput-profiler");
             virtual ~KTThroughputProfiler();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             void Start();
             void Stop();
 
-            void StartProfiling(KTDataPtr data);
+            void StartProfiling(KTDataHandle data);
 
-            void Data(KTDataPtr data);
+            void Data(KTDataHandle data);
 
             void Finish();
 

@@ -10,6 +10,8 @@
 #include "KTException.hh"
 #include "KTLogger.hh"
 
+//#include "KTTestData.hh"
+
 namespace Nymph
 {
     KTLOGGER(testsiglog, "KTTestProcessor")
@@ -26,7 +28,7 @@ namespace Nymph
     {
     }
 
-    bool KTTestProcessorA::Configure(const scarab::param_node*)
+    bool KTTestProcessorA::Configure(const scarab::param_node&)
     {
         return true;
     }
@@ -42,8 +44,8 @@ namespace Nymph
 
     KTTestProcessorB::KTTestProcessorB( const std::string& name ) :
             KTProcessor( name ),
-            fSlot1("first-slot", this, &KTTestProcessorB::SlotFunc1, {}),
-            fSlot2("second-slot", this, &KTTestProcessorB::SlotFunc2, {})
+            fSlot1("first-slot", this, &KTTestProcessorB::SlotFunc1),
+            fSlot2("second-slot", this, &KTTestProcessorB::SlotFunc2)
     {
         fSlot1Wrapper = GetSlot( "first-slot" );
         fSlot2Wrapper = GetSlot( "second-slot" );
@@ -53,7 +55,7 @@ namespace Nymph
     {
     }
 
-    bool KTTestProcessorB::Configure(const scarab::param_node*)
+    bool KTTestProcessorB::Configure(const scarab::param_node&)
     {
         return true;
     }
@@ -61,14 +63,14 @@ namespace Nymph
     void KTTestProcessorB::SlotFunc1(int input)
     {
         KTINFO(testsiglog, "Slot1: input is " << input);
-        fSlot1Wrapper->GetThreadRef()->Break( KTDataPtr(), fSlot1Wrapper->GetDoBreakpoint());
+        fSlot1Wrapper->GetThreadRef()->Break( KTDataHandle(), fSlot1Wrapper->GetDoBreakpoint());
         return;
     }
 
     void KTTestProcessorB::SlotFunc2(int input)
     {
         KTINFO(testsiglog, "Slot2: twice input is " << 2 * input);
-        fSlot2Wrapper->GetThreadRef()->Break( KTDataPtr(), fSlot2Wrapper->GetDoBreakpoint());
+        fSlot2Wrapper->GetThreadRef()->Break( KTDataHandle(), fSlot2Wrapper->GetDoBreakpoint());
         return;
     }
 
@@ -77,7 +79,7 @@ namespace Nymph
 
     KTTestProcessorC::KTTestProcessorC( const std::string& name ) :
             KTProcessor( name ),
-            fSlot1("first-slot", this, &KTTestProcessorC::SlotFunc1, {})
+            fSlot1("first-slot", this, &KTTestProcessorC::SlotFunc1)
     {
     }
 
@@ -85,7 +87,7 @@ namespace Nymph
     {
     }
 
-    bool KTTestProcessorC::Configure(const scarab::param_node*)
+    bool KTTestProcessorC::Configure(const scarab::param_node&)
     {
         return true;
     }
@@ -100,5 +102,82 @@ namespace Nymph
         return;
     }
 
+
+    KT_REGISTER_PROCESSOR(KTTestProcessorD, "test-proc-d");
+
+    KTTestProcessorD::KTTestProcessorD( const std::string& name ) :
+            KTProcessor( name ),
+            fDataSlot("test", this, &KTTestProcessorD::AnalysisFunc),
+            fDataSignal("test", this)
+    {
+    }
+
+    KTTestProcessorD::~KTTestProcessorD()
+    {
+    }
+
+    bool KTTestProcessorD::Configure(const scarab::param_node&)
+    {
+        return true;
+    }
+
+    void KTTestProcessorD::EmitSignal(bool isAwesome)
+    {
+        KTDataHandle dataHandle = CreateNewDataHandle();
+        KTTestDataExt& data = dataHandle->Of< KTTestDataExt >();
+        data.SetIsAwesome(isAwesome);
+        fDataSignal(dataHandle);
+        return;
+    }
+
+    void KTTestProcessorD::AnalysisFunc(const KTTestData& data)
+    {
+        KTINFO(testsiglog, "Is the data awesome? " << data.GetIsAwesome());
+        return;
+    }
+
+
+    KT_REGISTER_PROCESSOR(KTTestProcessorE, "test-proc-e");
+
+    KTTestProcessorE::KTTestProcessorE( const std::string& name ) :
+            KTProcessor( name ),
+            fDerived1DataSlot("derived-1", this, &KTTestProcessorE::BaseAnalysisFunc),
+            fDerived2DataSlot("derived-2", this, &KTTestProcessorE::BaseAnalysisFunc),
+            fDerived1DataSignal("derived-1", this),
+            fDerived2DataSignal("derived-2", this)
+    {
+    }
+
+    KTTestProcessorE::~KTTestProcessorE()
+    {
+    }
+
+    bool KTTestProcessorE::Configure(const scarab::param_node&)
+    {
+        return true;
+    }
+
+    void KTTestProcessorE::EmitSignals()
+    {
+        KTDataHandle dataHandle = CreateNewDataHandle();
+
+        KTINFO(testsiglog, "Creating data objects");
+        dataHandle->Of< KTTestDerived1DataExt >();
+        dataHandle->Of< KTTestDerived2DataExt >();
+
+        KTINFO(testsiglog, "Emitting data-1 signal");
+        fDerived1DataSignal( dataHandle );
+
+        KTINFO(testsiglog, "Emitting data-2 signal");
+        fDerived2DataSignal( dataHandle );
+
+        return;
+    }
+
+    void KTTestProcessorE::BaseAnalysisFunc(const KTTestBaseData& data)
+    {
+        KTINFO(testsiglog, "Data funniness measured to be: <" << data.GetFunniness() << ">");
+        return;
+    }
 
 } /* namespace Nymph */

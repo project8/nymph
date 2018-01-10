@@ -35,12 +35,12 @@ namespace Nymph
      Available configuration values: none
 
      Slots:
-     - "print-data": void (KTDataPtr) -- Prints the structure of the data object; Does not modify the data or cuts; Emits signal "data"
-     - "print-cuts": void (KTDataPtr) -- Prints the structure of the data's cuts; Does not modify the data or cuts; Emits signal "data"
-     - "print-data-and-cuts": void (KTDataPtr) -- Prints the structure of the data object and its cuts; Does not modify the data or cuts; Emits signal "data"
+     - "print-data": void (KTDataHandle) -- Prints the structure of the data object; Does not modify the data or cuts; Emits signal "data"
+     - "print-cuts": void (KTDataHandle) -- Prints the structure of the data's cuts; Does not modify the data or cuts; Emits signal "data"
+     - "print-data-and-cuts": void (KTDataHandle) -- Prints the structure of the data object and its cuts; Does not modify the data or cuts; Emits signal "data"
 
      Signals:
-     - "data": void (KTDataPtr) -- Emitted after structure information is printed
+     - "data": void (KTDataHandle) -- Emitted after structure information is printed
     */
 
     class KTPrintDataStructure : public KTProcessor
@@ -49,16 +49,16 @@ namespace Nymph
             KTPrintDataStructure(const std::string& name = "print-data-structure");
             virtual ~KTPrintDataStructure();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
         public:
-            void PrintDataStructure(KTDataPtr dataPtr);
-            void PrintCutStructure(KTDataPtr dataPtr);
-            void PrintDataAndCutStructure(KTDataPtr dataPtr);
+            void PrintDataStructure(KTDataHandle dataHandle);
+            void PrintCutStructure(KTDataHandle dataHandle);
+            void PrintDataAndCutStructure(KTDataHandle dataHandle);
 
         private:
-            void DoPrintDataStructure(KTDataPtr dataPtr);
-            void DoPrintCutStructure(KTDataPtr dataPtr);
+            void DoPrintDataStructure(KTDataHandle dataHandle);
+            void DoPrintCutStructure(KTDataHandle dataHandle);
 
             //***************
             // Signals
@@ -72,9 +72,9 @@ namespace Nymph
             //***************
 
         private:
-            KTSlot< KTDataPtr > fDataStructSlot;
-            KTSlot< KTDataPtr > fCutStructSlot;
-            KTSlot< KTDataPtr > fDataAndCutStructSlot;
+            KTSlot< KTDataHandle > fDataStructSlot;
+            KTSlot< KTDataHandle > fCutStructSlot;
+            KTSlot< KTDataHandle > fDataAndCutStructSlot;
 
     };
 }

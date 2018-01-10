@@ -8,12 +8,11 @@
 #include "KTTestCuts.hh"
 
 #include "KTLogger.hh"
+#include "KTTestData.hh"
 
 namespace Nymph
 {
     KTLOGGER(testlog, "KTTestCuts");
-
-    const std::string KTTestData::sName = "test-data";
 
     const std::string KTAwesomeCut::Result::sName = "awesome-cut";
     const std::string KTNotAwesomeCut::Result::sName = "not-awesome-cut";
@@ -22,28 +21,21 @@ namespace Nymph
     KT_REGISTER_CUT(KTNotAwesomeCut);
 
 
-    KTTestData::KTTestData() :
-            KTExtensibleData< KTTestData >(),
-            fIsAwesome(false)
-    {}
-
-    KTTestData::~KTTestData()
-    {}
-
-
     KTAwesomeCut::KTAwesomeCut(const std::string& name) :
-            KTCutOneArg(name)
-    {}
+            KTCutOnData(name)
+    {
+        SetApplyFunc( this, &KTAwesomeCut::Apply );
+    }
 
     KTAwesomeCut::~KTAwesomeCut()
     {}
 
-    bool KTAwesomeCut::Configure(const scarab::param_node* node)
+    bool KTAwesomeCut::Configure(const scarab::param_node&)
     {
         return true;
     }
 
-    bool KTAwesomeCut::Apply(KTData& data, KTTestData& testData)
+    bool KTAwesomeCut::Apply(KTCoreData& data, const KTTestData& testData)
     {
         bool isCut = ! testData.GetIsAwesome();
         KTDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
@@ -54,18 +46,20 @@ namespace Nymph
 
 
     KTNotAwesomeCut::KTNotAwesomeCut(const std::string& name) :
-            KTCutOneArg(name)
-    {}
+            KTCutOnData(name)
+    {
+        SetApplyFunc( this, &KTNotAwesomeCut::Apply );
+    }
 
     KTNotAwesomeCut::~KTNotAwesomeCut()
     {}
 
-    bool KTNotAwesomeCut::Configure(const scarab::param_node* node)
+    bool KTNotAwesomeCut::Configure(const scarab::param_node&)
     {
         return true;
     }
 
-    bool KTNotAwesomeCut::Apply(KTData& data, KTTestData& testData)
+    bool KTNotAwesomeCut::Apply(KTCoreData& data, const KTTestData& testData)
     {
         bool isCut = testData.GetIsAwesome();
         KTDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());

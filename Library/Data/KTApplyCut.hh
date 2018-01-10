@@ -43,12 +43,12 @@ namespace Nymph
      - "[cut name]": subtree -- specifies the cut to be used; parent node for the cut configuration
 
      Slots:
-     - "apply": void (KTDataPtr) -- Applies the cut to the received data; Requirements are set by the cut; No data is added.
+     - "apply": void (KTDataHandle) -- Applies the cut to the received data; Requirements are set by the cut; No data is added.
 
      Signals:
-     - "all": void (KTDataPtr) -- Emitted upon application of the cut regardless of cut result.
-     - "pass": void (KTDataPtr) -- Emitted upon application of the cut if the cut passed.
-     - "fail": void (KTDataPtr) -- Emitted upon application of the cut if the cut failed.
+     - "all": void (KTDataHandle) -- Emitted upon application of the cut regardless of cut result.
+     - "pass": void (KTDataHandle) -- Emitted upon application of the cut if the cut passed.
+     - "fail": void (KTDataHandle) -- Emitted upon application of the cut if the cut failed.
     */
 
     class KTApplyCut : public KTProcessor
@@ -57,7 +57,7 @@ namespace Nymph
             KTApplyCut(const std::string& name = "apply-cut");
             virtual ~KTApplyCut();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             KTCut* GetCut() const;
             void SetCut(KTCut* cut);
@@ -67,7 +67,7 @@ namespace Nymph
             KTCut* fCut;
 
         public:
-            void ApplyCut(KTDataPtr dataPtr);
+            void ApplyCut(KTDataHandle dataHandle);
 
 
             //***************

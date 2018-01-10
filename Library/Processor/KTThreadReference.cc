@@ -62,7 +62,7 @@ namespace Nymph
         return *this;
     }
 
-    void KTThreadReference::Break( const KTDataPtr& dataPtr, bool doBreakpoint )
+    void KTThreadReference::Break( const KTDataHandle& dataHandle, bool doBreakpoint )
     {
         if( doBreakpoint )
         {
@@ -75,7 +75,7 @@ namespace Nymph
             KTDEBUG( trlog, "Reacting to break (" << fName << ")" );
             // set the return for this thread
             KTWARN( trlog, "Setting value of data-ptr-ret promise (" << fName << ")" );
-            fDataPtrRet.set_value( dataPtr );
+            fDataPtrRet.set_value( dataHandle );
             // wait for continue signal
             fWaitForContinueFunc( lock );
         }

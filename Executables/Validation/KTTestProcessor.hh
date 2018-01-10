@@ -9,9 +9,9 @@
 #define KTTESTPROCESSOR_HH_
 
 #include "KTProcessor.hh"
-
-#include "KTSignal.hh"
 #include "KTSlot.hh"
+
+#include "KTTestData.hh"
 
 namespace Nymph
 {
@@ -25,7 +25,7 @@ namespace Nymph
             KTTestProcessorA( const std::string& name = "test-proc-a" );
             virtual ~KTTestProcessorA();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             void EmitSignals(int);
 
@@ -42,7 +42,7 @@ namespace Nymph
             KTTestProcessorB( const std::string& name = "test-proc-b" );
             virtual ~KTTestProcessorB();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             void SlotFunc1(int);
             void SlotFunc2(int);
@@ -64,7 +64,7 @@ namespace Nymph
             KTTestProcessorC( const std::string& name = "test-proc-c" );
             virtual ~KTTestProcessorC();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             void SlotFunc1(int);
 
@@ -72,6 +72,59 @@ namespace Nymph
             KTSlot< int > fSlot1;
     };
 
+
+//    class KTTestData;
+
+    /*!
+     * A simple test processor that has a slot for KTTestData
+     */
+    class KTTestProcessorD : public KTProcessor
+    {
+        public:
+            KTTestProcessorD( const std::string& name = "test-proc-d" );
+            virtual ~KTTestProcessorD();
+
+            bool Configure(const scarab::param_node& node);
+
+            // Creates a KTTestData object, sets the awesomeness to the given value, and emits fSignal
+            void EmitSignal(bool isAwesome = true);
+
+            void AnalysisFunc(const KTTestData& data);
+
+        private:
+            KTSlotData< void, KTTestDataExt > fDataSlot;
+
+            KTSignalData fDataSignal;
+    };
+
+
+//    template< class XDerivedDataType >
+//    class KTTestPolyDataBase< XDerivedDataType >;
+//    class KTTestDerived1Data;
+//    class KTTestDerived2Data;
+
+    /*!
+     * A simple test processor for testing polymorphic data, signals, and slots
+     */
+    class KTTestProcessorE : public KTProcessor
+    {
+        public:
+            KTTestProcessorE( const std::string& name = "test-proc-d" );
+            virtual ~KTTestProcessorE();
+
+            bool Configure(const scarab::param_node& node);
+
+            void EmitSignals();
+
+            void BaseAnalysisFunc(const KTTestBaseData& data);
+
+        private:
+            KTSlotData< void, KTTestDerived1DataExt > fDerived1DataSlot;
+            KTSlotData< void, KTTestDerived2DataExt > fDerived2DataSlot;
+
+            KTSignalData fDerived1DataSignal;
+            KTSignalData fDerived2DataSignal;
+    };
 
 } /* namespace Nymph */
 #endif /* KTTESTPROCESSOR_HH_ */

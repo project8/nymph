@@ -28,24 +28,24 @@ namespace Nymph
 
     }
 
-    bool KTDataQueueProcessor::ConfigureSubClass(const scarab::param_node*)
+    bool KTDataQueueProcessor::ConfigureSubClass(const scarab::param_node&)
     {
         return true;
     }
 
-    void KTDataQueueProcessor::EmitDataSignal(KTDataPtr data)
+    void KTDataQueueProcessor::EmitDataSignal(KTDataHandle data)
     {
         fDataSignal(data);
         return;
     }
 
-    void KTDataQueueProcessor::QueueData(KTDataPtr& data)
+    void KTDataQueueProcessor::QueueData(KTDataHandle& data)
     {
         fQueueDataSW->GetThreadRef()->Break(data, fQueueDataSW->GetDoBreakpoint());
         return DoQueueData(data);
     }
 /*
-    void KTDataQueueProcessor::QueueDataList(list< KTDataPtr >* dataList)
+    void KTDataQueueProcessor::QueueDataList(list< KTDataHandle >* dataList)
     {
         return DoQueueDataList(dataList, &KTDataQueueProcessor::EmitDataSignal);
     }

@@ -35,20 +35,18 @@ namespace Nymph
     {
     }
 
-    bool KTCutFilter::Configure(const scarab::param_node* node)
+    bool KTCutFilter::Configure(const scarab::param_node& node)
     {
         // Config-file settings
-        if (node == NULL) return true;
-
-        if (node->has("cut-mask-int"))
+        if (node.has("cut-mask-int"))
         {
-            SetCutMask(node->get_value< unsigned long long >("cut-mask-int"));
+            SetCutMask(node.get_value< unsigned long long >("cut-mask-int"));
         }
-        if (node->has("cut-mask"))
+        if (node.has("cut-mask"))
         {
-            SetCutMask(KTCutStatus::bitset_type(node->get_value("cut-mask")));
+            SetCutMask(KTCutStatus::bitset_type(node.get_value("cut-mask")));
         }
-        if (node->get_value("cut-mask-all", false))
+        if (node.get_value("cut-mask-all", false))
         {
             SetCutMaskAll();
         }
@@ -56,14 +54,14 @@ namespace Nymph
         return true;
     }
 
-    bool KTCutFilter::Filter(KTData& data)
+    bool KTCutFilter::Filter(const KTCoreData& data)
     {
         if (fAllBits)
         {
             return data.CutStatus().IsCut();
         }
 
-        KTCutStatus& cutStatus = data.CutStatus();
+        const KTCutStatus& cutStatus = data.CutStatus();
         if (fConvertToBitset)
         {
             fCutMask = cutStatus.ToBitset(fCutMaskInt);
@@ -74,25 +72,25 @@ namespace Nymph
         return cutStatus.IsCut(fCutMask);
     }
 
-    void KTCutFilter::FilterData(KTDataPtr dataPtr)
+    void KTCutFilter::FilterData(KTDataHandle dataHandle)
     {
         std::shared_ptr< KTThreadReference > ref = fFilterDataSW->GetThreadRef();
 
-        // all KTDataPtr's have KTData, so we won't bother checking
+        // all KTDataHandle's have KTCoreData, so we won't bother checking
 
-        bool failCut = Filter(dataPtr->Of< KTData >());
+        bool failCut = Filter(dataHandle->Of< KTCoreDataExt >());
 
-        ref->Break( dataPtr, fFilterDataSW->GetDoBreakpoint() );
+        ref->Break( dataHandle, fFilterDataSW->GetDoBreakpoint() );
 
         if (failCut)
         {
-            fAfterCutFailSignal(dataPtr);
+            fAfterCutFailSignal(dataHandle);
         }
         else
         {
-            fAfterCutPassSignal(dataPtr);
+            fAfterCutPassSignal(dataHandle);
         }
-        fAfterCutSignal(dataPtr);
+        fAfterCutSignal(dataHandle);
 
         return;
     }

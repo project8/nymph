@@ -23,7 +23,7 @@ namespace Nymph
             virtual ~KTTestPrimaryProcessor();
 
         public:
-            bool Configure( const scarab::param_node* node );
+            bool Configure( const scarab::param_node& node );
 
             MEMBERVARIABLE( unsigned, Iterations );
 

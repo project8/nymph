@@ -33,23 +33,22 @@ namespace Nymph
         delete fCut;
     }
 
-    bool KTApplyCut::Configure(const scarab::param_node* node)
+    bool KTApplyCut::Configure(const scarab::param_node& node)
     {
         // Config-file settings
-        if (node == NULL) return false;
 
-        for (scarab::param_node::const_iterator nodeIt = node->begin(); nodeIt != node->end(); ++nodeIt)
+        for (scarab::param_node::const_iterator nodeIt = node.begin(); nodeIt != node.end(); ++nodeIt)
         {
             // first do configuration values we know about
             // as it happens, there aren't any
 
             // any remaining should be cut names
             // ignore any that don't work
-            if (SelectCut(nodeIt->first))
+            if (SelectCut(nodeIt.name()))
             {
-                if (nodeIt->second->is_node())
+                if (nodeIt->is_node())
                 {
-                    fCut->Configure(&nodeIt->second->as_node());
+                    fCut->Configure(nodeIt->as_node());
                 }
                 continue;
             }
@@ -83,7 +82,7 @@ namespace Nymph
     }
 
 
-    void KTApplyCut::ApplyCut(KTDataPtr dataPtr)
+    void KTApplyCut::ApplyCut(KTDataHandle dataHandle)
     {
         std::shared_ptr< KTThreadReference > ref = fApplyCutSW->GetThreadRef();
 
@@ -93,19 +92,19 @@ namespace Nymph
             return;
         }
 
-        bool cutFailed = fCut->Apply(dataPtr);
+        bool cutFailed = fCut->Apply(dataHandle);
 
-        ref->Break( dataPtr, fApplyCutSW->GetDoBreakpoint() );
+        ref->Break( dataHandle, fApplyCutSW->GetDoBreakpoint() );
 
         if (cutFailed)
         {
-            fAfterCutFailSignal(dataPtr);
+            fAfterCutFailSignal(dataHandle);
         }
         else
         {
-            fAfterCutPassSignal(dataPtr);
+            fAfterCutPassSignal(dataHandle);
         }
-        fAfterCutSignal(dataPtr);
+        fAfterCutSignal(dataHandle);
         return;
     }
 

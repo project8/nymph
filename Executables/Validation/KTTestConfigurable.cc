@@ -31,24 +31,21 @@ namespace Nymph
     {
     }
 
-    bool KTTestConfigurable::Configure(const scarab::param_node* node)
+    bool KTTestConfigurable::Configure(const scarab::param_node& node)
     {
         // Config-file options
-        if (node != NULL)
+        // option: check for data before getting it from the node
+        if (node.has("int-data"))
         {
-            // option: check for data before getting it from the node
-            if (node->has("int-data"))
-            {
-                fIntData = node->get_value< int >("int-data", fIntData);
-                KTINFO(testparamlog, "Configured integer (= existing value if not provided): " << fIntData);
-            }
-
-            // option: don't check for data before getting it from the node; rely on the default if it's not there.
-            fDoubleData = node->get_value< double >("double-data", fDoubleData);
-            KTINFO(testparamlog, "Configured double (= existing value if not provided): " << fDoubleData);
-            fStringData = node->get_value("string-data", fStringData);
-            KTINFO(testparamlog, "Configured string (= existing value if not provided): " << fStringData);
+            fIntData = node.get_value< int >("int-data", fIntData);
+            KTINFO(testparamlog, "Configured integer (= existing value if not provided): " << fIntData);
         }
+
+        // option: don't check for data before getting it from the node; rely on the default if it's not there.
+        fDoubleData = node.get_value< double >("double-data", fDoubleData);
+        KTINFO(testparamlog, "Configured double (= existing value if not provided): " << fDoubleData);
+        fStringData = node.get_value("string-data", fStringData);
+        KTINFO(testparamlog, "Configured string (= existing value if not provided): " << fStringData);
 
         // Command-line options
         fIntData = fCLHandler->GetCommandLineValue< int >("int-data", fIntData);

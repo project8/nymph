@@ -152,17 +152,15 @@ namespace Nymph
         	const scarab::param_node& paramNode = param.as_node();
     		for (scarab::param_node::const_iterator nodeIt = paramNode.begin(); nodeIt != paramNode.end(); ++nodeIt)
     		{
-    			AddConfigOptionsToCLHandler(*nodeIt->second, nextRootName + nodeIt->first);
+    			AddConfigOptionsToCLHandler(*nodeIt, nextRootName + nodeIt.name());
     		}
     	}
 
     	return;
     }
 
-    bool KTApplication::Configure(const scarab::param_node* node)
+    bool KTApplication::Configure(const scarab::param_node&)
     {
-        //if (node == NULL) return true;
-
         return true;
     }
 
