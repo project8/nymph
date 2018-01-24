@@ -34,6 +34,9 @@ option( Nymph_BUILD_NYMPH_EXE "Flag to build the Nymph executable; also requires
 # Build python bindings (requires boost::python)
 option( Nymph_ENABLE_PYTHON "Build python bindings (NymphPy)" OFF )
 
+# Build python bindings via pybind11 (this should be renamed Nymph_ENABLE_PYTHON if we choose to go with pybind11 over boost::python)
+option( Nymph_ENABLE_PYBIND11 "Build python bindings via pybind11" OFF )
+
 # Add a "Standard" build type
 #set (CMAKE_BUILD_TYPE standard)
 set (CMAKE_CXX_FLAGS_STANDARD "-O1 -DNDEBUG -DSTANDARD" CACHE STRING "Flags used by the compiler during standard builds.")
@@ -90,6 +93,16 @@ if (Nymph_ENABLE_PYTHON)
     include (PythonPackage)
     python_package_find_python( 2.7 )
 endif (Nymph_ENABLE_PYTHON)
+
+##########
+# Pybind11
+##########
+
+if( Nymph_ENABLE_PYBIND11 )
+    set( PYBIND11_INSTALL ON CACHE BOOL "Pybind11 option to install itself" FORCE )
+    add_subdirectory( External/pybind11 )
+    include_directories( External/pybind11/include )    
+endif( Nymph_ENABLE_PYBIND11 )
 
 
 ###############
