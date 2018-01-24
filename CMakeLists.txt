@@ -71,7 +71,12 @@ pbuilder_add_submodule( Scarab Scarab/library )
 
 # this is needed for anything that wants to read or write JSON files
 get_directory_property( RAPIDJSON_FILE_BUFFER_SIZE DIRECTORY Scarab/library DEFINITION RAPIDJSON_FILE_BUFFER_SIZE )
-set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
+message( STATUS "is standalone? ${PBUILDER_STANDALONE}" )
+if( PBUILDER_STANDALONE )
+    set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} )
+else( PBUILDER_STANDALONE )
+    set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
+endif( PBUILDER_STANDALONE )
 
 #######
 # Boost
