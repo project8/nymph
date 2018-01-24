@@ -14,8 +14,19 @@
 
 #include "KTLogger.hh"
 
-#include <string>
+#include <boost/serialization/string.hpp>
 
+#include <string>
+/*
+namespace boost
+{
+    namespace archive
+    {
+        class polymorphic_iarchive;
+        class polymorphic_oarchive;
+    }
+}
+*/
 namespace bs  = boost::serialization;
 
 namespace Nymph
@@ -33,7 +44,10 @@ namespace Nymph
 
             template< class Archive >
             void serialize( Archive& ar, const unsigned version )
-            {}
+            {
+                std::cout << "### serialize for KTData" << std::endl;
+                return;
+            }
     };
 
     class KTDataRider
@@ -50,6 +64,7 @@ namespace Nymph
             template< class Archive >
             void serialize( Archive& ar, const unsigned version )
             {
+                std::cout << "### serialize for KTDataRider" << std::endl;
                 ar & fName;
                 return;
             }
@@ -69,6 +84,7 @@ namespace Nymph
             template< class Archive >
             void serialize( Archive& ar, const unsigned version )
             {
+                std::cout << "### serialize for KTExtensibleDataRider" << std::endl;
                 ar & bs::base_object< KTExtensibleStruct< XDerivedType, KTDataRider > >( *this );
                 return;
             }
@@ -85,7 +101,8 @@ namespace Nymph
                 template< class Archive > \
                 void serialize( Archive& ar, const unsigned version ) \
                 { \
-                    KTWARN( logdata_hh, "In extensible data " ); \
+                    /*KTWARN( logdata_hh, "In extensible data " );*/ \
+                    std::cout << "### serialize for ex_data_class_name" << std::endl; \
                     ar & bs::base_object< data_class_name >( *this ); \
                     ar & bs::base_object< KTExtensibleDataRider< ex_data_class_name > >( *this ); \
                     return; \

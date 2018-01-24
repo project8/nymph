@@ -9,8 +9,8 @@
 
 #include "KTTestData.hh"
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/polymorphic_text_oarchive.hpp>
+#include <boost/archive/polymorphic_text_iarchive.hpp>
 
 #include <fstream>
 
@@ -28,16 +28,16 @@ int main()
         KTTestData testData;
 
         // change data values from their defaults
-        coreData.SetCounter( 5 );
+        coreData.SetCounter( 500 );
         testData.SetIsAwesome( true );
 
         KTINFO(testlog, "KTCoreData counter: " << coreData.GetCounter());
         KTINFO(testlog, "KTTestData is-awesome: " << testData.GetIsAwesome());
 
         // create and open a character archive for output
-        std::ofstream fileOut("test_serialization_output.txt");
+        std::ofstream fileOut("test_polymorphic_serialization_output.txt");
 
-        boost::archive::text_oarchive oArchive(fileOut);
+        boost::archive::polymorphic_text_oarchive oArchive(fileOut);
         // write data objects to archive
         KTDEBUG(testlog, "Archiving ptr to KTCoreData");
         oArchive << coreData;
@@ -48,13 +48,14 @@ int main()
     }
 
     // ... some time later restore the class instance to its original state
-    KTCoreData newData;
-    KTTestData newTestData;
     {
-        // create and open an archive for input
-        std::ifstream fileIn("test_serialization_output.txt");
+        KTCoreData newData;
+        KTTestData newTestData;
 
-        boost::archive::text_iarchive iArchive(fileIn);
+        // create and open an archive for input
+        std::ifstream fileIn("test_polymorphic_serialization_output.txt");
+
+        boost::archive::polymorphic_text_iarchive iArchive(fileIn);
         // read class state from archive
         KTDEBUG(testlog, "Loading core data");
         iArchive >> newData;

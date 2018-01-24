@@ -63,7 +63,7 @@ namespace Nymph
             mutable KTExtensibleStructCore* fPrev;
 
         private:
-            friend class boost::serialization::access;
+            friend class bs::access;
 
             template< class Archive >
             void serialize( Archive& ar, const unsigned version );
@@ -91,7 +91,7 @@ namespace Nymph
             bool fIsCopyDisabled;
 
         private:
-            friend class boost::serialization::access;
+            friend class bs::access;
 
             template< class Archive >
             void serialize( Archive& ar, const unsigned version );

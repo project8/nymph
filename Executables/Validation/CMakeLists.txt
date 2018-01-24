@@ -53,6 +53,7 @@ if (Nymph_ENABLE_TESTING)
         TestExceptionInSlot
         TestExtDataSerialization
         TestLogger
+        TestPolymorphicSerialization
         TestPolymorphicSlotData
         TestPrimaryProcessor
         TestPrimaryProcessorNoThreading

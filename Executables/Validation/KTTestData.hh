@@ -58,6 +58,7 @@ namespace Nymph
     template< class Archive >
     void KTTestData::serialize( Archive& ar, const unsigned version )
     {
+        std::cout << "### serialize for KTTestData" << std::endl;
         ar & bs::base_object< KTData >( *this );
         ar & fIsAwesome;
         return;
@@ -66,6 +67,7 @@ namespace Nymph
     template< class Archive >
     void KTTestBaseData::serialize( Archive& ar, const unsigned version )
     {
+        std::cout << "### serialize for KTTestBaseData" << std::endl;
         ar & bs::base_object< KTData >( *this );
         ar & fFunniness;
         return;

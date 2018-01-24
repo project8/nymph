@@ -146,7 +146,7 @@ namespace Nymph
             bitset_type ToBitset(const std::string& mask) const;
 
         private:
-            friend class boost::serialization::access;
+            friend class bs::access;
 
             template< class Archive >
             void serialize( Archive& ar, const unsigned version );

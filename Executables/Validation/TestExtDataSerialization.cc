@@ -26,8 +26,8 @@ using namespace std;
 // as noted here (http://www.boost.org/doc/libs/1_64_0/libs/serialization/doc/special.html#export) this export line has to be after the inclusion of the archive headers
 //BOOST_CLASS_EXPORT_GUID( KTCoreDataExt, "core-data-ext")
 //BOOST_CLASS_EXPORT_GUID( KTTestDataExt, "test-data-ext")
-BOOST_CLASS_EXPORT( KTCoreDataExt)
-BOOST_CLASS_EXPORT( KTTestDataExt)
+//BOOST_CLASS_EXPORT( KTCoreDataExt)
+//BOOST_CLASS_EXPORT( KTTestDataExt)
 
 // this works when BOOST_CLASS_EXPORT_KEY is used in the respective data class headers
 // does not work if i put these macros into the data class source files

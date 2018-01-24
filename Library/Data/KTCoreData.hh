@@ -71,6 +71,7 @@ namespace Nymph
     template< class Archive >
     void KTCoreData::serialize( Archive& ar, const unsigned version )
     {
+        std::cout << "### serialize for KTCoreData" << std::endl;
         ar & bs::base_object< KTData >( *this );
         ar & fCounter;
         ar & fLastData;
