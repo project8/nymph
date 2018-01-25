@@ -1,5 +1,4 @@
-import sys
-sys.path.append('@LIB_INSTALL_DIR@')
+# Uses Nymph::PyTest::add(), which is defined in TestPythonBasics.cc
 
 import nymph_validation
 

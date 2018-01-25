@@ -96,3 +96,8 @@ pbuilder_install_headers( ${NYMPH_HEADERFILES} )
 if (Nymph_ENABLE_PYTHON)
     python_package_add_module(NymphPy.cc)
 endif (Nymph_ENABLE_PYTHON)
+
+if( Nymph_ENABLE_PYBIND11 )
+    configure_file( AddLibPythonPath.sh.in AddLibPythonPath.sh @ONLY)
+    install( FILES ${CMAKE_CURRENT_BINARY_DIR}/AddLibPythonPath.sh DESTINATION ${BIN_INSTALL_DIR} )
+endif( Nymph_ENABLE_PYBIND11 )
