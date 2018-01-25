@@ -1,0 +1,6 @@
+import sys
+sys.path.append('@LIB_INSTALL_DIR@')
+
+import nymph_validation
+
+print( '1 + 2 =', nymph_validation.add(1, 2) )

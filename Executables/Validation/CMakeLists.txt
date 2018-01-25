@@ -66,5 +66,17 @@ if (Nymph_ENABLE_TESTING)
     )
     
     pbuilder_executables( TEST_PROGRAMS LIB_DEPENDENCIES )
+    
+    
+    # Python bindings
+    set( VALIDATION_PYBINDING_FILES
+        TestPythonBasics.cc
+    )
+    
+    pybind11_add_module( nymph_validation MODULE ${VALIDATION_PYBINDING_FILES} )
+    pbuilder_install_libraries( nymph_validation )
+    
+    configure_file( TestPythonBasics.py.in TestPythonBasics.py @ONLY)
+    install( FILES ${CMAKE_CURRENT_BINARY_DIR}/TestPythonBasics.py DESTINATION ${BIN_INSTALL_DIR} )
         
 endif (Nymph_ENABLE_TESTING) 
