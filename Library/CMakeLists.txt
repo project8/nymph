@@ -88,6 +88,18 @@ set( NYMPH_PY_HEADERFILES
     ${APPL_DIR}/KTProcessorToolboxPy.hh
 )
 
+# Python binding headers
+set( NYMPH_PYBINDING_HEADERFILES
+    #${UTIL_DIR}/KTConfigurablePybind.hh
+    ${PROC_DIR}/KTProcessorPybind.hh
+    ${PROC_DIR}/KTPyProcessor.hh
+)
+
+# Python bindings
+set( NYMPH_PYBINDING_SOURCEFILES
+    NymphPybind.cc
+)
+
 ##################################################
 
 pbuilder_library( Nymph NYMPH_SOURCEFILES "" )
@@ -98,6 +110,14 @@ if (Nymph_ENABLE_PYTHON)
 endif (Nymph_ENABLE_PYTHON)
 
 if( Nymph_ENABLE_PYBIND11 )
+    set( LIB_DEPENDENCIES Nymph )
+
     configure_file( AddLibPythonPath.sh.in AddLibPythonPath.sh @ONLY)
     install( FILES ${CMAKE_CURRENT_BINARY_DIR}/AddLibPythonPath.sh DESTINATION ${BIN_INSTALL_DIR} )
+    
+    pybind11_add_module( py_nymph MODULE ${NYMPH_PYBINDING_SOURCEFILES} )
+    target_link_libraries( py_nymph PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
+    pbuilder_install_libraries( py_nymph )
+    pbuilder_install_headers( ${NYMPH_PYBINDING_HEADERFILES} )
+
 endif( Nymph_ENABLE_PYBIND11 )

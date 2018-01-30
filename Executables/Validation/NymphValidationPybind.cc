@@ -8,10 +8,10 @@
 #include "KTPyTestClassPybind.hh"
 #include "TestPythonBasics.hh"
 
-PYBIND11_MODULE( nymph_validation, mod )
+PYBIND11_MODULE( py_nymph_validation, mod )
 {
-    ExportKTPyTestClass( mod );
-    ExportTestPythonBasics( mod );
+    Nymph::ExportKTPyTestClass( mod );
+    Nymph::ExportTestPythonBasics( mod );
 }
 
 

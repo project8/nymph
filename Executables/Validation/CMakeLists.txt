@@ -70,30 +70,34 @@ if (Nymph_ENABLE_TESTING)
     pbuilder_executables( TEST_PROGRAMS LIB_DEPENDENCIES )
     
     
-    # Python Interface
+    if( Nymph_ENABLE_PYBIND11 )
+        # Python Interface
+        
+        # Python binding headers
+        set( VALIDATION_PYBINDING_HEADERFILES
+            KTPyTestClassPybind.hh
+            TestPythonBasics.hh
+        )
+        
+        # Python bindings
+        set( VALIDATION_PYBINDING_SOURCEFILES
+            NymphValidationPybind.cc
+        )
     
-    # Python binding headers
-    set( VALIDATION_PYBINDING_HEADERFILES
-        KTPyTestClassPybind.hh
-        TestPythonBasics.hh
-    )
+        # Python scripts
+        set( VALIDATION_PY_SCRIPTS
+            TestProcessorToolbox.py
+            TestPyTestClass.py
+            TestPythonBasics.py
+        )
+        
+        pybind11_add_module( py_nymph_validation MODULE ${VALIDATION_PYBINDING_SOURCEFILES} )
+        target_link_libraries( py_nymph_validation PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
+        pbuilder_install_libraries( py_nymph_validation )
+        pbuilder_install_headers( ${VALIDATION_PYBINDING_HEADERFILES} )
+        
+        install( FILES ${VALIDATION_PY_SCRIPTS} DESTINATION ${BIN_INSTALL_DIR} )
     
-    # Python bindings
-    set( VALIDATION_PYBINDING_SOURCEFILES
-        NymphValidationPy.cc
-    )
-
-    # Python scripts
-    set( VALIDATION_PY_SCRIPTS
-        TestPyTestClass.py
-        TestPythonBasics.py
-    )
-    
-    pybind11_add_module( nymph_validation MODULE ${VALIDATION_PYBINDING_SOURCEFILES} )
-    target_link_libraries( nymph_validation PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
-    pbuilder_install_libraries( nymph_validation )
-    pbuilder_install_headers( ${VALIDATION_PYBINDING_HEADERFILES} )
-    
-    install( FILES ${VALIDATION_PY_SCRIPTS} DESTINATION ${BIN_INSTALL_DIR} )
+    endif( Nymph_ENABLE_PYBIND11 )
         
 endif (Nymph_ENABLE_TESTING) 

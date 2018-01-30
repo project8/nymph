@@ -17,9 +17,10 @@ namespace Nymph
             return i + j;
         }
     }
-}
 
-void ExportTestPythonBasics( pybind11::module& mod )
-{
-    mod.def( "add", &Nymph::PyTest::add, "A function that adds two integers" );
+    void ExportTestPythonBasics( pybind11::module& mod )
+    {
+        mod.def( "add", &PyTest::add, "A function that adds two integers" );
+    }
+
 }

@@ -144,14 +144,19 @@ namespace Nymph
 
 
         public:
-            /// Make a connection between the signal from one processor and the slot from another processor
-            /// Both processors should already have been added to the Toolbox
-            /// Signal and slot strings should be formatted as: [processor name]:[signal/slot name]
-            bool MakeConnection(const std::string& signal, const std::string& slot, int order = std::numeric_limits< int >::min());
+            // for the MakeConnection overloading, extra overloading is used instead of default parameters so that the python interface works
 
             /// Make a connection between the signal from one processor and the slot from another processor
             /// Both processors should already have been added to the Toolbox
-            bool MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName, int order = std::numeric_limits< int >::min());
+            /// Signal and slot strings should be formatted as: [processor name]:[signal/slot name]
+            bool MakeConnection(const std::string& signal, const std::string& slot, int order);
+            bool MakeConnection(const std::string& signal, const std::string& slot) {return MakeConnection(signal, slot, std::numeric_limits< int >::min());}
+
+            /// Make a connection between the signal from one processor and the slot from another processor
+            /// Both processors should already have been added to the Toolbox
+            bool MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName, int order);
+            bool MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName)
+                    {return MakeConnection(signalProcName, signalName, slotProcName, slotName, std::numeric_limits< int >::min());}
 
             /// Set a breakpoint on a slot
             /// Slot string should be formatted as: [processor name]:[slot name]

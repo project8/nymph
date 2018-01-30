@@ -1,6 +1,6 @@
 # Demonstrates access to KTPyTestClass
 
-import nymph_validation as nv
+import py_nymph_validation as nv
 
 ptc = nv.KTPyTestClass()
 
