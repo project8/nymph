@@ -14,6 +14,8 @@ print('Configuring')
 ptb.AddProcessor('test-p-proc', 'tpp')
 ptb.AddProcessor('test-proc-b', 'tp')
 ptb.MakeConnection('tpp:the-signal', 'tp:first-slot')
+ptb.AddProcessor('test-proc-python-wrap', 'pw')
+ptb.MakeConnection('tpp:the-signal', 'pw:wrap-slot')
 ptb.PushBackToRunQueue('tpp')
 
 print('Running')

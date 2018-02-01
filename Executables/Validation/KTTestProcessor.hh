@@ -10,6 +10,10 @@
 
 #include "KTProcessor.hh"
 #include "KTSlot.hh"
+//#include "pybind11/pybind11.h"
+
+
+//using namespace py;
 
 #include "KTTestData.hh"
 
@@ -126,5 +130,45 @@ namespace Nymph
             KTSignalData fDerived2DataSignal;
     };
 
+
+    class KTWrapProcessor : public KTProcessor
+    {
+        public:
+            KTWrapProcessor( const std::string& name = "base-wrap-processor" );
+            virtual ~KTWrapProcessor();
+
+            bool Configure(const scarab::param_node& node);
+
+            void SlotFunc(int);
+            virtual void WrapFunction(int input);
+
+        private:
+            KTSlot< int > fSlot;
+
+    };
+
+/*    PYBIND11_MODULE(pywrapper, m) {
+        pybind11::class_<KTWrapProcessor, KTPyWrapProcessor> pythonwrap(m, "PythonWrap");
+        pythonwrap
+			.def(py::init<>())
+            .def("WrapFunction", &KTWrapProcessor::WrapFunction);
+    }
+
+    class KTPyWrapProcessor: public KTWrapProcessor
+    {
+    	public:
+    		// Inherit the constructors
+			using KTWrapProcessor::KTWrapProcessor;
+
+			// Trampoline (need one for each virtual function)
+			void WrapFunction(int input) override {
+				PYBIND11_OVERLOAD_PURE(
+						void, // Return type
+						KTWrapProcessor,      // Parent class
+						WrapFunction,          // Name of function in C++ (must match Python name)
+						input      // Argument(s)
+						);
+				}
+    };*/
 } /* namespace Nymph */
 #endif /* KTTESTPROCESSOR_HH_ */
