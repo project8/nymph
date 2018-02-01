@@ -87,6 +87,7 @@ namespace Nymph
             void SetIsCopyDisabled(bool flag);
         private:
             bool fIsCopyDisabled;
+            friend class cereal::access;
 
             template< class Archive >
             void serialize( Archive& ar );
