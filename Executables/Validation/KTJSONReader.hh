@@ -24,19 +24,21 @@ namespace Nymph
     class KTJSONReader : public KTProcessor
     {
         public:
-            KTJSONReader();
+            KTJSONReader( const std::string& name = "json-reader" );
             virtual ~KTJSONReader();
 
             bool Configure( const scarab::param_node& node );
 
             MEMBERVARIABLE( std::string, Filename );
 
+        public:
+            template< class XDataType >
+            void ReadData( XDataType& data );
+
         private:
             std::ifstream* fStreamInPtr;
             cereal::JSONInputArchive* fArchiveInPtr;
 
-            template< class XDataType >
-            void ReadData( XDataType& data );
     };
 
     template< class XDataType >
@@ -49,7 +51,8 @@ namespace Nymph
             fArchiveInPtr = new cereal::JSONInputArchive( *fStreamInPtr );
         }
 
-        *fArchiveInPtr( data );
+        KTDEBUG( jsrlog_hh, "Reading an object from JSON" );
+        (*fArchiveInPtr)( data );
 
         return;
     }

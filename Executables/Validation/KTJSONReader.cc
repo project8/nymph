@@ -14,8 +14,9 @@
 namespace Nymph
 {
 
-    KTJSONReader::KTJSONReader() :
-            fFilename( "json-reader-default-file.json" ),
+    KTJSONReader::KTJSONReader( const std::string& name) :
+            KTProcessor( name ),
+            fFilename( "json_reader_default_file.json" ),
             fStreamInPtr( nullptr ),
             fArchiveInPtr( nullptr )
     {
@@ -23,6 +24,7 @@ namespace Nymph
 
     KTJSONReader::~KTJSONReader()
     {
+        // archive must be delete before the stream!
         delete fArchiveInPtr;
         delete fStreamInPtr;
     }
