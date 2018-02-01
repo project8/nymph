@@ -24,6 +24,7 @@ namespace Nymph
 
     KTJSONReader::~KTJSONReader()
     {
+        // archive must be delete before the stream!
         delete fArchiveInPtr;
         delete fStreamInPtr;
     }

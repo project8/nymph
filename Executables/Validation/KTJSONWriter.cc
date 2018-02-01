@@ -24,8 +24,9 @@ namespace Nymph
 
     KTJSONWriter::~KTJSONWriter()
     {
-        delete fStreamOutPtr;
+        // archive must be delete before the stream!
         delete fArchiveOutPtr;
+        delete fStreamOutPtr;
     }
 
     bool KTJSONWriter::Configure( const scarab::param_node& node )
