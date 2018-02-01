@@ -40,13 +40,5 @@ namespace Nymph
 				}
 	};
 
-    PYBIND11_MODULE(pywrapper, m) {
-    	pybind11::class_<KTWrapProcessor, KTPyWrapProcessor> pythonwrap(m, "PythonWrap");
-        pythonwrap
-    		.def(pybind11::init<>())
-			.def("WrapFunction", &KTWrapProcessor::WrapFunction);
-	};
-
-
 
 } /* namespace Nymph */

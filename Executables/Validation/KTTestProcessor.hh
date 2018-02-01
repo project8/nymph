@@ -147,28 +147,5 @@ namespace Nymph
 
     };
 
-/*    PYBIND11_MODULE(pywrapper, m) {
-        pybind11::class_<KTWrapProcessor, KTPyWrapProcessor> pythonwrap(m, "PythonWrap");
-        pythonwrap
-			.def(py::init<>())
-            .def("WrapFunction", &KTWrapProcessor::WrapFunction);
-    }
-
-    class KTPyWrapProcessor: public KTWrapProcessor
-    {
-    	public:
-    		// Inherit the constructors
-			using KTWrapProcessor::KTWrapProcessor;
-
-			// Trampoline (need one for each virtual function)
-			void WrapFunction(int input) override {
-				PYBIND11_OVERLOAD_PURE(
-						void, // Return type
-						KTWrapProcessor,      // Parent class
-						WrapFunction,          // Name of function in C++ (must match Python name)
-						input      // Argument(s)
-						);
-				}
-    };*/
 } /* namespace Nymph */
 #endif /* KTTESTPROCESSOR_HH_ */
