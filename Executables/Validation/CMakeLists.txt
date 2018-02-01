@@ -22,7 +22,7 @@ if (Nymph_ENABLE_TESTING)
     )
     
     set (VALIDATION_SOURCEFILES
-        KTPyTestclass.cc
+        KTPyTestClass.cc
         KTTestConfigurable.cc
         KTTestCuts.cc
         KTTestData.cc
