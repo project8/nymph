@@ -43,6 +43,8 @@ namespace Nymph
             MEMBERVARIABLE_REF( std::string, Name );
 
         private:
+            friend class cereal::access;
+
             template< class Archive >
             void serialize( Archive& ar );
     };

@@ -85,6 +85,9 @@ namespace Nymph
             void SetIsCopyDisabled(bool flag);
         private:
             bool fIsCopyDisabled;
+
+            template< class Archive >
+            void serialize( Archive& ar );
     };
 
 
@@ -252,6 +255,16 @@ namespace Nymph
     }
 
 
+
+    template< class XInstanceType, class XBaseType >
+    template< class Archive >
+    void KTExtensibleStruct<XInstanceType, XBaseType>::serialize( Archive& ar )
+    {
+        std::cout << "### serialize for " << typeid(XBaseType).name() << std::endl;
+        ar( cereal::base_class< KTExtensibleStructCore< XBaseType > >( this ), fIsCopyDisabled );
+
+        return;
+    }
 
     template<class XInstanceType, class XBaseType>
     KTExtensibleStruct<XInstanceType, XBaseType>::KTExtensibleStruct(void)
