@@ -13,6 +13,7 @@ if (Nymph_ENABLE_TESTING)
 
     # Headers for any test classes
     set (VALIDATION_HEADERFILES
+        KTSerialWriter.hh
         KTTestConfigurable.hh
         KTTestCuts.hh
         KTTestData.hh
@@ -21,6 +22,7 @@ if (Nymph_ENABLE_TESTING)
     )
     
     set (VALIDATION_SOURCEFILES
+        KTSerialWriter.cc
         KTTestConfigurable.cc
         KTTestCuts.cc
         KTTestData.cc
