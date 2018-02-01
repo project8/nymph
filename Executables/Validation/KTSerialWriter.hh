@@ -49,6 +49,15 @@ namespace Nymph
             void SlotFunction( XDataType& data );
     };
 
+    template< class XDataType >
+    void KTSerialWriter::SlotFunction( XDataType& data )
+    {
+        // Write to JSON archive
+        (*fArchiveOutPtr)( data );
+
+        return;
+    }
+
     inline std::string KTSerialWriter::GetFileName() const
     {
         return fFileName;

@@ -27,6 +27,8 @@ int main()
 	writer.SetFileName( "test_serial_writer_output.json" );
 	writer.Initialize();
 
+	KTINFO( testlog, "Writing data to JSON acrhive" );
+
 	writer.SlotFunction< KTTestData >( testData );
 
 	KTINFO( testlog, "Validation script concluded" );

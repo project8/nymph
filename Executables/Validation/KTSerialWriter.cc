@@ -21,13 +21,13 @@ namespace Nymph
         fArchiveOutPtr( nullptr )
         {
             // Register slots here
-            RegisterSlot( "test-data", this, &KTSerialWriter::SlotFunction< KTTestData > );
+            //RegisterSlot( "test-data", this, &KTSerialWriter::SlotFunction< KTTestData > );
         }
 
     KTSerialWriter::~KTSerialWriter()
     {
-        //delete fStreamOutPtr;
-        //delete fArchiveOutPtr;
+        delete fStreamOutPtr;
+        delete fArchiveOutPtr;
     }
 
     bool KTSerialWriter::Configure( const scarab::param_node& node )
@@ -40,21 +40,12 @@ namespace Nymph
 
     void KTSerialWriter::Initialize()
     {
-        *fStreamOutPtr = std::ofstream( fFileName );
-        cereal::JSONOutputArchive fStupid( *fStreamOutPtr );
-        fArchiveOutPtr = &fStupid;
+        if( fStreamOutPtr == nullptr )
+        {
+            fStreamOutPtr = new std::ofstream( fFileName );
+            fArchiveOutPtr = new cereal::JSONOutputArchive( *fStreamOutPtr );
+        }
 
-        return;
-    }
-
-    template< class XDataType >
-    void KTSerialWriter::SlotFunction( XDataType& data )
-    {
-        // Write to JSON archive
-        KTINFO( avlog_hh, "Writing data to JSON acrhive" );
-        (*fArchiveOutPtr)( data );
-
-        KTINFO( avlog_hh, "Successfully wrote data to archive" );
         return;
     }
 }
