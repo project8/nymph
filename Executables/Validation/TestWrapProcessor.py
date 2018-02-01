@@ -15,17 +15,19 @@ ptb = nymph.KTProcessorToolbox('pt')
 print('Configuring')
 
 ptb.AddProcessor('test-p-proc', 'tpp')
-ptb.AddProcessor('test-proc-b', 'tp')
-ptb.AddProcessor('base-wrap-proc', 'bwp')
+#ptb.AddProcessor('test-proc-b', 'tp')
 
+p = WrappedProcessor()
+print('type of WrappedProcessor in python is: {}'.format( type(p)))
 
+p.WrapFunction = lambda x: print("Hey, I'm python")
 
+ptb.AddProcessor('bwp', p)
 #ptb.MakeConnection('tpp:the-signal', 'tp:first-slot')
 #ptb.MakeConnection('tpp:the-signal', 'tp:first-slot')
 ptb.MakeConnection('tpp:the-signal', 'bwp:wrap-slot')
 
-p = WrappedProcessor()
-p.WrapFunction = lambda x: print("Hey, I'm python")
+
 
 ptb.PushBackToRunQueue('tpp')
 

@@ -17,7 +17,6 @@ namespace Nymph
 {
     void ExportKTProcessorToolbox( pybind11::module& mod )
     {
-
         pybind11::class_< KTProcessorToolbox >( mod, "KTProcessorToolbox" )
                 .def( pybind11::init< const std::string & >() )
 
@@ -29,7 +28,8 @@ namespace Nymph
                 // GetProcessor skipped because raw pointers are not supported by pybind11
                 .def( "AddProcessor", (bool (KTProcessorToolbox::*)(const std::string&, const std::string&)) &KTProcessorToolbox::AddProcessor,
                         "Create a processor by name and add it to the toolbox" )
-                // skipping AddProcessor(const std::string&, KTProcessor*)
+				.def("AddProcessor", (bool (KTProcessorToolbox::*)(const std::string&, std::shared_ptr< KTProcessor > proc)) &KTProcessorToolbox::AddProcessor,
+						                       "Create a processor and add it to the toolbox" )
                 .def( "RemoveProcessor", &KTProcessorToolbox::RemoveProcessor,
                         "Remove a processor from the toolbox" )
                 // skipping ReleaseProcessor
@@ -77,7 +77,8 @@ namespace Nymph
                 .def( "CancelThreads", &KTProcessorToolbox::CancelThreads, "Kill any running thread at the next breakpoint check" )
                 .def( "JoinRunThread", &KTProcessorToolbox::JoinRunThread, "Blocking call to wait until Run() is complete; this should only be done by the owner of the thread (typically whoever called Run())" )
 
-                .def( "GetData", &KTProcessorToolbox::GetData, "Retrieve the data handle from a slot by thread name (i.e. the name of the primary processor for that thread)" )
+                .def( "GetData", &KTProcessorToolbox::GetData, "Retrieve the data handle from a slot by thread name (i.e. the name of the primary processor for that thread)" );
+
 
                 /*
                 // these are implemented in the boost::python version but not yet here
@@ -93,6 +94,7 @@ namespace Nymph
                 ;
 
     }
+
 }
 
 #endif /* NYMPH_KTPROCESSORTOOLBOXPYBIND_HH_ */
