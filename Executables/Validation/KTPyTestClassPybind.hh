@@ -37,7 +37,15 @@ namespace Nymph
 						WrapFunction,          // Name of function in C++ (must match Python name)
 						input      // Argument(s)
 						);
-				}
+			}
+			bool Configure(const scarab::param_node& node) override {
+							PYBIND11_OVERLOAD(
+									bool, // Return type
+									KTWrapProcessor,      // Parent class
+									Configure,          // Name of function in C++ (must match Python name)
+									node      // Argument(s)
+									);
+			}
 	};
 
 

@@ -134,7 +134,7 @@ namespace Nymph
     class KTWrapProcessor : public KTProcessor
     {
         public:
-            KTWrapProcessor( const std::string& name = "base-wrap-processor" );
+            KTWrapProcessor( const std::string& name = "base-wrap-proc" );
             virtual ~KTWrapProcessor();
 
             bool Configure(const scarab::param_node& node);

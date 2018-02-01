@@ -180,7 +180,7 @@ namespace Nymph
         return;
     }
 
-    KT_REGISTER_PROCESSOR(KTWrapProcessor, "test-proc-python-wrap");
+    KT_REGISTER_PROCESSOR(KTWrapProcessor, "base-wrap-proc");
 
     KTWrapProcessor::KTWrapProcessor( const std::string& name ) :
             KTProcessor( name ),

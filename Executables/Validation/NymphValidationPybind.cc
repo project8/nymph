@@ -17,7 +17,8 @@ PYBIND11_MODULE( py_nymph_validation, mod )
     pybind11::class_<Nymph::KTWrapProcessor, Nymph::KTPyWrapProcessor> wrap_processor(mod, "WrapProcessor");
         wrap_processor
     		.def(pybind11::init<>())
-    		.def("WrapFunction", &Nymph::KTWrapProcessor::WrapFunction);
+    		.def("WrapFunction", &Nymph::KTWrapProcessor::WrapFunction)
+        	.def("Configure", &Nymph::KTWrapProcessor::Configure);
 }
 
 
