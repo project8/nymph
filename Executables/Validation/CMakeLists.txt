@@ -13,7 +13,8 @@ if (Nymph_ENABLE_TESTING)
 
     # Headers for any test classes
     set (VALIDATION_HEADERFILES
-        KTSerialWriter.hh
+        kTJSONReader.hh
+        KTJSONWriter.hh
         KTTestConfigurable.hh
         KTTestCuts.hh
         KTTestData.hh
@@ -22,7 +23,8 @@ if (Nymph_ENABLE_TESTING)
     )
     
     set (VALIDATION_SOURCEFILES
-        KTSerialWriter.cc
+        KTJSONReader.cc
+        KTJSONWriter.cc
         KTTestConfigurable.cc
         KTTestCuts.cc
         KTTestData.cc
@@ -53,6 +55,7 @@ if (Nymph_ENABLE_TESTING)
         TestCut
         TestCutFilter
         TestExceptionInSlot
+        TestJSONWriter
         TestLogger
         TestPolymorphicSlotData
         TestPrimaryProcessor
@@ -62,7 +65,6 @@ if (Nymph_ENABLE_TESTING)
         TestProcessorToolboxMultithreaded
         TestProcessorToolboxSinglethreaded
         TestSerialization
-        TestSerialWriter
         TestSignalsAndSlots
         TestSlotData
         TestThroughputProfiler
