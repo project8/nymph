@@ -11,6 +11,8 @@
 
 #include <cereal/types/polymorphic.hpp>
 
+#include <memory>
+
 namespace Nymph
 {
 
@@ -42,21 +44,21 @@ namespace Nymph
             /// Extracts object of type XStructType
             template< class XStructType > inline XStructType* Detatch(void);
             /// Duplicates the extended object
-            virtual KTExtensibleStructCore* Clone(void) const = 0;
+            virtual std::shared_ptr< XBaseType > Clone(void) const = 0;
             /// Duplicates object only
             virtual void Pull(const KTExtensibleStructCore< XBaseType >& object) = 0;
             /// Returns the pointer to the next field
-            KTExtensibleStructCore* Next() const;
+            std::shared_ptr< KTExtensibleStructCore > Next() const;
             /// Returns the pointer to the previous field
-            KTExtensibleStructCore* Prev() const;
+            std::shared_ptr< KTExtensibleStructCore > Prev() const;
             /// Returns the pointer to the last field
-            KTExtensibleStructCore* Last() const;
+            std::shared_ptr< KTExtensibleStructCore > Last() const;
             /// Returns the pointer to the first field
-            KTExtensibleStructCore* First() const;
+            std::shared_ptr< KTExtensibleStructCore > First() const;
         protected:
             void SetPrevPtrInNext();
-            mutable KTExtensibleStructCore* fNext;
-            mutable KTExtensibleStructCore* fPrev;
+            mutable std::shared_ptr< KTExtensibleStructCore > fNext;
+            mutable std::shared_ptr< KTExtensibleStructCore > fPrev;
 
         private:
             friend class cereal::access;
@@ -79,7 +81,7 @@ namespace Nymph
             /// Duplicates the extended object
             KTExtensibleStruct& operator=(const KTExtensibleStruct& object);
             /// Duplicates the extended object
-            virtual KTExtensibleStructCore< XBaseType >* Clone(void) const;
+            virtual std::shared_ptr< XBaseType > Clone(void) const;
             /// Duplicates object only
             virtual void Pull(const KTExtensibleStructCore< XBaseType >& object);
             void SetIsCopyDisabled(bool flag);
@@ -93,38 +95,36 @@ namespace Nymph
 
 
     template<class XBaseType>
-    KTExtensibleStructCore<XBaseType>::KTExtensibleStructCore(void)
+    KTExtensibleStructCore<XBaseType>::KTExtensibleStructCore(void) :
+            fNext(),
+            fPrev()
     {
-        fPrev = 0;
-        fNext = 0;
     }
 
     template<class XBaseType>
-    KTExtensibleStructCore<XBaseType>::KTExtensibleStructCore(const KTExtensibleStructCore&)
+    KTExtensibleStructCore<XBaseType>::KTExtensibleStructCore(const KTExtensibleStructCore&) :
+            fNext(),
+            fPrev()
     {
-        fPrev = 0;
-        fNext = 0;
     }
 
     template<class XBaseType>
     KTExtensibleStructCore<XBaseType>::~KTExtensibleStructCore()
     {
-        delete fNext;
-        fNext = 0;
+        fNext.reset();
     }
 
     template<class XBaseType>
     KTExtensibleStructCore<XBaseType>& KTExtensibleStructCore<XBaseType>::operator=(const KTExtensibleStructCore&)
     {
-        fNext = 0;
+        fNext.reset();
         return *this;
     }
 
     template<class XBaseType>
     void KTExtensibleStructCore<XBaseType>::Clear(void)
     {
-        delete fNext;
-        fNext = 0;
+        fNext.reset();
     }
 
     template<class XBaseType>
@@ -143,7 +143,7 @@ namespace Nymph
             fNext->fPrev = this;
         }
 
-        return fNext->Of<XStructType>();
+        return fNext->template Of<XStructType>();
     }
 
     template<class XBaseType>
@@ -156,13 +156,13 @@ namespace Nymph
             return *target;
         }
 
-        if (fNext == 0)
+        if (! fNext)
         {
             fNext = new XStructType();
             fNext->fPrev = const_cast< KTExtensibleStructCore< XBaseType >* >(this);
         }
 
-        return fNext->Of<XStructType>();
+        return fNext->template Of<XStructType>();
     }
 
 
@@ -177,7 +177,7 @@ namespace Nymph
         }
         if (fNext)
         {
-            return fNext->Has<XStructType>();
+            return fNext->template Has<XStructType>();
         }
 
         return false;
@@ -200,45 +200,45 @@ namespace Nymph
             {
                 fNext = next->fNext;
                 fNext->fPrev = this;
-                next->fNext = 0;
+                next->fNext.reset();
             }
-            next->fPrev = 0;
+            next->fPrev.reset();
             return next;
         }
-        return fNext->Detatch<XStructType>();
+        return fNext->template Detatch<XStructType>();
     }
 
 
     template<class XBaseType>
-    inline KTExtensibleStructCore<XBaseType>* KTExtensibleStructCore<XBaseType>::Next() const
+    inline std::shared_ptr< KTExtensibleStructCore<XBaseType> > KTExtensibleStructCore<XBaseType>::Next() const
     {
         return fNext;
     }
 
     template<class XBaseType>
-    inline KTExtensibleStructCore<XBaseType>* KTExtensibleStructCore<XBaseType>::Prev() const
+    inline std::shared_ptr< KTExtensibleStructCore<XBaseType> > KTExtensibleStructCore<XBaseType>::Prev() const
     {
         return fPrev;
     }
 
     template<class XBaseType>
-    inline KTExtensibleStructCore<XBaseType>* KTExtensibleStructCore<XBaseType>::Last() const
+    inline std::shared_ptr< KTExtensibleStructCore<XBaseType> > KTExtensibleStructCore<XBaseType>::Last() const
     {
-        if (fNext == 0) return this;
+        if (fNext) return this;
         return fNext->Last();
     }
 
     template<class XBaseType>
-    inline KTExtensibleStructCore<XBaseType>* KTExtensibleStructCore<XBaseType>::First() const
+    inline std::shared_ptr< KTExtensibleStructCore<XBaseType> > KTExtensibleStructCore<XBaseType>::First() const
     {
-        if (fPrev == 0) return this;
+        if (fPrev) return this;
         return fPrev->First();
     }
 
     template<class XBaseType>
     inline void KTExtensibleStructCore<XBaseType>::SetPrevPtrInNext()
     {
-        fNext->fPrev = this;
+        fNext->fPrev.reset( this );
         return;
     }
 
@@ -287,7 +287,7 @@ namespace Nymph
 
         if (object.fNext)
         {
-            this->fNext = object.fNext->Clone();
+            this->fNext.reset( object.fNext->Clone() );
         }
     }
 
@@ -314,14 +314,14 @@ namespace Nymph
     }
 
     template<class XInstanceType, class XBaseType>
-    KTExtensibleStructCore<XBaseType>* KTExtensibleStruct<XInstanceType, XBaseType>::Clone(void) const
+    std::shared_ptr< XBaseType > KTExtensibleStruct<XInstanceType, XBaseType>::Clone(void) const
     {
         // assume CRTP is used properly,
         // otherwise compiling fails here (intended behavior)
         XInstanceType* instance = new XInstanceType(dynamic_cast<const XInstanceType&>(*this));
         if (this->fNext)
         {
-            instance->fNext = this->fNext->Clone();
+            instance->fNext.reset( this->fNext->Clone() );
             instance->SetPrevPtrInNext();
             //instance->fNext->fPrev = instance->fNext;
         }

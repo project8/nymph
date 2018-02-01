@@ -102,7 +102,7 @@ namespace Nymph
         return cut->GetState();
     }
 
-    const KTCutResult* KTCutStatus::GetCutResult(const std::string& cutName) const
+    const KTCutResult& KTCutStatus::GetCutResult(const std::string& cutName) const
     {
         const KTCutResult* cut = fCutResults.get()->Next(); // skip over KTCutResultHandle
         while (cut != NULL)
@@ -110,10 +110,10 @@ namespace Nymph
             if (cut->Name() == cutName) return cut;
             cut = cut->Next();
         }
-        return NULL;
+        throw KTException() << "Cannot find cut result";
     }
 
-    KTCutResult* KTCutStatus::GetCutResult(const std::string& cutName)
+    KTCutResult& KTCutStatus::GetCutResult(const std::string& cutName)
     {
         KTCutResult* cut = fCutResults.get()->Next(); // skip over KTCutResultHandle
         while (cut != NULL)
@@ -121,7 +121,7 @@ namespace Nymph
             if (cut->Name() == cutName) return cut;
             cut = cut->Next();
         }
-        return NULL;
+        throw KTException() << "Cannot find cut result";
     }
 
     bool KTCutStatus::SetCutState(const std::string& cutName, bool state, bool doUpdateStatus)

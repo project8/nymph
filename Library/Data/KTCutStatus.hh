@@ -11,9 +11,11 @@
 
 #include "KTCutResult.hh"
 
-#include <boost/dynamic_bitset.hpp>
-#include <boost/scoped_ptr.hpp>
+#include "KTException.hh"
 
+#include <boost/dynamic_bitset.hpp>
+
+#include <memory>
 #include <string>
 
 namespace Nymph
@@ -75,7 +77,7 @@ namespace Nymph
 
             KTCutStatus& operator=(const KTCutStatus& rhs);
 
-            const KTCutResult* CutResults() const;
+            const std::shared_ptr< KTCutResult > CutResults() const;
 
             void UpdateStatus();
 
@@ -96,12 +98,12 @@ namespace Nymph
             bool GetCutState(const std::string& cutName) const;
 
             template< typename XCutType >
-            const KTCutResult* GetCutResult() const;
-            const KTCutResult* GetCutResult(const std::string& cutName) const;
+            const KTCutResult& GetCutResult() const;
+            const KTCutResult& GetCutResult(const std::string& cutName) const;
 
             template< typename XCutType >
-            KTCutResult* GetCutResult();
-            KTCutResult* GetCutResult(const std::string& cutName);
+            KTCutResult& GetCutResult();
+            KTCutResult& GetCutResult(const std::string& cutName);
 
             template< typename XCutType >
             bool SetCutState(bool state, bool doUpdateStatus=true);
@@ -119,7 +121,7 @@ namespace Nymph
         private:
             friend std::ostream& operator<<(std::ostream& out, const KTCutStatus& status);
 
-            boost::scoped_ptr< KTCutResultHandle > fCutResults;
+            std::unique_ptr< KTCutResultHandle > fCutResults;
 
             bitset_type fSummary;
 
@@ -137,7 +139,7 @@ namespace Nymph
     std::ostream& operator<<(std::ostream& out, const KTCutStatus& status);
 
 
-    inline const KTCutResult* KTCutStatus::CutResults() const
+    inline const std::shared_ptr< KTCutResult > KTCutStatus::CutResults() const
     {
         return fCutResults.get()->Next();
     }
@@ -188,23 +190,23 @@ namespace Nymph
     }
 
     template< typename XCutType >
-    const KTCutResult* KTCutStatus::GetCutResult() const
+    const KTCutResult& KTCutStatus::GetCutResult() const
     {
         if (HasCutResult< XCutType >())
         {
-            return &(fCutResults.get()->Of< XCutType >());
+            return fCutResults.get()->Of< XCutType >();
         }
-        return NULL;
+        throw KTException() << "Cannot find cut result";
     }
 
     template< typename XCutType >
-    KTCutResult* KTCutStatus::GetCutResult()
+    KTCutResult& KTCutStatus::GetCutResult()
     {
         if (HasCutResult< XCutType >())
         {
-            return &(fCutResults.get()->Of< XCutType >());
+            return fCutResults.get()->Of< XCutType >();
         }
-        return NULL;
+        throw KTException() << "Cannot find cut result";
     }
 
     template< typename XCutType >
