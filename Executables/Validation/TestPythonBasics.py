@@ -2,4 +2,4 @@
 
 import py_nymph_validation
 
-print( '1 + 2 =', nymph_validation.add(1, 2) )
+print( '1 + 2 =', py_nymph_validation.add(1, 2) )
