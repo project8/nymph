@@ -28,6 +28,7 @@
 #include <initializer_list>
 #include <limits>
 #include <set>
+#include <memory>
 
 
 namespace Nymph
@@ -110,7 +111,7 @@ namespace Nymph
         private:
             struct ProcessorInfo
             {
-                KTProcessor* fProc;
+                std::shared_ptr< KTProcessor > fProc;
             };
             typedef std::map< std::string, ProcessorInfo > ProcessorMap;
             typedef ProcessorMap::iterator ProcMapIt;
@@ -119,13 +120,13 @@ namespace Nymph
 
         public:
             /// Get a pointer to a processor in the toolbox
-            KTProcessor* GetProcessor(const std::string& procName);
+            std::shared_ptr< KTProcessor > GetProcessor(const std::string& procName);
             /// Get a pointer to a processor in the toolbox
-            const KTProcessor* GetProcessor(const std::string& procName) const;
+            const std::shared_ptr< KTProcessor > GetProcessor(const std::string& procName) const;
 
             /// Add a processor to the toolbox
             /// Toolbox takes ownership of the processor
-            bool AddProcessor(const std::string& procName, KTProcessor* proc);
+            bool AddProcessor(const std::string& procName, std::shared_ptr< KTProcessor > proc);
             bool AddProcessor(const std::string& procType, const std::string& procName);
 
             /// Remove a processor from the toolbox
@@ -133,7 +134,7 @@ namespace Nymph
 
             /// Remove a processor from the toolbox and return it to the user
             /// Ownership is passed to the user
-            KTProcessor* ReleaseProcessor(const std::string& procName);
+            std::shared_ptr< KTProcessor > ReleaseProcessor(const std::string& procName);
 
             /// Remove all processors from the toolbox
             /// Also clears the run queue

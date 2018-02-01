@@ -91,7 +91,7 @@ namespace Nymph
                 {
                     procName = procNode->get_value("name");
                 }
-                KTProcessor* newProc = fProcFactory->create(procType, procType);
+                std::shared_ptr< KTProcessor > newProc ( fProcFactory->create(procType, procType));
                 if (newProc == NULL)
                 {
                     KTERROR(proclog, "Unable to create processor of type <" << procType << ">");
@@ -101,7 +101,7 @@ namespace Nymph
                 if (! AddProcessor(procName, newProc))
                 {
                     KTERROR(proclog, "Unable to add processor <" << procName << ">");
-                    delete newProc;
+                    //delete newProc; //not required for smart pointers
                     return false;
                 }
             }
@@ -265,7 +265,7 @@ namespace Nymph
         return ConfigureProcessors( translator.read_string( config, &optNode )->as_node() );
     }
 
-    KTProcessor* KTProcessorToolbox::GetProcessor(const std::string& procName)
+    std::shared_ptr< KTProcessor > KTProcessorToolbox::GetProcessor(const std::string& procName)
     {
         ProcMapIt it = fProcMap.find(procName);
         if (it == fProcMap.end())
@@ -276,7 +276,7 @@ namespace Nymph
         return it->second.fProc;
     }
 
-    const KTProcessor* KTProcessorToolbox::GetProcessor(const std::string& procName) const
+    const std::shared_ptr< KTProcessor > KTProcessorToolbox::GetProcessor(const std::string& procName) const
     {
         ProcMapCIt it = fProcMap.find(procName);
         if (it == fProcMap.end())
@@ -287,7 +287,7 @@ namespace Nymph
         return it->second.fProc;
     }
 
-    bool KTProcessorToolbox::AddProcessor(const std::string& procName, KTProcessor* proc)
+    bool KTProcessorToolbox::AddProcessor(const std::string& procName, std::shared_ptr< KTProcessor > proc)
     {
         ProcMapIt it = fProcMap.find(procName);
         if (it == fProcMap.end())
@@ -307,7 +307,7 @@ namespace Nymph
         ProcMapIt it = fProcMap.find(procName);
         if (it == fProcMap.end())
         {
-            KTProcessor* newProc = fProcFactory->create(procType, procType);
+            std::shared_ptr< KTProcessor > newProc ( fProcFactory->create(procType, procType));
             if (newProc == NULL)
             {
                 KTERROR(proclog, "Unable to create processor of type <" << procType << ">");
@@ -316,7 +316,7 @@ namespace Nymph
             if (! AddProcessor(procName, newProc))
             {
                 KTERROR(proclog, "Unable to add processor <" << procName << ">");
-                delete newProc;
+                //delete newProc;
                 return false;
             }
             return true;
@@ -327,17 +327,17 @@ namespace Nymph
 
     bool KTProcessorToolbox::RemoveProcessor(const std::string& procName)
     {
-        KTProcessor* procToRemove = ReleaseProcessor(procName);
+        std::shared_ptr< KTProcessor > procToRemove = ReleaseProcessor(procName);
         if (procToRemove == NULL)
         {
             return false;
         }
-        delete procToRemove;
+        //delete procToRemove;
         KTDEBUG(proclog, "Processor <" << procName << "> deleted.");
         return true;
     }
 
-    KTProcessor* KTProcessorToolbox::ReleaseProcessor(const std::string& procName)
+    std::shared_ptr< KTProcessor > KTProcessorToolbox::ReleaseProcessor(const std::string& procName)
     {
         ProcMapIt it = fProcMap.find(procName);
         if (it == fProcMap.end())
@@ -345,17 +345,17 @@ namespace Nymph
             KTWARN(proclog, "Processor <" << procName << "> was not found.");
             return NULL;
         }
-        KTProcessor* procToRelease = it->second.fProc;
+        std::shared_ptr< KTProcessor > procToRelease = it->second.fProc;
         fProcMap.erase(it);
         return procToRelease;
     }
 
     void KTProcessorToolbox::ClearProcessors()
     {
-        for (ProcMapIt it = fProcMap.begin(); it != fProcMap.end(); it++)
+        /*for (ProcMapIt it = fProcMap.begin(); it != fProcMap.end(); it++)
         {
             delete it->second.fProc;
-        }
+        }*/ //not required for smart pointers
         fProcMap.clear();
         fRunQueue.clear();
         return;
@@ -383,14 +383,14 @@ namespace Nymph
 
     bool KTProcessorToolbox::MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName, int order)
     {
-        KTProcessor* signalProc = GetProcessor(signalProcName);
+        std::shared_ptr< KTProcessor > signalProc = GetProcessor(signalProcName);
         if (signalProc == NULL)
         {
             KTERROR(proclog, "Processor named <" << signalProcName << "> was not found!");
             return false;
         }
 
-        KTProcessor* slotProc = GetProcessor(slotProcName);
+        std::shared_ptr< KTProcessor > slotProc = GetProcessor(slotProcName);
         if (slotProc == NULL)
         {
             KTERROR(proclog, "Processor named <" << slotProcName << "> was not found!");
@@ -401,11 +401,11 @@ namespace Nymph
         {
             if (order != std::numeric_limits< int >::min())
             {
-                signalProc->ConnectASlot(signalName, slotProc, slotName, order);
+                signalProc->ConnectASlot(signalName, slotProc.get(), slotName, order);
             }
             else
             {
-                signalProc->ConnectASlot(signalName, slotProc, slotName);
+                signalProc->ConnectASlot(signalName, slotProc.get(), slotName);
             }
         }
         catch (boost::exception& e)
@@ -434,7 +434,7 @@ namespace Nymph
 
     bool KTProcessorToolbox::SetBreakpoint(const std::string& slotProcName, const std::string& slotName)
     {
-        KTProcessor* slotProc = GetProcessor(slotProcName);
+        std::shared_ptr< KTProcessor > slotProc = GetProcessor(slotProcName);
         if (slotProc == NULL)
         {
             KTERROR(proclog, "Processor named <" << slotProcName << "> was not found!");
@@ -467,7 +467,7 @@ namespace Nymph
 
     bool KTProcessorToolbox::RemoveBreakpoint(const std::string& slotProcName, const std::string& slotName)
     {
-        KTProcessor* slotProc = GetProcessor(slotProcName);
+        std::shared_ptr< KTProcessor > slotProc = GetProcessor(slotProcName);
         if (slotProc == NULL)
         {
             KTERROR(proclog, "Processor named <" << slotProcName << "> was not found!");
@@ -545,7 +545,7 @@ namespace Nymph
 
     bool KTProcessorToolbox::AddProcessorToThreadGroup(const std::string& name, ThreadGroup& group)
     {
-        KTProcessor* procForRunQueue = GetProcessor(name);
+        std::shared_ptr< KTProcessor > procForRunQueue = GetProcessor(name);
         KTDEBUG(proclog, "Attempting to add processor <" << name << "> to the run queue");
         if (procForRunQueue == NULL)
         {
@@ -553,7 +553,7 @@ namespace Nymph
             return false;
         }
 
-        KTPrimaryProcessor* primaryProc = dynamic_cast< KTPrimaryProcessor* >(procForRunQueue);
+        KTPrimaryProcessor* primaryProc = dynamic_cast< KTPrimaryProcessor* >(procForRunQueue.get());
         if (primaryProc == NULL)
         {
             KTERROR(proclog, "Processor <" << name << "> is not a primary processor.");
