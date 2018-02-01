@@ -41,18 +41,18 @@ namespace Nymph
             virtual ~KTDataRider();
 
             MEMBERVARIABLE_REF( std::string, Name );
-/*
-        private:
-            friend class cereal::access;
 
+        private:
             template< class Archive >
-            void serialize( Archive& ar )
-            {
-                std::cout << "### serialize for KTDataRider" << std::endl;
-                ar( fName );
-            }
-*/
+            void serialize( Archive& ar );
     };
+
+    template< class Archive >
+    void KTDataRider::serialize( Archive& ar )
+    {
+            std::cout << "### serialize for KTDataRider" << std::endl;
+            ar( fName );
+    }
 
     template< class XDerivedType >
     class KTExtensibleDataRider : public KTExtensibleStruct< XDerivedType, KTDataRider >

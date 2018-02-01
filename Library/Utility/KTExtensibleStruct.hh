@@ -9,6 +9,8 @@
 #ifndef KTEXTENSIBLESTRUCT_HH_
 #define KTEXTENSIBLESTRUCT_HH_
 
+#include <cereal/types/polymorphic.hpp>
+
 namespace Nymph
 {
 
@@ -55,6 +57,12 @@ namespace Nymph
             void SetPrevPtrInNext();
             mutable KTExtensibleStructCore* fNext;
             mutable KTExtensibleStructCore* fPrev;
+
+        private:
+            friend class cereal::access;
+
+            template< class Archive >
+            void serialize( Archive& ar );
     };
 
 
@@ -229,6 +237,18 @@ namespace Nymph
     {
         fNext->fPrev = this;
         return;
+    }
+
+    template< class XBaseType >
+    template< class Archive >
+    void KTExtensibleStructCore<XBaseType>::serialize( Archive& ar )
+    {
+        std::cout << "### serialize for " << typeid(XBaseType).name() << std::endl;
+        ar( this );
+
+        if( fNext == 0 ){ return; }
+        
+        // archive pointer ( fNext )?
     }
 
 
