@@ -1,13 +1,13 @@
 /*
- *  KTSerialWriter.hh
+ *  KTJSONWriter.hh
  *
  *  Created on: Feb 1, 2018
  *      Author: E Zayas
  *
 */
 
-#ifndef KTSERIALWRITER_HH_
-#define KTSERIALWRITER_HH_
+#ifndef KTJSONWRITER_HH_
+#define KTJSONWRITER_HH_
 
 #include "KTData.hh"
 #include "KTProcessor.hh"
@@ -15,73 +15,53 @@
 
 #include "KTTestData.hh"
 
+#include "KTLogger.hh"
+
 #include "cereal/archives/json.hpp"
+
 #include <fstream>
+
+KTLOGGER( avlog_hh, "KTJSONWriter" );
 
 namespace Nymph
 {
-    class KTSerialWriter : public KTProcessor
+    class KTJSONWriter : public KTProcessor
     {
         public:
-            KTSerialWriter( const std::string& name = "serial-writer" );
-            virtual ~KTSerialWriter();
+            KTJSONWriter( const std::string& name = "serial-writer" );
+            virtual ~KTJSONWriter();
+
+            bool Configure( const scarab::param_node& node );
+
+            MEMBERVARIABLE( std::string, Filename );
+
+        public:
+            template< class XDataType >
+            void WriteData( XDataType& data );
 
         private:
-            std::string fFileName;
             std::ofstream* fStreamOutPtr;
             cereal::JSONOutputArchive* fArchiveOutPtr;
 
-        public:
-            bool Configure( const scarab::param_node& node );
-
-            void Initialize();
-
-            std::string GetFileName() const;
-            void SetFileName( std::string file );
-
-            std::ofstream* GetStreamOutPtr() const;
-            void SetStreamOutPtr( std::ofstream stream );
-
-            cereal::JSONOutputArchive* GetArchiveOutPtr() const;
-            void SetArchiveOutPtr( cereal::JSONOutputArchive archive );
-
-            template< class XDataType >
-            void SlotFunction( XDataType& data );
     };
 
-    inline std::string KTSerialWriter::GetFileName() const
+    template< class XDataType >
+    void KTJSONWriter::WriteData( XDataType& data )
     {
-        return fFileName;
-    }
+        if( fStreamOutPtr == nullptr )
+        {
+            fStreamOutPtr = new std::ofstream( fFilename );
+            fArchiveOutPtr = new cereal::JSONOutputArchive( *fStreamOutPtr );
+        }
 
-    inline void KTSerialWriter::SetFileName( std::string file )
-    {
-        fFileName = file;
-        return;
-    }
+        // Write to JSON archive
+        KTINFO( avlog_hh, "Writing data to JSON acrhive" );
+        (*fArchiveOutPtr)( data );
 
-    inline std::ofstream* KTSerialWriter::GetStreamOutPtr() const
-    {
-        return fStreamOutPtr;
-    }
-
-    inline void KTSerialWriter::SetStreamOutPtr( std::ofstream stream )
-    {
-        fStreamOutPtr = &stream;
-        return;
-    }
-
-    inline cereal::JSONOutputArchive* KTSerialWriter::GetArchiveOutPtr() const
-    {
-        return fArchiveOutPtr;
-    }
-
-    inline void KTSerialWriter::SetArchiveOutPtr( cereal::JSONOutputArchive archive )
-    {
-        fArchiveOutPtr = &archive;
+        KTINFO( avlog_hh, "Successfully wrote data to archive" );
         return;
     }
 
 } // namespace Nymph
 
-#endif // KTSERIALWRITER_HH_
+#endif // KTJSONWRITER_HH_

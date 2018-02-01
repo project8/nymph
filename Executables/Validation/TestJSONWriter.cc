@@ -6,29 +6,48 @@
  *
 */
 
-#include "KTLogger.hh"
-#include "KTSerialWriter.hh"
+#include "KTJSONWriter.hh"
+#include "KTJSONReader.hh"
+
 #include "KTTestData.hh" 
 
-LOGGER( testlog, "TestSerialWriter" );
+KTLOGGER( testlog, "TestJSONWriter" );
 
 using namespace Nymph;
 
 int main()
 {
-	// Create the test data
-	KTTestData testData;
-	testData.SetIsAwesome( true ); // because it isn't by default :(
+    std::string filename( "test_json_writer_output.json" );
 
-	KTINFO( testlog, "KTTestData is awesome? " << testData.GetIsAwesome() );
+    {
+        // Create the test data
+        KTTestData testData;
+        testData.SetIsAwesome( true ); // because it isn't by default :(
 
-	// Create the writer
-	KTSerialWriter writer;
-	writer.SetFileName( "test_serial_writer_output.json" );
-	writer.Initialize();
+        KTINFO( testlog, "KTTestData is awesome? " << testData.GetIsAwesome() );
 
-	writer.SlotFunction< KTTestData >( testData );
+        // Create the writer
+        KTJSONWriter writer;
+        writer.SetFilename( filename );
 
-	KTINFO( testlog, "Validation script concluded" );
+        KTINFO( testlog, "Writing data" );
+
+        writer.WriteData< KTTestData >( testData );
+
+        // destruction of the stream and archive (in the writer's destructor) properly closes the file
+    }
+
+    {
+        KTTestData newTestData;
+
+        KTJSONReader reader;
+        reader.SetFilename( filename );
+
+        reader.ReadData< KTTestData >( newTestData );
+
+        KTINFO( testlog, "Is the read data awesome? " << newTestData.GetIsAwesome() );
+    }
+
+    KTINFO( testlog, "Validation script concluded" );
 	return 0;
 }
