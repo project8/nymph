@@ -89,6 +89,7 @@ if (Nymph_ENABLE_TESTING)
             TestProcessorToolbox.py
             TestPyTestClass.py
             TestPythonBasics.py
+            TestPythonBindings.py
         )
         
         pybind11_add_module( py_nymph_validation MODULE ${VALIDATION_PYBINDING_SOURCEFILES} )

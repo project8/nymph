@@ -8,12 +8,14 @@
 #include "Application/KTProcessorToolboxPybind.hh"
 #include "Processor/KTProcessorPybind.hh"
 //#include "Utility/KTConfigurablePybind.hh"
+#include "Utility/KTParamNodePybind.hh"
 
 PYBIND11_MODULE( py_nymph, mod )
 {
     //Nymph::ExportKTConfigurable( mod );
     Nymph::ExportKTProcessor( mod );
     Nymph::ExportKTProcessorToolbox( mod );
+    Nymph::ExportParamNodePybind( mod );
 }
 
 
