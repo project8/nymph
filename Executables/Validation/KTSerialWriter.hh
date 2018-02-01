@@ -13,6 +13,8 @@
 #include "KTProcessor.hh"
 #include "KTSlot.hh"
 
+#include "KTTestData.hh"
+
 #include "cereal/archives/json.hpp"
 #include <fstream>
 
@@ -30,7 +32,9 @@ namespace Nymph
             cereal::JSONOutputArchive* fArchiveOutPtr;
 
         public:
-            bool Configure( const scarab::param_node* node );
+            bool Configure( const scarab::param_node& node );
+
+            void Initialize();
 
             std::string GetFileName() const;
             void SetFileName( std::string file );
@@ -42,7 +46,7 @@ namespace Nymph
             void SetArchiveOutPtr( cereal::JSONOutputArchive archive );
 
             template< class XDataType >
-            void SlotFunction( const XDataType& data );
+            void SlotFunction( XDataType& data );
     };
 
     inline std::string KTSerialWriter::GetFileName() const

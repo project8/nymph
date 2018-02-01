@@ -17,10 +17,11 @@ namespace Nymph
     KTSerialWriter::KTSerialWriter( const std::string& name ) :
         KTProcessor( name ),
         fFileName( "placeholder.json" ),
-        fStreamOutPtr(nullptr),
-        fArchiveOutPtr(nullptr)
+        fStreamOutPtr( nullptr ),
+        fArchiveOutPtr( nullptr )
         {
             // Register slots here
+            RegisterSlot( "test-data", this, &KTSerialWriter::SlotFunction< KTTestData > );
         }
 
     KTSerialWriter::~KTSerialWriter()
@@ -29,25 +30,29 @@ namespace Nymph
         //delete fArchiveOutPtr;
     }
 
-    bool KTSerialWriter::Configure( const scarab::param_node* node )
+    bool KTSerialWriter::Configure( const scarab::param_node& node )
     {
-        if (node == NULL) return false;
-
-        SetFileName( node->get_value< std::string >( "file-name", fFileName ) );
-
-        *fStreamOutPtr = std::ofstream( fFileName );
-        cereal::JSONOutputArchive fStupid( *fStreamOutPtr );
-        fArchiveOutPtr = &fStupid;
+        SetFileName( node.get_value< std::string >( "file-name", fFileName ) );
+        Initialize();
 
         return true;
     }
 
+    void KTSerialWriter::Initialize()
+    {
+        *fStreamOutPtr = std::ofstream( fFileName );
+        cereal::JSONOutputArchive fStupid( *fStreamOutPtr );
+        fArchiveOutPtr = &fStupid;
+
+        return;
+    }
+
     template< class XDataType >
-    void KTSerialWriter::SlotFunction( const XDataType& data )
+    void KTSerialWriter::SlotFunction( XDataType& data )
     {
         // Write to JSON archive
         KTINFO( avlog_hh, "Writing data to JSON acrhive" );
-        *fArchiveOutPtr( data );
+        (*fArchiveOutPtr)( data );
 
         KTINFO( avlog_hh, "Successfully wrote data to archive" );
         return;
