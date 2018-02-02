@@ -141,7 +141,7 @@ namespace Nymph
 
     inline const std::shared_ptr< KTCutResult > KTCutStatus::CutResults() const
     {
-        return fCutResults.get()->Next();
+        return fCutResults->Next();
     }
 
     template< typename XCutType >
