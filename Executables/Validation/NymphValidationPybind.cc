@@ -8,6 +8,7 @@
 #include "KTPyTestClassPybind.hh"
 #include "TestPythonBasics.hh"
 #include "pybind11/pybind11.h"
+#include <memory>
 
 PYBIND11_MODULE( py_nymph_validation, mod )
 {
@@ -19,6 +20,9 @@ PYBIND11_MODULE( py_nymph_validation, mod )
     		.def(pybind11::init<>())
     		.def("WrapFunction", &Nymph::KTWrapProcessor::WrapFunction)
         	.def("Configure", &Nymph::KTWrapProcessor::Configure);
+
+    pybind11::class_< Nymph::KTProcessor, std::shared_ptr<Nymph::KTProcessor>>( mod, "KTProcessor" );
+
 }
 
 
