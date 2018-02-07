@@ -97,6 +97,7 @@ set( NYMPH_PYBINDING_HEADERFILES
 
 # Python bindings
 set( NYMPH_PYBINDING_SOURCEFILES
+    ${PROC_DIR}/KTProcessorPybind.cc
     NymphPybind.cc
 )
 

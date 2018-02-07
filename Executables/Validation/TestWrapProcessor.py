@@ -7,9 +7,10 @@
 import py_nymph as nymph
 import py_nymph_validation as nv
 
-class WrappedProcessor(nv.WrapProcessor):
+class WrappedProcessor(nymph.WrapProcessor):
+    def __init__(self):
+        super(WrappedProcessor, self).__init__()
     pass
-
 
 
 ptb = nymph.KTProcessorToolbox('pt')

@@ -180,7 +180,7 @@ namespace Nymph
         return;
     }
 
-    KT_REGISTER_PROCESSOR(KTWrapProcessor, "base-wrap-proc");
+  /*  KT_REGISTER_PROCESSOR(KTWrapProcessor, "base-wrap-proc");
 
     KTWrapProcessor::KTWrapProcessor( const std::string& name ) :
             KTProcessor( name ),
@@ -209,6 +209,6 @@ namespace Nymph
     {
         KTINFO(testsiglog, "Hey, I'm base class");
         return;
-    }
+    }*/
 
 } /* namespace Nymph */

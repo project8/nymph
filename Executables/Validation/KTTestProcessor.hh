@@ -131,7 +131,7 @@ namespace Nymph
     };
 
 
-    class KTWrapProcessor : public KTProcessor
+ /*   class KTWrapProcessor : public KTProcessor
     {
         public:
             KTWrapProcessor( const std::string& name = "base-wrap-proc" );
@@ -145,7 +145,7 @@ namespace Nymph
         private:
             KTSlot< int > fSlot;
 
-    };
+    };*/
 
 } /* namespace Nymph */
 #endif /* KTTESTPROCESSOR_HH_ */

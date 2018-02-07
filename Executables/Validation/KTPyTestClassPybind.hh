@@ -23,7 +23,7 @@ namespace Nymph
                 ;
     };
 
-	class KTPyWrapProcessor: public KTWrapProcessor
+/*	class KTPyWrapProcessor: public KTWrapProcessor
 	{
 		public:
 			// Inherit the constructors
@@ -46,7 +46,7 @@ namespace Nymph
 									node      // Argument(s)
 									);
 			}
-	};
+	};*/
 
 
 } /* namespace Nymph */
