@@ -38,6 +38,7 @@ namespace Nymph
     {
         public:
             KTDataRider();
+            KTDataRider( const KTDataRider& orig );
             virtual ~KTDataRider();
 
             MEMBERVARIABLE_REF( std::string, Name );
@@ -62,7 +63,9 @@ namespace Nymph
         public:
             KTExtensibleDataRider() = delete;
             KTExtensibleDataRider( const std::string& name ) { KTDataRider::fName = name; }
+            KTExtensibleDataRider( const KTExtensibleDataRider< XDerivedType >& orig ) : KTExtensibleStruct< XDerivedType, KTDataRider >( *this ) {}
             virtual ~KTExtensibleDataRider() {}
+
 /*
             template< class Archive >
             void serialize( Archive& ar )
@@ -78,8 +81,14 @@ namespace Nymph
         { \
             public: \
                 ex_data_class_name() : data_class_name(), KTExtensibleDataRider< ex_data_class_name >( label ) {} \
+                ex_data_class_name( const ex_data_class_name& orig ) : data_class_name( *this ), KTExtensibleDataRider< ex_data_class_name >( *this ) {} \
                 virtual ~ex_data_class_name() {} \
                 \
+                std::shared_ptr< KTExtensibleStructCore< KTDataRider > > Clone() const \
+                { \
+                    std::shared_ptr< ex_data_class_name > copy = std::make_shared< ex_data_class_name >( *this ); \
+                    return std::static_pointer_cast< KTExtensibleStructCore< KTDataRider >, ex_data_class_name >( copy ); \
+                } \
         };
 
 /*

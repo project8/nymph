@@ -19,6 +19,10 @@ namespace Nymph
             fName()
     {}
 
+    KTDataRider::KTDataRider( const KTDataRider& orig ) :
+            fName( orig.fName )
+    {}
+
     KTDataRider::~KTDataRider()
     {}
 

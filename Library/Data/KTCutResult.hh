@@ -8,44 +8,49 @@
 #ifndef KTCUTRESULT_HH_
 #define KTCUTRESULT_HH_
 
-#include "KTExtensibleStruct.hh"
+//#include "KTExtensibleStruct.hh"
 
-#include "KTMemberVariable.hh"
+//#include "KTMemberVariable.hh"
 
 #include <string>
 
 namespace Nymph
 {
-    class KTCutResultCore
+    struct KTCutResult
     {
-        public:
-            KTCutResultCore() :
-                    fState(false)
-            {}
-            virtual ~KTCutResultCore() {}
-
-            virtual const std::string& Name() const = 0;
-
-            MEMBERVARIABLE(bool, State);
+        bool fState;
+        KTCutResult( bool state ) { fState = state; }
+        virtual ~KTCutResult() {}
+        virtual const std::string& Name() const = 0;
     };
 
-    typedef KTExtensibleStructCore< KTCutResultCore > KTCutResult;
-
-    template< class XDerivedType >
-    class KTExtensibleCutResult : public KTExtensibleStruct< XDerivedType, KTCutResultCore >
+    template< class XCutType >
+    struct KTTypedCutResult : KTCutResult
     {
-        public:
-            KTExtensibleCutResult() {}
-            virtual ~KTExtensibleCutResult() {}
-
-            const std::string& Name() const;
+        KTTypedCutResult( bool state ) : KTCutResult( state ) {}
+        virtual ~KTTypedCutResult() {}
+        virtual const std::string& Name() const
+        {
+            return XCutType::GetName();
+        }
     };
 
-    template< class XDerivedType >
-    inline const std::string& KTExtensibleCutResult< XDerivedType >::Name() const
+    template< class XCutType >
+    bool CheckCutResultType( std::shared_ptr< KTCutResult > result )
     {
-        return XDerivedType::sName;
+        return std::dynamic_pointer_cast< KTTypedCutResult< XCutType > >( result );
+
     }
+
+    struct CheckCutResultName
+    {
+        std::string fName;
+        CheckCutResultName( const std::string& name ) : fName( name ) {}
+        bool operator()( std::shared_ptr< KTCutResult > result )
+        {
+            return result->Name() == fName;
+        }
+    };
 
 } /* namespace Nymph */
 

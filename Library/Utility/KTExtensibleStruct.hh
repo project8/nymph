@@ -26,7 +26,8 @@ namespace Nymph
     struct KTExtensibleStructCore : public XBaseType
     {
         public:
-            typedef std::shared_ptr< XBaseType > BasePtr;
+            typedef KTExtensibleStructCore< XBaseType > BasePtrType;
+            typedef std::shared_ptr< BasePtrType > BasePtr;
 
         public:
             /// Default constructor
@@ -53,7 +54,7 @@ namespace Nymph
             /// Duplicates the extended object
             virtual BasePtr Clone() const = 0;
             /// Duplicates object only
-            virtual void Pull( const KTExtensibleStructCore< XBaseType >& object ) = 0;
+            virtual void Pull( const BasePtrType& object ) = 0;
             /// Returns the pointer to the next field
             BasePtr Next() const;
             /// Returns the pointer to the previous field
@@ -80,6 +81,7 @@ namespace Nymph
     struct KTExtensibleStruct : KTExtensibleStructCore< XBaseType >
     {
         public:
+            typedef typename KTExtensibleStructCore< XBaseType >::BasePtrType BasePtrType;
             typedef typename KTExtensibleStructCore< XBaseType >::BasePtr BasePtr;
 
         public:
@@ -93,7 +95,7 @@ namespace Nymph
             /// Duplicates the extended object
             virtual BasePtr Clone() const;
             /// Duplicates object only
-            virtual void Pull( const KTExtensibleStructCore< XBaseType >& object );
+            virtual void Pull( const BasePtrType& object );
             void SetIsCopyDisabled( bool flag );
         private:
             bool fIsCopyDisabled;
@@ -170,7 +172,7 @@ namespace Nymph
         if (! fNext)
         {
             fNext = std::make_shared< XStructType >();
-            fNext->fPrev.reset( const_cast< KTExtensibleStructCore< XBaseType >* >(this) );
+            fNext->fPrev.reset( const_cast< BasePtrType* >(this) );
         }
 
         return fNext->template Of<XStructType>();
@@ -272,7 +274,7 @@ namespace Nymph
     void KTExtensibleStruct<XInstanceType, XBaseType>::serialize( Archive& ar )
     {
         std::cout << "### serialize for " << typeid(XBaseType).name() << std::endl;
-        ar( cereal::base_class< KTExtensibleStructCore< XBaseType > >( this ), fIsCopyDisabled );
+        ar( cereal::base_class< BasePtrType >( this ), fIsCopyDisabled );
 
         return;
     }
@@ -299,7 +301,7 @@ namespace Nymph
 
         if (object.fNext)
         {
-            this->fNext.reset( object.fNext->Clone() );
+            this->fNext = object.fNext->Clone();
         }
     }
 
@@ -317,7 +319,7 @@ namespace Nymph
         if (object.fNext)
         {
             this->fNext = object.fNext->Clone();
-            this->KTExtensibleStructCore< XBaseType >::SetPrevPtrInNext();
+            this->BasePtrType::SetPrevPtrInNext();
             //this->fNext->fPrev = this;
         }
 
@@ -329,18 +331,20 @@ namespace Nymph
     {
         // assume CRTP is used properly,
         // otherwise compiling fails here (intended behavior)
-        BasePtr instance = std::make_shared< XBaseType >( XInstanceType(dynamic_cast<const XInstanceType&>(*this)) );
+        typedef KTExtensibleStruct< XInstanceType, XBaseType > InstancePtrType;
+        typedef std::shared_ptr< InstancePtrType > InstancePtr;
+        InstancePtr instance = std::make_shared< InstancePtrType >( XInstanceType(dynamic_cast<const XInstanceType&>(*this)) );
         if (this->fNext)
         {
-            instance->fNext.reset( this->fNext->Clone() );
+            instance->fNext = this->fNext->Clone();
             instance->SetPrevPtrInNext();
             //instance->fNext->fPrev = instance->fNext;
         }
-        return instance;
+        return std::static_pointer_cast< BasePtrType, InstancePtrType >( instance );
     }
 
     template<class XInstanceType, class XBaseType>
-    void KTExtensibleStruct<XInstanceType, XBaseType>::Pull(const KTExtensibleStructCore<XBaseType>& object)
+    void KTExtensibleStruct<XInstanceType, XBaseType>::Pull(const BasePtrType& object)
     {
         if (&object == this)
         {
