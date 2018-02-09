@@ -10,8 +10,6 @@
 
 #include "KTProcessor.hh"
 #include "KTSlot.hh"
-//#include "pybind11/pybind11.h"
-
 
 //using namespace py;
 
@@ -129,23 +127,6 @@ namespace Nymph
             KTSignalData fDerived1DataSignal;
             KTSignalData fDerived2DataSignal;
     };
-
-
- /*   class KTWrapProcessor : public KTProcessor
-    {
-        public:
-            KTWrapProcessor( const std::string& name = "base-wrap-proc" );
-            virtual ~KTWrapProcessor();
-
-            bool Configure(const scarab::param_node& node);
-
-            void SlotFunc(int);
-            virtual void WrapFunction(int input);
-
-        private:
-            KTSlot< int > fSlot;
-
-    };*/
 
 } /* namespace Nymph */
 #endif /* KTTESTPROCESSOR_HH_ */
