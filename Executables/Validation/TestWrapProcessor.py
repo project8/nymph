@@ -8,31 +8,41 @@ import py_nymph as nymph
 import py_nymph_validation as nv
 
 class WrappedProcessor(nymph.WrapProcessor):
-#    def WrapFunction(self, x):
-#        self.fThreshold = 0
-#        print("Hey, I'm a python processor. And by the way: fThreshold is {}".format(self.fThreshold))
     pass
 
-print("Making instace in python of class WrappedProcessor that inherits from nymph.WrapProcessor")
+print("\nMaking instace in python of class WrappedProcessor that inherits from nymph.WrapProcessor.\n")
 p = WrappedProcessor()
 
-print("Overwriting WrapFunction that will be called from the slot function")
-p.WrapFunction = lambda x: print("Hey, I'm a python processor. And by the way: fThreshold is {}".format(p.fThreshold))
 
-print("Adding a new variable to the processor")
-p.fThreshold = 6
-
-print('property fThreshold from python processor is {}'.format(p.fThreshold))
 ptb = nymph.KTProcessorToolbox('pt')
 
 print('Configuring')
-
 ptb.AddProcessor('test-p-proc', 'tpp')
 ptb.AddProcessor('bwp', p)
 ptb.MakeConnection('tpp:the-signal', 'bwp:wrap-slot')
 
-
 ptb.PushBackToRunQueue('tpp')
+
+
+print("\nBefore running: Overwrite WrapFunction that will be called from the slot function.\n")
+p.WrapFunction = lambda x: print("Hey, I'm a python processor. And by the way: fThreshold is {}".format(p.fThreshold))
+
+
+print("Add a new variable to the processor.\n")
+p.fThreshold = 6
+print('Property fThreshold from python processor is {}.\n'.format(p.fThreshold))
+
+
+print('Define new Configure method to set self.fThreshold.\n')
+def Configure(self, a):
+    print('In Configure: Setting new fThreshold.\n')
+    self.fThreshold = a
+    
+p.Configure = Configure
+p.Configure(p, 7)
+
+
+
 
 print('Running')
 
