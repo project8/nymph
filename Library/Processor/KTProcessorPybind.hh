@@ -63,6 +63,10 @@ namespace Nymph
 
 			// Trampoline (need one for each virtual function)
 			void WrapFunction(int input) override {
+				// I dont know what these two lines do,
+				// but at least the first one is necessary or nymph hangs when calling this as python method
+				pybind11::gil_scoped_release release;
+				pybind11::gil_scoped_acquire acquire;
 				PYBIND11_OVERLOAD_PURE(
 						void, // Return type
 						KTWrapProcessor,      // Parent class

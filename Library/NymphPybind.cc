@@ -18,7 +18,7 @@ PYBIND11_MODULE( py_nymph, mod )
 
     pybind11::class_< Nymph::KTProcessor, std::shared_ptr<Nymph::KTProcessor>>( mod, "KTProcessor" );
 
-    pybind11::class_<Nymph::KTWrapProcessor, Nymph::KTPyWrapProcessor> wrap_processor(mod, "WrapProcessor");
+    pybind11::class_<Nymph::KTWrapProcessor, Nymph::KTPyWrapProcessor, Nymph::KTProcessor, std::shared_ptr<Nymph::KTWrapProcessor>> wrap_processor(mod, "WrapProcessor", pybind11::dynamic_attr());
             wrap_processor
 				.def(pybind11::init<>())
 				.def("WrapFunction", &Nymph::KTWrapProcessor::WrapFunction)
