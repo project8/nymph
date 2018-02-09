@@ -21,7 +21,7 @@ namespace Nymph
     }
 
     KTCutStatus::KTCutStatus(const KTCutStatus& orig) :
-            fCutResults(dynamic_cast< KTCutResultHandle* >(orig.fCutResults->Clone())),
+            fCutResults(orig.fCutResults),
             fSummary()
     {
         UpdateStatus();
@@ -32,37 +32,34 @@ namespace Nymph
 
     KTCutStatus& KTCutStatus::operator=(const KTCutStatus& rhs)
     {
-        fCutResults.reset(dynamic_cast< KTCutResultHandle* >(rhs.fCutResults->Clone()));
+        fCutResults = rhs.fCutResults;
         UpdateStatus();
         return *this;
+    }
+
+    void KTCutStatus::AssignCutResult(unsigned maskPos, const std::string& name, bool state, bool doUpdateStatus)
+    {
+        if( fCutResults[maskPos].fAssigned )
+        {
+            throw KTException() << "Mask position <" << maskPos << "> has already been assigned";
+        }
+        fCutResults[maskPos].fName = name;
+        fCutResults[maskPos].fState = state;
+        fCutResults[maskPos].fAssigned = true;
+        if( doUpdateStatus ) UpdateStatus();
+        return;
     }
 
     void KTCutStatus::UpdateStatus()
     {
         KTDEBUG(cutlog, "Updating cut summary");
-        KTCutResult* cut = fCutResults.get()->Next(); // skip over KTCutResultHandle
-        if (cut == NULL)
-        {
-            KTDEBUG(cutlog, "No cuts");
-            fSummary.resize(1, false);
-            return;
-        }
-
-        // loop through once to count cuts
-        unsigned nCuts = 0;
-        while (cut != NULL)
-        {
-            ++nCuts;
-            cut = cut->Next();
-        }
-        KTDEBUG(cutlog, nCuts << " cuts");
+        unsigned nCuts = fCutResults.size();
         fSummary.resize(nCuts, false);
-        // loop through again to set cuts
-        cut = fCutResults.get()->Next(); // skip over KTCutResultHandle
+
+        // loop through to set cuts
         for (unsigned iCut = 0; iCut < nCuts; ++iCut)
         {
-            fSummary[iCut] = cut->GetState();
-            cut = cut->Next();
+            fSummary[iCut] = fCutResults[iCut].fAssigned && fCutResults[iCut].fState;
         }
         KTDEBUG(cutlog, "Cut summary bitset: " << fSummary);
         return;
@@ -70,20 +67,13 @@ namespace Nymph
 
     std::string KTCutStatus::CutResultsPresent() const
     {
-        KTCutResult* cut = fCutResults.get()->Next(); // skip over KTCutResultHandle
-        if (cut == NULL ) return "";
-
         std::string cutsPresent;
         for (auto cutIt = fCutResults.cbegin(); cutIt != fCutResults.cend(); ++cutIt)
         {
-            cutsPresent = cutIt->Name() + cutsPresent;
-        }
-        while (true)
-        {
-            cutsPresent = cut->Name() + cutsPresent;
-            cut = cut->Next();
-            if (cut != NULL) cutsPresent = " " + cutsPresent;
-            else break;
+            if (! cutIt->fName.empty())
+            {
+                cutsPresent = cutIt->fName + " " + cutsPresent;
+            }
         }
         return cutsPresent;
     }

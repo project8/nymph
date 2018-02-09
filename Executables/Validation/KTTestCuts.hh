@@ -22,12 +22,6 @@ namespace Nymph
     class KTAwesomeCut : public KTCutOnData< KTTestDataExt >
     {
         public:
-            struct Result : KTExtensibleCutResult< Result >
-            {
-                static const std::string sName;
-            };
-
-        public:
             KTAwesomeCut(const std::string& name = "default-awesome-cut");
             virtual ~KTAwesomeCut();
 
@@ -39,12 +33,6 @@ namespace Nymph
     // Cuts data that is IS awesome
     class KTNotAwesomeCut : public KTCutOnData< KTTestDataExt >
     {
-        public:
-            struct Result : KTExtensibleCutResult< Result >
-            {
-                static const std::string sName;
-            };
-
         public:
             KTNotAwesomeCut(const std::string& name = "default-not-awesome-cut");
             virtual ~KTNotAwesomeCut();
