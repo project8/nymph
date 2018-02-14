@@ -20,6 +20,8 @@ if (Nymph_ENABLE_TESTING)
         KTTestData.hh
         KTTestPrimaryProcessor.hh
         KTTestProcessor.hh
+        
+        KTExtTest.hh
     )
     
     set (VALIDATION_SOURCEFILES
@@ -54,6 +56,7 @@ if (Nymph_ENABLE_TESTING)
         TestCacheDirectory
         TestCut
         TestCutFilter
+        TestData
         TestExceptionInSlot
         TestJSONWriter
         TestLogger
@@ -69,6 +72,8 @@ if (Nymph_ENABLE_TESTING)
         TestSlotData
         TestThroughputProfiler
         TestUseBreakpoint
+        
+        TestExt
     )
     
     pbuilder_executables( TEST_PROGRAMS LIB_DEPENDENCIES )

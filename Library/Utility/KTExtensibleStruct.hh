@@ -9,6 +9,8 @@
 #ifndef KTEXTENSIBLESTRUCT_HH_
 #define KTEXTENSIBLESTRUCT_HH_
 
+#include "KTException.hh"
+
 #include <cereal/types/polymorphic.hpp>
 
 #include <memory>
@@ -23,11 +25,15 @@ namespace Nymph
      */
 
     template< class XBaseType >
-    struct KTExtensibleStructCore : public XBaseType
+    struct KTExtensibleStructCore : public XBaseType, public std::enable_shared_from_this< KTExtensibleStructCore< XBaseType > >
     {
         public:
             typedef KTExtensibleStructCore< XBaseType > BasePtrType;
             typedef std::shared_ptr< BasePtrType > BasePtr;
+            typedef std::weak_ptr< BasePtrType > WeakBasePtr;
+
+        private:
+            typedef std::enable_shared_from_this< KTExtensibleStructCore< XBaseType > > ESFTType;
 
         public:
             /// Default constructor
@@ -66,7 +72,7 @@ namespace Nymph
         protected:
             void SetPrevPtrInNext();
             mutable BasePtr fNext;
-            mutable BasePtr fPrev;
+            mutable WeakBasePtr fPrev;
 
         private:
             friend class cereal::access;
@@ -124,7 +130,6 @@ namespace Nymph
     template<class XBaseType>
     KTExtensibleStructCore<XBaseType>::~KTExtensibleStructCore()
     {
-        fNext.reset();
     }
 
     template<class XBaseType>
@@ -153,7 +158,7 @@ namespace Nymph
         if (! fNext)
         {
             fNext = std::make_shared< XStructType >();
-            fNext->fPrev.reset( this );
+            fNext->fPrev = ESFTType::shared_from_this();
         }
 
         return fNext->template Of<XStructType>();
@@ -171,8 +176,7 @@ namespace Nymph
 
         if (! fNext)
         {
-            fNext = std::make_shared< XStructType >();
-            fNext->fPrev.reset( const_cast< BasePtrType* >(this) );
+            throw KTException() << "Requested component of (const) extensible struct not present";
         }
 
         return fNext->template Of<XStructType>();
@@ -212,7 +216,7 @@ namespace Nymph
             if (next->fNext)
             {
                 fNext = next->fNext;
-                fNext->fPrev = this;
+                fNext->fPrev = ESFTType::shared_from_this();
                 next->fNext.reset();
             }
             next->fPrev.reset();
@@ -231,7 +235,7 @@ namespace Nymph
     template<class XBaseType>
     inline typename KTExtensibleStructCore<XBaseType>::BasePtr KTExtensibleStructCore<XBaseType>::Prev() const
     {
-        return fPrev;
+        return fPrev.lock();
     }
 
     template<class XBaseType>
@@ -244,14 +248,14 @@ namespace Nymph
     template<class XBaseType>
     inline typename KTExtensibleStructCore<XBaseType>::BasePtr KTExtensibleStructCore<XBaseType>::First() const
     {
-        if (fPrev) return this;
-        return fPrev->First();
+        if (! fPrev) return BasePtr(this);
+        return fPrev.lock()->First();
     }
 
     template<class XBaseType>
     inline void KTExtensibleStructCore<XBaseType>::SetPrevPtrInNext()
     {
-        fNext->fPrev.reset( this );
+        fNext->fPrev = ESFTType::shared_from_this();
         return;
     }
 

@@ -15,7 +15,7 @@ namespace Nymph
     KTLOGGER(testlog, "KTTestCuts");
 
     KT_REGISTER_CUT(KTAwesomeCut, "awesome-cut");
-    KT_REGISTER_CUT(KTNotAwesomeCut, "not-awesome-cut");
+    KT_REGISTER_CUT(KTNotAwesomeCut, "not-awesome-cut"  );
 
 
     KTAwesomeCut::KTAwesomeCut(const std::string& name) :

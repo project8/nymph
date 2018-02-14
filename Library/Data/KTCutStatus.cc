@@ -39,6 +39,12 @@ namespace Nymph
 
     void KTCutStatus::AssignCutResult(unsigned maskPos, const std::string& name, bool state, bool doUpdateStatus)
     {
+        KTDEBUG(cutlog, "Assigning cut result <" << name << "> to position <" << maskPos << "> with state <" << state << ">");
+        if( maskPos >= fCutResults.size() )
+        {
+            fCutResults.resize( maskPos + 1 );
+        }
+        KTDEBUG(cutlog, "Cut result size is now <" << fCutResults.size() << ">");
         if( fCutResults[maskPos].fAssigned )
         {
             throw KTException() << "Mask position <" << maskPos << "> has already been assigned";
