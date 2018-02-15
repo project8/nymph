@@ -71,9 +71,7 @@ namespace Nymph
         protected:
             template< class XRequestedType >
             std::shared_ptr< XRequestedType > _Detatch( BasePtrType prev = BasePtrType() );
-            //void SetPrevInNext( std::shared_ptr< KTExtensibleCore< XBaseType > > ptr );
 
-            //std::weak_ptr< KTExtensibleCore< XBaseType > > fPrev;
             BasePtrType fNext;
 
             bool fDisableExtendedCopy; // internal variable used to determine whether operator= copies extended fields
@@ -111,7 +109,6 @@ namespace Nymph
     template< class XBaseType >
     KTExtensibleCore< XBaseType >::KTExtensibleCore() :
             XBaseType(),
-            //fPrev(),
             fNext(),
             fDisableExtendedCopy( false )
     {
@@ -127,7 +124,6 @@ namespace Nymph
     {
         // must not call virtual functions on this because it's used in the copy constructor
 
-        std::cout << "KTExtensibleCore::operator=()" << std::endl;
         if( this == &orig ) return *this;
 
         fDisableExtendedCopy = false;
@@ -137,13 +133,10 @@ namespace Nymph
 
         // copy extended fields
         // only do this if orig.fDisableExtendedCopy is false
-        std::cout << "do we copy extended fields? ! " << orig.fDisableExtendedCopy << " && " << orig.fNext.operator bool() << " = " << bool(! orig.fDisableExtendedCopy && orig.fNext) << std::endl;
         if( ! orig.fDisableExtendedCopy && orig.fNext )
         {
-            std::cout << "duplicating extended fields" << std::endl;
             // duplicate extended fields with Clone()
             fNext = orig.fNext->Clone();  // this's fNext points to the copy of orig's fNext
-            //SetPrevInNext( ESFTBaseType::shared_from_this() ); // this's fNext's fPrev points back to this
         }
 
         // duplicate base class
@@ -162,23 +155,18 @@ namespace Nymph
     template< class XRequestedType >
     XRequestedType& KTExtensibleCore< XBaseType >::Of()
     {
-        std::cout << "in KTExtensibleCore::Of()" << std::endl;
         XRequestedType* requested = dynamic_cast< XRequestedType* >( this );
         if( requested != nullptr )
         {
-            std::cout << "type match" << std::endl;
             return *requested;
         }
 
         if( ! fNext )
         {
-            std::cout << "creating a new ext test core" << std::endl;
             std::shared_ptr< XRequestedType > requestedShared = std::make_shared< XRequestedType >();
             fNext = requestedShared;
-            //SetPrevInNext( ESFTBaseType::shared_from_this() );
             return *requestedShared;
         }
-        std::cout << "moving on to the next test core: " << fNext.operator bool() << std::endl;
         return fNext->template Of< XRequestedType >();
     }
 
@@ -186,7 +174,6 @@ namespace Nymph
     template< class XRequestedType >
     const XRequestedType& KTExtensibleCore< XBaseType >::Of() const
     {
-        std::cout << "in KTExtensibleCore::Of() const" << std::endl;
         const XRequestedType* requested = dynamic_cast< const XRequestedType* >( this );
         if( requested != nullptr )
         {
@@ -204,7 +191,6 @@ namespace Nymph
     template< class XRequestedType >
     std::shared_ptr< XRequestedType > KTExtensibleCore< XBaseType >::Share()
     {
-        std::cout << "in KTExtensibleCore::Share()" << std::endl;
         std::shared_ptr< XRequestedType > requested = std::dynamic_pointer_cast< XRequestedType >( ESFTBaseType::shared_from_this() );
         if( requested )
         {
@@ -214,13 +200,10 @@ namespace Nymph
 
         if( ! fNext )
         {
-            std::cout << "creating a new ext test core" << std::endl;
             requested = std::make_shared< XRequestedType >();
             fNext = requested;
-            //SetPrevInNext( ESFTBaseType::shared_from_this() );
             return requested;
         }
-        std::cout << "moving on to the next test core: " << fNext.operator bool() << std::endl;
         return fNext->template Share< XRequestedType >();
     }
 
@@ -228,7 +211,6 @@ namespace Nymph
     template< class XRequestedType >
     const std::shared_ptr< XRequestedType > KTExtensibleCore< XBaseType >::Share() const
     {
-        std::cout << "in KTExtensibleCore::Share() const" << std::endl;
         const std::shared_ptr< XRequestedType > requested = std::dynamic_pointer_cast< const XRequestedType >( ESFTBaseType::shared_from_this() );
         if( requested )
         {
@@ -290,15 +272,6 @@ namespace Nymph
     }
 
 
-
-    //template< class XBaseType >
-    //void KTExtensibleCore< XBaseType >::SetPrevInNext( std::shared_ptr< KTExtensibleCore< XBaseType > > ptr )
-    //{
-    //    fNext->fPrev = ptr;
-   //     return;
-    //}
-
-
     //**************
     // KTExtensible implementation
     //**************
@@ -324,7 +297,6 @@ namespace Nymph
     {
         // must not call any virtual functions on `this` because it's called from the copy constructor
 
-        std::cout << "KTExtensible::operator=()" << std::endl;
         if( this == &orig ) return *this;
 
         this->KTExtensibleCore< XBaseType >::operator=( orig );
@@ -336,7 +308,6 @@ namespace Nymph
     KTExtensibleCore< XBaseType >& KTExtensible< XInstanceType, XBaseType >::Pull( const KTExtensibleCore< XBaseType >& orig )
     {
         // copies information out from orig based on this's instance type and any extended fields present
-        std::cout << "KTExtensible::Pull()" << std::endl;
 
         if( this == &orig ) return *this;
 
@@ -366,8 +337,6 @@ namespace Nymph
     template< class XInstanceType, class XBaseType >
     std::shared_ptr< KTExtensibleCore< XBaseType > > KTExtensible< XInstanceType, XBaseType >::Clone() const
     {
-        std::cout << "KTExtensible::Clone()" << std::endl;
-
         std::shared_ptr< XInstanceType > instancePtr = std::make_shared< XInstanceType >();
         instancePtr->Pull(*this); // extracts just XInstanceType from this because instancePtr doesn't have any extended fields
 
@@ -375,7 +344,6 @@ namespace Nymph
         if( this->fNext )
         {
             instancePtr->fNext = this->fNext->Clone(); // instancePtr's fNext is a clone of this's fNext
-            //instancePtr->SetPrevInNext( instancePtr ); // instancePtr's fNext's fPrev points back to instance pointer
         }
 
         return instancePtr;
