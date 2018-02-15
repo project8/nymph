@@ -5,11 +5,9 @@
  *      Author: N.S. Oblath
  */
 
-#include "KTExtTest.hh"
-
 #include "KTLogger.hh"
 
-#include <iostream>
+#include "KTExtensible.hh"
 
 KTLOGGER( testlog, "KTExtTest" );
 

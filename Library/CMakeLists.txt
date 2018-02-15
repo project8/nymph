@@ -16,6 +16,7 @@ set( NYMPH_HEADERFILES
     ${UTIL_DIR}/KTDirectory.hh
     ${UTIL_DIR}/KTEventLoop.hh
     ${UTIL_DIR}/KTException.hh
+    ${UTIL_DIR}/KTExtensible.hh
     ${UTIL_DIR}/KTExtensibleStruct.hh
     ${UTIL_DIR}/KTExtensibleStructFactory.hh
     ${UTIL_DIR}/KTLogger.hh

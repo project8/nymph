@@ -1,16 +1,17 @@
 /*
- * KTExtTest.hh
+ * KTExtensible.hh
  *
  *  Created on: Feb 11, 2018
  *      Author: N.S. Oblath
  */
 
-#ifndef NYMPH_VALIDATION_KTEXTTEST_HH_
-#define NYMPH_VALIDATION_KTEXTTEST_HH_
+#ifndef NYMPH_KTEXTENSIBLE_HH_
+#define NYMPH_KTEXTENSIBLE_HH_
 
 #include "KTException.hh"
 
-#include <iostream>
+#include <cereal/types/polymorphic.hpp>
+
 #include <memory>
 
 namespace Nymph
@@ -68,6 +69,9 @@ namespace Nymph
             template< class XRequestedType >
             std::shared_ptr< XRequestedType > Detatch();
 
+            /// Returns a pointer to the next extended field
+            BasePtrType Next();
+
         protected:
             template< class XRequestedType >
             std::shared_ptr< XRequestedType > _Detatch( BasePtrType prev = BasePtrType() );
@@ -75,6 +79,12 @@ namespace Nymph
             BasePtrType fNext;
 
             bool fDisableExtendedCopy; // internal variable used to determine whether operator= copies extended fields
+
+        private:
+            friend class cereal::access;
+
+            template< class Archive >
+            void serialize( Archive& ar );
     };
 
     template< class XInstanceType, class XBaseType >
@@ -98,6 +108,12 @@ namespace Nymph
 
             /// Clones the extended object
             virtual BasePtrType Clone() const;
+
+        private:
+            friend class cereal::access;
+
+            template< class Archive >
+            void serialize( Archive& ar );
     };
 
 
@@ -247,6 +263,12 @@ namespace Nymph
     }
 
     template< class XBaseType >
+    std::shared_ptr< KTExtensibleCore< XBaseType > > KTExtensibleCore< XBaseType >::Next()
+    {
+        return fNext;
+    }
+
+    template< class XBaseType >
     template< class XRequestedType >
     std::shared_ptr< XRequestedType > KTExtensibleCore< XBaseType >::_Detatch( KTExtensibleCore< XBaseType >::BasePtrType prev )
     {
@@ -269,6 +291,14 @@ namespace Nymph
         }
 
         return std::shared_ptr< XRequestedType >();
+    }
+
+    template< class XBaseType >
+    template< class Archive >
+    void KTExtensibleCore< XBaseType >::serialize( Archive& ar )
+    {
+        std::cout << "### serialize for " << typeid(KTExtensibleCore< XBaseType >).name() << std::endl;
+        ar( cereal::base_class< XBaseType >( this ), fNext );
     }
 
 
@@ -349,6 +379,15 @@ namespace Nymph
         return instancePtr;
     }
 
+    template< class XInstanceType, class XBaseType >
+    template< class Archive >
+    void KTExtensible< XInstanceType, XBaseType >::serialize( Archive& ar )
+    {
+        std::cout << "### serialize for " << typeid(KTExtensible< XInstanceType, XBaseType >).name() << std::endl;
+        ar( cereal::base_class< ExtCoreType >( this ) );
+        return;
+    }
+
 } /* namespace Nymph */
 
-#endif /* NYMPH_VALIDATION_KTEXTTEST_HH_ */
+#endif /* NYMPH_KTEXTENSIBLE_HH_ */
