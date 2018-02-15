@@ -54,12 +54,15 @@ int main()
     MyClass2& data2 = data1->Of< MyClass2 >();
     data2.fValue = 3;
 
+    std::shared_ptr< MyClass2 > data2Shared = data1->Share< MyClass2 >();
+
     KTINFO( testlog, "data1 has data1: " << data1->Has< MyClass1 >() );
     KTINFO( testlog, "data1 has data2: " << data1->Has< MyClass2 >() );
     KTINFO( testlog, "data2 has data1: " << data2.Has< MyClass1 >() );
     KTINFO( testlog, "data2 has data2: " << data2.Has< MyClass2 >() );
     KTINFO( testlog, "Value of data1: " << data1->fValue );
     KTINFO( testlog, "Value of data2: " << data2.fValue );
+    KTINFO( testlog, "Value of data2Shared: " << data2Shared->fValue );
     KTINFO( testlog, "Size of data1: " << data1->size() );
     KTINFO( testlog, "Size of data2: " << data2.size() );
 

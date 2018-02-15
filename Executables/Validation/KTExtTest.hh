@@ -19,22 +19,26 @@ namespace Nymph
     template< class XBaseType >
     class KTExtensibleCore : public XBaseType, public std::enable_shared_from_this< KTExtensibleCore< XBaseType > >
     {
+        public:
+            typedef KTExtensibleCore< XBaseType > ExtCoreType;
+            typedef std::shared_ptr< ExtCoreType > BasePtrType;
+
         private:
             typedef std::enable_shared_from_this< KTExtensibleCore< XBaseType > > ESFTBaseType;
 
         public:
             KTExtensibleCore();
-            KTExtensibleCore( const KTExtensibleCore< XBaseType >& orig ) = delete; // deleted because copy of KTExtensibleCore is done using operator=()
+            KTExtensibleCore( const ExtCoreType& orig ) = delete; // deleted because copy of KTExtensibleCore is done using operator=()
             virtual ~KTExtensibleCore();
 
             /// Copies extended object
-            KTExtensibleCore& operator=( const KTExtensibleCore< XBaseType >& orig );
+            ExtCoreType& operator=( const ExtCoreType& orig );
 
             /// Copies the current object and only extended fields already present
-            virtual KTExtensibleCore& Pull( const KTExtensibleCore< XBaseType >& orig ) = 0; // implemented in KTExtensible because it requires knowing the extended field type
+            virtual ExtCoreType& Pull( const ExtCoreType& orig ) = 0; // implemented in KTExtensible because it requires knowing the extended field type
 
             /// Clones the extended object
-            virtual std::shared_ptr< KTExtensibleCore< XBaseType > > Clone() const = 0; // implemented in KTExtensible because it requires knowing the extended field type
+            virtual BasePtrType Clone() const = 0; // implemented in KTExtensible because it requires knowing the extended field type
 
             /// Returns the size of the extended object, including this field and any extended below it
             unsigned size() const;
@@ -47,6 +51,14 @@ namespace Nymph
             template< class XRequestedType >
             const XRequestedType& Of() const;
 
+            /// Returns a pointer to the object of the requested type or creates a new one if it's not present
+            template< class XRequestedType >
+            std::shared_ptr< XRequestedType > Share();
+
+            /// Returns a pointer to the object of the requested type or throws KTException if it's not present
+            template< class XRequestedType >
+            const std::shared_ptr< XRequestedType > Share() const;
+
             /// Checks whether the requested type is present
             template< class XRequestedType >
             bool Has() const;
@@ -58,11 +70,11 @@ namespace Nymph
 
         protected:
             template< class XRequestedType >
-            std::shared_ptr< XRequestedType > _Detatch( std::shared_ptr< KTExtensibleCore< XBaseType > > prev = std::shared_ptr< KTExtensibleCore< XBaseType > >() );
+            std::shared_ptr< XRequestedType > _Detatch( BasePtrType prev = BasePtrType() );
             //void SetPrevInNext( std::shared_ptr< KTExtensibleCore< XBaseType > > ptr );
 
             //std::weak_ptr< KTExtensibleCore< XBaseType > > fPrev;
-            std::shared_ptr< KTExtensibleCore< XBaseType > > fNext;
+            BasePtrType fNext;
 
             bool fDisableExtendedCopy; // internal variable used to determine whether operator= copies extended fields
     };
@@ -71,18 +83,23 @@ namespace Nymph
     class KTExtensible : public KTExtensibleCore< XBaseType >
     {
         public:
+            typedef KTExtensible< XInstanceType, XBaseType > ExtType;
+            typedef KTExtensibleCore< XBaseType > ExtCoreType;
+            typedef std::shared_ptr< KTExtensibleCore< XBaseType > > BasePtrType;
+
+        public:
             KTExtensible();
-            KTExtensible( const KTExtensible< XInstanceType, XBaseType >& orig );
+            KTExtensible( const ExtType& orig );
             virtual ~KTExtensible();
 
             /// Copies the extended object
-            KTExtensible& operator=( const KTExtensible< XInstanceType, XBaseType >& orig );
+            ExtType& operator=( const ExtType& orig );
 
             /// Copies the current object and only extended fields already present
-            virtual KTExtensibleCore< XBaseType >& Pull( const KTExtensibleCore< XBaseType >& orig );
+            virtual ExtCoreType& Pull( const ExtCoreType& orig );
 
             /// Clones the extended object
-            virtual std::shared_ptr< KTExtensibleCore< XBaseType > > Clone() const;
+            virtual BasePtrType Clone() const;
     };
 
 
@@ -146,7 +163,7 @@ namespace Nymph
     XRequestedType& KTExtensibleCore< XBaseType >::Of()
     {
         std::cout << "in KTExtensibleCore::Of()" << std::endl;
-        XRequestedType* requested = dynamic_cast< XRequestedType* >(this);
+        XRequestedType* requested = dynamic_cast< XRequestedType* >( this );
         if( requested != nullptr )
         {
             std::cout << "type match" << std::endl;
@@ -170,7 +187,7 @@ namespace Nymph
     const XRequestedType& KTExtensibleCore< XBaseType >::Of() const
     {
         std::cout << "in KTExtensibleCore::Of() const" << std::endl;
-        const XRequestedType* requested = dynamic_cast< const XRequestedType* >(this);
+        const XRequestedType* requested = dynamic_cast< const XRequestedType* >( this );
         if( requested != nullptr )
         {
             return *requested;
@@ -181,6 +198,48 @@ namespace Nymph
             throw KTException() << "Cannot add to a const extensible object";
         }
         return fNext->template Of< XRequestedType >();
+    }
+
+    template< class XBaseType >
+    template< class XRequestedType >
+    std::shared_ptr< XRequestedType > KTExtensibleCore< XBaseType >::Share()
+    {
+        std::cout << "in KTExtensibleCore::Share()" << std::endl;
+        std::shared_ptr< XRequestedType > requested = std::dynamic_pointer_cast< XRequestedType >( ESFTBaseType::shared_from_this() );
+        if( requested )
+        {
+            std::cout << "type match" << std::endl;
+            return requested;
+        }
+
+        if( ! fNext )
+        {
+            std::cout << "creating a new ext test core" << std::endl;
+            requested = std::make_shared< XRequestedType >();
+            fNext = requested;
+            //SetPrevInNext( ESFTBaseType::shared_from_this() );
+            return requested;
+        }
+        std::cout << "moving on to the next test core: " << fNext.operator bool() << std::endl;
+        return fNext->template Share< XRequestedType >();
+    }
+
+    template< class XBaseType >
+    template< class XRequestedType >
+    const std::shared_ptr< XRequestedType > KTExtensibleCore< XBaseType >::Share() const
+    {
+        std::cout << "in KTExtensibleCore::Share() const" << std::endl;
+        const std::shared_ptr< XRequestedType > requested = std::dynamic_pointer_cast< const XRequestedType >( ESFTBaseType::shared_from_this() );
+        if( requested )
+        {
+            return requested;
+        }
+
+        if( ! fNext )
+        {
+            throw KTException() << "Cannot add to a const extensible object";
+        }
+        return fNext->template Share< XRequestedType >();
     }
 
     template< class XBaseType >
@@ -207,7 +266,7 @@ namespace Nymph
 
     template< class XBaseType >
     template< class XRequestedType >
-    std::shared_ptr< XRequestedType > KTExtensibleCore< XBaseType >::_Detatch( std::shared_ptr< KTExtensibleCore< XBaseType > > prev )
+    std::shared_ptr< XRequestedType > KTExtensibleCore< XBaseType >::_Detatch( KTExtensibleCore< XBaseType >::BasePtrType prev )
     {
         if( dynamic_cast< XRequestedType* >( this ) )
         {
