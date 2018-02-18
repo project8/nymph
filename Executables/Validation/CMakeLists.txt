@@ -19,6 +19,7 @@ if (Nymph_ENABLE_TESTING)
         KTTestConfigurable.hh
         KTTestCuts.hh
         KTTestData.hh
+        KTTestDataPrimaryProcessor.hh
         KTTestPrimaryProcessor.hh
         KTTestProcessor.hh
     )
@@ -30,6 +31,7 @@ if (Nymph_ENABLE_TESTING)
         KTTestConfigurable.cc
         KTTestCuts.cc
         KTTestData.cc
+        KTTestDataPrimaryProcessor.cc
         KTTestPrimaryProcessor.cc
         KTTestProcessor.cc
     )
