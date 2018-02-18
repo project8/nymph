@@ -2,24 +2,24 @@
  *  KTJSONWriter.cc
  *
  *  Created on: Feb 1, 2018
- *      Author: E Zayas
+ *      Author: N.S. Oblath
  *
 */
 
 #include "KTJSONWriter.hh"
+
 #include "KTLogger.hh"
 
 
 namespace Nymph
 {
     KTJSONWriter::KTJSONWriter( const std::string& name ) :
-        KTProcessor( name ),
+        KTWriterWithTypists< KTJSONWriter, KTJSONWriterTypist >( name ),
         fFilename( "json_writer_default_file.json" ),
         fStreamOutPtr( nullptr ),
-        fArchiveOutPtr( nullptr )
+        fArchiveOutPtr( nullptr ),
+        fCoreDataSlot( "core", this, &KTJSONWriter::WriteData< KTCoreDataExt > )
         {
-            // Register slots here
-            RegisterSlot( "test-data", this, &KTJSONWriter::WriteData< KTTestData > );
         }
 
     KTJSONWriter::~KTJSONWriter()

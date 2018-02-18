@@ -43,6 +43,12 @@ namespace Nymph
             virtual ~KTTestBaseData() {}
 
             MEMBERVARIABLE(double, Funniness);
+
+        private:
+            friend class cereal::access;
+
+            template< class Archive >
+            void serialize( Archive& ar );
     };
 
     DEFINE_EXT_DATA_2( KTTestDerived1DataExt, KTTestBaseData, "test-derived-1" );
@@ -54,6 +60,13 @@ namespace Nymph
     {
             std::cout << "### serialize for KTTestData" << std::endl;
             ar( cereal::base_class< KTData >( this ), fIsAwesome );
+    }
+
+    template< class Archive >
+    void KTTestBaseData::serialize( Archive& ar )
+    {
+            std::cout << "### serialize for KTTestBaseData" << std::endl;
+            ar( cereal::base_class< KTData >( this ), fFunniness );
     }
 
 } /* namespace Nymph */

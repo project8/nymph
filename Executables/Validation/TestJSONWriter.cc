@@ -6,8 +6,8 @@
  *
 */
 
-#include "KTJSONWriter.hh"
 #include "KTJSONReader.hh"
+#include "KTJSONWriter.hh"
 
 #include "KTTestData.hh" 
 
@@ -36,7 +36,7 @@ int main()
 
         // destruction of the stream and archive (in the writer's destructor) properly closes the file
     }
-
+/*
     {
         KTTestData newTestData;
 
@@ -47,7 +47,7 @@ int main()
 
         KTINFO( testlog, "Is the read data awesome? " << newTestData.GetIsAwesome() );
     }
-
+*/
     KTINFO( testlog, "Validation script concluded" );
 	return 0;
 }
