@@ -63,6 +63,7 @@ if (Nymph_ENABLE_TESTING)
         TestExt
         TestExtSerialization
         TestJSONWriter
+        TestJSONWriterViaSlot
         TestLogger
         TestPolymorphicSlotData
         TestPrimaryProcessor

@@ -13,17 +13,21 @@
 namespace Nymph
 {
     class KTTestDataExt;
+    class KTTestDerived1DataExt;
+    class KTTestDerived2DataExt;
 
-    class KTJSONWriterValidation : public KTJSONWriterTypist
+    class KTJSONTypeWriterValidation : public KTJSONTypeWriter
     {
         public:
-            KTJSONWriterValidation();
-            virtual ~KTJSONWriterValidation();
+            KTJSONTypeWriterValidation( KTJSONWriter* writer );
+            virtual ~KTJSONTypeWriterValidation();
 
             virtual void RegisterSlots();
 
         private:
-            KTSlotData< void, KTTestDataExt > fTestDataSlot;
+            KTSlotData< void, KTTestDataExt > fTestSlot;
+            KTSlotData< void, KTTestDerived1DataExt > fTestDerived1Slot;
+            KTSlotData< void, KTTestDerived2DataExt > fTestDerived2Slot;
 
     };
 

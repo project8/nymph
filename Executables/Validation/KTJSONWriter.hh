@@ -27,9 +27,9 @@ namespace Nymph
 {
     class KTJSONWriter;
 
-    typedef KTDerivedTypeWriter< KTJSONWriter > KTJSONWriterTypist;
+    typedef KTDerivedTypeWriter< KTJSONWriter > KTJSONTypeWriter;
 
-    class KTJSONWriter : public KTWriterWithTypists< KTJSONWriter, KTJSONWriterTypist >
+    class KTJSONWriter : public KTWriterWithTypists< KTJSONWriter, KTJSONTypeWriter >
     {
         public:
             KTJSONWriter( const std::string& name = "json-writer" );

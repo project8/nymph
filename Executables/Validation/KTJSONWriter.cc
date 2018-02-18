@@ -14,7 +14,7 @@
 namespace Nymph
 {
     KTJSONWriter::KTJSONWriter( const std::string& name ) :
-        KTWriterWithTypists< KTJSONWriter, KTJSONWriterTypist >( name ),
+        KTWriterWithTypists< KTJSONWriter, KTJSONTypeWriter >( name ),
         fFilename( "json_writer_default_file.json" ),
         fStreamOutPtr( nullptr ),
         fArchiveOutPtr( nullptr ),

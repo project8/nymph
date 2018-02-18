@@ -15,9 +15,9 @@ namespace Nymph
     KT_REGISTER_PROCESSOR(KTTestDataPrimaryProcessor, "test-data-p-proc");
 
     KTTestDataPrimaryProcessor::KTTestDataPrimaryProcessor( const std::string& name ) :
-            KTPrimaryProcessor( {"derived-1"}, name ),
+            KTPrimaryProcessor( {"test-derived-1"}, name ),
             fIterations(10),
-            fTheSignal("derived-1", this)
+            fTheSignal("test-derived-1", this)
     {
     }
 
