@@ -17,6 +17,11 @@ LOGGER( testlog, "TestSerialization" );
 
 using namespace Nymph;
 
+// register the data classes so they can be serialized from base-class pointers.
+// json archive is already included, so it has been registered before these classes.
+CEREAL_REGISTER_TYPE( KTCoreDataExt );
+CEREAL_REGISTER_TYPE( KTTestDataExt );
+
 int main()
 {
     const std::string filename( "test_serialization_output.json" );
