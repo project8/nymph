@@ -30,6 +30,7 @@ set( NYMPH_HEADERFILES
     ${DATA_DIR}/KTCutResult.hh
     ${DATA_DIR}/KTCutStatus.hh
     ${DATA_DIR}/KTData.hh
+    ${DATA_DIR}/KTRegisterNymphExtData.hh
     ${PROC_DIR}/KTConnection.hh
     ${PROC_DIR}/KTPrimaryProcessor.hh
     ${PROC_DIR}/KTProcessor.hh
