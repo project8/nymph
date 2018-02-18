@@ -39,7 +39,7 @@ namespace Nymph
             // e.g. for a real processor, do some work here instead of sleeping
             boost::this_thread::sleep_for( boost::chrono::milliseconds(1) );
 
-            if( fThreadRef->GetCanceled() ) break;
+            if( fThreadRef && fThreadRef->GetCanceled() ) break;
 
             KTDataHandle handle = CreateNewDataHandle();
             KTTestDerived1DataExt& testData = handle->Of< KTTestDerived1DataExt >();
