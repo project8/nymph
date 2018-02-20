@@ -8,44 +8,28 @@
 #ifndef KTCUTRESULT_HH_
 #define KTCUTRESULT_HH_
 
-#include "KTExtensibleStruct.hh"
-
-#include "KTMemberVariable.hh"
-
 #include <string>
 
 namespace Nymph
 {
-    class KTCutResultCore
+    struct KTCutResult
     {
-        public:
-            KTCutResultCore() :
-                    fState(false)
-            {}
-            virtual ~KTCutResultCore() {}
-
-            virtual const std::string& Name() const = 0;
-
-            MEMBERVARIABLE(bool, State);
+        std::string fName;
+        bool fState;
+        bool fAssigned;
+        KTCutResult() : fName(), fState( false ), fAssigned( false ) {}
+        KTCutResult( const std::string& name, bool state ) : fName( name ), fState( state ), fAssigned( true ) {}
     };
 
-    typedef KTExtensibleStructCore< KTCutResultCore > KTCutResult;
-
-    template< class XDerivedType >
-    class KTExtensibleCutResult : public KTExtensibleStruct< XDerivedType, KTCutResultCore >
+    struct CheckCutResultName
     {
-        public:
-            KTExtensibleCutResult() {}
-            virtual ~KTExtensibleCutResult() {}
-
-            const std::string& Name() const;
+        std::string fName;
+        CheckCutResultName( const std::string& name ) : fName( name ) {}
+        bool operator()( const KTCutResult& result )
+        {
+            return result.fName == fName;
+        }
     };
-
-    template< class XDerivedType >
-    inline const std::string& KTExtensibleCutResult< XDerivedType >::Name() const
-    {
-        return XDerivedType::sName;
-    }
 
 } /* namespace Nymph */
 
