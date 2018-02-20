@@ -14,7 +14,6 @@ if (Nymph_ENABLE_TESTING)
     # Headers for any test classes
     set (VALIDATION_HEADERFILES
         KTJSONReader.hh
-        KTJSONWriter.hh
         KTJSONWriterValidation.hh
         KTTestConfigurable.hh
         KTTestCuts.hh
@@ -26,7 +25,6 @@ if (Nymph_ENABLE_TESTING)
     
     set (VALIDATION_SOURCEFILES
         KTJSONReader.cc
-        KTJSONWriter.cc
         KTJSONWriterValidation.cc
         KTTestConfigurable.cc
         KTTestCuts.cc

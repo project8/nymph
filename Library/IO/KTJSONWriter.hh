@@ -11,17 +11,16 @@
 
 // included first so that the archive is registered before the data classes
 #include "cereal/archives/json.hpp"
+// then register the nymph extensible data classes
+#include "KTRegisterNymphExtData.hh"
+
 
 #include "KTWriter.hh"
 #include "KTSlot.hh"
 
-#include "KTRegisterNymphValidationExtData.hh"
-
 #include "KTLogger.hh"
 
 #include <fstream>
-
-#include "KTTestData.hh"
 
 KTLOGGER( avlog_hh, "KTJSONWriter" );
 

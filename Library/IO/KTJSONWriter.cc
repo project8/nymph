@@ -6,7 +6,7 @@
  *
 */
 
-#include "KTJSONWriter.hh"
+#include "../../Library/IO/KTJSONWriter.hh"
 
 #include "KTLogger.hh"
 

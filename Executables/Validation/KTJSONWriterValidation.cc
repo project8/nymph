@@ -7,7 +7,7 @@
 
 #include "KTJSONWriterValidation.hh"
 
-#include "KTTestData.hh"
+#include "KTRegisterNymphValidationExtData.hh"
 
 namespace Nymph
 {
