@@ -39,8 +39,7 @@ namespace Nymph
             void serialize( Archive& ar )
             {
                 std::cout << "### serialize for KTCoreData" << std::endl;
-                ar( cereal::base_class< KTData >( this ), fCounter, fLastData );
-                //ar( cereal::base_class< KTData >( this ), fCounter, fLastData, fCutStatus );
+                ar( cereal::base_class< KTData >( this ), CEREAL_NVP(fCounter), CEREAL_NVP(fLastData), CEREAL_NVP(fCutStatus) );
             }
     };
 

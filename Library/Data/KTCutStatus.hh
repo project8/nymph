@@ -13,6 +13,10 @@
 
 #include "KTException.hh"
 
+#include "cereal/access.hpp"
+#include "cereal/types/string.hpp"
+#include "cereal/types/vector.hpp"
+
 #include <boost/dynamic_bitset.hpp>
 
 #include <algorithm>
@@ -25,12 +29,16 @@ namespace Nymph
      @class KTCutStatus
      @author N. S. Oblath
 
-     @brief Provides easy access to cut information.
+     @brief Provides easy access to cut result information.
 
      @details
+     The cut results can be imagined as an array of booleans, specifying whether the cut was passed: [true, false, false, true, . . . ].
+
+     Cuts are assigned both an array position (non-negative integer) and a name (string) before or when the results are set.
+
      KTCutStatus is typically used as a member variable of KTCoreData, the top-level data object.
 
-     KTCutStatus owns the set of cut results that have been added to a data object.
+     KTCutStatus owns the set of KTCutResults that have been added to a data object.
      It also owns a summary of those cuts (implemented with boost::dynamic_bitset).
 
      You can check if the data has been cut with the IsCut functions.
@@ -44,15 +52,24 @@ namespace Nymph
      - std::string masks are strings with each character either a 0 or 1.
 
      With KTCutStatus you can interact with individual cut results in the following ways:
-     - Add cut results to a data object with AddCutResult,
-     - Check to see if a particular cut result is present using HasCutResult,
-     - Get the value of a cut result with GetCutState,
-     - Set the value of a cut result with SetCutState,
-     - Directly access the cut result with GetCutResult, and
-     - Remove a cut result with RemoveCutResult.
+     - Get the number of cut results with size(),
+     - Get a reference to the cut results with CutResults(),
+     - If you need to manually update the cut status bitset, use UpdateStatus(),
+     - Add cut results to a data object with AssignCutResult(),
+     - Remove a cut result with RemoveCutResult(),
+     - Check to see if a particular cut result is present using HasCutResult(),
+     - Get the value of a cut result with GetCutState(), and
+     - Set the value of a cut result with SetCutState(),
 
-     For all except KTCutStatus::RemoveCutResult, the cut result can be identified by type or string name.
+     Cut results can typically be accessed by either name or mask position.
      */
+
+    // external serialization function for KTCutResult
+    template< class Archive >
+    void serialize( Archive & archive, KTCutResult& cutResult )
+    {
+        archive( CEREAL_NVP(cutResult.fName), CEREAL_NVP(cutResult.fState), CEREAL_NVP(cutResult.fAssigned) );
+    }
 
     class KTCutStatus
     {
@@ -112,7 +129,6 @@ namespace Nymph
             /// Returns a string with the names of the cuts that are present in bitset order
             std::string CutResultsPresent() const;
 
-
         private:
             friend std::ostream& operator<<(std::ostream& out, const KTCutStatus& status);
 
@@ -128,6 +144,15 @@ namespace Nymph
 
             bitset_type ToBitset(unsigned long long mask) const;
             bitset_type ToBitset(const std::string& mask) const;
+
+        private:
+            friend class cereal::access;
+
+            template< class Archive >
+            void save( Archive& ar ) const;
+
+            template< class Archive >
+            void load( Archive& ar );
 
     };
 
@@ -269,6 +294,21 @@ namespace Nymph
     inline KTCutStatus::bitset_type KTCutStatus::ToBitset(const std::string& mask) const
     {
         return bitset_type(mask);
+    }
+
+    template< class Archive >
+    void KTCutStatus::save( Archive& ar ) const
+    {
+        std::cout << "### save for KTCutStatus" << std::endl;
+        ar( CEREAL_NVP(fCutResults) );
+    }
+
+    template< class Archive >
+    void KTCutStatus::load( Archive& ar )
+    {
+        std::cout << "### load for KTCutStatus" << std::endl;
+        ar( CEREAL_NVP(fCutResults) );
+        UpdateStatus();
     }
 
 } /* namespace Nymph */
