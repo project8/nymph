@@ -6,13 +6,15 @@
  *
 */
 
-#include "../../Library/IO/KTJSONWriter.hh"
+#include "KTJSONWriter.hh"
 
 #include "KTLogger.hh"
 
 
 namespace Nymph
 {
+    KT_REGISTER_PROCESSOR( KTJSONWriter, "json-writer" );
+
     KTJSONWriter::KTJSONWriter( const std::string& name ) :
         KTWriterWithTypists< KTJSONWriter, KTJSONTypeWriter >( name ),
         fFilename( "json_writer_default_file.json" ),
