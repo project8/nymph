@@ -91,6 +91,14 @@ if (Nymph_ENABLE_PYTHON)
     python_package_find_python( 2.7 )
 endif (Nymph_ENABLE_PYTHON)
 
+########
+# Cereal
+########
+
+set( JUST_INSTALL_CEREAL ON CACHE BOOL "Cereal option: only install library" FORCE)
+add_subdirectory( External/cereal )
+include_directories( External/cereal/include )
+
 
 ###############
 # Build Nymph #

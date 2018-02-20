@@ -13,17 +13,23 @@ if (Nymph_ENABLE_TESTING)
 
     # Headers for any test classes
     set (VALIDATION_HEADERFILES
+        KTJSONReader.hh
+        KTJSONTypeWriterValidation.hh
         KTTestConfigurable.hh
         KTTestCuts.hh
         KTTestData.hh
+        KTTestDataPrimaryProcessor.hh
         KTTestPrimaryProcessor.hh
         KTTestProcessor.hh
     )
     
     set (VALIDATION_SOURCEFILES
+        KTJSONReader.cc
+        KTJSONTypeWriterValidation.cc
         KTTestConfigurable.cc
         KTTestCuts.cc
         KTTestData.cc
+        KTTestDataPrimaryProcessor.cc
         KTTestPrimaryProcessor.cc
         KTTestProcessor.cc
     )
@@ -50,7 +56,12 @@ if (Nymph_ENABLE_TESTING)
         TestCacheDirectory
         TestCut
         TestCutFilter
+        TestData
         TestExceptionInSlot
+        TestExt
+        TestExtSerialization
+        TestJSONWriter
+        TestJSONWriterViaSlot
         TestLogger
         TestPolymorphicSlotData
         TestPrimaryProcessor
@@ -59,6 +70,7 @@ if (Nymph_ENABLE_TESTING)
         TestProcessorToolbox2Threads
         TestProcessorToolboxMultithreaded
         TestProcessorToolboxSinglethreaded
+        TestSerialization
         TestSignalsAndSlots
         TestSlotData
         TestThroughputProfiler

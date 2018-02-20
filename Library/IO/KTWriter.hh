@@ -33,7 +33,7 @@ namespace Nymph
     class KTDerivedTypeWriter : public KTTypeWriter
     {
         public:
-            KTDerivedTypeWriter();
+            KTDerivedTypeWriter(XWriter* writer);
             virtual ~KTDerivedTypeWriter();
 
             void SetWriter(XWriter* writer);
@@ -44,9 +44,9 @@ namespace Nymph
 
 
     template< class XWriter >
-    KTDerivedTypeWriter< XWriter >::KTDerivedTypeWriter() :
+    KTDerivedTypeWriter< XWriter >::KTDerivedTypeWriter(XWriter* writer) :
             KTTypeWriter(),
-            fWriter(NULL)
+            fWriter(writer)
     {
     }
 
@@ -96,13 +96,13 @@ namespace Nymph
             KTWriter(name),
             fTypeWriters()
     {
-        KTTIFactory< XTypist >* twFactory = KTTIFactory< XTypist >::get_instance();
-        for (typename KTTIFactory< XTypist >::FactoryCIt factoryIt = twFactory->GetFactoryMapBegin();
+        KTTIFactory< XTypist, XWriter* >* twFactory = KTTIFactory< XTypist, XWriter* >::get_instance();
+        for (typename KTTIFactory< XTypist, XWriter* >::FactoryCIt factoryIt = twFactory->GetFactoryMapBegin();
                 factoryIt != twFactory->GetFactoryMapEnd();
                 factoryIt++)
         {
-            XTypist* newTypeWriter = twFactory->Create(factoryIt);
-            newTypeWriter->SetWriter(static_cast< XWriter* >(this));
+            XTypist* newTypeWriter = twFactory->Create(factoryIt, static_cast< XWriter* >(this));
+            //newTypeWriter->SetWriter(static_cast< XWriter* >(this));
             newTypeWriter->RegisterSlots();
             fTypeWriters.insert(typename TypeWriterMap::value_type(factoryIt->first, newTypeWriter));
         }
@@ -130,6 +130,8 @@ namespace Nymph
         return static_cast< XTypeWriter* >(it->second);
     }
 
+#define KT_REGISTER_TYPE_WRITER(writer_class, type_writer_base_class, typist) \
+        static ::Nymph::KTTIRegistrar< type_writer_base_class, type_writer_base_class##typist, writer_class* > s##type_writer_base_class##typist##Registrar;
 
 #define KT_REGISTER_WRITER(writer_class, writer_name) \
         static ::scarab::registrar< ::Nymph::KTWriter, writer_class, const std::string& > s##writer_class##WriterRegistrar(writer_name);

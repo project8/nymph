@@ -15,10 +15,13 @@ namespace Nymph
             fLastData( false ),
             fCutStatus()
     {
+        std::cout << "### KTCoreData constructor" << std::endl;
     }
 
     KTCoreData::~KTCoreData()
-    {}
+    {
+        std::cout << "### KTCoreData destrutor" << std::endl;
+    }
 
 
     KTDataHandle CreateNewDataHandle()

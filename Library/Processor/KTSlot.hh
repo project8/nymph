@@ -28,7 +28,7 @@ namespace Nymph
      @details
      Usage:
      To use this slot type the function to be called by the slot must exist in an object of type FuncOwnerType.
-     The function should have the signature ReturnType (Args).
+     The function should have the signature void (Args).
 
      In your Processor's header add a member variable of type KTSlot< ProcessorType, ReturnType, Args >.
      The variable may be private.
@@ -159,14 +159,6 @@ namespace Nymph
             KTSignalData* fSignalPtr;
     };
 
-    // Typedefs for backwards compatibility
-
-    //template< typename XDataType1 >
-    //using KTSlotDataOneType = KTSlotData< XDataType1 >;
-
-    //template< typename XDataType1, typename XDataType2 >
-    //using KTSlotDataTwoTypes = KTSlotData< XDataType1, XDataType2 >;
-
 
     /*!
      @class KTSlotDone
@@ -202,7 +194,7 @@ namespace Nymph
             void operator()();
 
         protected:
-            boost::function< void () > fFunc;
+            std::function< void () > fFunc;
 
             KTSignalDone* fSignalPtr;
     };
@@ -253,7 +245,7 @@ namespace Nymph
     template< class XFuncOwnerType, class... XFuncDataTypes >
     KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& ), KTSignalData* signalPtr) :
             KTSlot( name, owner, this, &KTSlotData::operator(), {signalPtr->GetName()} ),
-            fFunc( [func, owner]( XDataTypes... args ){ return (owner->*func)(args...);} ),
+            fFunc( [func, owner]( const XDataTypes&... args ){ return (owner->*func)(args...);} ),
             fSignalPtr( signalPtr )
     {
     }
@@ -262,7 +254,7 @@ namespace Nymph
     template< class XFuncOwnerType, class... XFuncDataTypes >
     KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& )) :
             KTSlot( name, owner, this, &KTSlotData::operator() ),
-            fFunc( [func, owner]( XDataTypes... args ){ return (owner->*func)(args...);} ),
+            fFunc( [func, owner]( const XDataTypes&... args ){ return (owner->*func)(args...);} ),
             fSignalPtr( nullptr )
     {
     }
@@ -271,7 +263,7 @@ namespace Nymph
     template< class XFuncOwnerType, class... XFuncDataTypes >
     KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& ), KTSignalData* signalPtr) :
             KTSlot( name, proc, this, &KTSlotData::operator(), { signalPtr->GetName()} ),
-            fFunc( [func, owner]( XDataTypes... args ){return (owner->*func) (args... );} ),
+            fFunc( [func, owner]( const XDataTypes&... args ){return (owner->*func) (args... );} ),
             fSignalPtr( signalPtr )
     {
     }
@@ -280,7 +272,7 @@ namespace Nymph
     template< class XFuncOwnerType, class... XFuncDataTypes >
     KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& )) :
             KTSlot( name, proc, this, &KTSlotData::operator() ),
-            fFunc( [func, owner]( XDataTypes... args ){return (owner->*func) (args... );} ),
+            fFunc( [func, owner]( const XDataTypes&... args ){return (owner->*func) (args... );} ),
             fSignalPtr( nullptr )
     {
     }
@@ -342,7 +334,7 @@ namespace Nymph
     template< class XFuncOwnerType, class... XFuncDataTypes >
     KTSlotData< void, XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&... ), KTSignalData* signalPtr) :
             KTSlot( name, owner, this, &KTSlotData::operator(), {signalPtr->GetName()} ),
-            fFunc( [func, owner]( XDataTypes... args ){ return (owner->*func)(args...);} ),
+            fFunc( [func, owner]( const XDataTypes&... args ){ return (owner->*func)(args...);} ),
             fSignalPtr( signalPtr )
     {
     }
@@ -351,7 +343,7 @@ namespace Nymph
     template< class XFuncOwnerType, class... XFuncDataTypes >
     KTSlotData< void, XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&... )) :
             KTSlot( name, owner, this, &KTSlotData::operator() ),
-            fFunc( [func, owner]( XDataTypes... args ){ return (owner->*func)(args...);} ),
+            fFunc( [func, owner]( const XDataTypes&... args ){ return (owner->*func)(args...);} ),
             fSignalPtr( nullptr )
     {
     }
@@ -360,7 +352,7 @@ namespace Nymph
     template< class XFuncOwnerType, class... XFuncDataTypes >
     KTSlotData< void, XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&... ), KTSignalData* signalPtr) :
             KTSlot( name, proc, this, &KTSlotData::operator(), { signalPtr->GetName()} ),
-            fFunc( [func, owner]( XDataTypes... args ){return (owner->*func) (args... );} ),
+            fFunc( [func, owner]( const XDataTypes&... args ){return (owner->*func) (args... );} ),
             fSignalPtr( signalPtr )
     {
     }
@@ -369,7 +361,7 @@ namespace Nymph
     template< class XFuncOwnerType, class... XFuncDataTypes >
     KTSlotData< void, XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&... )) :
             KTSlot( name, proc, this, &KTSlotData::operator() ),
-            fFunc( [func, owner]( XDataTypes... args ){return (owner->*func) (args... );} ),
+            fFunc( [func, owner]( const XDataTypes&... args ){return (owner->*func) (args... );} ),
             fSignalPtr( nullptr )
     {
     }

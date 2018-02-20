@@ -14,11 +14,8 @@ namespace Nymph
 {
     KTLOGGER(testlog, "KTTestCuts");
 
-    const std::string KTAwesomeCut::Result::sName = "awesome-cut";
-    const std::string KTNotAwesomeCut::Result::sName = "not-awesome-cut";
-
-    KT_REGISTER_CUT(KTAwesomeCut);
-    KT_REGISTER_CUT(KTNotAwesomeCut);
+    KT_REGISTER_CUT(KTAwesomeCut, "awesome-cut");
+    KT_REGISTER_CUT(KTNotAwesomeCut, "not-awesome-cut"  );
 
 
     KTAwesomeCut::KTAwesomeCut(const std::string& name) :
@@ -40,7 +37,7 @@ namespace Nymph
         bool isCut = ! testData.GetIsAwesome();
         KTDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
         KTDEBUG(testlog, "Is data cut? " << isCut);
-        data.CutStatus().AddCutResult< KTAwesomeCut::Result >(isCut);
+        data.CutStatus().SetCutState(fConfigName, isCut);
         return isCut;
     }
 
@@ -64,8 +61,7 @@ namespace Nymph
         bool isCut = testData.GetIsAwesome();
         KTDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
         KTDEBUG(testlog, "Is data cut? " << isCut);
-        // use the name-based AddCutResult
-        data.CutStatus().AddCutResult("not-awesome-cut", isCut);
+        data.CutStatus().SetCutState(fConfigName, isCut);
         return isCut;
     }
 
