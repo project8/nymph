@@ -21,5 +21,18 @@ namespace Nymph
         std::cout << "### KTTestData destructor" << std::endl;
     }
 
+    KTTestBaseData::KTTestBaseData() :
+        KTData(),
+        fFunniness(1000.)
+    {
+        std::cout << "### KTTestBaseData constructor" << std::endl;
+    }
+
+    KTTestBaseData::~KTTestBaseData()
+    {
+        std::cout << "### KTTestBaseData destructor" << std::endl;
+    }
+
+
 } /* namespace Nymph */
 

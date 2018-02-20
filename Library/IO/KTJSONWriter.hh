@@ -44,11 +44,15 @@ namespace Nymph
             template< class XDataType >
             void WriteData( const XDataType& data );
 
+            void WriteExtData( KTDataHandle handle );
+
         private:
             std::ofstream* fStreamOutPtr;
             cereal::JSONOutputArchive* fArchiveOutPtr;
 
         private:
+            KTSlot< KTDataHandle > fExtDataSlot;
+
             KTSlotData< void, KTCoreDataExt > fCoreDataSlot;
     };
 
@@ -62,10 +66,9 @@ namespace Nymph
         }
 
         // Write to JSON archive
-        KTINFO( avlog_hh, "Writing data to JSON archive" );
+        KTDEBUG( avlog_hh, "Writing data to JSON archive" );
         (*fArchiveOutPtr)( data );
 
-        KTINFO( avlog_hh, "Successfully wrote data to archive" );
         return;
     }
 

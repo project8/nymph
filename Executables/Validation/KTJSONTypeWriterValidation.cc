@@ -5,8 +5,7 @@
  *      Author: N.S. Oblath
  */
 
-#include "KTJSONWriterValidation.hh"
-
+#include "KTJSONTypeWriterValidation.hh"
 #include "KTRegisterNymphValidationExtData.hh"
 
 namespace Nymph

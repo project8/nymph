@@ -18,6 +18,7 @@ namespace Nymph
         fFilename( "json_writer_default_file.json" ),
         fStreamOutPtr( nullptr ),
         fArchiveOutPtr( nullptr ),
+        fExtDataSlot( "ext-data", this, &KTJSONWriter::WriteExtData ),
         fCoreDataSlot( "core", this, &KTJSONWriter::WriteData< KTCoreDataExt > )
         {
         }
@@ -31,9 +32,24 @@ namespace Nymph
 
     bool KTJSONWriter::Configure( const scarab::param_node& node )
     {
-        SetFilename( node.get_value( "file-name", fFilename ) );
+        SetFilename( node.get_value( "filename", fFilename ) );
 
         return true;
+    }
+
+    void KTJSONWriter::WriteExtData( KTDataHandle handle )
+    {
+        if( fStreamOutPtr == nullptr )
+        {
+            fStreamOutPtr = new std::ofstream( fFilename );
+            fArchiveOutPtr = new cereal::JSONOutputArchive( *fStreamOutPtr );
+        }
+
+        // Write to JSON archive
+        KTDEBUG( avlog_hh, "Writing extensible data to JSON archive" );
+        (*fArchiveOutPtr)( handle );
+
+        return;
     }
 
 }

@@ -36,11 +36,8 @@ namespace Nymph
     class KTTestBaseData : public KTData
     {
         public:
-            KTTestBaseData() :
-                KTData(),
-                fFunniness(1000.)
-            {}
-            virtual ~KTTestBaseData() {}
+            KTTestBaseData();
+            virtual ~KTTestBaseData();
 
             MEMBERVARIABLE(double, Funniness);
 

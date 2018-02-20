@@ -28,7 +28,7 @@ namespace Nymph
      @details
      Usage:
      To use this slot type the function to be called by the slot must exist in an object of type FuncOwnerType.
-     The function should have the signature ReturnType (Args).
+     The function should have the signature void (Args).
 
      In your Processor's header add a member variable of type KTSlot< ProcessorType, ReturnType, Args >.
      The variable may be private.

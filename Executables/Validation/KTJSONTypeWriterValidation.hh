@@ -1,12 +1,12 @@
 /*
- * KTJSONWriterValidation.hh
+ * KTJSONTypeWriterValidation.hh
  *
  *  Created on: Feb 17, 2018
  *      Author: N.S. Oblath
  */
 
-#ifndef NYMPH_KTJSONWRITERVALIDATION_HH_
-#define NYMPH_KTJSONWRITERVALIDATION_HH_
+#ifndef NYMPH_KTJSONTYPEWRITERVALIDATION_HH_
+#define NYMPH_KTJSONTYPEWRITERVALIDATION_HH_
 
 #include "KTJSONWriter.hh"
 
@@ -33,4 +33,4 @@ namespace Nymph
 
 } /* namespace Nymph */
 
-#endif /* NYMPH_KTJSONWRITERVALIDATION_HH_ */
+#endif /* NYMPH_KTJSONTYPEWRITERVALIDATION_HH_ */

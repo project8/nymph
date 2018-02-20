@@ -38,8 +38,12 @@ namespace Nymph
 
     bool KTTestDataPrimaryProcessor::Run()
     {
+        unsigned funniness = 867;
+
         for( unsigned iIteration = 0; iIteration < fIterations; ++iIteration )
         {
+            KTINFO( testlog, "Beginning iteration " << iIteration );
+
             // e.g. for a real processor, do some work here instead of sleeping
             boost::this_thread::sleep_for( boost::chrono::milliseconds(1) );
 
@@ -47,7 +51,7 @@ namespace Nymph
 
             KTDataHandle handle = CreateNewDataHandle();
             KTTestDerived1DataExt& testData = handle->Of< KTTestDerived1DataExt >();
-            testData.SetFunniness( 867 );
+            testData.SetFunniness( funniness++ );
             KTINFO( testlog, "Test derived1 data funniness: " << testData.GetFunniness() );
 
             fTheSignal( handle );
