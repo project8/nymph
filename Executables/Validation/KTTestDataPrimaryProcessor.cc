@@ -9,10 +9,14 @@
 
 #include "KTTestData.hh"
 
+#include "KTLogger.hh"
+
+LOGGER( testlog, "KTTestDataPrimaryProcessor" );
+
 namespace Nymph
 {
 
-    KT_REGISTER_PROCESSOR(KTTestDataPrimaryProcessor, "test-data-p-proc");
+    KT_REGISTER_PROCESSOR( KTTestDataPrimaryProcessor, "test-data-p-proc" );
 
     KTTestDataPrimaryProcessor::KTTestDataPrimaryProcessor( const std::string& name ) :
             KTPrimaryProcessor( {"test-derived-1"}, name ),
@@ -44,6 +48,7 @@ namespace Nymph
             KTDataHandle handle = CreateNewDataHandle();
             KTTestDerived1DataExt& testData = handle->Of< KTTestDerived1DataExt >();
             testData.SetFunniness( 867 );
+            KTINFO( testlog, "Test derived1 data funniness: " << testData.GetFunniness() );
 
             fTheSignal( handle );
         }

@@ -21,6 +21,8 @@
 
 #include <fstream>
 
+#include "KTTestData.hh"
+
 KTLOGGER( avlog_hh, "KTJSONWriter" );
 
 namespace Nymph
@@ -61,7 +63,7 @@ namespace Nymph
         }
 
         // Write to JSON archive
-        KTINFO( avlog_hh, "Writing data to JSON acrhive" );
+        KTINFO( avlog_hh, "Writing data to JSON archive" );
         (*fArchiveOutPtr)( data );
 
         KTINFO( avlog_hh, "Successfully wrote data to archive" );

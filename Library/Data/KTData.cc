@@ -10,10 +10,14 @@
 namespace Nymph
 {
     KTData::KTData()
-    {}
+    {
+        std::cout << "### KTData constructor" << std::endl;
+    }
 
     KTData::~KTData()
-    {}
+    {
+        std::cout << "### KTData destructor" << std::endl;
+    }
 
     KTDataRider::KTDataRider() :
             fName()
