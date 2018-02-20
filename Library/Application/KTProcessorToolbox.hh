@@ -28,6 +28,7 @@
 #include <initializer_list>
 #include <limits>
 #include <set>
+#include <memory>
 
 
 namespace Nymph
@@ -110,7 +111,7 @@ namespace Nymph
         private:
             struct ProcessorInfo
             {
-                KTProcessor* fProc;
+                std::shared_ptr< KTProcessor > fProc;
             };
             typedef std::map< std::string, ProcessorInfo > ProcessorMap;
             typedef ProcessorMap::iterator ProcMapIt;
@@ -119,13 +120,13 @@ namespace Nymph
 
         public:
             /// Get a pointer to a processor in the toolbox
-            KTProcessor* GetProcessor(const std::string& procName);
+            std::shared_ptr< KTProcessor > GetProcessor(const std::string& procName);
             /// Get a pointer to a processor in the toolbox
-            const KTProcessor* GetProcessor(const std::string& procName) const;
+            const std::shared_ptr< KTProcessor > GetProcessor(const std::string& procName) const;
 
             /// Add a processor to the toolbox
             /// Toolbox takes ownership of the processor
-            bool AddProcessor(const std::string& procName, KTProcessor* proc);
+            bool AddProcessor(const std::string& procName, std::shared_ptr< KTProcessor > proc);
             bool AddProcessor(const std::string& procType, const std::string& procName);
 
             /// Remove a processor from the toolbox
@@ -133,7 +134,7 @@ namespace Nymph
 
             /// Remove a processor from the toolbox and return it to the user
             /// Ownership is passed to the user
-            KTProcessor* ReleaseProcessor(const std::string& procName);
+            std::shared_ptr< KTProcessor > ReleaseProcessor(const std::string& procName);
 
             /// Remove all processors from the toolbox
             /// Also clears the run queue
@@ -144,14 +145,19 @@ namespace Nymph
 
 
         public:
-            /// Make a connection between the signal from one processor and the slot from another processor
-            /// Both processors should already have been added to the Toolbox
-            /// Signal and slot strings should be formatted as: [processor name]:[signal/slot name]
-            bool MakeConnection(const std::string& signal, const std::string& slot, int order = std::numeric_limits< int >::min());
+            // for the MakeConnection overloading, extra overloading is used instead of default parameters so that the python interface works
 
             /// Make a connection between the signal from one processor and the slot from another processor
             /// Both processors should already have been added to the Toolbox
-            bool MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName, int order = std::numeric_limits< int >::min());
+            /// Signal and slot strings should be formatted as: [processor name]:[signal/slot name]
+            bool MakeConnection(const std::string& signal, const std::string& slot, int order);
+            bool MakeConnection(const std::string& signal, const std::string& slot) {return MakeConnection(signal, slot, std::numeric_limits< int >::min());}
+
+            /// Make a connection between the signal from one processor and the slot from another processor
+            /// Both processors should already have been added to the Toolbox
+            bool MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName, int order);
+            bool MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName)
+                    {return MakeConnection(signalProcName, signalName, slotProcName, slotName, std::numeric_limits< int >::min());}
 
             /// Set a breakpoint on a slot
             /// Slot string should be formatted as: [processor name]:[slot name]

@@ -25,6 +25,7 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <memory>
 
 namespace Nymph
 {
