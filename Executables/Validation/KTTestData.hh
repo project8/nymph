@@ -59,14 +59,14 @@ namespace Nymph
     void KTTestData::serialize( Archive& ar )
     {
             std::cout << "### serialize for KTTestData" << std::endl;
-            ar( cereal::base_class< KTData >( this ), fIsAwesome );
+            ar( cereal::base_class< KTData >( this ), CEREAL_NVP(fIsAwesome) );
     }
 
     template< class Archive >
     void KTTestBaseData::serialize( Archive& ar )
     {
             std::cout << "### serialize for KTTestBaseData" << std::endl;
-            ar( cereal::base_class< KTData >( this ), fFunniness );
+            ar( cereal::base_class< KTData >( this ), CEREAL_NVP(fFunniness) );
     }
 
 } /* namespace Nymph */
