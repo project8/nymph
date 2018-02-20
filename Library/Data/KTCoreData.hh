@@ -32,6 +32,15 @@ namespace Nymph
 
             MEMBERVARIABLE_REF( KTCutStatus, CutStatus );
 
+        private:
+            friend class cereal::access;
+
+            template< class Archive >
+            void serialize( Archive& ar )
+            {
+                std::cout << "### serialize for KTCoreData" << std::endl;
+                ar( cereal::base_class< KTData >( this ), CEREAL_NVP(fCounter), CEREAL_NVP(fLastData), CEREAL_NVP(fCutStatus) );
+            }
     };
 
     DEFINE_EXT_DATA( KTCoreData, "core" )

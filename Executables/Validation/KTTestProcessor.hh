@@ -11,6 +11,8 @@
 #include "KTProcessor.hh"
 #include "KTSlot.hh"
 
+//using namespace py;
+
 #include "KTTestData.hh"
 
 namespace Nymph

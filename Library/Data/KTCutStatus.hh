@@ -11,10 +11,17 @@
 
 #include "KTCutResult.hh"
 
-#include <boost/dynamic_bitset.hpp>
-#include <boost/scoped_ptr.hpp>
+#include "KTException.hh"
 
-#include <string>
+#include "cereal/access.hpp"
+#include "cereal/types/string.hpp"
+#include "cereal/types/vector.hpp"
+
+#include <boost/dynamic_bitset.hpp>
+
+#include <algorithm>
+#include <memory>
+#include <vector>
 
 namespace Nymph
 {
@@ -22,12 +29,16 @@ namespace Nymph
      @class KTCutStatus
      @author N. S. Oblath
 
-     @brief Provides easy access to cut information.
+     @brief Provides easy access to cut result information.
 
      @details
+     The cut results can be imagined as an array of booleans, specifying whether the cut was passed: [true, false, false, true, . . . ].
+
+     Cuts are assigned both an array position (non-negative integer) and a name (string) before or when the results are set.
+
      KTCutStatus is typically used as a member variable of KTCoreData, the top-level data object.
 
-     KTCutStatus owns the set of cut results that have been added to a data object.
+     KTCutStatus owns the set of KTCutResults that have been added to a data object.
      It also owns a summary of those cuts (implemented with boost::dynamic_bitset).
 
      You can check if the data has been cut with the IsCut functions.
@@ -41,32 +52,34 @@ namespace Nymph
      - std::string masks are strings with each character either a 0 or 1.
 
      With KTCutStatus you can interact with individual cut results in the following ways:
-     - Add cut results to a data object with AddCutResult,
-     - Check to see if a particular cut result is present using HasCutResult,
-     - Get the value of a cut result with GetCutState,
-     - Set the value of a cut result with SetCutState,
-     - Directly access the cut result with GetCutResult, and
-     - Remove a cut result with RemoveCutResult.
+     - Get the number of cut results with size(),
+     - Get a reference to the cut results with CutResults(),
+     - If you need to manually update the cut status bitset, use UpdateStatus(),
+     - Add cut results to a data object with AssignCutResult(),
+     - Remove a cut result with RemoveCutResult(),
+     - Check to see if a particular cut result is present using HasCutResult(),
+     - Get the value of a cut result with GetCutState(), and
+     - Set the value of a cut result with SetCutState(),
 
-     For all except KTCutStatus::RemoveCutResult, the cut result can be identified by type or string name.
+     Cut results can typically be accessed by either name or mask position.
      */
+
+    // external serialization function for KTCutResult
+    template< class Archive >
+    void serialize( Archive & archive, KTCutResult& cutResult )
+    {
+        archive( CEREAL_NVP(cutResult.fName), CEREAL_NVP(cutResult.fState), CEREAL_NVP(cutResult.fAssigned) );
+    }
 
     class KTCutStatus
     {
         public:
             typedef boost::dynamic_bitset< > bitset_type;
 
-        private:
-            // private class KTCutStatus::KTCutResultHandle
-            // purposefully not registered with the cut factory
-            class KTCutResultHandle : public KTExtensibleCutResult< KTCutResultHandle >
-            {
-                public:
-                    KTCutResultHandle();
-                    ~KTCutResultHandle();
+            typedef std::vector< KTCutResult > CutResults_t;
 
-                    static const std::string sName;
-            };
+            typedef CutResults_t::iterator CutResultsIt;
+            typedef CutResults_t::const_iterator CutResultsCIt;
 
         public:
             KTCutStatus();
@@ -75,51 +88,51 @@ namespace Nymph
 
             KTCutStatus& operator=(const KTCutStatus& rhs);
 
-            const KTCutResult* CutResults() const;
+            /// Returns the size of the cut results vector
+            size_t size() const;
 
+            /// Returns a reference to the cut results vector
+            const CutResults_t& CutResults() const;
+
+            /// Updates the summary bitset from the cut results vector
             void UpdateStatus();
 
-            template< typename XCutType >
-            bool AddCutResult(bool state, bool doUpdateStatus=true);
-            bool AddCutResult(const std::string& cutName, bool state, bool doUpdateStatus=true);
-            // overload for const char* to avoid specializing the templated function below
-            bool AddCutResult(const char* cutName, bool state, bool doUpdateStatus=true);
-            template< typename XCutType >
-            bool AddCutResult(const XCutType& cut, bool doUpdateStatus=true);
+            /// Adds a new cut result if it doesn't exist, and assigns the specified name and state at maskPos; throws KTException if maskPos is already assigned
+            void AssignCutResult(unsigned maskPos, const std::string& name, bool state=false, bool doUpdateStatus=true);
 
-            template< typename XCutType >
-            bool HasCutResult() const;
+            /// Removes the cut by erasing the name and setting the state to false
+            void RemoveCutResult(const std::string& cutName, bool doUpdateStatus=true);
+            /// Removes the cut by erasing the name and setting the state to false
+            void RemoveCutResult(unsigned maskPos, bool doUpdateStatus=true);
+
+            CutResultsIt FindCutResult(const std::string& cutName);
+            CutResultsCIt FindCutResultC(const std::string& cutName) const;
+
+            CutResultsIt  CutResultsEnd();
+            CutResultsCIt CutResultsEndC() const;
+
+            /// Returns whether or not the specified cut is present
             bool HasCutResult(const std::string& cutName) const;
+            /// Returns whether or not the specified cut is present (whether or not it has been explicitly assigned)
+            bool HasCutResult(unsigned maskPos) const;
 
-            template< typename XCutType >
-            bool GetCutState() const;
+            /// Returns the state of the named cut; throws KTException if it doesn't exist
             bool GetCutState(const std::string& cutName) const;
+            /// Returns the state of the specified cut; throws KTException if it doesn't exist
+            bool GetCutState(unsigned maskPos) const;
 
-            template< typename XCutType >
-            const KTCutResult* GetCutResult() const;
-            const KTCutResult* GetCutResult(const std::string& cutName) const;
-
-            template< typename XCutType >
-            KTCutResult* GetCutResult();
-            KTCutResult* GetCutResult(const std::string& cutName);
-
-            template< typename XCutType >
-            bool SetCutState(bool state, bool doUpdateStatus=true);
-            bool SetCutState(const std::string& cutName, bool state, bool doUpdateStatus=true);
-
-            template< typename XCutType >
-            void RemoveCutResult(bool doUpdateStatus=true);
-            // cannot currently update by cut name
-            //void RemoveCutResult(const std::string& cutName, bool doUpdateStatus=true);
+            /// Sets the state of the specified cut; throws KTException if it doesn't exist
+            void SetCutState(const std::string& cutName, bool state, bool doUpdateStatus=true);
+            /// Sets the state of the specified cut; throws KTException if it doesn't exist
+            void SetCutState(unsigned maskPos, bool state, bool doUpdateStatus=true);
 
             /// Returns a string with the names of the cuts that are present in bitset order
             std::string CutResultsPresent() const;
 
-            size_t size() const;
         private:
             friend std::ostream& operator<<(std::ostream& out, const KTCutStatus& status);
 
-            boost::scoped_ptr< KTCutResultHandle > fCutResults;
+            CutResults_t fCutResults;
 
             bitset_type fSummary;
 
@@ -132,85 +145,118 @@ namespace Nymph
             bitset_type ToBitset(unsigned long long mask) const;
             bitset_type ToBitset(const std::string& mask) const;
 
+        private:
+            friend class cereal::access;
+
+            template< class Archive >
+            void save( Archive& ar ) const;
+
+            template< class Archive >
+            void load( Archive& ar );
+
     };
 
     std::ostream& operator<<(std::ostream& out, const KTCutStatus& status);
 
 
-    inline const KTCutResult* KTCutStatus::CutResults() const
+    inline const KTCutStatus::CutResults_t& KTCutStatus::CutResults() const
     {
-        return fCutResults.get()->Next();
+        return fCutResults;
     }
 
-    template< typename XCutType >
-    bool KTCutStatus::AddCutResult(bool state, bool doUpdateStatus)
+    inline KTCutStatus::CutResultsIt KTCutStatus::FindCutResult( const std::string& name )
     {
-        if (! HasCutResult< XCutType >())
+        if( name.empty() ) return fCutResults.end();
+        return std::find_if( fCutResults.begin(), fCutResults.end(), CheckCutResultName(name) );
+    }
+
+    inline KTCutStatus::CutResultsCIt KTCutStatus::FindCutResultC( const std::string& name ) const
+    {
+        if( name.empty() ) return fCutResults.cend();
+        return std::find_if( fCutResults.cbegin(), fCutResults.cend(), CheckCutResultName(name) );
+    }
+
+    inline KTCutStatus::CutResultsIt KTCutStatus::CutResultsEnd()
+    {
+        return fCutResults.end();
+    }
+
+    inline KTCutStatus::CutResultsCIt KTCutStatus::CutResultsEndC() const
+    {
+        return fCutResults.cend();
+    }
+
+    inline bool KTCutStatus::HasCutResult( const std::string& name ) const
+    {
+        return FindCutResultC(name) != std::end(fCutResults);
+    }
+
+    inline bool KTCutStatus::HasCutResult( unsigned maskPos ) const
+    {
+        return maskPos < fCutResults.size() && fCutResults[maskPos].fAssigned;
+    }
+
+    inline bool KTCutStatus::GetCutState( const std::string& name ) const
+    {
+        CutResultsCIt cutIt = FindCutResultC(name);
+        if (cutIt != fCutResults.cend())
         {
-            fCutResults.get()->Of< XCutType >().SetState(state);
+            return cutIt->fState;
+        }
+        throw KTException() << "Unable to find cut <" << name << ">";
+    }
+
+    inline bool KTCutStatus::GetCutState( unsigned maskPos ) const
+    {
+        if (maskPos < fCutResults.size())
+        {
+            return fCutResults[maskPos].fState;
+        }
+        throw KTException() << "Mask position <" << maskPos << "> is out of range (only " << size() << " cuts are present)";
+    }
+
+    inline void KTCutStatus::SetCutState(const std::string& name, bool state, bool doUpdateStatus)
+    {
+        CutResultsIt cutIt = FindCutResult(name);
+        if (cutIt != fCutResults.end())
+        {
+            cutIt->fState = state;
             if (doUpdateStatus) UpdateStatus();
-            return true;
+            return;
         }
-        return false;
+        throw KTException() << "Unable to find cut <" << name << ">";
     }
 
-    inline bool KTCutStatus::AddCutResult(const char* cutName, bool state, bool doUpdateStatus)
+    inline void KTCutStatus::SetCutState(unsigned maskPos, bool state, bool doUpdateStatus)
     {
-        return AddCutResult(std::string(cutName), state, doUpdateStatus);
-    }
-
-    template< typename XCutType >
-    bool KTCutStatus::AddCutResult(const XCutType& cut, bool doUpdateStatus)
-    {
-        if (! HasCutResult< XCutType >())
+        if (maskPos < fCutResults.size())
         {
-            fCutResults.get()->Of< XCutType >() = cut;
+            fCutResults[maskPos].fState = state;
             if (doUpdateStatus) UpdateStatus();
-            return true;
+            return;
         }
-        return false;
+        throw KTException() << "Mask position <" << maskPos << "> is out of range (only "<< size() << " cuts are present)";
     }
 
-    template< typename XCutType >
-    inline bool KTCutStatus::HasCutResult() const
+    inline void KTCutStatus::RemoveCutResult(const std::string& name, bool doUpdateStatus)
     {
-        return fCutResults.get()->Has< XCutType >();
-    }
-
-    template< typename XCutType >
-    bool KTCutStatus::GetCutState() const
-    {
-        if (HasCutResult< XCutType >())
+        CutResultsIt cutIt = FindCutResult(name);
+        if (cutIt != fCutResults.end())
         {
-            return fCutResults.get()->Of< XCutType >().GetState();
+            cutIt->fName = "";
+            cutIt->fState = false;
         }
-        return false;
+        if (doUpdateStatus) UpdateStatus();
+        return;
     }
 
-    template< typename XCutType >
-    const KTCutResult* KTCutStatus::GetCutResult() const
+    inline void KTCutStatus::RemoveCutResult(unsigned maskPos, bool doUpdateStatus)
     {
-        if (HasCutResult< XCutType >())
+        if (maskPos < fCutResults.size())
         {
-            return &(fCutResults.get()->Of< XCutType >());
+            fCutResults[maskPos].fName = "";
+            fCutResults[maskPos].fState = false;
         }
-        return NULL;
-    }
-
-    template< typename XCutType >
-    KTCutResult* KTCutStatus::GetCutResult()
-    {
-        if (HasCutResult< XCutType >())
-        {
-            return &(fCutResults.get()->Of< XCutType >());
-        }
-        return NULL;
-    }
-
-    template< typename XCutType >
-    inline void KTCutStatus::RemoveCutResult(bool doUpdateStatus)
-    {
-        delete fCutResults.get()->Detatch< XCutType >();
         if (doUpdateStatus) UpdateStatus();
         return;
     }
@@ -248,6 +294,21 @@ namespace Nymph
     inline KTCutStatus::bitset_type KTCutStatus::ToBitset(const std::string& mask) const
     {
         return bitset_type(mask);
+    }
+
+    template< class Archive >
+    void KTCutStatus::save( Archive& ar ) const
+    {
+        std::cout << "### save for KTCutStatus" << std::endl;
+        ar( CEREAL_NVP(fCutResults) );
+    }
+
+    template< class Archive >
+    void KTCutStatus::load( Archive& ar )
+    {
+        std::cout << "### load for KTCutStatus" << std::endl;
+        ar( CEREAL_NVP(fCutResults) );
+        UpdateStatus();
     }
 
 } /* namespace Nymph */

@@ -6,6 +6,7 @@
  */
 
 #include "KTPyTestClass.hh"
+#include "KTTestProcessor.hh"
 
 #include "pybind11/pybind11.h"
 
@@ -20,6 +21,6 @@ namespace Nymph
                 .def( "GetValue", &Nymph::KTPyTestClass::GetValue )
                 .def( "SetValue", &Nymph::KTPyTestClass::SetValue )
                 ;
-    }
+    };
 
 } /* namespace Nymph */

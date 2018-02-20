@@ -16,6 +16,7 @@ set( NYMPH_HEADERFILES
     ${UTIL_DIR}/KTDirectory.hh
     ${UTIL_DIR}/KTEventLoop.hh
     ${UTIL_DIR}/KTException.hh
+    ${UTIL_DIR}/KTExtensible.hh
     ${UTIL_DIR}/KTExtensibleStruct.hh
     ${UTIL_DIR}/KTExtensibleStructFactory.hh
     ${UTIL_DIR}/KTLogger.hh
@@ -29,6 +30,7 @@ set( NYMPH_HEADERFILES
     ${DATA_DIR}/KTCutResult.hh
     ${DATA_DIR}/KTCutStatus.hh
     ${DATA_DIR}/KTData.hh
+    ${DATA_DIR}/KTRegisterNymphExtData.hh
     ${PROC_DIR}/KTConnection.hh
     ${PROC_DIR}/KTPrimaryProcessor.hh
     ${PROC_DIR}/KTProcessor.hh
@@ -37,6 +39,7 @@ set( NYMPH_HEADERFILES
     ${PROC_DIR}/KTSlot.hh
     ${PROC_DIR}/KTSlotWrapper.hh
     ${PROC_DIR}/KTThreadReference.hh
+    ${IO_DIR}/KTJSONWriter.hh
     ${IO_DIR}/KTReader.hh
     ${IO_DIR}/KTWriter.hh
     ${APPL_DIR}/KTApplication.hh
@@ -69,6 +72,7 @@ set( NYMPH_SOURCEFILES
     ${PROC_DIR}/KTSignalWrapper.cc
     ${PROC_DIR}/KTSlotWrapper.cc
     ${PROC_DIR}/KTThreadReference.cc
+    ${IO_DIR}/KTJSONWriter.cc
     ${IO_DIR}/KTReader.cc
     ${IO_DIR}/KTWriter.cc
     ${APPL_DIR}/KTApplication.cc
@@ -98,6 +102,7 @@ set( NYMPH_PYBINDING_HEADERFILES
 
 # Python bindings
 set( NYMPH_PYBINDING_SOURCEFILES
+    ${PROC_DIR}/KTProcessorPybind.cc
     NymphPybind.cc
 )
 

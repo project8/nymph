@@ -15,13 +15,13 @@ namespace Nymph
     KTLOGGER(cutlog, "KTCut");
 
     KTCutStatus::KTCutStatus() :
-            fCutResults(new KTCutResultHandle()),
+            fCutResults(),
             fSummary()
     {
     }
 
     KTCutStatus::KTCutStatus(const KTCutStatus& orig) :
-            fCutResults(dynamic_cast< KTCutResultHandle* >(orig.fCutResults->Clone())),
+            fCutResults(orig.fCutResults),
             fSummary()
     {
         UpdateStatus();
@@ -32,157 +32,57 @@ namespace Nymph
 
     KTCutStatus& KTCutStatus::operator=(const KTCutStatus& rhs)
     {
-        fCutResults.reset(dynamic_cast< KTCutResultHandle* >(rhs.fCutResults->Clone()));
+        fCutResults = rhs.fCutResults;
         UpdateStatus();
         return *this;
+    }
+
+    void KTCutStatus::AssignCutResult(unsigned maskPos, const std::string& name, bool state, bool doUpdateStatus)
+    {
+        KTDEBUG(cutlog, "Assigning cut result <" << name << "> to position <" << maskPos << "> with state <" << state << ">");
+        if( maskPos >= fCutResults.size() )
+        {
+            fCutResults.resize( maskPos + 1 );
+        }
+        KTDEBUG(cutlog, "Cut result size is now <" << fCutResults.size() << ">");
+        if( fCutResults[maskPos].fAssigned )
+        {
+            throw KTException() << "Mask position <" << maskPos << "> has already been assigned";
+        }
+        fCutResults[maskPos].fName = name;
+        fCutResults[maskPos].fState = state;
+        fCutResults[maskPos].fAssigned = true;
+        if( doUpdateStatus ) UpdateStatus();
+        return;
     }
 
     void KTCutStatus::UpdateStatus()
     {
         KTDEBUG(cutlog, "Updating cut summary");
-        KTCutResult* cut = fCutResults.get()->Next(); // skip over KTCutResultHandle
-        if (cut == NULL)
-        {
-            KTDEBUG(cutlog, "No cuts");
-            fSummary.resize(1, false);
-            return;
-        }
-
-        // loop through once to count cuts
-        unsigned nCuts = 0;
-        while (cut != NULL)
-        {
-            ++nCuts;
-            cut = cut->Next();
-        }
-        KTDEBUG(cutlog, nCuts << " cuts");
+        unsigned nCuts = fCutResults.size();
         fSummary.resize(nCuts, false);
-        // loop through again to set cuts
-        cut = fCutResults.get()->Next(); // skip over KTCutResultHandle
+
+        // loop through to set cuts
         for (unsigned iCut = 0; iCut < nCuts; ++iCut)
         {
-            fSummary[iCut] = cut->GetState();
-            cut = cut->Next();
+            fSummary[iCut] = fCutResults[iCut].fAssigned && fCutResults[iCut].fState;
         }
         KTDEBUG(cutlog, "Cut summary bitset: " << fSummary);
         return;
     }
 
-    bool KTCutStatus::AddCutResult(const std::string& cutName, bool state, bool doUpdateStatus)
-    {
-        if (! HasCutResult(cutName))
-        {
-            KTExtensibleStructFactory< KTCutResultCore >* factory = KTExtensibleStructFactory< KTCutResultCore >::get_instance();
-            KTCutResult* newCut = factory->Create(cutName, fCutResults.get());
-            if (newCut == NULL)
-            {
-                KTERROR(cutlog, "Could not create cut of type <" << cutName << ">");
-                return false;
-            }
-            newCut->SetState(state);
-
-            if (doUpdateStatus) UpdateStatus();
-            return true;
-        }
-        return false;
-
-    }
-
-    bool KTCutStatus::HasCutResult(const std::string& cutName) const
-    {
-        if (GetCutResult(cutName) == NULL) return false;
-        return true;
-
-    }
-
-    bool KTCutStatus::GetCutState(const std::string& cutName) const
-    {
-        const KTCutResult* cut = GetCutResult(cutName);
-        if (cut == NULL) return false;
-        return cut->GetState();
-    }
-
-    const KTCutResult* KTCutStatus::GetCutResult(const std::string& cutName) const
-    {
-        const KTCutResult* cut = fCutResults.get()->Next(); // skip over KTCutResultHandle
-        while (cut != NULL)
-        {
-            if (cut->Name() == cutName) return cut;
-            cut = cut->Next();
-        }
-        return NULL;
-    }
-
-    KTCutResult* KTCutStatus::GetCutResult(const std::string& cutName)
-    {
-        KTCutResult* cut = fCutResults.get()->Next(); // skip over KTCutResultHandle
-        while (cut != NULL)
-        {
-            if (cut->Name() == cutName) return cut;
-            cut = cut->Next();
-        }
-        return NULL;
-    }
-
-    bool KTCutStatus::SetCutState(const std::string& cutName, bool state, bool doUpdateStatus)
-    {
-        KTCutResult* cut = GetCutResult(cutName);
-        if (cut == NULL)
-        {
-            KTWARN(cutlog, "Cut <" << cutName << "> not found");
-            return false;
-        }
-        cut->SetState(state);
-
-        if (doUpdateStatus) UpdateStatus();
-        return true;
-    }
-
-    /*
-    void KTCutStatus::RemoveCutResult(const std::string& cutName, bool doUpdateStatus)
-    {
-        KTCutResult* cut = fCutResults.get(); // don't skip over KTCutResultHandle
-        KTCutResult* nextCut = cut->Next();
-        while (nextCut != NULL)
-        {
-            if (nextCut->Name() == cutName)
-            {
-                // problem: can't pass nextCut->Next() to cut->Next()
-                if (doUpdateStatus) UpdateStatus();
-            }
-        }
-        return;
-    }
-    */
-
     std::string KTCutStatus::CutResultsPresent() const
     {
-        KTCutResult* cut = fCutResults.get()->Next(); // skip over KTCutResultHandle
-        if (cut == NULL ) return "";
-
         std::string cutsPresent;
-        while (true)
+        for (auto cutIt = fCutResults.cbegin(); cutIt != fCutResults.cend(); ++cutIt)
         {
-            cutsPresent = cut->Name() + cutsPresent;
-            cut = cut->Next();
-            if (cut != NULL) cutsPresent = " " + cutsPresent;
-            else break;
+            if (! cutIt->fName.empty())
+            {
+                cutsPresent = cutIt->fName + " " + cutsPresent;
+            }
         }
         return cutsPresent;
     }
-
-    // private class KTCutStatus::KTCutResultHandle
-    // purposefully not registered with the cut factory
-    KTCutStatus::KTCutResultHandle::KTCutResultHandle() :
-                KTExtensibleCutResult< KTCutStatus::KTCutResultHandle >()
-    {
-        fState = false;
-    }
-    KTCutStatus::KTCutResultHandle::~KTCutResultHandle()
-    {}
-
-    const std::string KTCutStatus::KTCutResultHandle::sName("top");
-
 
     std::ostream& operator<<(std::ostream& out, const KTCutStatus& status)
     {

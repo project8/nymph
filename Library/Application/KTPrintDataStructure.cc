@@ -83,7 +83,7 @@ namespace Nymph
         printbuf << "\nData Structure:\n";
         printbuf << "\t- " << dataHandle->Name() << '\n';
         KTDEBUG(datalog, "Found data type " << dataHandle->Name());
-        KTExtensibleStructCore< KTDataRider >* nextData = dataHandle->Next();
+        KTExtensibleCore< KTDataRider >::BasePtrType nextData = dataHandle->Next();
         while (nextData != NULL)
         {
             printbuf << "\t- " << nextData->Name() << '\n';
@@ -103,13 +103,14 @@ namespace Nymph
         KTCutStatus& cutStatus = dataHandle->CutStatus();
         printbuf << "\n" << cutStatus;
 
-        const KTCutResult* cutResult = cutStatus.CutResults();
+        const KTCutStatus::CutResults_t cutResults = cutStatus.CutResults();
         printbuf << "Cut Structure:\n";
-        while (cutResult != NULL)
+        unsigned nCuts = cutResults.size();
+        for (unsigned iCut = 0; iCut < nCuts; ++iCut)
         {
-            printbuf << "\t- " << cutResult->Name() << " -- is cut: " << cutResult->GetState() << '\n';
-            KTDEBUG(datalog, "Found cut type " << cutResult->Name());
-            cutResult = cutResult->Next();
+            if (! cutResults[iCut].fAssigned) continue;
+            printbuf << "\t" << iCut << " -- " << cutResults[iCut].fName << " -- is cut: " << cutResults[iCut].fState << '\n';
+            KTDEBUG(datalog, "Found cut type " << cutResults[iCut].fName << " at mask position " << iCut);
         }
 
         KTINFO(datalog, printbuf.str());

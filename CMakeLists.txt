@@ -109,6 +109,14 @@ if( Nymph_ENABLE_PYBIND11 )
     include_directories( External/pybind11/include )    
 endif( Nymph_ENABLE_PYBIND11 )
 
+########
+# Cereal
+########
+
+set( JUST_INSTALL_CEREAL ON CACHE BOOL "Cereal option: only install library" FORCE)
+add_subdirectory( External/cereal )
+include_directories( External/cereal/include )
+
 
 ###############
 # Build Nymph #

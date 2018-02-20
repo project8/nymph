@@ -9,6 +9,12 @@
 #ifndef KTEXTENSIBLESTRUCT_HH_
 #define KTEXTENSIBLESTRUCT_HH_
 
+#include "KTException.hh"
+
+#include <cereal/types/polymorphic.hpp>
+
+#include <memory>
+
 namespace Nymph
 {
 
@@ -19,42 +25,60 @@ namespace Nymph
      */
 
     template< class XBaseType >
-    struct KTExtensibleStructCore : public XBaseType
+    struct KTExtensibleStructCore : public XBaseType, public std::enable_shared_from_this< KTExtensibleStructCore< XBaseType > >
     {
         public:
+            typedef KTExtensibleStructCore< XBaseType > BasePtrType;
+            typedef std::shared_ptr< BasePtrType > BasePtr;
+            typedef std::weak_ptr< BasePtrType > WeakBasePtr;
+
+        private:
+            typedef std::enable_shared_from_this< KTExtensibleStructCore< XBaseType > > ESFTType;
+
+        public:
             /// Default constructor
-            KTExtensibleStructCore(void);
+            KTExtensibleStructCore();
             /// Copy constructor; duplicates the extended object
-            KTExtensibleStructCore(const KTExtensibleStructCore&);
+            KTExtensibleStructCore( const KTExtensibleStructCore& );
             virtual ~KTExtensibleStructCore();
             /// Duplicates the extended object
-            KTExtensibleStructCore& operator=(const KTExtensibleStructCore&);
+            KTExtensibleStructCore& operator=( const KTExtensibleStructCore& );
             /// Removes extended fields
-            virtual void Clear(void);
+            virtual void Clear();
             /// Returns a reference to the object of type XStructType; creates that object if it doesn't exist
-            template< class XStructType > inline XStructType& Of(void);
+            template< class XStructType >
+            inline XStructType& Of();
             /// Returns a const reference to the object of type XStructType; creates that object if it doesn't exist
-            template< class XStructType > inline const XStructType& Of(void) const;
+            template< class XStructType >
+            inline const XStructType& Of() const;
             /// Returns true if XStructType is or is below this object
-            template< class XStructType > inline bool Has(void) const;
+            template< class XStructType >
+            inline bool Has() const;
             /// Extracts object of type XStructType
-            template< class XStructType > inline XStructType* Detatch(void);
+            template< class XStructType >
+            inline std::shared_ptr< XStructType > Detatch();
             /// Duplicates the extended object
-            virtual KTExtensibleStructCore* Clone(void) const = 0;
+            virtual BasePtr Clone() const = 0;
             /// Duplicates object only
-            virtual void Pull(const KTExtensibleStructCore< XBaseType >& object) = 0;
+            virtual void Pull( const BasePtrType& object ) = 0;
             /// Returns the pointer to the next field
-            KTExtensibleStructCore* Next() const;
+            BasePtr Next() const;
             /// Returns the pointer to the previous field
-            KTExtensibleStructCore* Prev() const;
+            BasePtr Prev() const;
             /// Returns the pointer to the last field
-            KTExtensibleStructCore* Last() const;
+            BasePtr Last() const;
             /// Returns the pointer to the first field
-            KTExtensibleStructCore* First() const;
+            BasePtr First() const;
         protected:
             void SetPrevPtrInNext();
-            mutable KTExtensibleStructCore* fNext;
-            mutable KTExtensibleStructCore* fPrev;
+            mutable BasePtr fNext;
+            mutable WeakBasePtr fPrev;
+
+        private:
+            friend class cereal::access;
+
+            template< class Archive >
+            void serialize( Archive& ar );
     };
 
 
@@ -63,62 +87,67 @@ namespace Nymph
     struct KTExtensibleStruct : KTExtensibleStructCore< XBaseType >
     {
         public:
+            typedef typename KTExtensibleStructCore< XBaseType >::BasePtrType BasePtrType;
+            typedef typename KTExtensibleStructCore< XBaseType >::BasePtr BasePtr;
+
+        public:
             /// Default constructor
-            KTExtensibleStruct(void);
+            KTExtensibleStruct();
             /// Copy constructor; duplicates the extended object
-            KTExtensibleStruct(const KTExtensibleStruct& object);
+            KTExtensibleStruct( const KTExtensibleStruct& object );
             virtual ~KTExtensibleStruct();
             /// Duplicates the extended object
-            KTExtensibleStruct& operator=(const KTExtensibleStruct& object);
+            KTExtensibleStruct& operator=( const KTExtensibleStruct& object );
             /// Duplicates the extended object
-            virtual KTExtensibleStructCore< XBaseType >* Clone(void) const;
+            virtual BasePtr Clone() const;
             /// Duplicates object only
-            virtual void Pull(const KTExtensibleStructCore< XBaseType >& object);
-            void SetIsCopyDisabled(bool flag);
+            virtual void Pull( const BasePtrType& object );
+            void SetIsCopyDisabled( bool flag );
         private:
             bool fIsCopyDisabled;
+            friend class cereal::access;
+
+            template< class Archive >
+            void serialize( Archive& ar );
     };
 
 
 
     template<class XBaseType>
-    KTExtensibleStructCore<XBaseType>::KTExtensibleStructCore(void)
+    KTExtensibleStructCore<XBaseType>::KTExtensibleStructCore(void) :
+            fNext(),
+            fPrev()
     {
-        fPrev = 0;
-        fNext = 0;
     }
 
     template<class XBaseType>
-    KTExtensibleStructCore<XBaseType>::KTExtensibleStructCore(const KTExtensibleStructCore&)
+    KTExtensibleStructCore<XBaseType>::KTExtensibleStructCore( const KTExtensibleStructCore& ) :
+            fNext(),
+            fPrev()
     {
-        fPrev = 0;
-        fNext = 0;
     }
 
     template<class XBaseType>
     KTExtensibleStructCore<XBaseType>::~KTExtensibleStructCore()
     {
-        delete fNext;
-        fNext = 0;
     }
 
     template<class XBaseType>
-    KTExtensibleStructCore<XBaseType>& KTExtensibleStructCore<XBaseType>::operator=(const KTExtensibleStructCore&)
+    KTExtensibleStructCore<XBaseType>& KTExtensibleStructCore<XBaseType>::operator=( const KTExtensibleStructCore& )
     {
-        fNext = 0;
+        fNext.reset();
         return *this;
     }
 
     template<class XBaseType>
-    void KTExtensibleStructCore<XBaseType>::Clear(void)
+    void KTExtensibleStructCore<XBaseType>::Clear()
     {
-        delete fNext;
-        fNext = 0;
+        fNext.reset();
     }
 
     template<class XBaseType>
     template<class XStructType>
-    inline XStructType& KTExtensibleStructCore<XBaseType>::Of(void)
+    inline XStructType& KTExtensibleStructCore<XBaseType>::Of()
     {
         XStructType* target = dynamic_cast<XStructType*>(this);
         if (target)
@@ -128,16 +157,16 @@ namespace Nymph
 
         if (! fNext)
         {
-            fNext = new XStructType();
-            fNext->fPrev = this;
+            fNext = std::make_shared< XStructType >();
+            fNext->fPrev = ESFTType::shared_from_this();
         }
 
-        return fNext->Of<XStructType>();
+        return fNext->template Of<XStructType>();
     }
 
     template<class XBaseType>
     template<class XStructType>
-    inline const XStructType& KTExtensibleStructCore<XBaseType>::Of(void) const
+    inline const XStructType& KTExtensibleStructCore<XBaseType>::Of() const
     {
         const XStructType* target = dynamic_cast<const XStructType*>(this);
         if (target)
@@ -145,20 +174,19 @@ namespace Nymph
             return *target;
         }
 
-        if (fNext == 0)
+        if (! fNext)
         {
-            fNext = new XStructType();
-            fNext->fPrev = const_cast< KTExtensibleStructCore< XBaseType >* >(this);
+            throw KTException() << "Requested component of (const) extensible struct not present";
         }
 
-        return fNext->Of<XStructType>();
+        return fNext->template Of<XStructType>();
     }
 
 
 
     template<class XBaseType>
     template<class XStructType>
-    inline bool KTExtensibleStructCore<XBaseType>::Has(void) const
+    inline bool KTExtensibleStructCore<XBaseType>::Has() const
     {
         if (dynamic_cast<const XStructType*>(this))
         {
@@ -166,7 +194,7 @@ namespace Nymph
         }
         if (fNext)
         {
-            return fNext->Has<XStructType>();
+            return fNext->template Has<XStructType>();
         }
 
         return false;
@@ -176,67 +204,90 @@ namespace Nymph
 
     template<class XBaseType>
     template<class XStructType>
-    inline XStructType* KTExtensibleStructCore<XBaseType>::Detatch(void)
+    inline std::shared_ptr< XStructType > KTExtensibleStructCore<XBaseType>::Detatch()
     {
         if (! fNext)
         {
-            return 0;
+            return std::shared_ptr< XStructType >();
         }
-        XStructType* next = dynamic_cast<XStructType*>(fNext);
+        std::shared_ptr< XStructType > next = std::dynamic_pointer_cast< XStructType >(fNext);
         if (next)
         {
             if (next->fNext)
             {
                 fNext = next->fNext;
-                fNext->fPrev = this;
-                next->fNext = 0;
+                fNext->fPrev = ESFTType::shared_from_this();
+                next->fNext.reset();
             }
-            next->fPrev = 0;
+            next->fPrev.reset();
             return next;
         }
-        return fNext->Detatch<XStructType>();
+        return fNext->template Detatch<XStructType>();
     }
 
 
     template<class XBaseType>
-    inline KTExtensibleStructCore<XBaseType>* KTExtensibleStructCore<XBaseType>::Next() const
+    inline typename KTExtensibleStructCore<XBaseType>::BasePtr KTExtensibleStructCore<XBaseType>::Next() const
     {
         return fNext;
     }
 
     template<class XBaseType>
-    inline KTExtensibleStructCore<XBaseType>* KTExtensibleStructCore<XBaseType>::Prev() const
+    inline typename KTExtensibleStructCore<XBaseType>::BasePtr KTExtensibleStructCore<XBaseType>::Prev() const
     {
-        return fPrev;
+        return fPrev.lock();
     }
 
     template<class XBaseType>
-    inline KTExtensibleStructCore<XBaseType>* KTExtensibleStructCore<XBaseType>::Last() const
+    inline typename KTExtensibleStructCore<XBaseType>::BasePtr KTExtensibleStructCore<XBaseType>::Last() const
     {
-        if (fNext == 0) return this;
+        if (fNext) return this;
         return fNext->Last();
     }
 
     template<class XBaseType>
-    inline KTExtensibleStructCore<XBaseType>* KTExtensibleStructCore<XBaseType>::First() const
+    inline typename KTExtensibleStructCore<XBaseType>::BasePtr KTExtensibleStructCore<XBaseType>::First() const
     {
-        if (fPrev == 0) return this;
-        return fPrev->First();
+        if (! fPrev) return BasePtr(this);
+        return fPrev.lock()->First();
     }
 
     template<class XBaseType>
     inline void KTExtensibleStructCore<XBaseType>::SetPrevPtrInNext()
     {
-        fNext->fPrev = this;
+        fNext->fPrev = ESFTType::shared_from_this();
         return;
+    }
+
+    template< class XBaseType >
+    template< class Archive >
+    void KTExtensibleStructCore<XBaseType>::serialize( Archive& ar )
+    {
+        std::cout << "### serialize for " << typeid(XBaseType).name() << std::endl;
+        ar( this );
+
+        if( fNext == 0 ){ return; }
+        
+        // archive pointer ( fNext )?
     }
 
 
 
-    template<class XInstanceType, class XBaseType>
-    KTExtensibleStruct<XInstanceType, XBaseType>::KTExtensibleStruct(void)
+    template< class XInstanceType, class XBaseType >
+    template< class Archive >
+    void KTExtensibleStruct<XInstanceType, XBaseType>::serialize( Archive& ar )
     {
-        fIsCopyDisabled = false;
+        std::cout << "### serialize for " << typeid(XBaseType).name() << std::endl;
+        ar( cereal::base_class< BasePtrType >( this ), fIsCopyDisabled );
+
+        return;
+    }
+
+    template<class XInstanceType, class XBaseType>
+    KTExtensibleStruct<XInstanceType, XBaseType>::KTExtensibleStruct() :
+            KTExtensibleStructCore< XBaseType >(),
+            fIsCopyDisabled( false )
+    {
     }
 
     template<class XInstanceType, class XBaseType>
@@ -267,13 +318,12 @@ namespace Nymph
             return *this;
         }
 
-        delete this->fNext;
-        this->fNext = 0;
+        this->fNext.reset();
 
         if (object.fNext)
         {
             this->fNext = object.fNext->Clone();
-            this->KTExtensibleStructCore< XBaseType >::SetPrevPtrInNext();
+            this->BasePtrType::SetPrevPtrInNext();
             //this->fNext->fPrev = this;
         }
 
@@ -281,22 +331,24 @@ namespace Nymph
     }
 
     template<class XInstanceType, class XBaseType>
-    KTExtensibleStructCore<XBaseType>* KTExtensibleStruct<XInstanceType, XBaseType>::Clone(void) const
+    typename KTExtensibleStruct<XInstanceType, XBaseType>::BasePtr KTExtensibleStruct<XInstanceType, XBaseType>::Clone() const
     {
         // assume CRTP is used properly,
         // otherwise compiling fails here (intended behavior)
-        XInstanceType* instance = new XInstanceType(dynamic_cast<const XInstanceType&>(*this));
+        typedef KTExtensibleStruct< XInstanceType, XBaseType > InstancePtrType;
+        typedef std::shared_ptr< InstancePtrType > InstancePtr;
+        InstancePtr instance = std::make_shared< InstancePtrType >( XInstanceType(dynamic_cast<const XInstanceType&>(*this)) );
         if (this->fNext)
         {
             instance->fNext = this->fNext->Clone();
             instance->SetPrevPtrInNext();
             //instance->fNext->fPrev = instance->fNext;
         }
-        return instance;
+        return std::static_pointer_cast< BasePtrType, InstancePtrType >( instance );
     }
 
     template<class XInstanceType, class XBaseType>
-    void KTExtensibleStruct<XInstanceType, XBaseType>::Pull(const KTExtensibleStructCore<XBaseType>& object)
+    void KTExtensibleStruct<XInstanceType, XBaseType>::Pull(const BasePtrType& object)
     {
         if (&object == this)
         {
