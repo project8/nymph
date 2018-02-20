@@ -2,7 +2,7 @@
  * KTProcessorPybind.hh
  *
  *  Created on: Jan 24, 2018
- *      Author: obla999
+ *      Author: N.S. Oblath
  */
 
 #ifndef NYMPH_KTPROCESSORPYBIND_HH_
@@ -72,7 +72,7 @@ namespace Nymph
 						KTWrapProcessor,      // Parent class
 						WrapFunction,          // Name of function in C++ (must match Python name)
 						input      // Argument(s)
-						);
+				);
 			}
 			bool Configure(const scarab::param_node& node) override {
 				PYBIND11_OVERLOAD(
@@ -80,7 +80,7 @@ namespace Nymph
 						KTWrapProcessor,      // Parent class
 						Configure,          // Name of function in C++ (must match Python name)
 						node      // Argument(s)
-						);
+				);
 			}
 	};
 
