@@ -16,16 +16,24 @@ import py_nymph as nymph
 #     10. (self: py_nymph.ParamNodePybind, arg0: str, arg1: str) -> str
 
 int_value = nymph.param_value(5)
-print("Get value set to 5: ", int_value.as_int())
+print("What type of value is stored? (bool, uint, int, double, string): ", int_value.is_bool(), int_value.is_uint(), int_value.is_int(), int_value.is_double(), int_value.is_string())
+print("Get value set to 5:", int_value.as_int())
 
 string_value = nymph.param_value("Hello!")
-print("Get value set to \"Hello!\"", string_value.as_string())
+print("What type of value is stored? (bool, uint, int, double, string): ", string_value.is_bool(), string_value.is_uint(), string_value.is_int(), string_value.is_double(), string_value.is_string())
+print("Get value set to \"Hello!\":", string_value.as_string())
 
 # print(pnp.get_value())
 
 
 
 
-#a_node = nymph.ParamNode()
+a_node = nymph.param_node()
+a_node.add("int-value", int_value)
+a_node.add("string-value", string_value)
+
+print("Int value from node:", a_node.get_value_int("int-value"))
+print("String value from node:", a_node.get_value_string("string-value"))
+
 # Test the "get_value" function for all the different types: 
 # a_node.get_value("myKey")
