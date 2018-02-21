@@ -5,7 +5,7 @@
  *      Author: N.S. Oblath
  */
 
-#include "KTParamNodePybind.hh"
+#include "KTParamPybind.hh"
 
 #include "KTProcessorToolboxPybind.hh"
 #include "KTProcessorPybind.hh"
@@ -19,7 +19,7 @@ PYBIND11_MODULE( py_nymph, mod )
     //Nymph::ExportKTConfigurable( mod );
 	//Nymph::ExportKTProcessor( mod );
     Nymph::ExportKTProcessorToolbox( mod );
-    Nymph::ExportParamNodePybind( mod );
+    Nymph::ExportParamPybind( mod );
 
     pybind11::class_< Nymph::KTProcessor, std::shared_ptr<Nymph::KTProcessor> >( mod, "KTProcessor" );
 

@@ -95,9 +95,9 @@ set( NYMPH_PY_HEADERFILES
 # Python binding headers
 set( NYMPH_PYBINDING_HEADERFILES
     #${UTIL_DIR}/KTConfigurablePybind.hh
+    ${UTIL_DIR}/KTParamPybind.hh
     ${PROC_DIR}/KTProcessorPybind.hh
     ${PROC_DIR}/KTPyProcessor.hh
-    ${UTIL_DIR}/KTParamNodePybind.hh
 )
 
 # Python bindings

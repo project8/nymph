@@ -1,4 +1,4 @@
-# Demonstrates access to KTPyTestClass
+# Demonstrates access to param classes
 
 import py_nymph as nymph
 
@@ -15,14 +15,17 @@ import py_nymph as nymph
 #     9. (self: py_nymph.ParamNodePybind, arg0: str, arg1: float) -> float
 #     10. (self: py_nymph.ParamNodePybind, arg0: str, arg1: str) -> str
 
-a_value = nymph.ParamValue(True)
-print("Get a bool set to True: ", a_value.get())
+int_value = nymph.param_value(5)
+print("Get value set to 5: ", int_value.as_int())
+
+string_value = nymph.param_value("Hello!")
+print("Get value set to \"Hello!\"", string_value.as_string())
 
 # print(pnp.get_value())
 
 
 
 
-a_node = nymph.ParamNode()
+#a_node = nymph.ParamNode()
 # Test the "get_value" function for all the different types: 
 # a_node.get_value("myKey")
