@@ -59,17 +59,10 @@ namespace Nymph
             MEMBERVARIABLE(bool, LastData);
 
             MEMBERVARIABLEREF_NOSET(KTCutStatus, CutStatus);
-            // additional non-const get function
-            KTCutStatus& GetCutStatus();
 
         public:
             static const std::string sName;
     };
-
-    inline KTCutStatus& KTData::GetCutStatus()
-    {
-        return fCutStatus;
-    }
 
     typedef boost::shared_ptr< KTData > KTDataPtr;
 
