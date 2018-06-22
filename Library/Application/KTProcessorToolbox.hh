@@ -174,7 +174,7 @@ namespace Nymph
             //typedef std::set< KTPrimaryProcessor* > ThreadGroup;
             struct CompareThread
             {
-                bool operator() (const Thread& lhs, const Thread& rhs)
+                bool operator() (const Thread& lhs, const Thread& rhs) const
                 {
                     return lhs.fName < rhs.fName;
                 }
