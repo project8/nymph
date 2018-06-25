@@ -23,6 +23,7 @@ namespace Nymph
             .def( pybind11::init< int >() )
             .def( pybind11::init< double >() )
             .def( pybind11::init< const std::string& >() )
+            .def( pybind11::init< const char* >() )
 
             .def( "is_bool", (bool (scarab::param_value::*)() const) &scarab::param_value::is_bool, "Return whether the param_value stores a boolean value" )
             .def( "is_uint", (bool (scarab::param_value::*)() const) &scarab::param_value::is_uint, "Return whether the param_value stores an unsigned integer value" )
@@ -34,7 +35,7 @@ namespace Nymph
             .def( "as_uint", (unsigned (scarab::param_value::*)() const) &scarab::param_value::as_uint, "Get parameter value as an unsigned integer" )
             .def( "as_int", (int (scarab::param_value::*)() const) &scarab::param_value::as_int, "Get parameter value as a signed integer" )
             .def( "as_double", (double (scarab::param_value::*)() const) &scarab::param_value::as_double, "Get parameter value as a float" )
-            .def( "as_string", (std::string (scarab::param_value::*)() const) &scarab::param_value::as_string, "Get parameter value as a string" )
+            .def( "as_string", (const std::string& (scarab::param_value::*)() const) &scarab::param_value::as_string, "Get parameter value as a string" )
 
             .def( "set", (void (scarab::param_value::*)(bool)) &scarab::param_value::set, "Set a bool value" )
             .def( "set", (void (scarab::param_value::*)(unsigned)) &scarab::param_value::set, "Set an unsigned integer value" )
