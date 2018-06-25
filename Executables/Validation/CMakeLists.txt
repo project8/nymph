@@ -98,6 +98,7 @@ if (Nymph_ENABLE_TESTING)
     
         # Python scripts
         set( VALIDATION_PY_SCRIPTS
+            TestParamBindings.py
             TestProcessorToolbox.py
             TestPyTestClass.py
             TestPythonBasics.py
