@@ -201,7 +201,7 @@ namespace Nymph
             };
             struct CompareThread
             {
-                bool operator() (const Thread& lhs, const Thread& rhs)
+                bool operator() (const Thread& lhs, const Thread& rhs) const
                 {
                     return lhs.fProc < rhs.fProc;
                 }
