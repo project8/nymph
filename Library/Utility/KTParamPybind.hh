@@ -15,9 +15,10 @@ namespace Nymph
     void ExportParamPybind( pybind11::module& mod )
     {
         // param
+        pybind11::class_< scarab::param >( mod, "param" );
 
         // param_value
-        pybind11::class_< scarab::param_value >( mod, "param_value" )
+        pybind11::class_< scarab::param_value, scarab::param >( mod, "param_value" )
             .def( pybind11::init< bool >() )
             .def( pybind11::init< unsigned >() )
             .def( pybind11::init< int >() )
@@ -45,7 +46,7 @@ namespace Nymph
             ;
 
         // param_node
-        pybind11::class_< scarab::param_node >( mod, "param_node" )
+        pybind11::class_< scarab::param_node, scarab::param >( mod, "param_node" )
             .def( pybind11::init<>() )
             
             .def( "add",(bool (scarab::param_node::*)(const std::string&, const scarab::param&)) &scarab::param_node::add,
