@@ -38,8 +38,8 @@ namespace Nymph
     {
         scarab::param_translator translator;
         scarab::param_node optNode;
-        optNode.add( "encoding", new scarab::param_value( "json" ) );
-        return Configure( translator.read_string( config, &optNode )->as_node() );;
+        optNode.add( "encoding", "json" );
+        return Configure( translator.read_string( config, optNode )->as_node() );;
     }
 
 

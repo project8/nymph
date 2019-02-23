@@ -275,7 +275,7 @@ namespace Nymph
                     string nodeName(t_full_name.substr(t_node_start_pos, t_node_sep_pos));
                     if (parentNode.has(nodeName))
                     {
-                        parentNode = parentNode.node_at(nodeName);
+                        parentNode = parentNode[nodeName]().as_node();
                     }
                     else
                     {

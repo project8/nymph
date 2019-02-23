@@ -40,11 +40,11 @@ namespace Nymph
         // Config-file settings
         if (node.has("cut-mask-int"))
         {
-            SetCutMask(node.get_value< unsigned long long >("cut-mask-int"));
+            SetCutMask(node["cut-mask-int"]().as_uint());
         }
         if (node.has("cut-mask"))
         {
-            SetCutMask(KTCutStatus::bitset_type(node.get_value("cut-mask")));
+            SetCutMask(KTCutStatus::bitset_type(node["cut-mask"]().as_string()));
         }
         if (node.get_value("cut-mask-all", false))
         {
