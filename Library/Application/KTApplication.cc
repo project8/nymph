@@ -67,7 +67,7 @@ namespace Nymph
         {
             scarab::path configFilePath = scarab::expand_path( fConfigFilename );
             scarab::param_translator translator;
-            scarab::param* configFromFile = translator.read_file( configFilePath.native() );
+            scarab::param_ptr_t configFromFile = translator.read_file( configFilePath.native() );
             if( configFromFile == NULL )
             {
                 BOOST_THROW_EXCEPTION( KTException() << "[KTApplication] error parsing config file" << eom );
@@ -77,20 +77,18 @@ namespace Nymph
                 BOOST_THROW_EXCEPTION( KTException() << "[KTApplication] configuration file must consist of an object/node" << eom );
             }
             fConfigurator->Merge( configFromFile->as_node() );
-            delete configFromFile;
         }
 
         // Command-line JSON configuration
         if (! clJSON.empty())
         {
             scarab::param_input_json inputJSON;
-            scarab::param* configFromJSON = inputJSON.read_string( clJSON );
+            scarab::param_ptr_t configFromJSON = inputJSON.read_string( clJSON );
             if( ! configFromJSON->is_node() )
             {
                 BOOST_THROW_EXCEPTION( KTException() << "[KTApplication] command line json must be an object" << eom );
             }
             fConfigurator->Merge( configFromJSON->as_node() );
-            delete configFromJSON;
         }
 
         // Command-line overrides
@@ -141,7 +139,7 @@ namespace Nymph
     		unsigned arraySize = paramArray.size();
     		for (unsigned iParam = 0; iParam < arraySize; ++iParam)
     		{
-    			AddConfigOptionsToCLHandler(paramArray.at(iParam), nextRootName + std::to_string(iParam));
+    			AddConfigOptionsToCLHandler(paramArray[iParam], nextRootName + std::to_string(iParam));
     		}
     	}
     	else if (param.is_node())
