@@ -86,12 +86,6 @@ set( NYMPH_SOURCEFILES
     ${APPL_DIR}/KTThroughputProfiler.cc
 )
 
-set( NYMPH_PY_HEADERFILES
-    ${DATA_DIR}/KTDataPy.hh
-    ${PROC_DIR}/KTProcessorPy.hh
-    ${APPL_DIR}/KTProcessorToolboxPy.hh
-)
-
 # Python binding headers
 set( NYMPH_PYBINDING_HEADERFILES
     #${UTIL_DIR}/KTConfigurablePybind.hh
@@ -111,11 +105,7 @@ set( NYMPH_PYBINDING_SOURCEFILES
 pbuilder_library( Nymph NYMPH_SOURCEFILES "" )
 pbuilder_install_headers( ${NYMPH_HEADERFILES} )
 
-if (Nymph_ENABLE_PYTHON)
-    python_package_add_module(NymphPy.cc)
-endif (Nymph_ENABLE_PYTHON)
-
-if( Nymph_ENABLE_PYBIND11 )
+if( Nymph_ENABLE_PYTHON )
     set( LIB_DEPENDENCIES Nymph )
 
     configure_file( AddLibPythonPath.sh.in AddLibPythonPath.sh @ONLY)
@@ -125,5 +115,4 @@ if( Nymph_ENABLE_PYBIND11 )
     target_link_libraries( py_nymph PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
     pbuilder_install_libraries( py_nymph )
     pbuilder_install_headers( ${NYMPH_PYBINDING_HEADERFILES} )
-
-endif( Nymph_ENABLE_PYBIND11 )
+endif( Nymph_ENABLE_PYTHON )

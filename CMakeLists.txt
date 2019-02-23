@@ -32,10 +32,7 @@ set_option( USE_CPP11 TRUE )
 option( Nymph_BUILD_NYMPH_EXE "Flag to build the Nymph executable; also requires Nymph_ENABLE_EXECUTABLES" ON )
 
 # Build python bindings (requires boost::python)
-option( Nymph_ENABLE_PYTHON "Build python bindings (NymphPy)" OFF )
-
-# Build python bindings via pybind11 (this should be renamed Nymph_ENABLE_PYTHON if we choose to go with pybind11 over boost::python)
-option( Nymph_ENABLE_PYBIND11 "Build python bindings via pybind11" OFF )
+option( Nymph_ENABLE_PYTHON "Build python bindings" OFF )
 
 # Add a "Standard" build type
 #set (CMAKE_BUILD_TYPE standard)
@@ -84,30 +81,21 @@ endif( PBUILDER_STANDALONE )
 
 # Boost (1.46 required for filesystem version 3)
 list (APPEND Boost_COMPONENTS chrono date_time filesystem program_options system thread)
-if (Nymph_ENABLE_PYTHON)
-    list(APPEND Boost_COMPONENTS python)
-endif (Nymph_ENABLE_PYTHON)
 find_package (Boost 1.46.0 REQUIRED COMPONENTS ${Boost_COMPONENTS})
 # make sure dynamic linking is assumed for all boost libraries
 add_definitions (-DBOOST_ALL_DYN_LINK)
 include_directories (${Boost_INCLUDE_DIRS})
 pbuilder_add_ext_libraries (${Boost_LIBRARIES})
 
-# python deps
-if (Nymph_ENABLE_PYTHON)
-    include (PythonPackage)
-    python_package_find_python( 2.7 )
-endif (Nymph_ENABLE_PYTHON)
-
 ##########
 # Pybind11
 ##########
 
-if( Nymph_ENABLE_PYBIND11 )
+if( Nymph_ENABLE_PYTHON )
     set( PYBIND11_INSTALL ON CACHE BOOL "Pybind11 option to install itself" FORCE )
     add_subdirectory( External/pybind11 )
     include_directories( External/pybind11/include )    
-endif( Nymph_ENABLE_PYBIND11 )
+endif( Nymph_ENABLE_PYTHON )
 
 ########
 # Cereal

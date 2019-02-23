@@ -82,7 +82,7 @@ if (Nymph_ENABLE_TESTING)
     pbuilder_executables( TEST_PROGRAMS LIB_DEPENDENCIES )
     
     
-    if( Nymph_ENABLE_PYBIND11 )
+    if( Nymph_ENABLE_PYTHON )
         # Python Interface
         
         # Python binding headers
@@ -112,6 +112,6 @@ if (Nymph_ENABLE_TESTING)
         
         install( FILES ${VALIDATION_PY_SCRIPTS} DESTINATION ${BIN_INSTALL_DIR} )
     
-    endif( Nymph_ENABLE_PYBIND11 )
+    endif( Nymph_ENABLE_PYTHON )
         
 endif (Nymph_ENABLE_TESTING) 
