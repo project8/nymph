@@ -52,10 +52,10 @@ namespace Nymph
     {
         try
         {
-            fParamBuffer = &const_cast< scarab::param& >( fMasterConfig->at( aName ) );
+            fParamBuffer = &const_cast< scarab::param& >( (*fMasterConfig)[aName] );
             if( fParamBuffer->is_value() )
             {
-                return fParamBuffer->as_value().get< XReturnType >();
+                return (*fParamBuffer)().as< XReturnType >();
             }
         }
         catch( std::exception& e )
@@ -68,10 +68,10 @@ namespace Nymph
     {
         try
         {
-            fParamBuffer = &const_cast< scarab::param& >( fMasterConfig->at( aName ) );
+            fParamBuffer = &const_cast< scarab::param& >( (*fMasterConfig)[aName] );
             if( fParamBuffer->is_value() )
             {
-                return fParamBuffer->as_value().get< XReturnType >();
+                return (*fParamBuffer)().as< XReturnType >();
             }
         }
         catch( std::exception& e )

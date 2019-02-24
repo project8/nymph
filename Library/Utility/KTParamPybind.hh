@@ -39,10 +39,10 @@ namespace Nymph
             .def( "as_string", (const std::string& (scarab::param_value::*)() const) &scarab::param_value::as_string, "Get parameter value as a string" )
 
             .def( "set", (void (scarab::param_value::*)(bool)) &scarab::param_value::set, "Set a bool value" )
-            .def( "set", (void (scarab::param_value::*)(unsigned)) &scarab::param_value::set, "Set an unsigned integer value" )
-            .def( "set", (void (scarab::param_value::*)(int)) &scarab::param_value::set, "Set a signed integer value" )
+            .def( "set", (void (scarab::param_value::*)(unsigned)) &scarab::param_value::set<uint64_t>, "Set an unsigned integer value" )
+            .def( "set", (void (scarab::param_value::*)(int)) &scarab::param_value::set<int64_t>, "Set a signed integer value" )
             .def( "set", (void (scarab::param_value::*)(double)) &scarab::param_value::set, "Set an float value" )
-            .def( "set", (void (scarab::param_value::*)(const std::string&)) &scarab::param_value::set, "Set an string value" )
+            .def( "set", (void (scarab::param_value::*)(std::string)) &scarab::param_value::set, "Set an string value" )
             ;
 
         // param_node
@@ -52,17 +52,8 @@ namespace Nymph
             .def( "add",(bool (scarab::param_node::*)(const std::string&, const scarab::param&)) &scarab::param_node::add,
                     "Add a param object to a node" )
 
-            // Get value of the parameter, when no default is set
-            .def( "get_value_bool", (bool (scarab::param_node::*)(const std::string&) const) &scarab::param_node::get_value<bool>,
-                    "Get parameter node value as a bool" )
-            .def( "get_value_uint", (unsigned (scarab::param_node::*)(const std::string&) const) &scarab::param_node::get_value<uint>,
-                    "Get parameter node value as an unsigned integer" )
-            .def( "get_value_int", (int (scarab::param_node::*)(const std::string&) const) &scarab::param_node::get_value<int>,
-                    "Get parameter node value as a signed integer" )
-            .def( "get_value_double", (double (scarab::param_node::*)(const std::string&) const) &scarab::param_node::get_value<double>,
-                    "Get parameter node value as a float" )
-            .def( "get_value_string", (std::string (scarab::param_node::*)(const std::string&) const) &scarab::param_node::get_value,
-                    "Get parameter node value as a string" )
+            .def( "at", (scarab::param& (scarab::param_node::*)(const std::string&)) &scarab::param_node::operator[],
+                    "Get the param object for a given key" )
 
             // Get value of the parameter, bringing along the default value
             .def( "get_value", (bool (scarab::param_node::*)(const std::string&, bool) const) &scarab::param_node::get_value<bool>,
@@ -90,17 +81,8 @@ namespace Nymph
             .def( "assign", (void (scarab::param_array::*)(unsigned, const scarab::param&)) &scarab::param_array::assign,
                     "Add a param object to the specified index in a array" )
 
-            // Get value of the parameter, when no default is set
-            .def( "get_value_bool", (bool (scarab::param_array::*)(unsigned) const) &scarab::param_array::get_value<bool>,
-                    "Get parameter array value as a bool" )
-            .def( "get_value_uint", (unsigned (scarab::param_array::*)(unsigned) const) &scarab::param_array::get_value<uint>,
-                    "Get parameter array value as an unsigned integer" )
-            .def( "get_value_int", (int (scarab::param_array::*)(unsigned) const) &scarab::param_array::get_value<int>,
-                    "Get parameter array value as a signed integer" )
-            .def( "get_value_double", (double (scarab::param_array::*)(unsigned) const) &scarab::param_array::get_value<double>,
-                    "Get parameter array value as a float" )
-            .def( "get_value_string", (std::string (scarab::param_array::*)(unsigned) const) &scarab::param_array::get_value,
-                    "Get parameter array value as a string" )
+            .def( "at", (scarab::param& (scarab::param_array::*)(unsigned)) &scarab::param_array::operator[],
+                    "Get the param object for a given index" )
 
             // Get value of the parameter, bringing along the default value
             .def( "get_value", (bool (scarab::param_array::*)(unsigned, bool) const) &scarab::param_array::get_value<bool>,

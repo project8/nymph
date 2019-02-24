@@ -64,7 +64,7 @@ namespace Nymph
         }
         else
         {
-            const scarab::param_array& procArray = node.array_at( "processors" );
+            const scarab::param_array& procArray = node["processors"].as_array();
             for( scarab::param_array::const_iterator procIt = procArray.begin(); procIt != procArray.end(); ++procIt )
             {
                 if( ! procIt->is_node() )
@@ -72,24 +72,24 @@ namespace Nymph
                     KTERROR( proclog, "Invalid processor entry: not a node" );
                     return false;
                 }
-                const scarab::param_node* procNode = &( procIt->as_node() );
+                const scarab::param_node& procNode = procIt->as_node();
 
-                if (! procNode->has("type"))
+                if (! procNode.has("type"))
                 {
                     KTERROR(proclog, "Unable to create processor: no processor type given");
                     return false;
                 }
-                string procType = procNode->get_value("type");
+                string procType = procNode["type"]().as_string();
 
                 string procName;
-                if (! procNode->has("name"))
+                if (! procNode.has("name"))
                 {
                     KTINFO(proclog, "No name given for processor of type <" << procType << ">; using type as name.");
                     procName = procType;
                 }
                 else
                 {
-                    procName = procNode->get_value("name");
+                    procName = procNode["name"]().as_string();
                 }
                 std::shared_ptr< KTProcessor > newProc ( fProcFactory->create(procType, procType));
                 if (newProc == NULL)
@@ -115,7 +115,7 @@ namespace Nymph
         }
         else
         {
-            const scarab::param_array& connArray = node.array_at( "connections" );
+            const scarab::param_array& connArray = node["connections"].as_array();
             for( scarab::param_array::const_iterator connIt = connArray.begin(); connIt != connArray.end(); ++connIt )
             {
                 if( ! connIt->is_node() )
@@ -123,23 +123,23 @@ namespace Nymph
                     KTERROR( proclog, "Invalid connection entry: not a node" );
                     return false;
                 }
-                const scarab::param_node* connNode = &( connIt->as_node() );
+                const scarab::param_node& connNode = connIt->as_node();
 
-                if ( ! connNode->has("signal") || ! connNode->has("slot") )
+                if ( ! connNode.has("signal") || ! connNode.has("slot") )
                 {
                     KTERROR(proclog, "Signal/Slot connection information is incomplete!");
-                    if (connNode->has("signal"))
+                    if (connNode.has("signal"))
                     {
-                        KTWARN(proclog, "signal = " << connNode->get_value("signal"));
+                        KTWARN(proclog, "signal = " << connNode["signal"]());
                     }
                     else
                     {
                         KTERROR(proclog, "signal = MISSING");
                     }
 
-                    if (connNode->has("slot"))
+                    if (connNode.has("slot"))
                     {
-                        KTWARN(proclog, "slot = " << connNode->get_value("slot"));
+                        KTWARN(proclog, "slot = " << connNode["slot"]());
                     }
                     else
                     {
@@ -149,30 +149,30 @@ namespace Nymph
                 }
 
                 bool connReturn = false;
-                if (connNode->has("order"))
+                if (connNode.has("order"))
                 {
-                    connReturn = MakeConnection(connNode->get_value("signal"), connNode->get_value("slot"), connNode->get_value< int >("order"));
+                    connReturn = MakeConnection(connNode["signal"]().as_string(), connNode["slot"]().as_string(), connNode["order"]().as_int());
                 }
                 else
                 {
-                    connReturn = MakeConnection(connNode->get_value("signal"), connNode->get_value("slot"));
+                    connReturn = MakeConnection(connNode["signal"]().as_string(), connNode["slot"]().as_string());
                 }
                 if (! connReturn)
                 {
-                    KTERROR(proclog, "Unable to make connection <" << connNode->get_value("signal") << "> --> <" << connNode->get_value("slot") << ">");
+                    KTERROR(proclog, "Unable to make connection <" << connNode["signal"]() << "> --> <" << connNode["slot"]() << ">");
                     return false;
                 }
 
-                if (connNode->has("breakpoint"))
+                if (connNode.has("breakpoint"))
                 {
-                    if (! SetBreakpoint(connNode->get_value("slot")))
+                    if (! SetBreakpoint(connNode["slot"]().as_string()))
                     {
-                        KTERROR(proclog, "Unable to set breakpoint on <" << connNode->get_value("slot"));
+                        KTERROR(proclog, "Unable to set breakpoint on <" << connNode["slot"]());
                         return false;
                     }
                 }
 
-                KTINFO(proclog, "Signal <" << connNode->get_value("signal") << "> connected to slot <" << connNode->get_value("slot") << ">");
+                KTINFO(proclog, "Signal <" << connNode["signal"]() << "> connected to slot <" << connNode["slot"]() << ">");
             }
         }
 
@@ -187,7 +187,7 @@ namespace Nymph
         }
         else
         {
-            const scarab::param_array& rqArray = node.array_at( "run-queue" );
+            const scarab::param_array& rqArray = node["run-queue"].as_array();
             for (scarab::param_array::const_iterator rqIt = rqArray.begin(); rqIt != rqArray.end(); ++rqIt)
             {
                 if (rqIt->is_value())
@@ -247,7 +247,7 @@ namespace Nymph
                     continue;
                 }
             }
-            const scarab::param_node& subNode = node.node_at(nameUsed);
+            const scarab::param_node& subNode = node[nameUsed].as_node();
             if (! iter->second.fProc->Configure(subNode))
             {
                 KTERROR(proclog, "An error occurred while configuring processor <" << procName << "> with parameter node <" << nameUsed << ">");
@@ -262,7 +262,7 @@ namespace Nymph
         scarab::param_translator translator;
         scarab::param_node optNode;
         optNode.add( "encoding", new scarab::param_value( "json" ) );
-        return ConfigureProcessors( translator.read_string( config, &optNode )->as_node() );
+        return ConfigureProcessors( translator.read_string( config, optNode )->as_node() );
     }
 
     std::shared_ptr< KTProcessor > KTProcessorToolbox::GetProcessor(const std::string& procName)
