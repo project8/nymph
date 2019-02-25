@@ -11,11 +11,18 @@
 #include "KTSignalSlotBase.hh"
 
 #include "KTConnection.hh"
+#include "KTException.hh"
+#include "KTLogger.hh"
 
 #include <map>
 
 namespace Nymph
 {
+    KTLOGGER( signallog, "KTSignal" );
+
+    struct KTConnectionException : public KTException
+    {};
+
     /// A m_signal object may call multiple slots with the
     /// same signature. You can connect functions to the m_signal
     /// which will be called when the emit() method on the
@@ -36,7 +43,7 @@ namespace Nymph
             KTSignal( KTSignal&& ) = delete;
             virtual ~KTSignal();
 
-            virtual void Connect( KTSlotBase* slot );
+            virtual void Connect( KTSlotBase* slot, int group );
 
             // disconnects a previously connected function
             void Disconnect( KTSlotBase* slot ) const;
@@ -52,7 +59,7 @@ namespace Nymph
             typedef std::map< KTSlotBase*, KTConnection > slot_map; // to get around the problem of having a comma inside a macro function argument
             MEMBERVARIABLE_REF_MUTABLE_CONST( slot_map, Slots );
 
-            boost_signal fSignal;
+            boost_signal fInternalSignal;
     };
 
 
@@ -111,7 +118,8 @@ namespace Nymph
     template< typename... XArgs >
     template< typename XOwner >
     KTSignal< XArgs... >::KTSignal< XOwner >( const std::string& name, XOwner* owner ) :
-            fSlots()
+            fSlots(),
+            fInternalSignal()
     {
         owner->RegisterSignal( name, this );
     }
@@ -123,23 +131,36 @@ namespace Nymph
     }
 
     template< typename... XArgs >
-    void KTSignal< XArgs... >::Connect( KTSlotBase* slot )
+    void KTSignal< XArgs... >::Connect( KTSlotBase* slot, int group )
     {
-        // ensure that the slot is of the correct type
-        m_slot< x_args... >* derived_slot = dynamic_cast< m_slot< x_args... >* >( p_slot );
-        if( p_slot == nullptr )
+        if( fSlots.count( slot ) != 0 )
         {
-            throw error() << "signal/slot signature mismatch: signal=" << f_name << "; slot=" << p_slot->name();
+            KTWARN( signallog, "Signal <" << fName << "> is already connected to slot <" << slot->Name() << ">" );
+            return;
         }
 
-        // make the connection
-        int connection_id = connect_function( derived_slot->function() );
+        // ensure that the slot is of the correct type
+        KTSlot< XArgs... >* derivedSlot = dynamic_cast< KTSlot< XArgs... >* >( slot );
+        if( slot == nullptr )
+        {
+            BOOST_THROW_EXCEPTION( KTConnectionException() << "Trying to connect signal <" << fName << "> to slot <" << slot->Name() << ">, but cannot make the connection:\n" <<
+                    "\tUnable to cast from KTSlotBase to this signal's derived type." << eom );
+        }
 
-        // inform the slot of the signal connection so that it can disconnect
-        derived_slot->connections().insert( std::pair< int, m_signal< x_args... >* >( connection_id, this ) );
+        KTConnection connection;
+        if( group >= 0 )
+        {
+            connection = fInternalSignal.connect( group, derivedSlot->Function() );
+        }
+        else
+        {
+            connection = fInternalSignal.connect( derivedSlot->Function() );
+        }
 
-        return connection_id;
+        fSlots.insert( std::make_pair< KTSlotBase*, KTConnection >( slot, connection ) );
+        slot->AddConnection( this );
 
+        return;
     }
 
     // disconnects a previously connected function

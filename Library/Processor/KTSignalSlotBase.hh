@@ -28,7 +28,7 @@ namespace Nymph
 
             void RemoveConnection( KTSignalBase* ) const = 0;
 
-            MEMBERVARIABLE_REF( std::string, name );
+            MEMBERVARIABLE_REF( std::string, Name );
     };
 
 
@@ -44,7 +44,7 @@ namespace Nymph
 
             virtual void Disconnect( KTSlotBase* slot ) = 0;
 
-            MEMBERVARIABLE_REF( std::string, name );
+            MEMBERVARIABLE_REF( std::string, Name );
     };
 
 } /* namespace Nymph */
