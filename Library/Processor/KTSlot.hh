@@ -12,6 +12,7 @@
 
 //#include "KTException.hh"
 #include "KTLogger.hh"
+#include "KTThreadReference.hh"
 
 #include <initializer_list>
 #include <set>
@@ -54,6 +55,12 @@ namespace Nymph
 
             typedef std::set< KTSignalBase* > signal_connections; // to get around the problem of having a comma inside a macro function argument
             MEMBERVARIABLE_REF_MUTABLE( signal_connections, Connections );
+
+            // TODO: move fDoBreakpoint to KTSlot
+            // TODO: KTThreadReference should be a templated object, KTThreadReference< XArgs... >
+            // TODO: KTThreadReference< XArgs... > inherits from KTThreadReferenceBase
+            MEMBERVARIABLE( bool, DoBreakpoint );
+            MEMBERVARIABLE_SHARED_PTR_CONST( KTThreadReference, ThreadRef );
 
     };
 
@@ -110,7 +117,9 @@ namespace Nymph
     template< typename XOwner >
     KTSlot< XArgs... >::KTSlot< XOwner >( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ), signal_list signals ) :
             fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);} ),
-            fConnections()
+            fConnections(),
+            fThreadRef( std::make_shared< KTThreadReference >() ),
+            fDoBreakpoint(false)
     {
         owner->RegisterSlot( name, this, signals );
     }
@@ -118,8 +127,10 @@ namespace Nymph
     template< typename... XArgs >
     template< typename XOwner >
     KTSlot< XArgs... >::KTSlot< XOwner >( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) const, signal_list signals ) :
-    fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);}  ),
-    fConnections()
+            fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);}  ),
+            fConnections(),
+            fThreadRef( std::make_shared< KTThreadReference >() ),
+            fDoBreakpoint(false)
     {
         owner->RegisterSlot( name, this, signals );
     }
@@ -127,8 +138,10 @@ namespace Nymph
     template< typename... XArgs >
     template< typename XOwner >
     KTSlot< XArgs... >::KTSlot< XOwner >( const std::string& name, XOwner* owner, const boost::function< signature >& func, signal_list signals ) :
-    fFunction( func ),
-    fConnections()
+            fFunction( func ),
+            fConnections(),
+            fThreadRef( std::make_shared< KTThreadReference >() ),
+            fDoBreakpoint(false)
     {
         owner->RegisterSlot( name, this, signals );
     }
@@ -136,8 +149,10 @@ namespace Nymph
     template< typename... XArgs >
     template< typename XOwner, typename XFuncClass >
     KTSlot< XArgs... >::KTSlot< XOwner, XFuncClass >( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ), signal_list signals ) :
-    fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
-    fConnections()
+            fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
+            fConnections(),
+            fThreadRef( std::make_shared< KTThreadReference >() ),
+            fDoBreakpoint(false)
     {
         owner->RegisterSlot( name, this, signals );
     }
@@ -145,8 +160,10 @@ namespace Nymph
     template< typename... XArgs >
     template< typename XOwner, typename XFuncClass >
     KTSlot< XArgs... >::KTSlot< XOwner, XFuncClass >( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ) const, signal_list signals ) :
-    fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
-    fConnections()
+            fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
+            fConnections(),
+            fThreadRef( std::make_shared< KTThreadReference >() ),
+            fDoBreakpoint(false)
     {
         owner->RegisterSlot( name, this, signals );
     }

@@ -31,7 +31,6 @@ namespace Nymph
     {
         for (SlotMapIt iter = fSlotMap.begin(); iter != fSlotMap.end(); iter++)
         {
-            iter->second->Disconnect();
             delete iter->second;
         }
         for (SigMapIt iter = fSignalMap.begin(); iter != fSignalMap.end(); iter++)
@@ -42,7 +41,7 @@ namespace Nymph
 
     void KTProcessor::PassThreadRefUpdate(const std::string& slotName, std::shared_ptr< KTThreadReference > threadRef)
     {
-        std::function< void(std::shared_ptr< KTThreadReference >) > funcObj = [this, &slotName](std::shared_ptr< KTThreadReference > ref){ GetSlot(slotName)->SetThreadRef(ref); };
+        std::function< void(std::shared_ptr< KTThreadReference >) > funcObj = [this, &slotName](std::shared_ptr< KTThreadReference > ref){ GetSlot(slotName)->ThreadRef() = ref; };
         PassToConnProcs(slotName, funcObj, threadRef);
         return;
     }
@@ -50,8 +49,8 @@ namespace Nymph
     void KTProcessor::ConnectASlot(const std::string& signalName, KTProcessor* processor, const std::string& slotName, int groupNum)
     {
         // get the signal and slot wrapper pointers
-        KTSignalWrapper* signal = GetSignal(signalName);
-        KTSlotWrapper* slot = processor->GetSlot(slotName);
+        KTSignalBase* signal = GetSignal(signalName);
+        KTSlotBase* slot = processor->GetSlot(slotName);
 
         try
         {
@@ -90,7 +89,7 @@ namespace Nymph
         return;
     }
 
-    void KTProcessor::ConnectSignalToSlot(KTSignalWrapper* signal, KTSlotWrapper* slot, int groupNum)
+    void KTProcessor::ConnectSignalToSlot(KTSignalBase* signal, KTSlotBase* slot, int groupNum)
     {
         if (signal == nullptr)
         {
@@ -101,12 +100,12 @@ namespace Nymph
             BOOST_THROW_EXCEPTION( KTSlotException() << "Slot pointer was NULL" << eom );
         }
 
-        slot->SetConnection(signal, groupNum);
+        signal->Connect(slot, groupNum);
 
         return;
     }
 
-    KTSignalWrapper* KTProcessor::GetSignal(const std::string& name)
+    KTSignalBase* KTProcessor::GetSignal(const std::string& name)
     {
         SigMapIt iter = fSignalMap.find(name);
         if (iter == fSignalMap.end())
@@ -116,7 +115,7 @@ namespace Nymph
         return iter->second;
     }
 
-    KTSlotWrapper* KTProcessor::GetSlot(const std::string& name)
+    KTSlotBase* KTProcessor::GetSlot(const std::string& name)
     {
         SlotMapIt iter = fSlotMap.find(name);
         if (iter == fSlotMap.end())
@@ -128,7 +127,7 @@ namespace Nymph
 
     bool KTProcessor::GetDoBreakpoint(const std::string& slotName)
     {
-        KTSlotWrapper* slot = GetSlot(slotName);
+        KTSlotBase* slot = GetSlot(slotName);
         if (slot != nullptr)
         {
             return slot->GetDoBreakpoint();
@@ -139,7 +138,7 @@ namespace Nymph
 
     void KTProcessor::SetDoBreakpoint(const std::string& slotName, bool flag)
     {
-        KTSlotWrapper* slot = GetSlot(slotName);
+        KTSlotBase* slot = GetSlot(slotName);
         if (slot != nullptr)
         {
             return slot->SetDoBreakpoint(flag);

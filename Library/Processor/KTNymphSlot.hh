@@ -10,7 +10,9 @@
 
 #include "KTSlot.hh"
 
-
+#include "KTException.hh"
+#include "KTNymphSignals.hh"
+#include "KTProcessor.hh"
 
 namespace Nymph
 {
@@ -23,6 +25,21 @@ namespace Nymph
 
     template< typename Arg1, typename Arg2 >
     using KTSlotTwoArg = KTSlot< Arg1, Arg2 >;
+
+
+    template <typename... Types>
+    struct foo {};
+
+    template < typename... Types1, template <typename...> class T
+             , typename... Types2, template <typename...> class V
+             , typename U >
+    void
+    bar(const T<Types1...>&, const V<Types2...>&, const U& u)
+    {
+      std::cout << sizeof...(Types1) << std::endl;
+      std::cout << sizeof...(Types2) << std::endl;
+      std::cout << u << std::endl;
+    }
 
 
     /*!
@@ -164,7 +181,7 @@ namespace Nymph
     template< class XReturnType, class... XDataTypes >
     template< class XFuncOwnerType, class... XFuncDataTypes >
     KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& ), KTSignalData* signalPtr) :
-            KTSlot( name, owner, this, &KTSlotData::operator(), {signalPtr->GetName()} ),
+            KTSlot( name, owner, this, &KTSlotData::operator(), {signalPtr->Name()} ),
             fFunc( [func, owner]( const XDataTypes&... args ){ return (owner->*func)(args...);} ),
             fSignalPtr( signalPtr )
     {
@@ -182,7 +199,7 @@ namespace Nymph
     template< class XReturnType, class... XDataTypes >
     template< class XFuncOwnerType, class... XFuncDataTypes >
     KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& ), KTSignalData* signalPtr) :
-            KTSlot( name, proc, this, &KTSlotData::operator(), { signalPtr->GetName()} ),
+            KTSlot( name, proc, this, &KTSlotData::operator(), { signalPtr->Name()} ),
             fFunc( [func, owner]( const XDataTypes&... args ){return (owner->*func) (args... );} ),
             fSignalPtr( signalPtr )
     {
@@ -207,7 +224,7 @@ namespace Nymph
     {
         // Standard data slot pattern:
 
-        std::shared_ptr< KTThreadReference > ref = fSlotWrapper->GetThreadRef();
+        std::shared_ptr< KTThreadReference > ref = fThreadRef;
 
         // Check to ensure that the required data type is present
         if( ! DataPresent< XDataTypes... >( dataHandle ) )
@@ -230,7 +247,7 @@ namespace Nymph
 
         // Perform breakpoint here if necessary (either if initiated here or if stopping here due to a breakpoint elsewhere)
         // Sets the dataHandle into the return
-        ref->Break( dataHandle, fSlotWrapper->GetDoBreakpoint() );
+        ref->Break( dataHandle, fDoBreakpoint );
 
         // If there's a signal pointer, emit the signal
         if( fSignalPtr != nullptr )
@@ -253,7 +270,7 @@ namespace Nymph
     template< class... XDataTypes >
     template< class XFuncOwnerType, class... XFuncDataTypes >
     KTSlotData< void, XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&... ), KTSignalData* signalPtr) :
-            KTSlot( name, owner, this, &KTSlotData::operator(), {signalPtr->GetName()} ),
+            KTSlot( name, owner, this, &KTSlotData::operator(), {signalPtr->Name()} ),
             fFunc( [func, owner]( const XDataTypes&... args ){ return (owner->*func)(args...);} ),
             fSignalPtr( signalPtr )
     {
@@ -271,7 +288,7 @@ namespace Nymph
     template< class... XDataTypes >
     template< class XFuncOwnerType, class... XFuncDataTypes >
     KTSlotData< void, XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&... ), KTSignalData* signalPtr) :
-            KTSlot( name, proc, this, &KTSlotData::operator(), { signalPtr->GetName()} ),
+            KTSlot( name, proc, this, &KTSlotData::operator(), { signalPtr->Name()} ),
             fFunc( [func, owner]( const XDataTypes&... args ){return (owner->*func) (args... );} ),
             fSignalPtr( signalPtr )
     {
@@ -296,7 +313,7 @@ namespace Nymph
     {
         // Standard data slot pattern:
 
-        std::shared_ptr< KTThreadReference > ref = fSlotWrapper->GetThreadRef();
+        std::shared_ptr< KTThreadReference > ref = fThreadRef;
 
         // Check to ensure that the required data type is present
         if( ! DataPresent< XDataTypes... >( dataHandle ) )
@@ -319,7 +336,7 @@ namespace Nymph
 
         // Perform breakpoint here if necessary (either if initiated here or if stopping here due to a breakpoint elsewhere)
         // Sets the dataHandle into the return
-        ref->Break( dataHandle, fSlotWrapper->GetDoBreakpoint() );
+        ref->Break( dataHandle, fDoBreakpoint );
 
         // If there's a signal pointer, emit the signal
         if( fSignalPtr != nullptr )
@@ -341,7 +358,7 @@ namespace Nymph
 
     template< class XFuncOwnerType >
     KTSlotDone::KTSlotDone(const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)(), KTSignalDone* signalPtr) :
-            KTSlot( name, owner, this, &KTSlotDone::operator(), {signalPtr->GetName()} ),
+            KTSlot( name, owner, this, &KTSlotDone::operator(), {signalPtr->Name()} ),
             fFunc( [func, owner](){ return (owner->*func)(); } ),
             fSignalPtr( signalPtr )
     {
@@ -349,7 +366,7 @@ namespace Nymph
 
     template< class XFuncOwnerType >
     KTSlotDone::KTSlotDone(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)(), KTSignalDone* signalPtr) :
-            KTSlot( name, proc, this, &KTSlotDone::operator(), {signalPtr->GetName()} ),
+            KTSlot( name, proc, this, &KTSlotDone::operator(), {signalPtr->Name()} ),
             fFunc( [func, owner](){ return (owner->*func)(); } ),
             fSignalPtr( signalPtr )
     {
@@ -366,7 +383,7 @@ namespace Nymph
 
         // Perform breakpoint here if necessary (either if initiated here or if stopping here due to a breakpoint elsewhere)
         // Sets the dataHandle into the return
-        fSlotWrapper->GetThreadRef()->Break( KTDataHandle(), fSlotWrapper->GetDoBreakpoint() );
+        fThreadRef->Break( KTDataHandle(), fDoBreakpoint );
 
         // If there's a signal pointer, emit the signal
         if( fSignalPtr != nullptr )

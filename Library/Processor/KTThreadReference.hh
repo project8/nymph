@@ -18,10 +18,50 @@ namespace Nymph
 {
     typedef boost::promise< KTDataHandle > KTDataPtrReturn;
 
-    class KTThreadReference
+    class KTThreadReferenceBase
+    {
+        protected:
+            typedef boost::unique_lock< boost::mutex > boost_unique_lock;
+
+        public:
+            KTThreadReferenceBase();
+            KTThreadReferenceBase( const KTThreadReferenceBase& ) = delete;
+            KTThreadReferenceBase( KTThreadReferenceBase&& orig );
+
+            KTThreadReferenceBase& operator=( const KTThreadReferenceBase& ) = delete;
+            KTThreadReferenceBase& operator=( KTThreadReferenceBase&& );
+
+        public:
+            //**************************
+            // for use within the thread
+            //**************************
+
+            void SetReturnException( boost::exception_ptr excPtr );
+
+        public:
+            //******************************
+            // for use outside of the thread
+            //******************************
+
+            void SetInitiateBreakFunc( const std::function< void() >& initBreakFunc );
+            void SetWaitForContinueFunc( const std::function< void( boost_unique_lock& ) >& waitForContFunc );
+
+        public:
+            MEMBERVARIABLE_REF( std::string, Name );
+            MEMBERVARIABLE( bool, BreakFlag );
+            MEMBERVARIABLE( bool, Canceled );
+            MEMBERVARIABLE_REF( boost::mutex, Mutex );
+
+        private:
+            std::function< void() > fInitiateBreakFunc;
+            std::function< void( boost_unique_lock& ) > fWaitForContinueFunc;
+    };
+
+    template< typename... XArgs >
+    class KTThreadReference : public KTThreadReferenceBase
     {
         private:
-            typedef boost::unique_lock< boost::mutex > boost_unique_lock;
+            typedef KTThreadReferenceBase::boost_unique_lock boost_unique_lock;
 
         public:
             KTThreadReference();
@@ -36,10 +76,9 @@ namespace Nymph
             // for use within the thread
             //**************************
 
-            void Break( const KTDataHandle& dataHandle, bool doBreakpoint  );
+            void Break( bool doBreakpoint, const XArgs&... dataHandle );
 
-            void SetReturnException( boost::exception_ptr excPtr );
-            void SetReturnValue( KTDataHandle dataHandle );
+            void SetReturnValue( XArgs... dataHandle );
 
         public:
             //******************************
@@ -52,23 +91,9 @@ namespace Nymph
 
             void RefreshDataPtrRet();
 
-            void SetInitiateBreakFunc( const std::function< void() >& initBreakFunc );
-            void SetWaitForContinueFunc( const std::function< void( boost_unique_lock& ) >& waitForContFunc );
-
-            boost::mutex& Mutex();
-            const boost::mutex& Mutex() const;
-
-        public:
-            MEMBERVARIABLE_REF( std::string, Name );
-            MEMBERVARIABLE( bool, BreakFlag );
-            MEMBERVARIABLE( bool, Canceled );
-
         private:
             KTDataPtrReturn fDataPtrRet;
             boost::unique_future< KTDataHandle > fDataPtrRetFuture;
-            std::function< void() > fInitiateBreakFunc;
-            std::function< void( boost_unique_lock& ) > fWaitForContinueFunc;
-            boost::mutex fMutex;
     };
 
     inline void KTThreadReference::SetReturnException( boost::exception_ptr excPtr )

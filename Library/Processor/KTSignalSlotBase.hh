@@ -40,9 +40,9 @@ namespace Nymph
             KTSignalBase( const std::string& name, x_owner* owner );
             virtual ~KTSignalBase();
 
-            virtual void Connect( KTSlotBase* slot ) = 0;
+            virtual void Connect( KTSlotBase* slot, int group ) = 0;
 
-            virtual void Disconnect( KTSlotBase* slot ) = 0;
+            virtual void Disconnect( KTSlotBase* slot ) const = 0;
 
             MEMBERVARIABLE_REF( std::string, Name );
     };
