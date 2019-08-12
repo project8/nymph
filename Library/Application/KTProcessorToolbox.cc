@@ -11,14 +11,13 @@
 #include "KTPrimaryProcessor.hh"
 
 #include "factory.hh"
+#include "param_codec.hh"
+
+#include <vector>
 
 #ifndef SINGLETHREADED
 #include <boost/thread.hpp>
 #endif
-
-#include <vector>
-
-#include "param_codec.hh"
 
 using std::deque;
 using std::set;
@@ -31,7 +30,6 @@ namespace Nymph
 
     KTProcessorToolbox::KTProcessorToolbox(const std::string& name) :
             KTConfigurable(name),
-            fProcFactory(scarab::factory< KTProcessor, const std::string& >::get_instance()),
             fRunQueue(),
             fProcMap()
     {
@@ -44,6 +42,8 @@ namespace Nymph
 
     bool KTProcessorToolbox::Configure(const scarab::param_node& node)
     {
+        auto tProcFactory = scarab::factory< KTProcessor, const std::string& >::get_instance();
+
         KTPROG(proclog, "Configuring . . .");
         // Deal with "processor" blocks first
         if (! node.has("processors"))
@@ -79,7 +79,7 @@ namespace Nymph
                 {
                     procName = procNode["name"]().as_string();
                 }
-                KTProcessor* newProc = fProcFactory->create(procType, procType);
+                KTProcessor* newProc = tProcFactory->create(procType, procType);
                 if (newProc == NULL)
                 {
                     KTERROR(proclog, "Unable to create processor of type <" << procType << ">");
@@ -335,10 +335,12 @@ namespace Nymph
 
     bool KTProcessorToolbox::AddProcessor(const std::string& procType, const std::string& procName)
     {
+        auto tProcFactory = scarab::factory< KTProcessor, const std::string& >::get_instance();
+
         ProcMapIt it = fProcMap.find(procName);
         if (it == fProcMap.end())
         {
-            KTProcessor* newProc = fProcFactory->create(procType, procType);
+            KTProcessor* newProc = tProcFactory->create(procType, procType);
             if (newProc == NULL)
             {
                 KTERROR(proclog, "Unable to create processor of type <" << procType << ">");
