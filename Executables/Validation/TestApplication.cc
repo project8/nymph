@@ -83,10 +83,6 @@ int main(int argc, char** argv)
     KTTestConfigurable* testObj = new KTTestConfigurable();
 
     const scarab::param_node& topNode = app->GetConfigurator()->Config();
-    if (topNode == NULL)
-    {
-        KTWARN(testapplog, "Top-level node <" << testObj->GetConfigName() << "> was not found");
-    }
 
     if (testObj->Configure(topNode[testObj->GetConfigName()].as_node()))
     {
