@@ -42,42 +42,42 @@ namespace Nymph
         ClearProcessors();
     }
 
-    bool KTProcessorToolbox::Configure(const scarab::param_node* node)
+    bool KTProcessorToolbox::Configure(const scarab::param_node& node)
     {
         KTPROG(proclog, "Configuring . . .");
         // Deal with "processor" blocks first
-        const scarab::param_array* procArray = node->array_at( "processors" );
-        if (procArray == NULL)
+        if (! node.has("processors"))
         {
             KTWARN(proclog, "No processors were specified");
         }
         else
         {
-            for( scarab::param_array::const_iterator procIt = procArray->begin(); procIt != procArray->end(); ++procIt )
+            const scarab::param_array& procArray = node["processors"].as_array();
+            for( scarab::param_array::const_iterator procIt = procArray.begin(); procIt != procArray.end(); ++procIt )
             {
-                if( ! (*procIt)->is_node() )
+                if( ! procIt->is_node() )
                 {
                     KTERROR( proclog, "Invalid processor entry: not a node" );
                     return false;
                 }
-                const scarab::param_node* procNode = &( (*procIt)->as_node() );
+                const scarab::param_node& procNode = procIt->as_node();
 
-                if (! procNode->has("type"))
+                if (! procNode.has("type"))
                 {
                     KTERROR(proclog, "Unable to create processor: no processor type given");
                     return false;
                 }
-                string procType = procNode->get_value("type");
+                string procType = procNode["type"]().as_string();
 
                 string procName;
-                if (! procNode->has("name"))
+                if (! procNode.has("name"))
                 {
                     KTINFO(proclog, "No name given for processor of type <" << procType << ">; using type as name.");
                     procName = procType;
                 }
                 else
                 {
-                    procName = procNode->get_value("name");
+                    procName = procNode["name"]().as_string();
                 }
                 KTProcessor* newProc = fProcFactory->create(procType, procType);
                 if (newProc == NULL)
@@ -97,37 +97,37 @@ namespace Nymph
 
 
         // Then deal with connections"
-        const scarab::param_array* connArray = node->array_at( "connections" );
-        if (connArray == NULL)
+        if (! node.has("connections"))
         {
             KTWARN(proclog, "No connections were specified");
         }
         else
         {
-            for( scarab::param_array::const_iterator connIt = connArray->begin(); connIt != connArray->end(); ++connIt )
+            const scarab::param_array& connArray = node["connections"].as_array();
+            for( scarab::param_array::const_iterator connIt = connArray.begin(); connIt != connArray.end(); ++connIt )
             {
-                if( ! (*connIt)->is_node() )
+                if( ! connIt->is_node() )
                 {
                     KTERROR( proclog, "Invalid connection entry: not a node" );
                     return false;
                 }
-                const scarab::param_node* connNode = &( (*connIt)->as_node() );
+                const scarab::param_node& connNode = connIt->as_node();
 
-                if ( ! connNode->has("signal") || ! connNode->has("slot") )
+                if ( ! connNode.has("signal") || ! connNode.has("slot") )
                 {
                     KTERROR(proclog, "Signal/Slot connection information is incomplete!");
-                    if (connNode->has("signal"))
+                    if (connNode.has("signal"))
                     {
-                        KTWARN(proclog, "signal = " << connNode->get_value("signal"));
+                        KTWARN(proclog, "signal = " << connNode["signal"]());
                     }
                     else
                     {
                         KTERROR(proclog, "signal = MISSING");
                     }
 
-                    if (connNode->has("slot"))
+                    if (connNode.has("slot"))
                     {
-                        KTWARN(proclog, "slot = " << connNode->get_value("slot"));
+                        KTWARN(proclog, "slot = " << connNode["slot"]());
                     }
                     else
                     {
@@ -137,21 +137,21 @@ namespace Nymph
                 }
 
                 bool connReturn = false;
-                if (connNode->has("order"))
+                if (connNode.has("order"))
                 {
-                    connReturn = MakeConnection(connNode->get_value("signal"), connNode->get_value("slot"), connNode->get_value< int >("order"));
+                    connReturn = MakeConnection(connNode["signal"]().as_string(), connNode["slot"]().as_string(), connNode["order"]().as_int());
                 }
                 else
                 {
-                    connReturn = MakeConnection(connNode->get_value("signal"), connNode->get_value("slot"));
+                    connReturn = MakeConnection(connNode["signal"]().as_string(), connNode["slot"]().as_string());
                 }
                 if (! connReturn)
                 {
-                    KTERROR(proclog, "Unable to make connection <" << connNode->get_value("signal") << "> --> <" << connNode->get_value("slot") << ">");
+                    KTERROR(proclog, "Unable to make connection <" << connNode["signal"]().as_string() << "> --> <" << connNode["slot"]().as_string() << ">");
                     return false;
                 }
 
-                KTINFO(proclog, "Signal <" << connNode->get_value("signal") << "> connected to slot <" << connNode->get_value("slot") << ">");
+                KTINFO(proclog, "Signal <" << connNode["signal"]().as_string() << "> connected to slot <" << connNode["slot"]().as_string() << ">");
             }
         }
 
@@ -160,36 +160,36 @@ namespace Nymph
         // The run queue is an array of processor names, or groups of names, which will be run sequentially.
         // If names are grouped (in another array), those in that group will be run in parallel.
         // In single threaded mode all threads will be run sequentially in the order they were specified.
-        const scarab::param_array* rqArray = node->array_at( "run-queue" );
-        if (rqArray == NULL)
+        if (! node.has("run-queue") || ! node["run-queue"].is_array())
         {
             KTWARN(proclog, "Run queue was not specified");
         }
         else
         {
-            for (scarab::param_array::const_iterator rqIt = rqArray->begin(); rqIt != rqArray->end(); ++rqIt)
+            const scarab::param_array& rqArray = node["run-queue"].as_array();
+            for (scarab::param_array::const_iterator rqIt = rqArray.begin(); rqIt != rqArray.end(); ++rqIt)
             {
-                if ((*rqIt)->is_value())
+                if (rqIt->is_value())
                 {
-                    if (! PushBackToRunQueue((*rqIt)->as_value().as_string()))
+                    if (! PushBackToRunQueue((*rqIt)().as_string()))
                     {
                         KTERROR(proclog, "Unable to process run-queue entry: could not add processor to the queue");
                         return false;
                     }
                 }
-                else if ((*rqIt)->is_array())
+                else if (rqIt->is_array())
                 {
-                    const scarab::param_array* rqNode = &( (*rqIt)->as_array() );
+                    const scarab::param_array& rqNode = rqIt->as_array();
                     std::vector< std::string > names;
 
-                    for (scarab::param_array::const_iterator rqArrayIt = rqNode->begin(); rqArrayIt != rqNode->end(); ++rqArrayIt)
+                    for (scarab::param_array::const_iterator rqArrayIt = rqNode.begin(); rqArrayIt != rqNode.end(); ++rqArrayIt)
                     {
-                        if (! (*rqArrayIt)->is_value())
+                        if (! rqArrayIt->is_value())
                         {
                             KTERROR(proclog, "Invalid run-queue array entry: not a value");
                             return false;
                         }
-                        names.push_back((*rqArrayIt)->as_value().as_string());
+                        names.push_back((*rqArrayIt)().as_string());
                     }
 
                     if (! PushBackToRunQueue(names))
@@ -209,32 +209,37 @@ namespace Nymph
         return true;
     }
 
-    bool KTProcessorToolbox::ConfigureProcessors(const scarab::param_node* node)
+    bool KTProcessorToolbox::ConfigureProcessors(const scarab::param_node& node)
     {
         for (ProcMapIt iter = fProcMap.begin(); iter != fProcMap.end(); iter++)
         {
             KTDEBUG(proclog, "Attempting to configure processor <" << iter->first << ">");
             string procName = iter->first;
             string nameUsed;
-            const scarab::param_node* subNode = node->node_at(procName);
-            if (subNode == NULL)
+            if (node.has(procName))
+            {
+                nameUsed = procName;
+            }
+            else
             {
                 string configName = iter->second.fProc->GetConfigName();
                 KTWARN(proclog, "Did not find a parameter node <" << procName << ">\n"
                         "\tWill check using the generic name of the processor, <" << configName << ">.");
-                subNode = node->node_at(configName);
-                if (subNode == NULL)
+                if (node.has(configName))
                 {
-                    KTWARN(proclog, "Did not find a parameter node <" << configName << ">\n"
-                            "\tProcessor <" << iter->first << "> was not configured.");
+                    nameUsed = configName;
+                    KTWARN(proclog, "Configuring processor <" << procName << "> with configuration found using the generic name of the processor: <" << configName << ">");
+                }
+                else
+                {
+                    KTWARN(proclog, "Did not find configuration information for processor <" << procName << "> (type <" << configName << ">)\n"
+                            "\tProcessor <" << procName << "> was not configured.");
                     continue;
                 }
-                nameUsed = configName;
             }
-            else
-            {
-                nameUsed = procName;
-            }
+
+            const scarab::param_node& subNode = node[nameUsed].as_node();
+
             if (! iter->second.fProc->Configure(subNode))
             {
                 KTERROR(proclog, "An error occurred while configuring processor <" << iter->first << "> with parameter node <" << nameUsed << ">");
@@ -249,7 +254,7 @@ namespace Nymph
         scarab::param_translator translator;
         scarab::param_node optNode;
         optNode.add( "encoding", new scarab::param_value( "json" ) );
-        return ConfigureProcessors( &translator.read_string( config, &optNode )->as_node() );
+        return ConfigureProcessors( translator.read_string( config, optNode )->as_node() );
     }
 
     bool KTProcessorToolbox::Run()

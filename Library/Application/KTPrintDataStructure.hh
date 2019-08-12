@@ -49,7 +49,7 @@ namespace Nymph
             KTPrintDataStructure(const std::string& name = "print-data-structure");
             virtual ~KTPrintDataStructure();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
         public:
             void PrintDataStructure(KTDataPtr dataPtr);

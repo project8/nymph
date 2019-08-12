@@ -60,7 +60,7 @@ namespace Nymph
             KTCutFilter(const std::string& name = "cut-filter");
             virtual ~KTCutFilter();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             void SetCutMask(KTCutStatus::bitset_type mask);
             void SetCutMask(unsigned long long mask);

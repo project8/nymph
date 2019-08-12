@@ -35,20 +35,18 @@ namespace Nymph
     {
     }
 
-    bool KTCutFilter::Configure(const scarab::param_node* node)
+    bool KTCutFilter::Configure(const scarab::param_node& node)
     {
         // Config-file settings
-        if (node == NULL) return true;
-
-        if (node->has("cut-mask-int"))
+        if (node.has("cut-mask-int"))
         {
-            SetCutMask(node->get_value< unsigned long long >("cut-mask-int"));
+            SetCutMask(node["cut-mask-int"]().as_uint());
         }
-        if (node->has("cut-mask"))
+        if (node.has("cut-mask"))
         {
-            SetCutMask(KTCutStatus::bitset_type(node->get_value("cut-mask")));
+            SetCutMask(KTCutStatus::bitset_type(node["cut-mask"]().as_string()));
         }
-        if (node->get_value("cut-mask-all", false))
+        if (node.get_value("cut-mask-all", false))
         {
             SetCutMaskAll();
         }

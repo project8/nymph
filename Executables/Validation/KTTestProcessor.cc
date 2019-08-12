@@ -23,7 +23,7 @@ namespace Nymph
     {
     }
 
-    bool KTTestProcessorA::Configure(const scarab::param_node*)
+    bool KTTestProcessorA::Configure(const scarab::param_node&)
     {
         return true;
     }
@@ -47,7 +47,7 @@ namespace Nymph
     {
     }
 
-    bool KTTestProcessorB::Configure(const scarab::param_node*)
+    bool KTTestProcessorB::Configure(const scarab::param_node&)
     {
         return true;
     }
