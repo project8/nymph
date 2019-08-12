@@ -58,14 +58,14 @@ namespace Nymph
         public:
             KTApplication();
             /// Constructor to use with command-line options; includes parsing of the command line by KTCommandLineHandler (except for config-file-dependent options)
-            KTApplication(int argC, char** argV, bool requireArgs=true, scarab::param_node* defaultConfig=NULL);
+            KTApplication(int argC, char** argV, bool requireArgs=true, const scarab::param_node& defaultConfig=scarab::param_node());
             virtual ~KTApplication();
 
         private:
-            void AddConfigOptionsToCLHandler(const scarab::param* param, const std::string& rootName);
+            void AddConfigOptionsToCLHandler(const scarab::param& param, const std::string& rootName);
 
         public:
-            virtual bool Configure(const scarab::param_node* node);
+            virtual bool Configure(const scarab::param_node& node);
 
         public:
             KTCommandLineHandler* GetCommandLineHandler() const;

@@ -30,7 +30,7 @@ namespace Nymph
     {
     }
 
-    KTApplication::KTApplication(int argC, char** argV, bool requireArgs, scarab::param_node* defaultConfig) :
+    KTApplication::KTApplication(int argC, char** argV, bool requireArgs, const scarab::param_node& defaultConfig) :
             KTConfigurable("app"),
             fCLHandler(KTCommandLineHandler::get_instance()),
             fConfigurator( KTConfigurator::get_instance() ),
@@ -57,17 +57,14 @@ namespace Nymph
         const scarab::param_node* clConfigOverride = fCLHandler->GetConfigOverride();
 
         // Default configuration
-        if (defaultConfig != NULL)
-        {
-            fConfigurator->Merge(*defaultConfig);
-        }
+        fConfigurator->Merge(defaultConfig);
 
         // JSON file configuration
         if (! fConfigFilename.empty())
         {
             scarab::path configFilePath = scarab::expand_path( fConfigFilename );
             scarab::param_translator translator;
-            scarab::param* configFromFile = translator.read_file( configFilePath.native() );
+            scarab::param_ptr_t configFromFile = translator.read_file( configFilePath.native() );
             if( configFromFile == NULL )
             {
                 throw KTException() << "[KTApplication] error parsing config file";
@@ -77,20 +74,18 @@ namespace Nymph
                 throw KTException() << "[KTApplication] configuration file must consist of an object/node";
             }
             fConfigurator->Merge( configFromFile->as_node() );
-            delete configFromFile;
         }
 
         // Command-line JSON configuration
         if (! clJSON.empty())
         {
             scarab::param_input_json inputJSON;
-            scarab::param* configFromJSON = inputJSON.read_string( clJSON );
+            scarab::param_ptr_t configFromJSON = inputJSON.read_string( clJSON );
             if( ! configFromJSON->is_node() )
             {
                 throw KTException() << "[KTApplication] command line json must be an object";
             }
             fConfigurator->Merge( configFromJSON->as_node() );
-            delete configFromJSON;
         }
 
         // Command-line overrides
@@ -99,7 +94,7 @@ namespace Nymph
             fConfigurator->Merge( *clConfigOverride );
         }
 
-        KTINFO( applog, "Final configuration:\n" << *(fConfigurator->Config()) );
+        KTINFO( applog, "Final configuration:\n" << fConfigurator->Config() );
 
         AddConfigOptionsToCLHandler(fConfigurator->Config(), "");
         fCLHandler->FinalizeNewOptionGroups();
@@ -122,47 +117,45 @@ namespace Nymph
         }
     }
 
-    void KTApplication::AddConfigOptionsToCLHandler(const scarab::param* param, const std::string& rootName)
+    void KTApplication::AddConfigOptionsToCLHandler(const scarab::param& param, const std::string& rootName)
     {
-    	if (param->is_null())
+    	if (param.is_null())
     	{
     		fCLHandler->AddOption("Config File Options", "Configuration flag: " + rootName, rootName, false);
     	}
-    	else if (param->is_value())
+    	else if (param.is_value())
     	{
     		fCLHandler->AddOption< string >("Config File Options", "Configuration value: " + rootName, rootName, false);
     	}
-    	else if (param->is_array())
+    	else if (param.is_array())
     	{
         	string nextRootName(rootName);
         	if (! rootName.empty() && rootName.back() != '.') nextRootName += ".";
 
-        	const scarab::param_array* paramArray = &param->as_array();
-    		unsigned arraySize = paramArray->size();
+        	const scarab::param_array& paramArray = param.as_array();
+    		unsigned arraySize = paramArray.size();
     		for (unsigned iParam = 0; iParam < arraySize; ++iParam)
     		{
-    			AddConfigOptionsToCLHandler(paramArray->at(iParam), nextRootName + std::to_string(iParam));
+    			AddConfigOptionsToCLHandler(paramArray[iParam], nextRootName + std::to_string(iParam));
     		}
     	}
-    	else if (param->is_node())
+    	else if (param.is_node())
     	{
         	string nextRootName(rootName);
         	if (! rootName.empty()) nextRootName += ".";
 
-        	const scarab::param_node* paramNode = &param->as_node();
-    		for (scarab::param_node::const_iterator nodeIt = paramNode->begin(); nodeIt != paramNode->end(); ++nodeIt)
+        	const scarab::param_node& paramNode = param.as_node();
+    		for (scarab::param_node::const_iterator nodeIt = paramNode.begin(); nodeIt != paramNode.end(); ++nodeIt)
     		{
-    			AddConfigOptionsToCLHandler(nodeIt->second, nextRootName + nodeIt->first);
+    			AddConfigOptionsToCLHandler(*nodeIt, nextRootName + nodeIt.name());
     		}
     	}
 
     	return;
     }
 
-    bool KTApplication::Configure(const scarab::param_node* node)
+    bool KTApplication::Configure(const scarab::param_node&)
     {
-        //if (node == NULL) return true;
-
         return true;
     }
 

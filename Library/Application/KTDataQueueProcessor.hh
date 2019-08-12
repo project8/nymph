@@ -67,8 +67,8 @@ namespace Nymph
             KTDataQueueProcessorTemplate(const std::string& name = "default-data-queue-proc-template-name");
             virtual ~KTDataQueueProcessorTemplate();
 
-            bool Configure(const scarab::param_node* node);
-            virtual bool ConfigureSubClass(const scarab::param_node* node) = 0;
+            bool Configure(const scarab::param_node& node);
+            virtual bool ConfigureSubClass(const scarab::param_node& node) = 0;
 
             Status GetStatus() const;
             void SetStatus(KTDataQueueProcessorTemplate< XProcessorType >::Status);
@@ -163,7 +163,7 @@ namespace Nymph
             KTDataQueueProcessor(const std::string& name = "data-queue");
             virtual ~KTDataQueueProcessor();
 
-            bool ConfigureSubClass(const scarab::param_node* node);
+            bool ConfigureSubClass(const scarab::param_node& node);
 
         public:
             void EmitDataSignal(KTDataPtr data);
@@ -216,9 +216,9 @@ namespace Nymph
     }
 
     template< class XProcessorType >
-    bool KTDataQueueProcessorTemplate< XProcessorType >::Configure(const scarab::param_node* node)
+    bool KTDataQueueProcessorTemplate< XProcessorType >::Configure(const scarab::param_node& node)
     {
-        fQueue.set_timeout(node->get_value< unsigned >("timeout", fQueue.get_timeout()));
+        fQueue.set_timeout(node.get_value< unsigned >("timeout", fQueue.get_timeout()));
 
         if (! ConfigureSubClass(node)) return false;
         return true;
