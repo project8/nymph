@@ -124,4 +124,18 @@ if (Nymph_ENABLE_EXECUTABLES)
     add_subdirectory( Executables/Validation )
 endif (Nymph_ENABLE_EXECUTABLES)
 
+
+#########
+# Tests #
+#########
+
+if( Nymph_ENABLE_TESTING )
+    add_subdirectory( Testing )
+endif()
+
+
+####################################
+# Variables for the parent project #
+####################################
+
 pbuilder_variables_for_parent()
