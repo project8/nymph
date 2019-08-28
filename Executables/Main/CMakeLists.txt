@@ -7,15 +7,15 @@ if( Nymph_ENABLE_EXECUTABLES )
     message(STATUS "Nymph exectuables library dependencies: ${all_libs}" )
     
     set( programs
-        ConfigCheck
+#        ConfigCheck
     )
     
     if( Nymph_BUILD_NYMPH_EXE )
         set( programs
-            Nymph
+#            Nymph
         )
     endif( Nymph_BUILD_NYMPH_EXE )
     
-    pbuilder_executables( programs all_libs )
+#    pbuilder_executables( programs all_libs )
     
 endif( Nymph_ENABLE_EXECUTABLES )
