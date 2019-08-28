@@ -24,9 +24,9 @@ namespace Nymph
             KTSlotBase( const std::string& name, XOwner* owner );
             virtual ~KTSlotBase();
 
-            void AddConnection( KTSignalBase* ) const = 0;
+            virtual void AddConnection( KTSignalBase* ) const = 0;
 
-            void RemoveConnection( KTSignalBase* ) const = 0;
+            virtual void RemoveConnection( KTSignalBase* ) const = 0;
 
             MEMBERVARIABLE_REF( std::string, Name );
     };

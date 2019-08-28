@@ -36,7 +36,7 @@ namespace Nymph
             // for use within the thread
             //**************************
 
-            void SetReturnException( boost::exception_ptr excPtr );
+            //void SetReturnException( boost::exception_ptr excPtr );
 
         public:
             //******************************
@@ -85,6 +85,8 @@ namespace Nymph
             // for use outside of the thread
             //******************************
 
+            void SetReturnException( boost::exception_ptr excPtr );
+
             KTDataHandle GetReturnValue();
             boost::unique_future< KTDataHandle >& GetDataPtrRetFuture();
             const boost::unique_future< KTDataHandle >& GetDataPtrRetFuture() const;
@@ -96,60 +98,56 @@ namespace Nymph
             boost::unique_future< KTDataHandle > fDataPtrRetFuture;
     };
 
-    inline void KTThreadReference::SetReturnException( boost::exception_ptr excPtr )
+    template< typename... XArgs >
+    void KTThreadReference< XArgs... >::SetReturnException( boost::exception_ptr excPtr )
     {
         fDataPtrRet.set_exception( excPtr );
         return;
     }
 
-    inline void KTThreadReference::SetReturnValue( KTDataHandle dataHandle )
+    template< typename... XArgs >
+    void KTThreadReference< XArgs... >::SetReturnValue( XArgs... dataHandle )
     {
-        fDataPtrRet.set_value( dataHandle );
+        fDataPtrRet.set_value( dataHandle... );
         return;
     }
 
-    inline KTDataHandle KTThreadReference::GetReturnValue()
+    template< typename... XArgs >
+    KTDataHandle KTThreadReference< XArgs... >::GetReturnValue()
     {
         return fDataPtrRetFuture.get();
     }
 
-    inline boost::unique_future< KTDataHandle >& KTThreadReference::GetDataPtrRetFuture()
+    template< typename... XArgs >
+    boost::unique_future< KTDataHandle >& KTThreadReference< XArgs... >::GetDataPtrRetFuture()
     {
         return fDataPtrRetFuture;
     }
 
-    inline const boost::unique_future< KTDataHandle >& KTThreadReference::GetDataPtrRetFuture() const
+    template< typename... XArgs >
+    const boost::unique_future< KTDataHandle >& KTThreadReference< XArgs... >::GetDataPtrRetFuture() const
     {
         return fDataPtrRetFuture;
     }
 
-    inline void KTThreadReference::RefreshDataPtrRet()
+    template< typename... XArgs >
+    void KTThreadReference< XArgs... >::RefreshDataPtrRet()
     {
         fDataPtrRet = KTDataPtrReturn();
         fDataPtrRetFuture = fDataPtrRet.get_future();
         return;
     }
 
-    inline void KTThreadReference::SetInitiateBreakFunc( const std::function< void() >& initBreakFunc )
+    inline void KTThreadReferenceBase::SetInitiateBreakFunc( const std::function< void() >& initBreakFunc )
     {
         fInitiateBreakFunc = initBreakFunc;
         return;
     }
 
-    inline void KTThreadReference::SetWaitForContinueFunc( const std::function< void( boost_unique_lock& ) >& waitForContFunc )
+    inline void KTThreadReferenceBase::SetWaitForContinueFunc( const std::function< void( boost_unique_lock& ) >& waitForContFunc )
     {
         fWaitForContinueFunc = waitForContFunc;
         return;
-    }
-
-    inline boost::mutex& KTThreadReference::Mutex()
-    {
-        return fMutex;
-    }
-
-    inline const boost::mutex& KTThreadReference::Mutex() const
-    {
-        return fMutex;
     }
 
 
