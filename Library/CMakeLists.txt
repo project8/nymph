@@ -52,6 +52,8 @@ set( NYMPH_HEADERFILES
 #    ${APPL_DIR}/KTProcessorToolbox.hh
 #    ${APPL_DIR}/KTRunNymph.hh
 #    ${APPL_DIR}/KTThroughputProfiler.hh
+    ${UTIL_DIR}/Exception.hh
+    ${UTIL_DIR}/MemberVariable.hh
 )
 
 set( NYMPH_SOURCEFILES
@@ -84,6 +86,7 @@ set( NYMPH_SOURCEFILES
 #    ${APPL_DIR}/KTProcessorToolbox.cc
 #    ${APPL_DIR}/KTRunNymph.cc
 #    ${APPL_DIR}/KTThroughputProfiler.cc
+    ${UTIL_DIR}/Exception.cc
 )
 
 # Python binding headers
