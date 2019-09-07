@@ -9,7 +9,7 @@ cmake_minimum_required (VERSION 3.1)
 #########
 
 cmake_policy( SET CMP0048 NEW ) # version in project()
-project( Nymph VERSION 1.4.5 )
+project( Nymph VERSION 1.4.7 )
 
 list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Scarab/cmake )
 include( PackageBuilder )
@@ -123,5 +123,19 @@ add_subdirectory( Library )
 if (Nymph_ENABLE_EXECUTABLES)
     add_subdirectory( Executables/Validation )
 endif (Nymph_ENABLE_EXECUTABLES)
+
+
+#########
+# Tests #
+#########
+
+if( Nymph_ENABLE_TESTING )
+    add_subdirectory( Testing )
+endif()
+
+
+####################################
+# Variables for the parent project #
+####################################
 
 pbuilder_variables_for_parent()
