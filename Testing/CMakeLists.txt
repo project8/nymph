@@ -8,7 +8,7 @@ set( testing_HEADERS
 )
 
 set( testing_SOURCES
-    TestExt.cc
+    TestSignalSlot.cc
     UseCatch.cc
 )
 

@@ -13,13 +13,17 @@
 #include "SignalSlotBase.hh"
 
 #include "Exception.hh"
-#include "Logger.hh"
 
-#include <map>
+#include "logger.hh"
+
+#include <set>
 
 namespace Nymph
 {
     LOGGER( signallog, "Signal" );
+
+    template< typename... XArgs >
+    class Slot;
 
     /// A Signal object may call multiple slots with the
     /// same signature. You can connect functions to the Signal
@@ -33,14 +37,16 @@ namespace Nymph
             using signature = void( XArgs... );
 
         public:
+            /// Unowned signal
             Signal( const std::string& name );
+            /// Owned signal
             template< typename XOwner >
             Signal( const std::string& name, XOwner* owner );
             Signal( const Signal& ) = delete;
             Signal( Signal&& ) = delete;
             virtual ~Signal();
 
-            virtual void Connect( SlotPtr_t slot, int group );
+            virtual void Connect( SlotPtr_t slot, int group = -1 );
 
             // disconnects a previously connected function
             void Disconnect( SlotPtr_t slot ) const;
@@ -57,7 +63,7 @@ namespace Nymph
 
         protected:
             friend class Slot< XArgs... >;
-            void _Connect( SlotPtr_t slot, int group );
+            virtual void _Connect( SlotPtr_t slot, int group );
     };
 
 
@@ -121,8 +127,9 @@ namespace Nymph
 
     template< typename... XArgs >
     template< typename XOwner >
-    Signal< XArgs... >::Signal< XOwner >( const std::string& name, XOwner* owner ) :
-            fSlots()
+    inline Signal< XArgs... >::Signal( const std::string& name, XOwner* owner ) :
+            SignalBase( name ),
+            fConnections()
     {
         owner->RegisterSignal( name, this );
     }
@@ -136,7 +143,7 @@ namespace Nymph
     template< typename... XArgs >
     void Signal< XArgs... >::Connect( SlotPtr_t slot, int group )
     {
-        if( fSlots.count( slot ) != 0 )
+        if( fConnections.count( slot ) != 0 )
         {
             LWARN( signallog, "Signal <" << fName << "> is already connected to slot <" << slot->Name() << ">" );
             return;
@@ -167,7 +174,7 @@ namespace Nymph
     }
 
     template< typename... XArgs >
-    void Signal< XArgs... >::_Connect( SlotPtr_t slot, int group )
+    inline void Signal< XArgs... >::_Connect( SlotPtr_t slot, int group )
     {
         fConnections.insert( slot );
         return;
@@ -175,7 +182,7 @@ namespace Nymph
 
     // disconnects a previously connected function
     template< typename... XArgs >
-    void Signal< XArgs... >::Disconnect( SlotPtr_t slot ) const
+    inline void Signal< XArgs... >::Disconnect( SlotPtr_t slot ) const
     {
         slot->RemoveConnection( this );
         return;
@@ -185,7 +192,7 @@ namespace Nymph
     template< typename... XArgs >
     void Signal< XArgs... >::DisconnectAll() const
     {
-        for( auto connection : fSlots )
+        for( auto connection : fConnections )
         {
             connection->RemoveConnection( this );
         }
@@ -196,16 +203,16 @@ namespace Nymph
     template< typename... XArgs >
     inline void Signal< XArgs... >::Emit( XArgs... args )
     {
-        (*this)( args );
+        (*this)( args... );
         return;
     }
 
     template< typename... XArgs >
     inline void Signal< XArgs... >::operator()( XArgs... args )
     {
-        for( auto connection : fSlots )
+        for( auto connection : fConnections )
         {
-            connection->Function( args );
+            connection->Function( args... );
         }
         return;
     }

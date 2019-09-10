@@ -8,6 +8,7 @@
 #ifndef NYMPH_SIGNALSLOTBASE_HH_
 #define NYMPH_SIGNALSLOTBASE_HH_
 
+#include "Exception.hh"
 #include "MemberVariable.hh"
 
 #include <memory>
@@ -15,6 +16,12 @@
 
 namespace Nymph
 {
+    struct SignalException : virtual public Exception {};
+    struct SlotException : virtual public Exception {};
+
+    struct ConnectionException : public Exception {};
+
+
     class SignalBase;
     class SlotBase;
 
@@ -29,11 +36,14 @@ namespace Nymph
             //SlotBase( const std::string& name, XOwner* owner );
             virtual ~SlotBase();
 
-            virtual void AddConnection( SignalPtr_t ) const = 0;
+            virtual void AddConnection( SignalPtr_t signal, int group = -1 ) const = 0;
 
-            virtual void RemoveConnection( SignalPtr_t ) const = 0;
+            virtual void RemoveConnection( SignalPtr_t signal) const = 0;
 
             MEMVAR_REF( std::string, Name );
+
+        protected:
+            virtual void _AddConnection( SignalPtr_t signal, int group ) const = 0;
     };
 
 
@@ -45,11 +55,14 @@ namespace Nymph
             //SignalBase( const std::string& name, XOwner* owner );
             virtual ~SignalBase();
 
-            virtual void Connect( SlotPtr_t slot, int group ) = 0;
+            virtual void Connect( SlotPtr_t slot, int group = -1 ) = 0;
 
             virtual void Disconnect( SlotPtr_t slot ) const = 0;
 
             MEMVAR_REF( std::string, Name );
+
+        protected:
+            virtual void _Connect( SlotPtr_t slot, int group ) = 0;
     };
 
 } /* namespace Nymph */

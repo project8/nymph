@@ -15,7 +15,9 @@
 //#include "Exception.hh"
 //#include "ThreadReference.hh"
 
-#include "Logger.hh"
+#include "logger.hh"
+
+#include <boost/function.hpp>
 
 #include <initializer_list>
 #include <set>
@@ -34,14 +36,21 @@ namespace Nymph
             using signal_list = std::initializer_list< std::string >;
 
         public:
+            /// Unowned slot
+            Slot( const std::string& name, const boost::function< signature >& func, signal_list signals = {} );
+            /// Owned slot, non-const member function
             template< typename XOwner >
             Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ), signal_list signals = {} );
+            /// Owned slot, const member function
             template< typename XOwner >
             Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) const, signal_list signals = {} );
+            /// Owned slot, generic function
             template< typename XOwner >
             Slot( const std::string& name, XOwner* owner, const boost::function< signature >& func, signal_list signals = {} );
+            /// Owned slot, non-const member fuction of another class
             template< typename XOwner, typename XFuncClass >
             Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ), signal_list signals = {} );
+            /// Owned slot, const member fuction of another class
             template< typename XOwner, typename XFuncClass >
             Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ) const, signal_list signals = {} );
             Slot( const Slot& ) = delete;
@@ -50,9 +59,9 @@ namespace Nymph
 
             void DisconnectAll() const;
 
-            void AddConnection( SignalPtr_t ) const;
+            void AddConnection( SignalPtr_t signal, int group = -1 ) const;
 
-            void RemoveConnection( SignalPtr_t ) const;
+            void RemoveConnection( SignalPtr_t signal ) const;
 
             MEMVAR_REF( boost::function< signature >, Function );
 
@@ -63,7 +72,7 @@ namespace Nymph
 
         protected:
             friend class Signal< XArgs... >;
-            void _AddConnection( Signal_ptr_t ) const;
+            virtual void _AddConnection( SignalPtr_t, int group ) const;
 
     };
 
@@ -117,33 +126,45 @@ namespace Nymph
     // Slot
 
     template< typename... XArgs >
-    template< typename XOwner >
-    Slot< XArgs... >::Slot< XOwner >( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ), signal_list signals ) :
-            fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);} ),
-            fConnections(),
-            fThreadRef( std::make_shared< ThreadReference >() ),
-            fDoBreakpoint(false)
-    {
-        owner->RegisterSlot( name, this, signals );
-    }
-
-    template< typename... XArgs >
-    template< typename XOwner >
-    Slot< XArgs... >::Slot< XOwner >( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) const, signal_list signals ) :
-            fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);}  ),
-            fConnections(),
-            fThreadRef( std::make_shared< ThreadReference >() ),
-            fDoBreakpoint(false)
-    {
-        owner->RegisterSlot( name, this, signals );
-    }
-
-    template< typename... XArgs >
-    template< typename XOwner >
-    Slot< XArgs... >::Slot< XOwner >( const std::string& name, XOwner* owner, const boost::function< signature >& func, signal_list signals ) :
+    Slot< XArgs... >::Slot( const std::string& name, const boost::function< signature >& func, signal_list signals ) :
+            SlotBase( name ),
             fFunction( func ),
             fConnections(),
-            fThreadRef( std::make_shared< ThreadReference >() ),
+            //fThreadRef( std::make_shared< ThreadReference >() ),
+            fDoBreakpoint( false )
+    {}
+
+    template< typename... XArgs >
+    template< typename XOwner >
+    Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ), signal_list signals ) :
+            SlotBase( name ),
+            fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);} ),
+            fConnections(),
+            //fThreadRef( std::make_shared< ThreadReference >() ),
+            fDoBreakpoint(false)
+    {
+        owner->RegisterSlot( name, this, signals );
+    }
+
+    template< typename... XArgs >
+    template< typename XOwner >
+    Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) const, signal_list signals ) :
+            SlotBase( name ),
+            fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);}  ),
+            fConnections(),
+            //fThreadRef( std::make_shared< ThreadReference >() ),
+            fDoBreakpoint(false)
+    {
+        owner->RegisterSlot( name, this, signals );
+    }
+
+    template< typename... XArgs >
+    template< typename XOwner >
+    Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, const boost::function< signature >& func, signal_list signals ) :
+            SlotBase( name ),
+            fFunction( func ),
+            fConnections(),
+            //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint(false)
     {
         owner->RegisterSlot( name, this, signals );
@@ -151,10 +172,11 @@ namespace Nymph
 
     template< typename... XArgs >
     template< typename XOwner, typename XFuncClass >
-    Slot< XArgs... >::Slot< XOwner, XFuncClass >( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ), signal_list signals ) :
+    Slot< XArgs... >::Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ), signal_list signals ) :
+            SlotBase( name ),
             fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
             fConnections(),
-            fThreadRef( std::make_shared< ThreadReference >() ),
+            //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint(false)
     {
         owner->RegisterSlot( name, this, signals );
@@ -162,10 +184,11 @@ namespace Nymph
 
     template< typename... XArgs >
     template< typename XOwner, typename XFuncClass >
-    Slot< XArgs... >::Slot< XOwner, XFuncClass >( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ) const, signal_list signals ) :
+    Slot< XArgs... >::Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ) const, signal_list signals ) :
+            SlotBase( name ),
             fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
             fConnections(),
-            fThreadRef( std::make_shared< ThreadReference >() ),
+            //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint(false)
     {
         owner->RegisterSlot( name, this, signals );
@@ -188,7 +211,7 @@ namespace Nymph
     }
 
     template< typename... XArgs >
-    void Slot< XArgs... >::AddConnection( SignalPtr_t signal ) const
+    void Slot< XArgs... >::AddConnection( SignalPtr_t signal, int group ) const
     {
         if( fConnections.count( signal ) != 0 )
         {

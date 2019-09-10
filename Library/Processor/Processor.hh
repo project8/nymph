@@ -10,9 +10,6 @@
 
 #include "SignalSlotBase.hh"
 
-#include "Exception.hh"
-#include "MemberVariable.hh"
-
 #include "factory.hh"
 #include "logger.hh"
 #include "param.hh"
@@ -24,11 +21,6 @@ namespace Nymph
     LOGGER(processorlog, "Processor.hh");
 
     struct ProcessorException : virtual public Exception {};
-
-    struct SignalException : virtual public Exception {};
-    struct SlotException : virtual public Exception {};
-
-    struct ConnectionException : public Exception {};
 
     class Processor
     {

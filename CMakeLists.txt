@@ -121,7 +121,7 @@ include_directories (BEFORE
 
 add_subdirectory( Library )
 if (Nymph_ENABLE_EXECUTABLES)
-    add_subdirectory( Executables/Validation )
+    #add_subdirectory( Executables/Validation )
 endif (Nymph_ENABLE_EXECUTABLES)
 
 
