@@ -16,7 +16,6 @@
 
 #include "logger.hh"
 
-#include <set>
 
 namespace Nymph
 {
@@ -48,22 +47,9 @@ namespace Nymph
 
             virtual void Connect( SlotPtr_t slot, int group = -1 );
 
-            // disconnects a previously connected function
-            void Disconnect( SlotPtr_t slot ) const;
-
-            // disconnects all previously connected functions
-            void DisconnectAll() const;
-
             // calls all connected functions
             void Emit( XArgs... args );
             void operator()( XArgs... args );
-
-            typedef std::set< SlotPtr_t > slot_connections; // to get around the problem of having a comma inside a macro function argument
-            MEMVAR_REF_MUTABLE_CONST( slot_connections, Connections );
-
-        protected:
-            friend class Slot< XArgs... >;
-            virtual void _Connect( SlotPtr_t slot, int group );
     };
 
 
@@ -121,15 +107,13 @@ namespace Nymph
 
     template< typename... XArgs >
     Signal< XArgs... >::Signal( const std::string& name ) :
-            SignalBase( name ),
-            fConnections()
+            SignalBase( name )
     {}
 
     template< typename... XArgs >
     template< typename XOwner >
     inline Signal< XArgs... >::Signal( const std::string& name, XOwner* owner ) :
-            SignalBase( name ),
-            fConnections()
+            SignalBase( name )
     {
         owner->RegisterSignal( name, this );
     }
@@ -167,35 +151,8 @@ namespace Nymph
             connection = fInternalSignal.connect( derivedSlot->Function() );
         }
 */
-        _Connect( slot, group );
-        slot->_AddConnection( this );
+        AddConnection( slot, group );
 
-        return;
-    }
-
-    template< typename... XArgs >
-    inline void Signal< XArgs... >::_Connect( SlotPtr_t slot, int group )
-    {
-        fConnections.insert( slot );
-        return;
-    }
-
-    // disconnects a previously connected function
-    template< typename... XArgs >
-    inline void Signal< XArgs... >::Disconnect( SlotPtr_t slot ) const
-    {
-        slot->RemoveConnection( this );
-        return;
-    }
-
-    // disconnects all previously connected functions
-    template< typename... XArgs >
-    void Signal< XArgs... >::DisconnectAll() const
-    {
-        for( auto connection : fConnections )
-        {
-            connection->RemoveConnection( this );
-        }
         return;
     }
 
@@ -212,7 +169,7 @@ namespace Nymph
     {
         for( auto connection : fConnections )
         {
-            connection->Function( args... );
+            std::static_pointer_cast< Slot< XArgs... > >(connection)->Function()( args... );
         }
         return;
     }

@@ -20,7 +20,6 @@
 #include <boost/function.hpp>
 
 #include <initializer_list>
-#include <set>
 
 namespace Nymph
 {
@@ -57,23 +56,14 @@ namespace Nymph
             Slot( Slot&& ) = delete;
             virtual ~Slot();
 
-            void DisconnectAll() const;
+            void ConnectTo( SignalPtr_t signal, int group = -1 );
 
-            void AddConnection( SignalPtr_t signal, int group = -1 ) const;
-
-            void RemoveConnection( SignalPtr_t signal ) const;
+            // execute fFunction
+            void operator()( XArgs... args );
 
             MEMVAR_REF( boost::function< signature >, Function );
 
-            typedef std::set< SignalBase* > signal_connections; // to get around the problem of having a comma inside a macro function argument
-            MEMVAR_REF_MUTABLE( signal_connections, Connections );
-
             MEMVAR( bool, DoBreakpoint );
-
-        protected:
-            friend class Signal< XArgs... >;
-            virtual void _AddConnection( SignalPtr_t, int group ) const;
-
     };
 
 
@@ -129,7 +119,6 @@ namespace Nymph
     Slot< XArgs... >::Slot( const std::string& name, const boost::function< signature >& func, signal_list signals ) :
             SlotBase( name ),
             fFunction( func ),
-            fConnections(),
             //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint( false )
     {}
@@ -139,7 +128,6 @@ namespace Nymph
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ), signal_list signals ) :
             SlotBase( name ),
             fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);} ),
-            fConnections(),
             //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint(false)
     {
@@ -151,7 +139,6 @@ namespace Nymph
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) const, signal_list signals ) :
             SlotBase( name ),
             fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);}  ),
-            fConnections(),
             //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint(false)
     {
@@ -163,7 +150,6 @@ namespace Nymph
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, const boost::function< signature >& func, signal_list signals ) :
             SlotBase( name ),
             fFunction( func ),
-            fConnections(),
             //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint(false)
     {
@@ -175,7 +161,6 @@ namespace Nymph
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ), signal_list signals ) :
             SlotBase( name ),
             fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
-            fConnections(),
             //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint(false)
     {
@@ -187,7 +172,6 @@ namespace Nymph
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ) const, signal_list signals ) :
             SlotBase( name ),
             fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
-            fConnections(),
             //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint(false)
     {
@@ -201,17 +185,7 @@ namespace Nymph
     }
 
     template< typename... XArgs >
-    void Slot< XArgs... >::DisconnectAll() const
-    {
-        for( auto connection : fConnections )
-        {
-            connection->Disconnect( this );
-        }
-        return;
-    }
-
-    template< typename... XArgs >
-    void Slot< XArgs... >::AddConnection( SignalPtr_t signal, int group ) const
+    void Slot< XArgs... >::ConnectTo( SignalPtr_t signal, int group )
     {
         if( fConnections.count( signal ) != 0 )
         {
@@ -219,31 +193,15 @@ namespace Nymph
             return;
         }
 
-        // ensure that the slot is of the correct type
-        if( ! std::dynamic_pointer_cast< Signal< XArgs... > >( signal ) )
-        {
-            BOOST_THROW_EXCEPTION( ConnectionException() << "Trying to connect slot <" << fName << "> to signal <" << signal->Name() << ">, but cannot make the connection:\n" <<
-                    "\tUnable to cast from SignalBase to this slot's derived type.\n" << 
-                    "\tArgument types do not match" << eom );
-        }
-
-        _AddConnection( signal, group );
-        signal->_Connect( this, group );
+        signal->Connect( shared_from_this(), group );
 
         return;
     }
 
     template< typename... XArgs >
-    void Slot< XArgs... >::_AddConnection( SignalPtr_t signal ) const
+    inline void Slot< XArgs... >::operator()( XArgs... args )
     {
-        fConnections.insert( signal );
-        return;
-    }
-
-    template< typename... XArgs >
-    void Slot< XArgs... >::RemoveConnection( SignalPtr_t signal ) const
-    {
-        fConnections.erase( signal );
+        fFunction( args... );
         return;
     }
 

@@ -12,6 +12,7 @@
 #include "MemberVariable.hh"
 
 #include <memory>
+#include <set>
 #include <string>
 
 namespace Nymph
@@ -28,7 +29,7 @@ namespace Nymph
     typedef std::shared_ptr< SignalBase > SignalPtr_t;
     typedef std::shared_ptr< SlotBase > SlotPtr_t;
 
-    class SlotBase
+    class SlotBase : public std::enable_shared_from_this< SlotBase >
     {
         public:
             SlotBase( const std::string& name );
@@ -36,18 +37,23 @@ namespace Nymph
             //SlotBase( const std::string& name, XOwner* owner );
             virtual ~SlotBase();
 
-            virtual void AddConnection( SignalPtr_t signal, int group = -1 ) const = 0;
+            virtual void ConnectTo( SignalPtr_t signal, int group = -1 ) = 0;
 
-            virtual void RemoveConnection( SignalPtr_t signal) const = 0;
+            void Disconnect( SignalPtr_t signal);
+            void DisconnectAll();
 
             MEMVAR_REF( std::string, Name );
 
+            typedef std::set< SignalPtr_t > signal_connections; // to get around the problem of having a comma inside a macro function argument
+            MEMVAR_REF_MUTABLE( signal_connections, Connections );
+
         protected:
-            virtual void _AddConnection( SignalPtr_t signal, int group ) const = 0;
+            friend class SignalBase;
+            virtual void AddConnection( SignalPtr_t signal );
     };
 
 
-    class SignalBase
+    class SignalBase : public std::enable_shared_from_this< SignalBase >
     {
         public:
             SignalBase( const std::string& name );
@@ -57,13 +63,45 @@ namespace Nymph
 
             virtual void Connect( SlotPtr_t slot, int group = -1 ) = 0;
 
-            virtual void Disconnect( SlotPtr_t slot ) const = 0;
+            void Disconnect( const SlotPtr_t slot );
+            void DisconnectAll();
 
             MEMVAR_REF( std::string, Name );
 
+            typedef std::set< SlotPtr_t > slot_connections; // to get around the problem of having a comma inside a macro function argument
+            MEMVAR_REF_MUTABLE_CONST( slot_connections, Connections );
+
         protected:
-            virtual void _Connect( SlotPtr_t slot, int group ) = 0;
+            friend class SignalBase;
+            virtual void AddConnection( SlotPtr_t slot, int group );
     };
+
+    inline void SlotBase::AddConnection( SignalPtr_t signal )
+    {
+        fConnections.insert( signal );
+        return;
+    }
+
+    inline void SlotBase::Disconnect( SignalPtr_t signal )
+    {
+        signal->Disconnect( shared_from_this() );
+        return;
+    }
+
+    inline void SignalBase::AddConnection( SlotPtr_t slot, int group )
+    {
+        fConnections.insert( slot );
+        slot->AddConnection( shared_from_this() );
+        return;
+    }
+
+    // disconnects a previously connected function
+    inline void SignalBase::Disconnect( SlotPtr_t slot )
+    {
+        slot->fConnections.erase( shared_from_this() );
+        fConnections.erase( slot );
+        return;
+    }
 
 } /* namespace Nymph */
 
