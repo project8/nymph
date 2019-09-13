@@ -45,7 +45,7 @@ namespace Nymph
             Signal( Signal&& ) = delete;
             virtual ~Signal();
 
-            virtual void Connect( SlotPtr_t slot, int group = -1 );
+            virtual void Connect( SlotBase* slot, int group = -1 );
 
             // calls all connected functions
             void Emit( XArgs... args );
@@ -125,7 +125,7 @@ namespace Nymph
     }
 
     template< typename... XArgs >
-    void Signal< XArgs... >::Connect( SlotPtr_t slot, int group )
+    void Signal< XArgs... >::Connect( SlotBase* slot, int group )
     {
         if( fConnections.count( slot ) != 0 )
         {
@@ -134,7 +134,7 @@ namespace Nymph
         }
 
         // ensure that the slot is of the correct type
-        if( ! std::dynamic_pointer_cast< Slot< XArgs... > >( slot ) )
+        if( ! dynamic_cast< Slot< XArgs... >* >( slot ) )
         {
             BOOST_THROW_EXCEPTION( ConnectionException() << "Trying to connect signal <" << fName << "> to slot <" << slot->Name() << ">, but cannot make the connection:\n" <<
                     "\tUnable to cast from SlotBase to this signal's derived type.\n" << 
@@ -169,7 +169,7 @@ namespace Nymph
     {
         for( auto connection : fConnections )
         {
-            std::static_pointer_cast< Slot< XArgs... > >(connection)->Function()( args... );
+            static_cast< Slot< XArgs... >* >(connection)->Function()( args... );
         }
         return;
     }

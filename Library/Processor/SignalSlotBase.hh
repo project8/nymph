@@ -24,12 +24,8 @@ namespace Nymph
 
 
     class SignalBase;
-    class SlotBase;
 
-    typedef std::shared_ptr< SignalBase > SignalPtr_t;
-    typedef std::shared_ptr< SlotBase > SlotPtr_t;
-
-    class SlotBase : public std::enable_shared_from_this< SlotBase >
+    class SlotBase
     {
         public:
             SlotBase( const std::string& name );
@@ -37,23 +33,23 @@ namespace Nymph
             //SlotBase( const std::string& name, XOwner* owner );
             virtual ~SlotBase();
 
-            virtual void ConnectTo( SignalPtr_t signal, int group = -1 ) = 0;
+            virtual void ConnectTo( SignalBase* signal, int group = -1 ) = 0;
 
-            void Disconnect( SignalPtr_t signal);
+            void Disconnect( SignalBase* signal);
             void DisconnectAll();
 
             MEMVAR_REF( std::string, Name );
 
-            typedef std::set< SignalPtr_t > signal_connections; // to get around the problem of having a comma inside a macro function argument
+            typedef std::set< SignalBase* > signal_connections; // to get around the problem of having a comma inside a macro function argument
             MEMVAR_REF_MUTABLE( signal_connections, Connections );
 
         protected:
             friend class SignalBase;
-            virtual void AddConnection( SignalPtr_t signal );
+            virtual void AddConnection( SignalBase* signal );
     };
 
 
-    class SignalBase : public std::enable_shared_from_this< SignalBase >
+    class SignalBase
     {
         public:
             SignalBase( const std::string& name );
@@ -61,44 +57,44 @@ namespace Nymph
             //SignalBase( const std::string& name, XOwner* owner );
             virtual ~SignalBase();
 
-            virtual void Connect( SlotPtr_t slot, int group = -1 ) = 0;
+            virtual void Connect( SlotBase* slot, int group = -1 ) = 0;
 
-            void Disconnect( const SlotPtr_t slot );
+            void Disconnect( SlotBase* slot );
             void DisconnectAll();
 
             MEMVAR_REF( std::string, Name );
 
-            typedef std::set< SlotPtr_t > slot_connections; // to get around the problem of having a comma inside a macro function argument
+            typedef std::set< SlotBase* > slot_connections; // to get around the problem of having a comma inside a macro function argument
             MEMVAR_REF_MUTABLE_CONST( slot_connections, Connections );
 
         protected:
             friend class SignalBase;
-            virtual void AddConnection( SlotPtr_t slot, int group );
+            virtual void AddConnection( SlotBase* slot, int group );
     };
 
-    inline void SlotBase::AddConnection( SignalPtr_t signal )
+    inline void SlotBase::AddConnection( SignalBase* signal )
     {
         fConnections.insert( signal );
         return;
     }
 
-    inline void SlotBase::Disconnect( SignalPtr_t signal )
+    inline void SlotBase::Disconnect( SignalBase* signal )
     {
-        signal->Disconnect( shared_from_this() );
+        signal->Disconnect( this );
         return;
     }
 
-    inline void SignalBase::AddConnection( SlotPtr_t slot, int group )
+    inline void SignalBase::AddConnection( SlotBase* slot, int group )
     {
         fConnections.insert( slot );
-        slot->AddConnection( shared_from_this() );
+        slot->AddConnection( this );
         return;
     }
 
     // disconnects a previously connected function
-    inline void SignalBase::Disconnect( SlotPtr_t slot )
+    inline void SignalBase::Disconnect( SlotBase* slot )
     {
-        slot->fConnections.erase( shared_from_this() );
+        slot->fConnections.erase( this );
         fConnections.erase( slot );
         return;
     }

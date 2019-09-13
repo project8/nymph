@@ -56,7 +56,7 @@ namespace Nymph
             Slot( Slot&& ) = delete;
             virtual ~Slot();
 
-            void ConnectTo( SignalPtr_t signal, int group = -1 );
+            void ConnectTo( SignalBase* signal, int group = -1 );
 
             // execute fFunction
             void operator()( XArgs... args );
@@ -185,7 +185,7 @@ namespace Nymph
     }
 
     template< typename... XArgs >
-    void Slot< XArgs... >::ConnectTo( SignalPtr_t signal, int group )
+    void Slot< XArgs... >::ConnectTo( SignalBase* signal, int group )
     {
         if( fConnections.count( signal ) != 0 )
         {
@@ -193,7 +193,7 @@ namespace Nymph
             return;
         }
 
-        signal->Connect( shared_from_this(), group );
+        signal->Connect( this, group );
 
         return;
     }

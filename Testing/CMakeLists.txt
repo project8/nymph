@@ -8,6 +8,7 @@ set( testing_HEADERS
 )
 
 set( testing_SOURCES
+    TestProcessor.cc
     TestSignalSlot.cc
     UseCatch.cc
 )

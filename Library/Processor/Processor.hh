@@ -25,11 +25,11 @@ namespace Nymph
     class Processor
     {
         protected:
-            typedef std::map< std::string, SignalPtr_t > SignalMap;
+            typedef std::map< std::string, SignalBase* > SignalMap;
             typedef SignalMap::iterator SigMapIt;
             typedef SignalMap::value_type SigMapVal;
 
-            typedef std::map< std::string, SlotPtr_t > SlotMap;
+            typedef std::map< std::string, SlotBase* > SlotMap;
             typedef SlotMap::iterator SlotMapIt;
             typedef SlotMap::value_type SlotMapVal;
 
@@ -42,10 +42,10 @@ namespace Nymph
 
         public:
             /// Configure the processor with a param_node
-            virtual bool Configure( const scarab::param_node& node ) = 0;
+            virtual void Configure( const scarab::param_node& node ) = 0;
 
             /// Utility function for connecting any signal to any slot
-            static void ConnectSignalToSlot( SignalPtr_t signal, SlotPtr_t slot, int groupNum=-1 );
+            static void ConnectSignalToSlot( SignalBase* signal, SlotBase* slot, int groupNum=-1 );
 
             /// Connect a signal in this processor to a slot in a different processor
             void ConnectASlot( const std::string& signalName, Processor& processor, const std::string& slotName, int groupNum=-1 );
@@ -53,10 +53,10 @@ namespace Nymph
             void ConnectASignal( Processor& processor, const std::string& signalName, const std::string& slotName, int groupNum=-1 );
 
             /// Register a signal object with this processor
-            void RegisterSignal( std::string name, SignalPtr_t signal );
+            void RegisterSignal( std::string name, SignalBase* signal );
 
             /// Register a slot object with this processor
-            void RegisterSlot( std::string name, SlotPtr_t slot, std::initializer_list< std::string > signals = {} );
+            void RegisterSlot( std::string name, SlotBase* slot, std::initializer_list< std::string > signals = {} );
 
             //bool GetDoBreakpoint( const std::string& slotName );
             //void SetDoBreakpoint( const std::string& slotName, bool flag );
@@ -66,21 +66,17 @@ namespace Nymph
             MEMVAR_REF_CONST( SignalMap, Signals );
             MEMVAR_REF_CONST( SlotMap, Slots );
 
-        protected:
-            template< typename XReturn, typename... XArgs >
-            void PassToConnProcs( const std::string& slotName, std::function< XReturn(XArgs...) > function, XArgs... args );
-
     };
 
 
-    inline void Processor::RegisterSignal( std::string name, SignalPtr_t signal )
+    inline void Processor::RegisterSignal( std::string name, SignalBase* signal )
     {
         LDEBUG( processorlog, "Registering signal <" << name << "> in processor <" << fName << ">" );
         fSignals.insert( SigMapVal(name, signal) );
         return;
     }
 
-    inline void Processor::RegisterSlot( std::string name, SlotPtr_t slot, std::initializer_list< std::string > signals )
+    inline void Processor::RegisterSlot( std::string name, SlotBase* slot, std::initializer_list< std::string > signals )
     {
         LDEBUG( processorlog, "Registering slot <" << name << "> in processor <" << fName << ">" );
         fSlots.insert( SlotMapVal(name, slot) );

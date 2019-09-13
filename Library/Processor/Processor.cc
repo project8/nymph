@@ -73,7 +73,7 @@ namespace Nymph
         return;
     }
 
-    void Processor::ConnectSignalToSlot( SignalPtr_t signal, SlotPtr_t slot, int groupNum )
+    void Processor::ConnectSignalToSlot( SignalBase* signal, SlotBase* slot, int groupNum )
     {
         if( ! signal )
         {

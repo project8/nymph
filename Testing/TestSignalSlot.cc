@@ -17,21 +17,56 @@ TEST_CASE( "signal_slot", "[signal],[slot],[processor]" )
 
     int testValue = 0;
 
-    SignalPtr_t signalPtr = std::make_shared< Signal< int > >( "signal" );
-    SlotPtr_t slotPtr = std::make_shared< Slot< int > >( "slot", [&](int aValue ){ testValue = aValue; } );
+    Signal< int > signal( "signal" );
+    Slot< int > slot( "slot", [&](int aValue ){ testValue = aValue; } );
 
-    REQUIRE( signalPtr );
-    REQUIRE( slotPtr );
+    signal.Connect( &slot );
 
-    signalPtr->Connect( slotPtr );
+    REQUIRE( signal.Connections().size() == 1 );
+    REQUIRE( slot.Connections().size() == 1 );
 
-    //REQUIRE( signalPtr->Connections().size() == 1 );
-    //REQUIRE( slotPtr->Connections().size() == 1 );
-
-    std::dynamic_pointer_cast< Signal< int > >(signalPtr)->Emit( 5 );
+    signal.Emit( 5 );
     REQUIRE( testValue == 5 );
 
-    std::dynamic_pointer_cast< Signal< int > >(signalPtr)->operator()( 10 );
+    signal( 10 );
     REQUIRE( testValue == 10 );
+
+    signal.Disconnect( &slot );
+
+    REQUIRE( signal.Connections().size() == 0 );
+    REQUIRE( slot.Connections().size() == 0 );
+
+    // connect and disconnect via slot
+    slot.ConnectTo( &signal );
+
+    REQUIRE( signal.Connections().size() == 1 );
+    REQUIRE( slot.Connections().size() == 1 );
+
+    slot.Disconnect( &signal );
+
+    REQUIRE( signal.Connections().size() == 0 );
+    REQUIRE( slot.Connections().size() == 0 );
+
+    // reconnect for testing SignalBase::DisconnectAll()
+    signal.Connect( &slot );
+
+    REQUIRE( signal.Connections().size() == 1 );
+    REQUIRE( slot.Connections().size() == 1 );
+
+    signal.DisconnectAll();
+
+    REQUIRE( signal.Connections().size() == 0 );
+    REQUIRE( slot.Connections().size() == 0 );
+
+    // reconnect for testing SlotBaseDisconnectAll()
+    slot.ConnectTo( &signal );
+
+    REQUIRE( signal.Connections().size() == 1 );
+    REQUIRE( slot.Connections().size() == 1 );
+
+    slot.DisconnectAll();
+
+    REQUIRE( signal.Connections().size() == 0 );
+    REQUIRE( slot.Connections().size() == 0 );
 
 }

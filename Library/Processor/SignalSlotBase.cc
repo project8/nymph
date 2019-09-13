@@ -19,9 +19,9 @@ namespace Nymph
 
     void SlotBase::DisconnectAll()
     {
-        for( auto connection : fConnections )
+        while( ! fConnections.empty() )
         {
-            connection->Disconnect( shared_from_this() );
+            Disconnect( *fConnections.begin() );
         }
         return;
     }
@@ -37,9 +37,9 @@ namespace Nymph
     // disconnects all previously connected functions
     void SignalBase::DisconnectAll()
     {
-        for( auto connection : fConnections )
+        while( ! fConnections.empty() )
         {
-            Disconnect( connection );
+            Disconnect( *fConnections.begin() );
         }
         return;
     }
