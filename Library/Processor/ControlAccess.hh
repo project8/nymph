@@ -9,6 +9,7 @@
 #define NYMPH_CONTROLACCESS_HH_
 
 #include <memory>
+#include <tuple>
 
 namespace Nymph
 {
@@ -19,7 +20,7 @@ namespace Nymph
             virtual ~ReturnBufferBase();
     };
 
-    template< typename OneArg >
+    template< typename... Args >
     struct ReturnBuffer : ReturnBufferBase
     {
         public:
@@ -27,21 +28,21 @@ namespace Nymph
                     fReturn( nullptr )
             {}
 
-            ReturnBuffer( OneArg& retval ) :
-                    fReturn( &retval )
+            ReturnBuffer( Args&... retval ) :
+                    fReturn( new std::tuple< Args&... >( retval... ) )
             {}
 
             virtual ~ReturnBuffer()
             {}
 
-            OneArg& GetReturn()
+            std::tuple< Args&... >& GetReturn()
             {
                 if( fReturn == nullptr ) throw std::exception();
                 return *fReturn;
             }
 
         protected:
-            OneArg* fReturn;
+            std::tuple< Args&... >* fReturn;
     };
 
     template<>
@@ -57,7 +58,6 @@ namespace Nymph
         }
     };
 
-    //TODO fill this in with anything useful
     class ControlAccess
     {
         public:
@@ -65,28 +65,28 @@ namespace Nymph
 
             virtual ~ControlAccess();
 
-            template< typename OneArg >
-            void SetReturn( OneArg& arg );
+            template< typename... Args >
+            void SetReturn( Args&... arg );
 
-            template< typename OneArg >
-            OneArg& GetReturn();
+            template< typename... Args >
+            std::tuple< Args&... >& GetReturn();
 
         protected:
             std::shared_ptr< ReturnBufferBase > fReturn;
     };
 
 
-    template< typename OneArg >
-    void ControlAccess::SetReturn( OneArg& arg )
+    template< typename... Args >
+    void ControlAccess::SetReturn( Args&... args )
     {
-        fReturn = std::make_shared< ReturnBuffer< OneArg > >( arg );
+        fReturn = std::make_shared< ReturnBuffer< Args... > >( args... );
         return;
     }
 
-    template< typename OneArg >
-    OneArg& ControlAccess::GetReturn()
+    template< typename... Args >
+    std::tuple< Args&... >& ControlAccess::GetReturn()
     {
-        std::shared_ptr< ReturnBuffer< OneArg > > buffer( std::dynamic_pointer_cast< ReturnBuffer< OneArg > >(fReturn) );
+        std::shared_ptr< ReturnBuffer< Args... > > buffer( std::dynamic_pointer_cast< ReturnBuffer< Args... > >(fReturn) );
         if( buffer == nullptr ) throw std::exception();
         return buffer->GetReturn();
     }

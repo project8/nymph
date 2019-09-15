@@ -23,7 +23,7 @@ TEST_CASE( "control_access", "[control_access]" )
 
     control.SetReturn< int >( intReturn );
 
-    REQUIRE( control.GetReturn< int >() == intReturn );
-    REQUIRE_THROWS( control.GetReturn< unsigned >() == intReturn );
+    REQUIRE( std::get< 0 >(control.GetReturn< int >()) == intReturn );
+    REQUIRE_THROWS( control.GetReturn< unsigned >() );
 
 }
