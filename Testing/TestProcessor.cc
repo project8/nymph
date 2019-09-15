@@ -33,7 +33,7 @@ namespace Nymph
                     fSecondValueSlot2( "second-value-2", this, &TestProc::SetSecondValue )
             {}
 
-            ~TestProc()
+            virtual ~TestProc()
             {}
 
             void Configure( const scarab::param_node& node )
@@ -45,25 +45,18 @@ namespace Nymph
             MEMVAR( int, Value );
             MEMVAR( int, SecondValue );
 
-            Signal< int >& ValueSig()
-            {
-                return fValueSig;
-            }
-
             void SecondValueSlotFunction( int newValue )
             {
                 fSecondValueSig( newValue );
             }
 
-        private:
-            Signal< int > fValueSig;
-            Slot< int > fValueSlot;
+            MEMVAR_REF( Signal< int >, ValueSig );
+            MEMVAR_REF( Slot< int >, ValueSlot );
 
-            //Signal< int > fSecondValueSig;
             MEMVAR_REF( Signal< int >, SecondValueSig );
-        private:
-            Slot< int > fSecondValueSlot;
-            Slot< int > fSecondValueSlot2;
+            MEMVAR_REF( Slot< int >, SecondValueSlot );
+            MEMVAR_REF( Slot< int >, SecondValueSlot2 );
+
     };
 
     // external slot function owner

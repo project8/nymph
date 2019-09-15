@@ -1,67 +1,51 @@
 /*
- * KTPrimaryProcessor.cc
+ * PrimaryProcessor.cc
  *
  *  Created on: Oct 10, 2012
  *      Author: N.S. Oblath
  */
 
-#include "KTPrimaryProcessor.hh"
+#include "PrimaryProcessor.hh"
 
-#include "KTException.hh"
-#include "KTLogger.hh"
+#include "Exception.hh"
+
+#include "logger.hh"
 
 namespace Nymph
 {
-    KTLOGGER( proclog, "KTPrimaryProcessor" );
+    LOGGER( proclog, "PrimaryProcessor" );
 
-    KTPrimaryProcessor::KTPrimaryProcessor( std::initializer_list< std::string > signals, const std::string& name ) :
-            KTProcessor( name ),
-            fSignalsEmitted( signals ),
-            fThreadRef(),
-            fDoBreakpoint(false)
+    PrimaryProcessor::PrimaryProcessor( const std::string& name ) :
+            Processor( name )
+    {}
+
+    PrimaryProcessor::~PrimaryProcessor()
+    {}
+
+    void PrimaryProcessor::operator()( ControlAccess* control )
     {
-
-    }
-
-    KTPrimaryProcessor::~KTPrimaryProcessor()
-    {
-    }
-
-    void KTPrimaryProcessor::operator ()( std::shared_ptr< KTThreadReference > ref, boost::condition_variable& startedCV, bool& startedFlag )
-    {
-        fThreadRef = ref;
-
-        // pass updated thread reference to downstream slots
-        for( auto sigIt = fSignalsEmitted.begin(); sigIt != fSignalsEmitted.end(); ++sigIt )
+        for( auto signalIt = fSignals.begin(); signalIt != fSignals.end(); ++signalIt )
         {
-            // loop over all processor:slots called by this signal
-            auto sigConnRange = fSigConnMap.equal_range( *sigIt );
-            for( SigConnMapCIt sigConnIt = sigConnRange.first; sigConnIt != sigConnRange.second; ++sigConnIt )
-            {
-                // pass the update on to the connected-to processor
-                sigConnIt->second.first->PassThreadRefUpdate( sigConnIt->second.second, fThreadRef );
-            }
+            signalIt->second->SetControl( control );
         }
-
-        startedFlag = true;
-        startedCV.notify_all();
 
         // go!
         try
         {
             if( ! Run() )
             {
-                KTERROR( proclog, "An error occurred during processor running." );
-                THROW_THREADREF_EXCEPTION( fThreadRef, KTException() << "An error occurred during processor running" );
+                LERROR( proclog, "An error occurred during processor running." );
+                //THROW_THREADREF_EXCEPTION( fThreadRef, KTException() << "An error occurred during processor running" );
             }
             else
             {
-                fThreadRef->SetReturnValue( KTDataHandle() );
+                LWARN( proclog, "Valid return" );
+                //fThreadRef->SetReturnValue( KTDataHandle() );
             }
         }
         catch( boost::exception& e )
         {
-            fThreadRef->SetReturnException( boost::current_exception() );
+            //fThreadRef->SetReturnException( boost::current_exception() );
         }
         return;
     }
