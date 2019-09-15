@@ -66,22 +66,13 @@ namespace Nymph
             MEMVAR_REF_CONST( SignalMap, Signals );
             MEMVAR_REF_CONST( SlotMap, Slots );
 
+            // this is used only to hold pointers to slots waiting for signals
+            // the keys are the names of the signals being waited for, and the values are the slot pointers
+            typedef std::multimap< std::string, SlotBase* > WaitingSlotMap;
+            MEMVAR_REF_CONST( WaitingSlotMap, SlotsWaitingForSignals );
+
     };
 
-
-    inline void Processor::RegisterSignal( std::string name, SignalBase* signal )
-    {
-        LDEBUG( processorlog, "Registering signal <" << name << "> in processor <" << fName << ">" );
-        fSignals.insert( SigMapVal(name, signal) );
-        return;
-    }
-
-    inline void Processor::RegisterSlot( std::string name, SlotBase* slot, std::initializer_list< std::string > signals )
-    {
-        LDEBUG( processorlog, "Registering slot <" << name << "> in processor <" << fName << ">" );
-        fSlots.insert( SlotMapVal(name, slot) );
-        return;
-    }
 
     inline void Processor::ConnectASignal(Processor& processor, const std::string& signalName, const std::string& slotName, int groupNum )
     {

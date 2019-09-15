@@ -34,6 +34,7 @@ namespace Nymph
     {
         public:
             using signature = void( XArgs... );
+            using full_signature = void( ControlAccess*, XArgs... );
 
         public:
             /// Unowned signal
@@ -169,7 +170,7 @@ namespace Nymph
     {
         for( auto connection : fConnections )
         {
-            static_cast< Slot< XArgs... >* >(connection)->Function()( args... );
+            static_cast< Slot< XArgs... >* >(connection)->operator()( fControl, args... );
         }
         return;
     }

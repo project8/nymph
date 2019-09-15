@@ -12,6 +12,7 @@ set( APPL_DIR Application )
 set( NYMPH_HEADERFILES
     ${UTIL_DIR}/Exception.hh
     ${UTIL_DIR}/MemberVariable.hh
+    ${PROC_DIR}/ControlAccess.hh
     #${PROC_DIR}/PrimaryProcessor.hh
     ${PROC_DIR}/Processor.hh
     ${PROC_DIR}/SignalSlotBase.hh
