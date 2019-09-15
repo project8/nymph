@@ -9,7 +9,11 @@
 #include "Signal.hh"
 #include "Slot.hh"
 
+#include "logger.hh"
+
 #include "catch.hpp"
+
+LOGGER( testlog, "TestProcessor" );
 
 namespace Nymph
 {
@@ -21,8 +25,12 @@ namespace Nymph
             TestProc() :
                     Processor( "test" ),
                     fValue( 0 ),
+                    fSecondValue( 0 ),
                     fValueSig( "value", this ),
-                    fValueSlot( "value", this, &TestProc::SetValue )
+                    fValueSlot( "value", this, &TestProc::SetValue ),
+                    fSecondValueSig( "second-value", this ),
+                    fSecondValueSlot( "second-value", this, &TestProc::SecondValueSlotFunction, {"second-value"} ),
+                    fSecondValueSlot2( "second-value-2", this, &TestProc::SetSecondValue )
             {}
 
             ~TestProc()
@@ -35,15 +43,27 @@ namespace Nymph
             }
 
             MEMVAR( int, Value );
+            MEMVAR( int, SecondValue );
 
             Signal< int >& ValueSig()
             {
                 return fValueSig;
             }
 
+            void SecondValueSlotFunction( int newValue )
+            {
+                fSecondValueSig( newValue );
+            }
+
         private:
             Signal< int > fValueSig;
             Slot< int > fValueSlot;
+
+            //Signal< int > fSecondValueSig;
+            MEMVAR_REF( Signal< int >, SecondValueSig );
+        private:
+            Slot< int > fSecondValueSlot;
+            Slot< int > fSecondValueSlot2;
     };
 
     // external slot function owner
@@ -82,9 +102,13 @@ TEST_CASE( "processor", "[signal],[slot],[processor]" )
 
     SECTION( "Signals and Slots" )
     {
-        // check that the processor has one slot and one signal
-        REQUIRE( tester.Signals().size() == 1 );
-        REQUIRE( tester.Slots().size() == 1 );
+        // check that the processor has the right number of signals and slots registered
+        REQUIRE( tester.Signals().size() == 2 );
+        REQUIRE( tester.Slots().size() == 3 );
+
+        //**************************
+        // Testing signal->slot
+        //**************************
 
         // this is a slot using a lambda function to set a variable
         int lambdaValue = 0;
@@ -100,7 +124,7 @@ TEST_CASE( "processor", "[signal],[slot],[processor]" )
         REQUIRE( lambdaValue == 0 );
 
         // we've added a couple more slots
-        REQUIRE( tester.Slots().size() == 3 );
+        REQUIRE( tester.Slots().size() == 5 );
 
         // no connections yet
         REQUIRE( tester.Signals().at("value")->Connections().size() == 0 );
@@ -132,6 +156,11 @@ TEST_CASE( "processor", "[signal],[slot],[processor]" )
         REQUIRE( tester.Slots().at("value")->Connections().size() == 1 );
         REQUIRE( tester.Slots().at("slotOwnerSlot")->Connections().size() == 1 );
 
+        // now have "signal" connected to three slots:
+        //     value --> value
+        //     value --> lambdaSlot
+        //     value --> slotOwnerSlot
+
         // emit the signal
         int newValue = 10;
         tester.ValueSig().Emit( newValue );
@@ -140,6 +169,27 @@ TEST_CASE( "processor", "[signal],[slot],[processor]" )
         REQUIRE( tester.GetValue() == newValue );
         REQUIRE( slotOwner.fValue == newValue );
         REQUIRE( lambdaValue == newValue );
+
+        //*********************************
+        // testing slot->signal->slot
+        //*********************************
+
+        // check initial value
+        REQUIRE( tester.GetSecondValue() == 0 );
+
+        REQUIRE( tester.Slots().at("second-value")->SignalsUsed().size() == 1 );
+        REQUIRE( tester.Slots().at("second-value")->SignalsUsed()[0] == &tester.SecondValueSig() );
+
+        tester.ConnectASlot( "second-value", tester, "second-value-2" );
+
+        // now have second-value (slot) emits second-value --> second-value-2
+
+        REQUIRE( tester.Signals().at("second-value")->Connections().size() == 1 );
+        REQUIRE( tester.Slots().at("second-value-2")->Connections().size() == 1 );
+
+        tester.SecondValueSlotFunction( newValue );
+
+        REQUIRE( tester.GetSecondValue() == newValue );
     }
 
 }
