@@ -8,6 +8,13 @@
 #ifndef NYMPH_CONTROLACCESS_HH_
 #define NYMPH_CONTROLACCESS_HH_
 
+#include "MemberVariable.hh"
+
+#include "cancelable.hh"
+
+#include <boost/thread/condition_variable.hpp>
+#include <boost/thread/mutex.hpp>
+
 #include <memory>
 #include <tuple>
 
@@ -58,7 +65,7 @@ namespace Nymph
         }
     };
 
-    class ControlAccess
+    class ControlAccess : public scarab::cancelable
     {
         public:
             ControlAccess();
@@ -73,6 +80,16 @@ namespace Nymph
 
         protected:
             std::shared_ptr< ReturnBufferBase > fReturn;
+
+        public:
+            void Break(); // called by this thread
+            void Resume(); // called by user thread
+
+            MEMVAR_REF( boost::mutex, Mutex );
+            MEMVAR_REF( boost::condition_variable, CondVar );
+            MEMVAR_ATOMIC_NOSET( bool, BreakFlag );
+            MEMVAR( unsigned, CycleTimeMS );
+
     };
 
 
