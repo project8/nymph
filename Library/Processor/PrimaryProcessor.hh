@@ -1,30 +1,41 @@
 /*
- * KTPrimaryProcessor.hh
+ * PrimaryProcessor.hh
  *
  *  Created on: Oct 10, 2012
  *      Author: N.S. Oblath
  */
 
-#ifndef KTPRIMARYPROCESSOR_HH_
-#define KTPRIMARYPROCESSOR_HH_
+#ifndef NYMPH_PRIMARYPROCESSOR_HH_
+#define NYMPH_PRIMARYPROCESSOR_HH_
 
-#include "KTProcessor.hh"
+#include "Processor.hh"
 
-#include "KTCoreData.hh"
-#include "KTThreadReference.hh"
-
-#include <boost/thread/condition_variable.hpp>
-
-#include <atomic>
 
 namespace Nymph
 {
 
-    class KTPrimaryProcessor : public KTProcessor
+    class PrimaryProcessor : public Processor
     {
         public:
-            KTPrimaryProcessor( std::initializer_list< std::string > signals, const std::string& name = "default-primary-processor-name" );
-            virtual ~KTPrimaryProcessor();
+            PrimaryProcessor( const std::string& name );
+            virtual ~PrimaryProcessor();
+
+        public:
+            /// Callable function used by std::thread
+            void operator()( ControlAccess* control );
+
+            /// Starts the  main action of the processor
+            virtual bool Run() = 0;
+
+    };
+
+
+/*
+    class PrimaryProcessor : public Processor
+    {
+        public:
+            PrimaryProcessor( std::initializer_list< std::string > signals, const std::string& name = "default-primary-processor-name" );
+            virtual ~PrimaryProcessor();
 
         public:
             /// Callable function used by std::thread
@@ -44,10 +55,12 @@ namespace Nymph
 
     };
 
-    inline std::shared_ptr< KTThreadReference > KTPrimaryProcessor::GetThreadRef()
+    inline std::shared_ptr< KTThreadReference > PrimaryProcessor::GetThreadRef()
     {
         return fThreadRef;
     }
+*/
 
 } /* namespace Nymph */
-#endif /* KTPRIMARYPROCESSOR_HH_ */
+
+#endif /* NYMPH_PRIMARYPROCESSOR_HH_ */

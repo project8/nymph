@@ -13,7 +13,6 @@
 #include "SignalSlotBase.hh"
 
 //#include "Exception.hh"
-//#include "ThreadReference.hh"
 
 #include "logger.hh"
 
@@ -25,18 +24,18 @@ namespace Nymph
 {
     LOGGER(slotlog, "Slot");
 
-
     // Type XOwner is the class that owns the Slot object
     template< typename... XArgs >
     class Slot : public SlotBase
     {
         public:
             using signature = void( XArgs... );
+            using full_signature = void( ControlAccess*, XArgs... );
             using signal_list = std::initializer_list< std::string >;
 
         public:
             /// Unowned slot
-            Slot( const std::string& name, const boost::function< signature >& func, signal_list signals = {} );
+            Slot( const std::string& name, const boost::function< signature >& func );
             /// Owned slot, non-const member function
             template< typename XOwner >
             Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ), signal_list signals = {} );
@@ -56,14 +55,20 @@ namespace Nymph
             Slot( Slot&& ) = delete;
             virtual ~Slot();
 
-            void ConnectTo( SignalPtr_t signal, int group = -1 );
+            void ConnectTo( SignalBase* signal, int group = -1 );
 
-            // execute fFunction
+            /// execute fFunction without using a ControlAccess object
             void operator()( XArgs... args );
+
+            /// execute fFunction with a ControlAccess object
+            void operator()( ControlAccess* access, XArgs... args );
 
             MEMVAR_REF( boost::function< signature >, Function );
 
             MEMVAR( bool, DoBreakpoint );
+
+        protected:
+            void SlotFuncWrapper( ControlAccess* access, XArgs... args );
     };
 
 
@@ -116,7 +121,7 @@ namespace Nymph
     // Slot
 
     template< typename... XArgs >
-    Slot< XArgs... >::Slot( const std::string& name, const boost::function< signature >& func, signal_list signals ) :
+    Slot< XArgs... >::Slot( const std::string& name, const boost::function< signature >& func ) :
             SlotBase( name ),
             fFunction( func ),
             //fThreadRef( std::make_shared< ThreadReference >() ),
@@ -185,7 +190,7 @@ namespace Nymph
     }
 
     template< typename... XArgs >
-    void Slot< XArgs... >::ConnectTo( SignalPtr_t signal, int group )
+    void Slot< XArgs... >::ConnectTo( SignalBase* signal, int group )
     {
         if( fConnections.count( signal ) != 0 )
         {
@@ -193,7 +198,7 @@ namespace Nymph
             return;
         }
 
-        signal->Connect( shared_from_this(), group );
+        signal->Connect( this, group );
 
         return;
     }
@@ -202,6 +207,29 @@ namespace Nymph
     inline void Slot< XArgs... >::operator()( XArgs... args )
     {
         fFunction( args... );
+        return;
+    }
+
+    template< typename... XArgs >
+    inline void Slot< XArgs... >::operator()( ControlAccess* access, XArgs... args )
+    {
+        SlotFuncWrapper( access, args... );
+        return;
+    }
+
+    template< typename... XArgs >
+    inline void Slot< XArgs... >::SlotFuncWrapper( ControlAccess* access, XArgs... args )
+    {
+        //TODO could do something with `access` here
+        for( auto signalIt = fSignalsUsed.begin(); signalIt != fSignalsUsed.end(); ++signalIt )
+        {
+            (*signalIt)->SetControl( access );
+        }
+
+        fFunction( args... );
+
+        //TODO could do more with `access` here
+
         return;
     }
 

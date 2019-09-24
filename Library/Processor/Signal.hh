@@ -34,6 +34,7 @@ namespace Nymph
     {
         public:
             using signature = void( XArgs... );
+            using full_signature = void( ControlAccess*, XArgs... );
 
         public:
             /// Unowned signal
@@ -45,11 +46,13 @@ namespace Nymph
             Signal( Signal&& ) = delete;
             virtual ~Signal();
 
-            virtual void Connect( SlotPtr_t slot, int group = -1 );
+            virtual void Connect( SlotBase* slot, int group = -1 );
 
             // calls all connected functions
             void Emit( XArgs... args );
             void operator()( XArgs... args );
+
+            MEMVAR( bool, DoBreakpoint );
     };
 
 
@@ -107,13 +110,15 @@ namespace Nymph
 
     template< typename... XArgs >
     Signal< XArgs... >::Signal( const std::string& name ) :
-            SignalBase( name )
+            SignalBase( name ),
+            fDoBreakpoint( false )
     {}
 
     template< typename... XArgs >
     template< typename XOwner >
     inline Signal< XArgs... >::Signal( const std::string& name, XOwner* owner ) :
-            SignalBase( name )
+            SignalBase( name ),
+            fDoBreakpoint( false )
     {
         owner->RegisterSignal( name, this );
     }
@@ -125,7 +130,7 @@ namespace Nymph
     }
 
     template< typename... XArgs >
-    void Signal< XArgs... >::Connect( SlotPtr_t slot, int group )
+    void Signal< XArgs... >::Connect( SlotBase* slot, int group )
     {
         if( fConnections.count( slot ) != 0 )
         {
@@ -134,7 +139,7 @@ namespace Nymph
         }
 
         // ensure that the slot is of the correct type
-        if( ! std::dynamic_pointer_cast< Slot< XArgs... > >( slot ) )
+        if( ! dynamic_cast< Slot< XArgs... >* >( slot ) )
         {
             BOOST_THROW_EXCEPTION( ConnectionException() << "Trying to connect signal <" << fName << "> to slot <" << slot->Name() << ">, but cannot make the connection:\n" <<
                     "\tUnable to cast from SlotBase to this signal's derived type.\n" << 
@@ -167,9 +172,15 @@ namespace Nymph
     template< typename... XArgs >
     inline void Signal< XArgs... >::operator()( XArgs... args )
     {
+        if( fDoBreakpoint )
+        {
+            fControl->SetReturn< XArgs... >( args... );
+            fControl->Break(); // waits for resume or exit
+        }
+
         for( auto connection : fConnections )
         {
-            std::static_pointer_cast< Slot< XArgs... > >(connection)->Function()( args... );
+            static_cast< Slot< XArgs... >* >(connection)->operator()( fControl, args... );
         }
         return;
     }
