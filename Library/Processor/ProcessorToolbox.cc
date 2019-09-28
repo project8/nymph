@@ -8,10 +8,10 @@
 #include "ProcessorToolbox.hh"
 
 #include "Exception.hh"
-#include "Logger.hh"
 #include "PrimaryProcessor.hh"
 
 #include "factory.hh"
+#include "logger.hh"
 #include "param_codec.hh"
 
 #include <boost/exception/get_error_info.hpp>
@@ -30,22 +30,22 @@ namespace Nymph
             fProcFactory( scarab::factory< Processor, const std::string& >::get_instance() ),
             fRunSingleThreaded( false ),
             fRunQueue(),
-            fProcMap(),
+            fProcMap()/*,
             fThreadReferences(),
             fContinueCV(),
             fDoContinue( false ),
             fBreakContMutex(),
             fDoRunThread( nullptr ),
             fDoRunPromise(),
-            fDoRunBreakFlag( false )
+            fDoRunBreakFlag( false )*/
     {
     }
 
     ProcessorToolbox::~ProcessorToolbox()
     {
-        CancelThreads();
+        //CancelThreads();
 
-        JoinRunThread();
+        //JoinRunThread();
 
         ClearProcessors();
     }
@@ -238,7 +238,7 @@ namespace Nymph
             string nameUsed(procName);
             if( ! node.has(nameUsed) )
             {
-                nameUsed = iter->second.fProc->GetConfigName();
+                nameUsed = iter->second.fProc->Name();
                 if( ! node.has(nameUsed) )
                 {
                     LWARN( proclog, "Did not find a parameter node <" << procName << "> or <" << nameUsed << ">\n"
@@ -254,14 +254,6 @@ namespace Nymph
             }
         }
         return true;
-    }
-
-    bool ProcessorToolbox::ConfigureProcessors( const std::string& config )
-    {
-        scarab::param_translator translator;
-        scarab::param_node optNode;
-        optNode.add( "encoding", new scarab::param_value( "json" ) );
-        return ConfigureProcessors( translator.read_string( config, optNode )->as_node() );
     }
 
     std::shared_ptr< Processor > ProcessorToolbox::GetProcessor( const std::string& procName )
@@ -336,9 +328,9 @@ namespace Nymph
         return true;
     }
 
-    std::shared_ptr< Processor > ProcessorToolbox::ReleaseProcessor( const std::string& procName 
+    std::shared_ptr< Processor > ProcessorToolbox::ReleaseProcessor( const std::string& procName )
     {
-        ProcMapIt it = fProcMap.find(p rocName );
+        ProcMapIt it = fProcMap.find( procName );
         if( it == fProcMap.end() )
         {
             LWARN( proclog, "Processor <" << procName << "> was not found." );
@@ -419,30 +411,30 @@ namespace Nymph
         return true;
     }
 
-    bool ProcessorToolbox::SetBreakpoint( const std::string& slot )
+    bool ProcessorToolbox::SetBreakpoint( const std::string& signal )
     {
-        string slotProcName, slotName;
-        if(! ParseSignalSlotName( slot, slotProcName, slotName ) )
+        string signalProcName, signalName;
+        if(! ParseSignalSlotName( signal, signalProcName, signalName ) )
         {
-            LERROR(proclog, "Unable to parse slot name: <" << slot << ">");
+            LERROR(proclog, "Unable to parse signal name: <" << signal << ">");
             return false;
         }
 
-        return SetBreakpoint( slotProcName, slotName );
+        return SetBreakpoint( signalProcName, signalName );
     }
 
-    bool ProcessorToolbox::SetBreakpoint( const std::string& slotProcName, const std::string& slotName )
+    bool ProcessorToolbox::SetBreakpoint( const std::string& signalProcName, const std::string& signalName )
     {
-        std::shared_ptr< Processor > slotProc = GetProcessor( slotProcName );
-        if( slotProc == nullptr )
+        std::shared_ptr< Processor > signalProc = GetProcessor( signalProcName );
+        if( signalProc == nullptr )
         {
-            LERROR( proclog, "Processor named <" << slotProcName << "> was not found!" );
+            LERROR( proclog, "Processor named <" << signalProcName << "> was not found!" );
             return false;
         }
 
         try
         {
-            slotProc->SetDoBreakpoint( slotName, true );
+            signalProc->SetDoBreakpoint( signalName, true );
             return true;
         }
         catch( boost::exception& e )
@@ -452,30 +444,30 @@ namespace Nymph
         }
     }
 
-    bool ProcessorToolbox::RemoveBreakpoint( const std::string& slot )
+    bool ProcessorToolbox::RemoveBreakpoint( const std::string& signal )
     {
-        string slotProcName, slotName;
-        if( ! ParseSignalSlotName( slot, slotProcName, slotName ) )
+        string signalProcName, signalName;
+        if( ! ParseSignalSlotName( signal, signalProcName, signalName ) )
         {
-            LERROR( proclog, "Unable to parse slot name: <" << slot << ">" );
+            LERROR( proclog, "Unable to parse signal name: <" << signal << ">" );
             return false;
         }
 
-        return RemoveBreakpoint( slotProcName, slotName );
+        return RemoveBreakpoint( signalProcName, signalName );
     }
 
-    bool ProcessorToolbox::RemoveBreakpoint( const std::string& slotProcName, const std::string& slotName )
+    bool ProcessorToolbox::RemoveBreakpoint( const std::string& signalProcName, const std::string& signalName )
     {
-        std::shared_ptr< Processor > slotProc = GetProcessor( slotProcName );
-        if( slotProc == nullptr )
+        std::shared_ptr< Processor > signalProc = GetProcessor( signalProcName );
+        if( signalProc == nullptr )
         {
-            LERROR(proclog, "Processor named <" << slotProcName << "> was not found!");
+            LERROR(proclog, "Processor named <" << signalProcName << "> was not found!");
             return false;
         }
 
         try
         {
-            slotProc->SetDoBreakpoint( slotName, false );
+            signalProc->SetDoBreakpoint( signalName, false );
             return true;
         }
         catch( boost::exception& e )
@@ -562,7 +554,7 @@ namespace Nymph
         group.insert( Thread(primaryProc, name) );
         return true;
     }
-
+/*
     void ProcessorToolbox::AsyncRun()
     {
         if( fDoRunThread != nullptr )
@@ -981,5 +973,5 @@ namespace Nymph
 
         return true;
     }
-
+*/
 } /* namespace Nymph */

@@ -30,7 +30,8 @@ namespace Nymph
     SignalBase::SignalBase( const std::string& name ) :
             fName( name ),
             fConnections(),
-            fControl( nullptr )
+            fControl( nullptr ),
+            fDoBreakpoint( false )
     {}
 
     SignalBase::~SignalBase()

@@ -156,17 +156,17 @@ namespace Nymph
             bool MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName, int order);
             bool MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName);
 
-            /// Set a breakpoint on a slot
-            /// Slot string should be formatted as: [processor name]:[slot name]
-            bool SetBreakpoint( const std::string& slot );
-            /// Set a breakpoint on a slot
-            bool SetBreakpoint( const std::string& slotProcName, const std::string& slotName );
+            /// Set a breakpoint on a signal
+            /// Slot string should be formatted as: [processor name]:[signal name]
+            bool SetBreakpoint( const std::string& signal );
+            /// Set a breakpoint on a signal
+            bool SetBreakpoint( const std::string& signalProcName, const std::string& signalName );
 
-            /// Remove a breakpoint from a slot
-            /// Slot string should be formatted as: [processor name]:[slot name]
-            bool RemoveBreakpoint( const std::string& slot );
-            /// Remove a breakpoint from a slot
-            bool RemoveBreakpoint( const std::string& slotProcName, const std::string& slotName );
+            /// Remove a breakpoint from a signal
+            /// Slot string should be formatted as: [processor name]:[signal name]
+            bool RemoveBreakpoint( const std::string& signal );
+            /// Remove a breakpoint from a signal
+            bool RemoveBreakpoint( const std::string& signalProcName, const std::string& signalName );
 
         private:
             bool ParseSignalSlotName( const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot ) const;
@@ -206,9 +206,10 @@ namespace Nymph
             };
             typedef std::set< Thread, CompareThread > ThreadGroup;
             typedef std::deque< ThreadGroup > RunQueue;
-            bool AddProcessorToThreadGroup( const std::string& name, ThreadGroup& group );
-
             RunQueue fRunQueue;
+
+            bool AddProcessorToThreadGroup( const std::string& name, ThreadGroup& group );
+/*
 
         public:
             /// Process the run queue.
@@ -256,10 +257,10 @@ namespace Nymph
             boost::promise< void > fDoRunPromise;
             boost::shared_future< void > fDoRunFuture;
             bool fDoRunBreakFlag;
-
+*/
     };
 
-
+/*
     template< class Value, class IIterator >
     class KTThreadRefFutureIter : public boost::iterator_adaptor< KTThreadRefFutureIter< Value, IIterator >, IIterator, Value, boost::random_access_traversal_tag >
     {
@@ -292,7 +293,7 @@ namespace Nymph
 
     typedef KTThreadRefFutureIter< boost::unique_future< KTDataHandle >, std::vector< std::shared_ptr< KTThreadReference > >::iterator > KTThreadRefFutureIterator;
     typedef KTThreadRefFutureIter< const boost::unique_future< KTDataHandle >, std::vector< std::shared_ptr< KTThreadReference > >::const_iterator > KTThreadRefFutureConstIterator;
-
+*/
 
     inline bool ProcessorToolbox::MakeConnection(const std::string& signal, const std::string& slot) 
     {
@@ -315,7 +316,7 @@ namespace Nymph
         fRunQueue.clear();
         return;
     }
-
+/*
     inline void ProcessorToolbox::WaitForContinue( boost_unique_lock& lock )
     {
         //fMasterContSignal.wait();
@@ -333,6 +334,6 @@ namespace Nymph
         delete fDoRunThread;
         fDoRunThread = nullptr;
     }
-
+*/
 } /* namespace Nymph */
 #endif /* NYMPH_PROCESSORTOOLBOX_HH_ */

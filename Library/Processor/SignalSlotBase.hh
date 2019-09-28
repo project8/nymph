@@ -73,6 +73,8 @@ namespace Nymph
 
             MEMVAR( ControlAccess*, Control ); // doesn't use MEMVAR_PTR because Signal doesn't own the object pointed to by fControl
 
+            MEMVAR( bool, DoBreakpoint );
+
         protected:
             friend class SignalBase;
             virtual void AddConnection( SlotBase* slot, int group );

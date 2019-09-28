@@ -51,8 +51,6 @@ namespace Nymph
             // calls all connected functions
             void Emit( XArgs... args );
             void operator()( XArgs... args );
-
-            MEMVAR( bool, DoBreakpoint );
     };
 
 
@@ -110,15 +108,13 @@ namespace Nymph
 
     template< typename... XArgs >
     Signal< XArgs... >::Signal( const std::string& name ) :
-            SignalBase( name ),
-            fDoBreakpoint( false )
+            SignalBase( name )
     {}
 
     template< typename... XArgs >
     template< typename XOwner >
     inline Signal< XArgs... >::Signal( const std::string& name, XOwner* owner ) :
-            SignalBase( name ),
-            fDoBreakpoint( false )
+            SignalBase( name )
     {
         owner->RegisterSignal( name, this );
     }

@@ -58,8 +58,8 @@ namespace Nymph
             /// Register a slot object with this processor
             void RegisterSlot( std::string name, SlotBase* slot, std::initializer_list< std::string > signals = {} );
 
-            //bool GetDoBreakpoint( const std::string& slotName );
-            //void SetDoBreakpoint( const std::string& slotName, bool flag );
+            bool GetDoBreakpoint( const std::string& slotName );
+            void SetDoBreakpoint( const std::string& slotName, bool flag );
 
             MEMVAR_REF( std::string, Name );
 
