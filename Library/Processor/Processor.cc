@@ -128,13 +128,15 @@ namespace Nymph
 
         return;
     }
-/*
-    bool Processor::GetDoBreakpoint( const std::string& slotName )
+
+    bool Processor::GetDoBreakpoint( const std::string& signalName )
     {
-        KTSlotBase* slot = GetSlot(slotName);
-        if (slot != nullptr)
+        if( fSignals.count( signalName ) != 0 )
         {
-            return slot->GetDoBreakpoint();
+        SignalBase* signal = fSignals.at(signalName);
+        if (signal != nullptr)
+        {
+            return signal->GetDoBreakpoint();
         }
         BOOST_THROW_EXCEPTION( KTException() << "Slot <" << slotName << "> was not found" << eom );
         return false;
@@ -150,5 +152,5 @@ namespace Nymph
         BOOST_THROW_EXCEPTION( KTException() << "Slot <" << slotName << "> was not found" << eom );
         return;
     }
-*/
+
 } /* namespace Nymph */

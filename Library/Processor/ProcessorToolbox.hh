@@ -15,14 +15,14 @@
 #include "factory.hh"
 #include "param.hh"
 
-#define BOOST_THREAD_PROVIDES_FUTURE
-#include <boost/thread/future.hpp>
+//#define BOOST_THREAD_PROVIDES_FUTURE
+//#include <boost/thread/future.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
+//#include <boost/thread/thread.hpp>
 
-#include <boost/iterator/iterator_adaptor.hpp>
-#include <boost/type_traits/is_convertible.hpp>
-#include <boost/utility/enable_if.hpp>
+//#include <boost/iterator/iterator_adaptor.hpp>
+//#include <boost/type_traits/is_convertible.hpp>
+//#include <boost/utility/enable_if.hpp>
 
 #include <deque>
 #include <initializer_list>

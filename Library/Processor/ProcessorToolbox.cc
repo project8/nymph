@@ -14,8 +14,8 @@
 #include "logger.hh"
 #include "param_codec.hh"
 
-#include <boost/exception/get_error_info.hpp>
-#include <boost/thread.hpp>
+//#include <boost/exception/get_error_info.hpp>
+//#include <boost/thread.hpp>
 
 using std::deque;
 using std::set;
@@ -286,7 +286,7 @@ namespace Nymph
             ProcessorInfo pInfo;
             pInfo.fProc = proc;
             fProcMap.insert( ProcMapValue(procName, pInfo) );
-            LDEBUG( proclog, "Added processor <" << procName << "> (a.k.a. " << proc->GetConfigName() << ")" );
+            LDEBUG( proclog, "Added processor <" << procName << "> (a.k.a. " << proc->Name() << ")" );
             return true;
         }
         LWARN( proclog, "Processor <" << procName << "> already exists; new processor was not added." );
@@ -402,8 +402,8 @@ namespace Nymph
         catch (boost::exception& e)
         {
             LERROR( proclog, "An error occurred while connecting signals and slots:\n"
-                    << "\tSignal " << signalName << " from processor " << signalProcName << " (a.k.a. " << signalProc->GetConfigName() << ")" << '\n'
-                    << "\tSlot " << slotName << " from processor " << slotProcName << " (a.k.a. " << slotProc->GetConfigName() << ")" << '\n'
+                    << "\tSignal " << signalName << " from processor " << signalProcName << " (a.k.a. " << signalProc->Name() << ")" << '\n'
+                    << "\tSlot " << slotName << " from processor " << slotProcName << " (a.k.a. " << slotProc->Name() << ")" << '\n'
                     << '\t' << diagnostic_information( e ) );
             return false;
         }
