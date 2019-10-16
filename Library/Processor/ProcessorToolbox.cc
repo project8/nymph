@@ -247,9 +247,14 @@ namespace Nymph
                 }
             }
             const scarab::param_node& subNode = node[nameUsed].as_node();
-            if( ! iter->second.fProc->Configure(subNode) )
+            try
+            {
+                iter->second.fProc->Configure(subNode);
+            }
+            catch( const Exception& e )
             {
                 LERROR( proclog, "An error occurred while configuring processor <" << procName << "> with parameter node <" << nameUsed << ">" );
+                LERROR( proclog, e.what() );
                 return false;
             }
         }

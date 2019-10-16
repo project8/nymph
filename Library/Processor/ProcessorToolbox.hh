@@ -17,7 +17,7 @@
 
 //#define BOOST_THREAD_PROVIDES_FUTURE
 //#include <boost/thread/future.hpp>
-#include <boost/thread/mutex.hpp>
+//#include <boost/thread/mutex.hpp>
 //#include <boost/thread/thread.hpp>
 
 //#include <boost/iterator/iterator_adaptor.hpp>
@@ -87,7 +87,7 @@ namespace Nymph
     class ProcessorToolbox
     {
         private:
-            typedef boost::unique_lock< boost::mutex > boost_unique_lock;
+            typedef std::unique_lock< std::mutex > unique_lock;
 
         public:
             ProcessorToolbox( const std::string& name = "processor-toolbox" );

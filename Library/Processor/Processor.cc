@@ -7,6 +7,8 @@
 
 #include "Processor.hh"
 
+#include "Exception.hh"
+
 #include <utility>
 
 namespace Nymph
@@ -131,25 +133,23 @@ namespace Nymph
 
     bool Processor::GetDoBreakpoint( const std::string& signalName )
     {
-        if( fSignals.count( signalName ) != 0 )
-        {
-        SignalBase* signal = fSignals.at(signalName);
+        SignalBase* signal = fSignals.at(signalName  );
         if (signal != nullptr)
         {
             return signal->GetDoBreakpoint();
         }
-        BOOST_THROW_EXCEPTION( KTException() << "Slot <" << slotName << "> was not found" << eom );
+        BOOST_THROW_EXCEPTION( Exception() << "Signal <" << signalName << "> was not found" << eom );
         return false;
     }
 
-    void Processor::SetDoBreakpoint( const std::string& slotName, bool flag )
+    void Processor::SetDoBreakpoint( const std::string& signalName, bool flag )
     {
-        KTSlotBase* slot = GetSlot(slotName);
-        if (slot != nullptr)
+        SignalBase* signal = fSignals.at(signalName  );
+        if( signal != nullptr )
         {
-            return slot->SetDoBreakpoint(flag);
+            return signal->SetDoBreakpoint( flag );
         }
-        BOOST_THROW_EXCEPTION( KTException() << "Slot <" << slotName << "> was not found" << eom );
+        BOOST_THROW_EXCEPTION( Exception() << "Signal <" << signalName << "> was not found" << eom );
         return;
     }
 

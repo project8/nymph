@@ -33,18 +33,18 @@ namespace Nymph
 
     void ControlAccess::Resume()
     {
-        boost::unique_lock< boost::mutex > lock( fMutex );
+        std::unique_lock< std::mutex > lock( fMutex );
         fBreakFlag.store( false );
         fCondVar.notify_one();
     }
 
     void ControlAccess::Break()
     {
-        boost::unique_lock< boost::mutex > lock( fMutex );
+        std::unique_lock< std::mutex > lock( fMutex );
         fBreakFlag.store( true );
         while( fBreakFlag.load() && ! is_canceled() )
         {
-            fCondVar.wait_for( lock, boost::chrono::milliseconds(fCycleTimeMS) );
+            fCondVar.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
         }
     }
 

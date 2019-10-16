@@ -12,10 +12,12 @@
 
 #include "cancelable.hh"
 
-#include <boost/thread/condition_variable.hpp>
-#include <boost/thread/mutex.hpp>
+//#include <boost/thread/condition_variable.hpp>
+//#include <boost/thread/mutex.hpp>
 
+#include <condition_variable>
 #include <memory>
+#include <mutex>
 #include <tuple>
 
 namespace Nymph
@@ -85,8 +87,8 @@ namespace Nymph
             void Break(); // called by this thread
             void Resume(); // called by user thread
 
-            MEMVAR_REF( boost::mutex, Mutex );
-            MEMVAR_REF( boost::condition_variable, CondVar );
+            MEMVAR_REF( std::mutex, Mutex );
+            MEMVAR_REF( std::condition_variable, CondVar );
             MEMVAR_ATOMIC_NOSET( bool, BreakFlag );
             MEMVAR( unsigned, CycleTimeMS );
 
