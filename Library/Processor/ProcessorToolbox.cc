@@ -498,7 +498,7 @@ namespace Nymph
 
     bool ProcessorToolbox::PushBackToRunQueue( const std::string& name )
     {
-        ThreadGroup threadGroup;
+        ThreadSourceGroup threadGroup;
 
         if( ! AddProcessorToThreadGroup( name, threadGroup ) )
         {
@@ -519,7 +519,7 @@ namespace Nymph
 
     bool ProcessorToolbox::PushBackToRunQueue( std::vector< std::string > names )
     {
-        ThreadGroup threadGroup;
+        ThreadSourceGroup threadGroup;
 
         std::stringstream toPrint;
         for( const std::string& name : names )
@@ -539,7 +539,7 @@ namespace Nymph
         return true;
     }
 
-    bool ProcessorToolbox::AddProcessorToThreadGroup( const std::string& name, ThreadGroup& group )
+    bool ProcessorToolbox::AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroup& group )
     {
         std::shared_ptr< Processor > procForRunQueue = GetProcessor( name );
         LDEBUG( proclog, "Attempting to add processor <" << name << "> to the run queue" );
@@ -556,10 +556,10 @@ namespace Nymph
             return false;
         }
         //group.insert(primaryProc);
-        group.insert( Thread(primaryProc, name) );
+        group.insert( ThreadSource(primaryProc, name) );
         return true;
     }
-/*
+
     void ProcessorToolbox::AsyncRun()
     {
         if( fDoRunThread != nullptr )
@@ -696,6 +696,7 @@ namespace Nymph
         fDoRunThread = new boost::thread( singleThreadRun );
         return;
     }
+
     void ProcessorToolbox::StartMultiThreadedRun()
     {
         auto multiThreadRun = [&]()
@@ -712,30 +713,30 @@ namespace Nymph
                         boost_unique_lock breakContLock( fBreakContMutex );
                         //boost_unique_lock threadFuturesLock( fThreadReferencesMutex );
 
-                        for (ThreadGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
+                        for (ThreadSourceGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
                         {
                             std::string procName( tgIter->fName );
                             LINFO( proclog, "Starting processor <" << procName << ">" );
 
-                            std::shared_ptr< KTThreadReference > thisThreadRef = std::make_shared< KTThreadReference >();
-                            thisThreadRef->Name() = procName;
+                            //std::shared_ptr< KTThreadReference > thisThreadRef = std::make_shared< KTThreadReference >();
+                            //thisThreadRef->Name() = procName;
 
-                            thisThreadRef->SetInitiateBreakFunc( [&](){ this->InitiateBreak(); } );
-                            thisThreadRef->SetWaitForContinueFunc( [&]( boost_unique_lock& lock ){ this->WaitForContinue( lock ); } );
-                            fThreadReferences.push_back( thisThreadRef );
+                            //thisThreadRef->SetInitiateBreakFunc( [&](){ this->InitiateBreak(); } );
+                            //thisThreadRef->SetWaitForContinueFunc( [&]( boost_unique_lock& lock ){ this->WaitForContinue( lock ); } );
+                            //fThreadReferences.push_back( thisThreadRef );
 
-                            boost::condition_variable threadStartedCV;
-                            boost::mutex threadStartedMutex;
-                            bool threadStartedFlag = false;
+                            //boost::condition_variable threadStartedCV;
+                            //boost::mutex threadStartedMutex;
+                            //bool threadStartedFlag = false;
 
-                            boost_unique_lock threadStartedLock( threadStartedMutex );
-                            boost::thread* thisThread = new boost::thread( [&](){ tgIter->fProc->operator()( thisThreadRef, threadStartedCV, threadStartedFlag ); } );
-                            KTDEBUG( proclog, "Thread ID is <" << thisThread->get_id() << ">; waiting for thread start" );
-                            while( ! threadStartedFlag )
-                            {
-                                threadStartedCV.wait( threadStartedLock );
-                            }
-                            KTDEBUG( proclog, "Thread has started" );
+                            //boost_unique_lock threadStartedLock( threadStartedMutex );
+                            //boost::thread* thisThread = new boost::thread( [&](){ tgIter->fProc->operator()( thisThreadRef, threadStartedCV, threadStartedFlag ); } );
+                            //KTDEBUG( proclog, "Thread ID is <" << thisThread->get_id() << ">; waiting for thread start" );
+                            //while( ! threadStartedFlag )
+                            //{
+                            //    threadStartedCV.wait( threadStartedLock );
+                            //}
+                            //KTDEBUG( proclog, "Thread has started" );
 
                             threads.add_thread( thisThread );
 
@@ -978,5 +979,5 @@ namespace Nymph
 
         return true;
     }
-*/
+
 } /* namespace Nymph */

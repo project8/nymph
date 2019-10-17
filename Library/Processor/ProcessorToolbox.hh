@@ -189,27 +189,27 @@ namespace Nymph
             void ClearRunQueue();
 
         private:
-            struct Thread
+            struct ThreadSource
             {
                 PrimaryProcessor* fProc;
                 std::string fName;
-                Thread( PrimaryProcessor* proc, const std::string& name ) : 
+                ThreadSource( PrimaryProcessor* proc, const std::string& name ) : 
                         fProc(proc), fName(name)
                 {}
             };
-            struct CompareThread
+            struct CompareThreadSource
             {
-                bool operator()( const Thread& lhs, const Thread& rhs ) const
+                bool operator()( const ThreadSource& lhs, const ThreadSource& rhs ) const
                 {
                     return lhs.fProc < rhs.fProc;
                 }
             };
-            typedef std::set< Thread, CompareThread > ThreadGroup;
-            typedef std::deque< ThreadGroup > RunQueue;
+            typedef std::set< ThreadSource, CompareThreadSource > ThreadSourceGroup;
+            typedef std::deque< ThreadSourceGroup > RunQueue;
             RunQueue fRunQueue;
 
-            bool AddProcessorToThreadGroup( const std::string& name, ThreadGroup& group );
-/*
+            bool AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroup& group );
+
 
         public:
             /// Process the run queue.
@@ -257,7 +257,7 @@ namespace Nymph
             boost::promise< void > fDoRunPromise;
             boost::shared_future< void > fDoRunFuture;
             bool fDoRunBreakFlag;
-*/
+
     };
 
 /*
