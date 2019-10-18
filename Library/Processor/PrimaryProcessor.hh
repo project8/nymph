@@ -22,7 +22,7 @@ namespace Nymph
 
         public:
             /// Callable function used by std::thread
-            void operator()( ControlAccess* control );
+            void operator()( ControlAccessPtr control );
 
             /// Starts the  main action of the processor
             virtual bool Run() = 0;

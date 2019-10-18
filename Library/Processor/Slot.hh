@@ -30,7 +30,7 @@ namespace Nymph
     {
         public:
             using signature = void( XArgs... );
-            using full_signature = void( ControlAccess*, XArgs... );
+            using full_signature = void( ControlAccessPtr, XArgs... );
             using signal_list = std::initializer_list< std::string >;
 
         public:
@@ -61,14 +61,14 @@ namespace Nymph
             void operator()( XArgs... args );
 
             /// execute fFunction with a ControlAccess object
-            void operator()( ControlAccess* access, XArgs... args );
+            void operator()( ControlAccessPtr access, XArgs... args );
 
             MEMVAR_REF( boost::function< signature >, Function );
 
             MEMVAR( bool, DoBreakpoint );
 
         protected:
-            void SlotFuncWrapper( ControlAccess* access, XArgs... args );
+            void SlotFuncWrapper( ControlAccessPtr access, XArgs... args );
     };
 
 
@@ -211,14 +211,14 @@ namespace Nymph
     }
 
     template< typename... XArgs >
-    inline void Slot< XArgs... >::operator()( ControlAccess* access, XArgs... args )
+    inline void Slot< XArgs... >::operator()( ControlAccessPtr access, XArgs... args )
     {
         SlotFuncWrapper( access, args... );
         return;
     }
 
     template< typename... XArgs >
-    inline void Slot< XArgs... >::SlotFuncWrapper( ControlAccess* access, XArgs... args )
+    inline void Slot< XArgs... >::SlotFuncWrapper( ControlAccessPtr access, XArgs... args )
     {
         //TODO could do something with `access` here
         for( auto signalIt = fSignalsUsed.begin(); signalIt != fSignalsUsed.end(); ++signalIt )

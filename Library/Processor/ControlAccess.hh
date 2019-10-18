@@ -22,6 +22,33 @@
 
 namespace Nymph
 {
+    class SharedControl
+    {
+        public:
+            SharedControl();
+            virtual ~SharedControl();
+
+            void Break(); // to be called by a working thread
+
+            void Cancel(); // to be called by a working thread
+
+            bool IsAtBreak() const; // to be called by a working thread
+
+            bool IsCanceled() const; // to be called by a working thread
+
+            // return: true = continue; false = cancel
+            bool WaitToContinue() const; // to be called by a working thread
+
+            void Resume(); // to be called by the processor toolbox
+
+            MEMVAR_REF( std::mutex, Mutex );
+            MEMVAR_REF( std::condition_variable, CondVar );
+            MEMVAR_NOSET( bool, BreakFlag );
+            MEMVAR_NOSET( bool, CanceledFlag );
+            MEMVAR( unsigned, CycleTimeMS );
+
+    }
+
     class ReturnBufferBase
     {
         public:
@@ -84,15 +111,10 @@ namespace Nymph
             std::shared_ptr< ReturnBufferBase > fReturn;
 
         public:
-            void Break(); // called by this thread
-            void Resume(); // called by user thread
-
-            MEMVAR_REF( std::mutex, Mutex );
-            MEMVAR_REF( std::condition_variable, CondVar );
-            MEMVAR_ATOMIC_NOSET( bool, BreakFlag );
-            MEMVAR( unsigned, CycleTimeMS );
-
+            MEM_VAR_SHARED_PTR( SharedControl, Control );
     };
+
+    typedef std::shared_ptr< ControlAccess > ControlAccessPtr;
 
 
     template< typename... Args >

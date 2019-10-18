@@ -34,7 +34,7 @@ namespace Nymph
     {
         public:
             using signature = void( XArgs... );
-            using full_signature = void( ControlAccess*, XArgs... );
+            using full_signature = void( ControlAccessPtr, XArgs... );
 
         public:
             /// Unowned signal
@@ -51,6 +51,8 @@ namespace Nymph
             // calls all connected functions
             void Emit( XArgs... args );
             void operator()( XArgs... args );
+
+            MEMVAR_SHARED_PTR( ControlAccess, ControlAcc );
     };
 
 
@@ -168,15 +170,17 @@ namespace Nymph
     template< typename... XArgs >
     inline void Signal< XArgs... >::operator()( XArgs... args )
     {
+        // TODO: if not canceled and at breakpoint, then set return and break
         if( fDoBreakpoint )
         {
             fControl->SetReturn< XArgs... >( args... );
             fControl->Break(); // waits for resume or exit
         }
+        // TODO: if canceled, quit
 
         for( auto connection : fConnections )
         {
-            static_cast< Slot< XArgs... >* >(connection)->operator()( fControl, args... );
+            static_cast< Slot< XArgs... >* >(connection)->operator()( fControlAcc, args... );
         }
         return;
     }

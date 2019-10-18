@@ -22,11 +22,12 @@ namespace Nymph
     PrimaryProcessor::~PrimaryProcessor()
     {}
 
-    void PrimaryProcessor::operator()( ControlAccess* control )
+    void PrimaryProcessor::operator()( ControlAccessPtr control )
     {
+        // pass the control access pointer to every signal in the primary processor
         for( auto signalIt = fSignals.begin(); signalIt != fSignals.end(); ++signalIt )
         {
-            signalIt->second->SetControl( control );
+            signalIt->second->SetControlAcc( control );
         }
 
         // go!

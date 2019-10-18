@@ -30,7 +30,8 @@ namespace Nymph
             fProcFactory( scarab::factory< Processor, const std::string& >::get_instance() ),
             fRunSingleThreaded( false ),
             fRunQueue(),
-            fProcMap()/*,
+            fProcMap(),
+            fControl( new SharedControl() )/*,
             fThreadReferences(),
             fContinueCV(),
             fDoContinue( false ),
@@ -717,6 +718,8 @@ namespace Nymph
                         {
                             std::string procName( tgIter->fName );
                             LINFO( proclog, "Starting processor <" << procName << ">" );
+
+                            
 
                             //std::shared_ptr< KTThreadReference > thisThreadRef = std::make_shared< KTThreadReference >();
                             //thisThreadRef->Name() = procName;

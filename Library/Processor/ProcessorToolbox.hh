@@ -9,6 +9,7 @@
 #ifndef NYMPH_PROCESSORTOOLBOX_HH_
 #define NYMPH_PROCESSORTOOLBOX_HH_
 
+#include "ControlAccess.hh"
 #include "MemberVariable.hh"
 //#include "KTThreadReference.hh"
 
@@ -193,8 +194,9 @@ namespace Nymph
             {
                 PrimaryProcessor* fProc;
                 std::string fName;
+                ControlAccessPtr fControlAccess;
                 ThreadSource( PrimaryProcessor* proc, const std::string& name ) : 
-                        fProc(proc), fName(name)
+                        fProc(proc), fName(name), fControlAccess( new ControlAccess() )
                 {}
             };
             struct CompareThreadSource
@@ -236,9 +238,9 @@ namespace Nymph
 
             KTDataHandle GetData( const std::string& threadName );
 
-        private:
-            friend class KTThreadReference;
+            MEMVAR_SHARED_PTR_CONST( SharedControl, Control );
 
+        private:
             typedef boost::shared_future< KTDataHandle > Future;
 
             void StartSingleThreadedRun();
