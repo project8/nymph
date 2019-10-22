@@ -221,10 +221,10 @@ namespace Nymph
     inline void Slot< XArgs... >::SlotFuncWrapper( ControlAccessPtr access, XArgs... args )
     {
         //TODO could do something with `access` here
-        for( auto signalIt = fSignalsUsed.begin(); signalIt != fSignalsUsed.end(); ++signalIt )
-        {
-            (*signalIt)->SetControl( access );
-        }
+        //for( auto signalIt = fSignalsUsed.begin(); signalIt != fSignalsUsed.end(); ++signalIt )
+        //{
+        //    (*signalIt)->SetControl( access );
+        //}
 
         fFunction( args... );
 

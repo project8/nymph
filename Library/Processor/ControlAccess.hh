@@ -8,9 +8,12 @@
 #ifndef NYMPH_CONTROLACCESS_HH_
 #define NYMPH_CONTROLACCESS_HH_
 
+#include "Exception.hh"
 #include "MemberVariable.hh"
+#include "ReturnBuffer.hh"
 
-#include "cancelable.hh"
+#include "cancelable.hh" // remove when ControlAccess is removed
+#include "singleton.hh"
 
 //#include <boost/thread/condition_variable.hpp>
 //#include <boost/thread/mutex.hpp>
@@ -18,17 +21,24 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
-#include <tuple>
 
 namespace Nymph
 {
-    class SharedControl
+
+    class SharedControl : public scarab::singleton< SharedControl >
     {
-        public:
+        protected:
+            allow_singleton_access( SharedControl );
+
             SharedControl();
             virtual ~SharedControl();
 
-            void Break(); // to be called by a working thread
+        public:
+            template< typename... Args >
+            std::tuple< Args&... >& GetReturn();
+
+            template< typename... Args >
+            void Break( Args&... args ); // to be called by a working thread
 
             void Cancel(); // to be called by a working thread
 
@@ -39,60 +49,51 @@ namespace Nymph
             // return: true = continue; false = cancel
             bool WaitToContinue() const; // to be called by a working thread
 
+            // return: true = was a break; false = cancel
+            bool WaitForBreakOrCanceled() const; // to be called by the processor toolbox
+
             void Resume(); // to be called by the processor toolbox
 
-            MEMVAR_REF( std::mutex, Mutex );
-            MEMVAR_REF( std::condition_variable, CondVar );
+            MEMVAR_REF_MUTABLE( std::mutex, Mutex );
+            MEMVAR_REF_MUTABLE( std::condition_variable, CondVarContinue );
+            MEMVAR_REF_MUTABLE( std::condition_variable, CondVarBreak );
             MEMVAR_NOSET( bool, BreakFlag );
             MEMVAR_NOSET( bool, CanceledFlag );
             MEMVAR( unsigned, CycleTimeMS );
+            MEMVAR_SHARED_PTR_CONST( ReturnBufferBase, ReturnPtr );
 
-    }
-
-    class ReturnBufferBase
-    {
-        public:
-            ReturnBufferBase();
-            virtual ~ReturnBufferBase();
     };
 
     template< typename... Args >
-    struct ReturnBuffer : ReturnBufferBase
+    void SharedControl::Break( Args&... args )
     {
-        public:
-            ReturnBuffer() :
-                    fReturn( nullptr )
-            {}
-
-            ReturnBuffer( Args&... retval ) :
-                    fReturn( new std::tuple< Args&... >( retval... ) )
-            {}
-
-            virtual ~ReturnBuffer()
-            {}
-
-            std::tuple< Args&... >& GetReturn()
-            {
-                if( fReturn == nullptr ) throw std::exception();
-                return *fReturn;
-            }
-
-        protected:
-            std::tuple< Args&... >* fReturn;
-    };
-
-    template<>
-    struct ReturnBuffer< void > : ReturnBufferBase
-    {
-        ReturnBuffer() :
-                ReturnBufferBase()
-        {}
-
-        void GetReturn()
+        while( IsAtBreak() && ! IsCanceled() )
         {
-            return;
+            if( ! WaitToContinue() )
+            {
+                BOOST_THROW_EXCEPTION( Exception() << "Canceled while waiting to initiate a breakpoint" << eom );
+            }
         }
-    };
+
+        std::unique_lock< std::mutex > lock( fMutex );
+        fBreakFlag = true;
+        fCondVarBreak.notify_all();
+        return;
+    }
+
+
+
+    template< typename... Args >
+    std::tuple< Args&... >& SharedControl::GetReturn()
+    {
+        if( ! fReturnPtr ) BOOST_THROW_EXCEPTION( Exception() << "No return available" << eom );
+        std::unique_lock< std::mutex > lock( fMutex );
+        std::shared_ptr< ReturnBuffer< Args... > > buffer( std::dynamic_pointer_cast< ReturnBuffer< Args... > >(fReturnPtr) );
+        if( buffer == nullptr ) BOOST_THROW_EXCEPTION( Exception() << "Incorrect types used to get return" << eom );
+        return buffer->GetReturn();
+    }
+
+
 
     class ControlAccess : public scarab::cancelable
     {
@@ -111,7 +112,7 @@ namespace Nymph
             std::shared_ptr< ReturnBufferBase > fReturn;
 
         public:
-            MEM_VAR_SHARED_PTR( SharedControl, Control );
+            //MEM_VAR_SHARED_PTR( SharedControl, Control );
     };
 
     typedef std::shared_ptr< ControlAccess > ControlAccessPtr;

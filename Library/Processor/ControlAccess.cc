@@ -7,81 +7,80 @@
 
 #include "ControlAccess.hh"
 
-#include <boost/thread/locks.hpp>
-#include <boost/thread/lock_types.hpp>
+//#include <boost/thread/locks.hpp>
+//#include <boost/thread/lock_types.hpp>
 
 
 namespace Nymph
 {
     SharedControl::SharedControl() :
             fMutex(),
-            fCondVar(),
+            fCondVarContinue(),
+            fCondVarBreak(),
             fBreakFlag( false ),
             fCanceledFlag( false ),
             fCycleTimeMS( 500 )
     {}
 
-    SharedContrl::~SharedControl()
+    SharedControl::~SharedControl()
     {}
 
-    void SharedContrl::Break()
-    {
-        std::unique_lock< std::mutex > lock( fMutex );
-        fBreakFlag = true;
-        return;
-    }
-
-    void SharedContrl::Cancel()
+    void SharedControl::Cancel()
     {
         std::unique_lock< std::mutex > lock( fMutex );
         fCanceledFlag = true;
+        fCondVarBreak.notify_all();
         return;
     }
 
-    bool SharedContrl::IsAtBreak() const
+    bool SharedControl::IsAtBreak() const
     {
         std::unique_lock< std::mutex > lock( fMutex );
         return fBreakFlag;
     }
 
-    bool SharedContrl::IsCanceled() const
+    bool SharedControl::IsCanceled() const
     {
         std::unique_lock< std::mutex > lock( fMutex );
         return fCanceledFlag;
     }
 
-    bool SharedContrl::WaitToContinue() const
+    bool SharedControl::WaitToContinue() const
     {
         std::unique_lock< std::mutex > lock( fMutex );
         if( fBreakFlag )
         {
             while( fBreakFlag && ! fCanceledFlag )
             {
-                fCondVar.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
+                fCondVarContinue.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
             }
         }
-        return ! fCanceled; // returns true if the thread should continue; false if it should end
+        return ! fCanceledFlag; // returns true if the thread should continue; false if it should end
     }
 
-    void SharedContrl::Resume()
+    bool SharedControl::WaitForBreakOrCanceled() const
+    {
+        std::unique_lock< std::mutex > lock( fMutex );
+        while( ! fBreakFlag && ! fCanceledFlag )
+        {
+            fCondVarBreak.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
+        }
+        return fCanceledFlag ? false : fBreakFlag;
+    }
+
+    void SharedControl::Resume()
     {
         std::unique_lock< std::mutex > lock( fMutex );
         fBreakFlag = false;
-        fCondVar.notify_all();
+        fCondVarContinue.notify_all();
     }
 
 
 
-    ReturnBufferBase::ReturnBufferBase()
-    {}
-
-    ReturnBufferBase::~ReturnBufferBase()
-    {}
-
 
     ControlAccess::ControlAccess() :
-            fReturn( new ReturnBuffer< int >() ),
-            fControl()
+            fReturn( new ReturnBuffer< int >() )//,
+            //fControl()
     {}
 
     ControlAccess::~ControlAccess()

@@ -12,7 +12,9 @@
 
 #include "SignalSlotBase.hh"
 
+#include "ControlAccess.hh"
 #include "Exception.hh"
+#include "QuitThread.hh"
 
 #include "logger.hh"
 
@@ -52,6 +54,7 @@ namespace Nymph
             void Emit( XArgs... args );
             void operator()( XArgs... args );
 
+            // TODO: remove this
             MEMVAR_SHARED_PTR( ControlAccess, ControlAcc );
     };
 
@@ -170,13 +173,24 @@ namespace Nymph
     template< typename... XArgs >
     inline void Signal< XArgs... >::operator()( XArgs... args )
     {
-        // TODO: if not canceled and at breakpoint, then set return and break
+        SharedControl* control = SharedControl::get_instance();
+
+        // if we're canceled, then quit the thread
+        // if we're at a break, then wait to continue
+        //   once we continue, if we need to quit, then do so
+        if( control->IsCanceled() || (control->IsAtBreak() && ! control->WaitToContinue()) )
+        {
+            QUIT_THREAD;
+        }
+
         if( fDoBreakpoint )
         {
-            fControl->SetReturn< XArgs... >( args... );
-            fControl->Break(); // waits for resume or exit
+            control->Break( args... );
+            if( ! control->WaitToContinue() )
+            {
+                QUIT_THREAD;
+            }
         }
-        // TODO: if canceled, quit
 
         for( auto connection : fConnections )
         {

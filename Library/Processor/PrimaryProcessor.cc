@@ -7,6 +7,7 @@
 
 #include "PrimaryProcessor.hh"
 
+#include "QuitThread.hh"
 #include "Exception.hh"
 
 #include "logger.hh"
@@ -22,13 +23,15 @@ namespace Nymph
     PrimaryProcessor::~PrimaryProcessor()
     {}
 
-    void PrimaryProcessor::operator()( ControlAccessPtr control )
+    void PrimaryProcessor::operator()()// ControlAccessPtr control )
     {
         // pass the control access pointer to every signal in the primary processor
+        /*
         for( auto signalIt = fSignals.begin(); signalIt != fSignals.end(); ++signalIt )
         {
             signalIt->second->SetControlAcc( control );
         }
+        */
 
         // go!
         try
@@ -43,6 +46,10 @@ namespace Nymph
                 LWARN( proclog, "Valid return" );
                 //fThreadRef->SetReturnValue( KTDataHandle() );
             }
+        }
+        catch( QuitThread& e )
+        {
+            LDEBUG( proclog, "Thread quit from " << e.fFile << ", line " << e.fLine );
         }
         catch( boost::exception& e )
         {

@@ -14,6 +14,9 @@
 #include "logger.hh"
 #include "param_codec.hh"
 
+#include <map>
+#include <thread>
+
 //#include <boost/exception/get_error_info.hpp>
 //#include <boost/thread.hpp>
 
@@ -708,10 +711,11 @@ namespace Nymph
 
                 for (RunQueue::iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
                 {
-                    boost::thread_group threads;
+                    //boost::thread_group threads;
+                    std::map< std::thread > threads;
 
                     { // scope for threadFuturesLock
-                        boost_unique_lock breakContLock( fBreakContMutex );
+                        //boost_unique_lock breakContLock( fBreakContMutex );
                         //boost_unique_lock threadFuturesLock( fThreadReferencesMutex );
 
                         for (ThreadSourceGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
@@ -719,7 +723,7 @@ namespace Nymph
                             std::string procName( tgIter->fName );
                             LINFO( proclog, "Starting processor <" << procName << ">" );
 
-                            
+                            threads.emplace( procName, &PrimaryProcessor::operator(), tgIter->fProc );
 
                             //std::shared_ptr< KTThreadReference > thisThreadRef = std::make_shared< KTThreadReference >();
                             //thisThreadRef->Name() = procName;
@@ -741,11 +745,37 @@ namespace Nymph
                             //}
                             //KTDEBUG( proclog, "Thread has started" );
 
-                            threads.add_thread( thisThread );
+                            //threads.add_thread( thisThread );
 
                         }// end for loop over the thread group
                     } // end scope for threadFuturesLock
 
+                    SharedControl* control = SharedControl::get_instance();
+                    bool stillRunning = true;
+                    while( stillRunning )
+                    {
+                        bool breakOrCanceled = control->WaitForBreakOrCanceled();
+                        if( breakOrCanceled )
+                        {
+                            // then at a breakpoint
+                            stillRunning = true;
+                            LDEBUG( proclog, "At a breakpoint" );
+                            // TODO: do we need to do anything while at a breakpoint?
+                            if( ! control->WaitToContinue() )
+                            {
+                                stillRunning = false;
+                                LDEBUG( proclog, "Detected cancelation while waiting at breakpoint" );
+                            }
+                        }
+                        else
+                        {
+                            // then canceled
+                            stillRunning = false;
+                            LDEBUG( proclog, "Detected cancelation while waiting during running" );
+                        }
+                    }
+
+                    /*
                     bool stillRunning = true; // determines behavior that depends on whether a return from the thread was temporary or from the thread completing
                     do
                     {
@@ -794,6 +824,7 @@ namespace Nymph
                     threads.join_all();
                     boost_unique_lock breakContLock( fBreakContMutex );
                     fThreadReferences.clear();
+                    */
                 } // end for loop over the run-queue
 
                 LPROG( proclog, "Processing is complete (multi-threaded)" );
@@ -802,24 +833,27 @@ namespace Nymph
             {
                 // exceptions thrown in this function or from within processors will end up here
                 LERROR( proclog, "Caught std::exception thrown in a processor or in the multi-threaded run function: " << e.what() );
-                LWARN( proclog, "Setting boost::exception of do-run-promise in StartMultiThreadedRun" );
-                fDoRunPromise.set_exception( boost::current_exception() );
+                SharedControl::get_instance()->Cancel();
+                //LWARN( proclog, "Setting boost::exception of do-run-promise in StartMultiThreadedRun" );
+                //fDoRunPromise.set_exception( boost::current_exception() );
                 return;
             }
             catch( boost::exception& e )
             {
                 // exceptions thrown in this function or from within processors will end up here
                 LERROR( proclog, "Caught boost::exception thrown in a processor or in the multi-threaded run function" );
-                LWARN( proclog, "Setting boost::exception of do-run-promise in StartMultiThreadedRun" );
-                fDoRunPromise.set_exception( boost::current_exception() );
+                LERROR( proclog, "Diagnostic Information:\n" << diagnostic_information( e ) );
+                SharedControl::get_instance()->Cancel();
+                //LWARN( proclog, "Setting boost::exception of do-run-promise in StartMultiThreadedRun" );
+                //fDoRunPromise.set_exception( boost::current_exception() );
                 return;
             }
-            LWARN( proclog, "Setting value of do-run-promise in StartMultiThreadedRun" );
-            fDoRunPromise.set_value();
+            //LWARN( proclog, "Setting value of do-run-promise in StartMultiThreadedRun" );
+            //fDoRunPromise.set_value();
             return;
         }; // end multi-threaded run lambda
 
-        fDoRunThread = new boost::thread( multiThreadRun );
+        fDoRunThread = new std::thread( multiThreadRun );
         return;
     }
 

@@ -68,8 +68,8 @@ namespace Nymph
 
             // this is used only to hold pointers to slots waiting for signals
             // the keys are the names of the signals being waited for, and the values are the slot pointers
-            typedef std::multimap< std::string, SlotBase* > WaitingSlotMap;
-            MEMVAR_REF_CONST( WaitingSlotMap, SlotsWaitingForSignals );
+            //typedef std::multimap< std::string, SlotBase* > WaitingSlotMap;
+            //MEMVAR_REF_CONST( WaitingSlotMap, SlotsWaitingForSignals );
 
     };
 

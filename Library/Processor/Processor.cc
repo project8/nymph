@@ -31,11 +31,11 @@ namespace Nymph
         fSignals.insert( SigMapVal(name, signal) );
 
         // give the signal to any slots that are waiting for it
-        auto range = fSlotsWaitingForSignals.equal_range( name );
-        for( auto rangeIt = range.first; rangeIt != range.second; ++rangeIt )
-        {
-            rangeIt->second->SignalsUsed().push_back( signal );
-        }
+        //auto range = fSlotsWaitingForSignals.equal_range( name );
+        //for( auto rangeIt = range.first; rangeIt != range.second; ++rangeIt )
+        //{
+        //    rangeIt->second->SignalsUsed().push_back( signal );
+        //}
 
         return;
     }
@@ -45,6 +45,7 @@ namespace Nymph
         LDEBUG( processorlog, "Registering slot <" << name << "> in processor <" << fName << ">" );
         fSlots.insert( SlotMapVal(name, slot) );
 
+        /*
         // take care of giving signal pointers to the slot, or saving them for later assignment
         for( auto signalIt = signals.begin(); signalIt != signals.end(); ++signalIt )
         {
@@ -60,6 +61,7 @@ namespace Nymph
                 slot->SignalsUsed().push_back( signalPtrIt->second );
             }
         }
+        */
 
         return;
     }
