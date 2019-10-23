@@ -34,14 +34,14 @@ namespace Nymph
             fRunSingleThreaded( false ),
             fRunQueue(),
             fProcMap(),
-            fControl( new SharedControl() )/*,
-            fThreadReferences(),
-            fContinueCV(),
-            fDoContinue( false ),
-            fBreakContMutex(),
-            fDoRunThread( nullptr ),
-            fDoRunPromise(),
-            fDoRunBreakFlag( false )*/
+            //fControl( new SharedControl() ),
+            //fThreadReferences(),
+            //fContinueCV(),
+            //fDoContinue( false ),
+            //fBreakContMutex(),
+            fDoRunThread()//,
+            //fDoRunPromise(),
+            //fDoRunBreakFlag( false )
     {
     }
 
@@ -566,7 +566,7 @@ namespace Nymph
 
     void ProcessorToolbox::AsyncRun()
     {
-        if( fDoRunThread != nullptr )
+        if( ! fDoRunThread.joinable() )
         {
             LERROR( proclog, "It appears that a run has already been started" );
             return;
@@ -712,7 +712,7 @@ namespace Nymph
                 for (RunQueue::iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
                 {
                     //boost::thread_group threads;
-                    std::map< std::thread > threads;
+                    std::map< std::string, std::thread > threads;
 
                     { // scope for threadFuturesLock
                         //boost_unique_lock breakContLock( fBreakContMutex );
@@ -723,7 +723,7 @@ namespace Nymph
                             std::string procName( tgIter->fName );
                             LINFO( proclog, "Starting processor <" << procName << ">" );
 
-                            threads.emplace( procName, &PrimaryProcessor::operator(), tgIter->fProc );
+                            threads.emplace( procName, std::thread(&PrimaryProcessor::operator(), tgIter->fProc) );
 
                             //std::shared_ptr< KTThreadReference > thisThreadRef = std::make_shared< KTThreadReference >();
                             //thisThreadRef->Name() = procName;
@@ -853,13 +853,15 @@ namespace Nymph
             return;
         }; // end multi-threaded run lambda
 
-        fDoRunThread = new std::thread( multiThreadRun );
+        fDoRunThread = std::thread( multiThreadRun );
         return;
     }
 
 
-    bool ProcessorToolbox::WaitForBreak()
+    bool ProcessorToolbox::WaitForBreakOrCanceled()
     {
+        return SharedControl::get_instance()->WaitForBreakOrCanceled();
+        /*
         boost_unique_lock breakContLock( fBreakContMutex );
 
         if( fDoRunBreakFlag )
@@ -896,28 +898,35 @@ namespace Nymph
             LERROR( proclog, "An error occurred during processing: " << boost::diagnostic_information( e ) );
             return false;
         }
+        */
+    }
+
+    bool ProcessorToolbox::WaitToContinue()
+    {
+        return SharedControl::get_instance()->WaitToContinue();
     }
 
     void ProcessorToolbox::WaitForEndOfRun()
     {
         // WaitForBreak() and WaitForContinue() throw boost::exception for problems with the future or promise objects
 
-        KTDEBUG( proclog, "Waiting for end-of-run" );
-        while( WaitForBreak() )
+        LDEBUG( proclog, "Waiting for end-of-run" );
+        while( WaitForBreakOrCanceled() )
         {
-            KTDEBUG( proclog, "Reached breakpoint; waiting for continue" );
-            boost::mutex localMutex;
-            boost_unique_lock localLock( localMutex );
-            WaitForContinue( localLock );
-            KTDEBUG( proclog, "Processing resuming; waiting for end-of-run" );
+            LDEBUG( proclog, "Reached breakpoint; waiting for continue" );
+            WaitToContinue();
+            LDEBUG( proclog, "Processing resuming; waiting for end-of-run" );
         }
-        KTDEBUG( proclog, "End-of-run reached" );
+        LDEBUG( proclog, "End-of-run reached" );
 
         return;
     }
 
     void ProcessorToolbox::Continue()
     {
+        SharedControl::get_instance()->Resume();
+        return;
+        /*
         if( ! fDoRunBreakFlag )
         {
             LWARN( proclog, "Not currently at a breakpoint" );
@@ -946,8 +955,9 @@ namespace Nymph
         fContinueCV.notify_all();
 
         return;
+        */
     }
-
+/*
     KTDataHandle ProcessorToolbox::GetData( const std::string& threadName )
     {
         //boost_unique_lock threadFuturesLock( fThreadReferencesMutex );
@@ -967,7 +977,7 @@ namespace Nymph
         boost_unique_lock lock( (*trIt)->Mutex() );
         return (*trIt)->GetReturnValue();
     }
-
+*/
 /*
     void ProcessorToolbox::InitiateBreak()
     {
@@ -994,6 +1004,12 @@ namespace Nymph
         return;
     }
     */
+
+   void ProcessorToolbox::JoinRunThread()
+   {
+       fDoRunThread.join();
+       return;
+   }
 
     void ProcessorToolbox::CancelThreads()
     {

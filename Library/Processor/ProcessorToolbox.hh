@@ -30,6 +30,7 @@
 #include <limits>
 #include <set>
 #include <memory>
+#include <thread>
 
 
 namespace Nymph
@@ -220,7 +221,7 @@ namespace Nymph
 
             void AsyncRun();
 
-            void WaitToContinue();
+            bool WaitToContinue();
 
             /// Returns when processing is completed or a breakpoint is reached
             /// Throws a boost::exception if there's an error with the future object in use
@@ -257,7 +258,7 @@ namespace Nymph
             //bool fDoContinue;
             //boost::mutex fBreakContMutex;
 
-            //boost::thread* fDoRunThread;
+            std::thread fDoRunThread;
             //boost::promise< void > fDoRunPromise;
             //boost::shared_future< void > fDoRunFuture;
             //bool fDoRunBreakFlag;
