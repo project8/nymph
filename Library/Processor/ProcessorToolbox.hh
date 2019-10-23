@@ -194,9 +194,9 @@ namespace Nymph
             {
                 PrimaryProcessor* fProc;
                 std::string fName;
-                ControlAccessPtr fControlAccess;
+                //ControlAccessPtr fControlAccess;
                 ThreadSource( PrimaryProcessor* proc, const std::string& name ) : 
-                        fProc(proc), fName(name), fControlAccess( new ControlAccess() )
+                        fProc(proc), fName(name)//, fControlAccess( new ControlAccess() )
                 {}
             };
             struct CompareThreadSource
@@ -220,13 +220,13 @@ namespace Nymph
 
             void AsyncRun();
 
-            void WaitForContinue( boost_unique_lock& lock );
+            void WaitToContinue();
 
             /// Returns when processing is completed or a breakpoint is reached
             /// Throws a boost::exception if there's an error with the future object in use
             /// If the return is true, processing can continue after the break
             /// If the return is false, processing has ended (either normally or due to an error)
-            bool WaitForBreak();
+            bool WaitForBreakOrCanceled();
 
             void WaitForEndOfRun();
 
@@ -236,29 +236,31 @@ namespace Nymph
 
             void JoinRunThread();
 
-            KTDataHandle GetData( const std::string& threadName );
+            // TODO: return value access
 
-            MEMVAR_SHARED_PTR_CONST( SharedControl, Control );
+            //KTDataHandle GetData( const std::string& threadName );
+
+            //MEMVAR_SHARED_PTR_CONST( SharedControl, Control );
 
         private:
-            typedef boost::shared_future< KTDataHandle > Future;
+            //typedef boost::shared_future< KTDataHandle > Future;
 
-            void StartSingleThreadedRun();
+            //void StartSingleThreadedRun();
             void StartMultiThreadedRun();
 
             // called from KTThreadReference::Break
-            void InitiateBreak();
+            //void InitiateBreak();
 
-            std::vector< std::shared_ptr< KTThreadReference > > fThreadReferences;
+            //std::vector< std::shared_ptr< KTThreadReference > > fThreadReferences;
 
-            boost::condition_variable fContinueCV;
-            bool fDoContinue;
-            boost::mutex fBreakContMutex;
+            //boost::condition_variable fContinueCV;
+            //bool fDoContinue;
+            //boost::mutex fBreakContMutex;
 
-            boost::thread* fDoRunThread;
-            boost::promise< void > fDoRunPromise;
-            boost::shared_future< void > fDoRunFuture;
-            bool fDoRunBreakFlag;
+            //boost::thread* fDoRunThread;
+            //boost::promise< void > fDoRunPromise;
+            //boost::shared_future< void > fDoRunFuture;
+            //bool fDoRunBreakFlag;
 
     };
 

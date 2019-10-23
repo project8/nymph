@@ -572,26 +572,26 @@ namespace Nymph
             return;
         }
 
-        fDoRunPromise = boost::promise< void >();
-        fDoRunFuture = fDoRunPromise.get_future().share();
+        //fDoRunPromise = boost::promise< void >();
+        //fDoRunFuture = fDoRunPromise.get_future().share();
 
-        bool willRunSingleThreaded = fRunSingleThreaded;
-#ifdef SINGLETHREADED
-        willRunSingleThreaded = true;
-#endif
+        //bool willRunSingleThreaded = fRunSingleThreaded;
+//#ifdef SINGLETHREADED
+        //willRunSingleThreaded = true;
+//#endif
 
-        if( willRunSingleThreaded )
-        {
-            StartSingleThreadedRun();
-        }
-        else
-        {
-            StartMultiThreadedRun();
-        }
+        //if( willRunSingleThreaded )
+        //{
+        //    StartSingleThreadedRun();
+        //}
+        //else
+        //{
+        StartMultiThreadedRun();
+        //}
 
         return;
     }
-
+/*
     void ProcessorToolbox::StartSingleThreadedRun()
     {
         auto singleThreadRun = [&]()
@@ -700,7 +700,7 @@ namespace Nymph
         fDoRunThread = new boost::thread( singleThreadRun );
         return;
     }
-
+*/
     void ProcessorToolbox::StartMultiThreadedRun()
     {
         auto multiThreadRun = [&]()
@@ -968,6 +968,7 @@ namespace Nymph
         return (*trIt)->GetReturnValue();
     }
 
+/*
     void ProcessorToolbox::InitiateBreak()
     {
         boost_unique_lock breakContLock( fBreakContMutex );
@@ -992,9 +993,13 @@ namespace Nymph
 
         return;
     }
+    */
 
     void ProcessorToolbox::CancelThreads()
     {
+        SharedControl::get_instance()->Cancel();
+        return;
+        /*
         boost_unique_lock breakContLock( fBreakContMutex );
         for( auto trIt = fThreadReferences.begin(); trIt != fThreadReferences.end(); ++trIt )
         {
@@ -1002,6 +1007,7 @@ namespace Nymph
             (*trIt)->SetCanceled( true );
         }
         return;
+        */
     }
 
     bool ProcessorToolbox::Run()
