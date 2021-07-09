@@ -1,21 +1,33 @@
 # CMakeLists for Nymph/Executables/Main
 # Author: N. Oblath
 
-if( Nymph_ENABLE_EXECUTABLES )
-
-    get_property( all_libs GLOBAL PROPERTY ${PROJECT_NAME}_LIBRARIES )
-    message(STATUS "Nymph exectuables library dependencies: ${all_libs}" )
-    
-    set( programs
-        ConfigCheck
+if( NOT Nymph_AS_SUBMODULE )
+    set( Nymph_package_libs
+        Nymph
     )
-    
-    if( Nymph_BUILD_NYMPH_EXE )
-        set( programs
-            Nymph
-        )
-    endif( Nymph_BUILD_NYMPH_EXE )
-    
-    pbuilder_executables( programs all_libs )
-    
-endif( Nymph_ENABLE_EXECUTABLES )
+endif()
+
+set( Nymph_SOURCES
+    ConfigCheck.cc
+)
+if( Nymph_BUILD_NYMPH_EXE )
+    set( Nymph_SOURCES
+        ${Nymph_SOURCES}
+        Nymph
+    )
+endif( Nymph_BUILD_NYMPH_EXE )
+
+
+set( Nymph_PROGRAMS )
+pbuilder_executables( 
+    SOURCES ${Nymph_SOURCES}
+    TARGETS_VAR Nymph_PROGRAMS
+    PROJECT_LIBRARIES ${Nymph_package_libs}
+    PUBLIC_EXTERNAL_LIBRARIES ${Nymph_EXE_LIBRARIES}
+#        PRIVATE_EXTERNAL_LIBRARIES ${PRIVATE_EXT_LIBS}
+)
+
+pbuilder_component_install_and_export( 
+    COMPONENT Executables
+    EXETARGETS ${Nymph_PROGRAMS}
+)

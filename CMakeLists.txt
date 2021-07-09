@@ -26,7 +26,7 @@ include( Nymph )
 #################
 
 # require C++11
-set_option( USE_CPP11 TRUE )
+set( CMAKE_CXX_STANDARD 11 )
 
 # Build the Nymph executable (also requires Nymph_ENABLE_EXECUTABLES)
 option( Nymph_BUILD_NYMPH_EXE "Flag to build the Nymph executable; also requires Nymph_ENABLE_EXECUTABLES" ON )
@@ -60,54 +60,76 @@ nymph_process_options()
 # Nymph dependencies #
 ######################
 
-########
-# Scarab
-########
-
-pbuilder_add_submodule( Scarab Scarab/library )
-
-# this is needed for anything that wants to read or write JSON files
-get_directory_property( RAPIDJSON_FILE_BUFFER_SIZE DIRECTORY Scarab/library DEFINITION RAPIDJSON_FILE_BUFFER_SIZE )
-set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
+set( PUBLIC_EXT_LIBS )
+set( PRIVATE_EXT_LIBS )
 
 #######
 # Boost
 #######
 
 # Boost (1.46 required for filesystem version 3)
-list (APPEND Boost_COMPONENTS date_time filesystem program_options system thread)
-if (Nymph_ENABLE_PYTHON)
-    list(APPEND Boost_COMPONENTS python)
-endif (Nymph_ENABLE_PYTHON)
-find_package (Boost 1.46.0 REQUIRED COMPONENTS ${Boost_COMPONENTS})
+list( APPEND BOOST_COMPONENTS date_time filesystem program_options system thread )
+find_package( Boost 1.46.0 REQUIRED COMPONENTS ${BOOST_COMPONENTS} )
+list( APPEND PUBLIC_EXT_LIBS Boost::boost Boost::date_time Boost::program_options Boost::thread Boost::filesystem )
 # make sure dynamic linking is assumed for all boost libraries
+set( Boost_USE_STATIC_LIBS OFF )
+set( Boost_USE_STATIC_RUNTIME OFF )
+set( Boost_ALL_DYN_LINK ON )
 add_definitions (-DBOOST_ALL_DYN_LINK)
-include_directories (${Boost_INCLUDE_DIRS})
-pbuilder_add_ext_libraries (${Boost_LIBRARIES})
 
-# python deps
-if (Nymph_ENABLE_PYTHON)
-    include (PythonPackage)
-    python_package_find_python( 2.7 )
-endif (Nymph_ENABLE_PYTHON)
+# Python 
+
+if( Nymph_ENABLE_PYTHON )
+    set_option( Scarab_BUILD_PYTHON TRUE )
+else( Nymph_ENABLE_PYTHON )
+    set_option( Scarab_BUILD_PYTHON FALSE )
+endif( Nymph_ENABLE_PYTHON )
+
+
+#####################
+# Prepare for build #
+#####################
+
+pbuilder_prepare_project()
+
+
+##############
+# Submodules #
+##############
+
+########
+# Scarab
+########
+
+pbuilder_add_submodule( Scarab Scarab )
+
+# all parts of midge use Scarab, so include it here
+pbuilder_use_sm_library( Scarab Scarab )
+
+# this is needed for anything that wants to read or write JSON files
+get_directory_property( RAPIDJSON_FILE_BUFFER_SIZE DIRECTORY Scarab/library DEFINITION RAPIDJSON_FILE_BUFFER_SIZE )
+set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
 
 
 ###############
 # Build Nymph #
 ###############
 
-include_directories (BEFORE 
-    ${PROJECT_SOURCE_DIR}/Library/Utility
-    ${PROJECT_SOURCE_DIR}/Library/Data
-    ${PROJECT_SOURCE_DIR}/Library/Processor
-    ${PROJECT_SOURCE_DIR}/Library/IO
-    ${PROJECT_SOURCE_DIR}/Library/Application
-)
-
-
 add_subdirectory( Library )
-if (Nymph_ENABLE_EXECUTABLES)
-    add_subdirectory( Executables/Validation )
-endif (Nymph_ENABLE_EXECUTABLES)
 
-pbuilder_variables_for_parent()
+if (Nymph_ENABLE_TESTING)
+    add_subdirectory( Executables/Validation )
+endif (Nymph_ENABLE_TESTING)
+
+if (Nymph_ENABLE_EXECUTABLES)
+    add_subdirectory( Executables/Main )
+endif (Nymph_ENABLE_EXECUTABLES )
+
+
+##########
+# Config #
+##########
+
+configure_file( ${PROJECT_SOURCE_DIR}/NymphConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/NymphConfig.cmake @ONLY )
+
+pbuilder_do_package_config()
