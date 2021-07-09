@@ -37,10 +37,10 @@ namespace Nymph
     {
     };
 
-    bool KTThroughputProfiler::Configure(const scarab::param_node* node)
+    bool KTThroughputProfiler::Configure(const scarab::param_node& node)
     {
-        SetOutputFileFlag(node->get_value< bool >("output-file-flag", fOutputFileFlag));
-        SetOutputFilename(node->get_value("output-filename-base", fOutputFilename));
+        SetOutputFileFlag(node.get_value< bool >("output-file-flag", fOutputFileFlag));
+        SetOutputFilename(node.get_value("output-filename-base", fOutputFilename));
 
         return true;
     }

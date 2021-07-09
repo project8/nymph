@@ -32,14 +32,14 @@ namespace Nymph
      A fully implemented cut MUST have the following:
      - Public nested class called Result, inheriting from KTExtensibleCutResult< Result >, and containing a public static std::string name sName.
      - Cut registration using the macro KT_REGISTER_CUT([class name])
-     - Implementation of bool Configure(const scarab::param_node*)
+     - Implementation of bool Configure(const scarab::param_node&)
      - Implementation of bool Apply(KTData&, <DataType(s)>)
 
      Your cut class should inherit from KTCutOneArg or KTCutTwoArgs, depending on the number of data types involved in your cut.
 
      The existence of [class name]::Result and [class name]::Result::sName are enforces at compile time by the KT_REGISTER_CUT macro.
 
-     The functions bool Configure(const scarab::param_node*) and void Apply(KTData&, <DataType(s)>) are abstract in the base classes, and therefore must be implemented.
+     The functions bool Configure(const scarab::param_node&) and void Apply(KTData&, <DataType(s)>) are abstract in the base classes, and therefore must be implemented.
 
      Boolean return value interpretation:
      - TRUE means the cut was failed

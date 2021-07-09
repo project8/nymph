@@ -39,7 +39,7 @@ namespace Nymph
         scarab::param_translator translator;
         scarab::param_node optNode;
         optNode.add( "encoding", new scarab::param_value( "json" ) );
-        return Configure( &translator.read_string( config, &optNode )->as_node() );;
+        return Configure( translator.read_string( config, optNode )->as_node() );;
     }
 
 
@@ -61,7 +61,7 @@ namespace Nymph
     {
         if (fIsConfigured) return true;
 
-        scarab::param_node* node = KTConfigurator::get_instance()->Config();
+        const scarab::param_node& node = KTConfigurator::get_instance()->Config();
         if (! this->Configure(node))
         {
             KTERROR(conflog, "An error occurred while configuring <" << fConfigName << ">");

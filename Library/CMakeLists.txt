@@ -1,13 +1,21 @@
 # CMakeLists for Nymph/Library
 # Author: N. Oblath
 
-include( PythonPackage )
+#include( PythonPackage )
 
 set( UTIL_DIR Utility )
 set( DATA_DIR Data )
 set( PROC_DIR Processor )
 set( IO_DIR IO )
 set( APPL_DIR Application )
+
+include_directories( BEFORE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/${UTIL_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/${DATA_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/${PROC_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/${IO_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/${APPL_DIR}
+)
 
 set( NYMPH_HEADERFILES
     ${UTIL_DIR}/KTCacheDirectory.hh
@@ -80,17 +88,28 @@ set( NYMPH_SOURCEFILES
     ${APPL_DIR}/KTThroughputProfiler.cc
 )
 
-set( NYMPH_PY_HEADERFILES
-    ${DATA_DIR}/KTDataPy.hh
-    ${PROC_DIR}/KTProcessorPy.hh
-    ${APPL_DIR}/KTProcessorToolboxPy.hh
-)
+#set( NYMPH_PY_HEADERFILES
+#    ${DATA_DIR}/KTDataPy.hh
+#    ${PROC_DIR}/KTProcessorPy.hh
+#    ${APPL_DIR}/KTProcessorToolboxPy.hh
+#)
 
 ##################################################
 
-pbuilder_library( Nymph NYMPH_SOURCEFILES "" )
+pbuilder_library( 
+    TARGET Nymph 
+    SOURCES ${NYMPH_SOURCEFILES}
+    PUBLIC_EXTERNAL_LIBRARIES ${PUBLIC_EXT_LIBS}
+)
+
+pbuilder_component_install_and_export( 
+    COMPONENT Library
+    LIBTARGETS Nymph
+)
+
 pbuilder_install_headers( ${NYMPH_HEADERFILES} )
 
-if (Nymph_ENABLE_PYTHON)
-    python_package_add_module(NymphPy.cc)
-endif (Nymph_ENABLE_PYTHON)
+
+#if (Nymph_ENABLE_PYTHON)
+#    python_package_add_module(NymphPy.cc)
+#endif (Nymph_ENABLE_PYTHON)

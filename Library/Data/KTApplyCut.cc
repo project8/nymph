@@ -33,23 +33,22 @@ namespace Nymph
         delete fCut;
     }
 
-    bool KTApplyCut::Configure(const scarab::param_node* node)
+    bool KTApplyCut::Configure(const scarab::param_node& node)
     {
         // Config-file settings
-        if (node == NULL) return false;
 
-        for (scarab::param_node::const_iterator nodeIt = node->begin(); nodeIt != node->end(); ++nodeIt)
+        for (scarab::param_node::const_iterator nodeIt = node.begin(); nodeIt != node.end(); ++nodeIt)
         {
             // first do configuration values we know about
             // as it happens, there aren't any
 
             // any remaining should be cut names
             // ignore any that don't work
-            if (SelectCut(nodeIt->first))
+            if (SelectCut(nodeIt.name()))
             {
-                if (nodeIt->second->is_node())
+                if (nodeIt->is_node())
                 {
-                    fCut->Configure(&nodeIt->second->as_node());
+                    fCut->Configure(nodeIt->as_node());
                 }
                 continue;
             }

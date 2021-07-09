@@ -5,9 +5,9 @@
  *      Author: nsoblath
  *
  *  To test the command-line interface:
- *    > TestApplication -c /path/to/test-config.json -t "blah"
- *    > TestApplication -c /path/to/test-config.json --test-opt "blah"
- *    > TestApplication -c /path/to/test-config.json --TestConfiguration.int-data=500
+ *    > TestApplication -c /path/to/TestConfigurator.json
+ *    > TestApplication -c /path/to/TestConfigurator.json --test-app-opt=blah
+ *    > TestApplication -c /path/to/TestConfigurator.json --int-data 20
  */
 
 
@@ -82,13 +82,9 @@ int main(int argc, char** argv)
 
     KTTestConfigurable* testObj = new KTTestConfigurable();
 
-    const scarab::param_node* topNode = app->GetConfigurator()->Config();
-    if (topNode == NULL)
-    {
-        KTWARN(testapplog, "Top-level node <" << testObj->GetConfigName() << "> was not found");
-    }
+    const scarab::param_node& topNode = app->GetConfigurator()->Config();
 
-    if (testObj->Configure(topNode->node_at(testObj->GetConfigName())))
+    if (testObj->Configure(topNode[testObj->GetConfigName()].as_node()))
     {
         KTINFO(testapplog, "Configuration complete:\n"
                 << "\tInt data: " << testObj->GetIntData() << '\n'
