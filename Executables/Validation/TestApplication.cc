@@ -5,9 +5,9 @@
  *      Author: nsoblath
  *
  *  To test the command-line interface:
- *    > TestApplication -c /path/to/test-config.json -t "blah"
- *    > TestApplication -c /path/to/test-config.json --test-opt "blah"
- *    > TestApplication -c /path/to/test-config.json --TestConfiguration.int-data=500
+ *    > TestApplication -c /path/to/TestConfigurator.json
+ *    > TestApplication -c /path/to/TestConfigurator.json --test-app-opt=blah
+ *    > TestApplication -c /path/to/TestConfigurator.json --int-data 20
  */
 
 

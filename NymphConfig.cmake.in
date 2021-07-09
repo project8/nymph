@@ -1,0 +1,16 @@
+# NymphConfig.cmake
+
+get_filename_component( Nymph_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH )
+
+# Find the dependencies
+include( CMakeFindDependencyMacro )
+find_dependency( Scarab REQUIRED PATHS ${Nymph_CMAKE_DIR}/Scarab @Scarab_BINARY_LOCATION@ )
+
+# Import library targets if they're not already present
+if( NOT TARGET Nymph::@Nymph_FULL_TARGET_NAME@ )
+    if( TARGET @Nymph_FULL_TARGET_NAME@ )
+        add_library( Nymph::@Nymph_FULL_TARGET_NAME@ ALIAS @Nymph_FULL_TARGET_NAME@ )
+    else()
+        include("${Nymph_CMAKE_DIR}/Nymph_Library_Targets.cmake")
+    endif()
+endif()

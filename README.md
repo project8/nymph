@@ -7,30 +7,28 @@ Nymph is a C++-based data analysis framework.
 Dependencies
 ------------
 
-**External**
-- CMake (3.1 or better)
+- CMake (3.12 or better)
 - Boost (date_time, filesystem, program_options, system, thread; 1.46 or better)
-
-**Distributed Code** (included with Mantis directly)
-- RapidJSON
-- RapidXML
+- RapidJSON (optional; required for JSON processing)
+- yaml-cpp (optional; required for YAML processing)
 
 
 Operating System Support
 ------------------------
 
 * Mac OS X (usually tested on OS X 10.10)
-* Linux (usually tested on Debian Wheezy)
+* Linux (usually tested on Ubuntu)
 
 
 Directory Structure
 -------------------
 
 *  cmake - Files that CMake uses to build KTCore.
-*  Executables - Source code for the main Katydid executable and test programs.
-*  External - RapidJSON and RapidXML packages
-*  Library - Source for the KTCore library
-*  Templates - Example files for creating a processor and the main CMakeLists.txt file for a package using KTCore.
+*  Documentation - Library documentation
+*  Executables - Source code for the main Nymph executable and test programs.
+*  Library - Source for the Nymph library
+*  Scarab - Submodule
+*  Templates - Example files for creating a processor and the main CMakeLists.txt file for a package using Nymph.
 
 
 Installing
