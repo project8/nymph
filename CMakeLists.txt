@@ -14,8 +14,6 @@ project( Nymph VERSION 1.4.7 )
 list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Scarab/cmake )
 include( PackageBuilder )
 
-pbuilder_prepare_project()
-
 # Nymph CMake files
 list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake )
 include( Nymph )
