@@ -9,7 +9,7 @@ cmake_minimum_required (VERSION 3.12)
 #########
 
 cmake_policy( SET CMP0048 NEW ) # version in project()
-project( Nymph VERSION 1.5.1 )
+project( Nymph VERSION 1.5.2 )
 
 list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Scarab/cmake )
 include( PackageBuilder )
