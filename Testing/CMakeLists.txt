@@ -4,13 +4,19 @@
 
 ##########
 
+include_directories( BEFORE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 set( testing_HEADERS
+    TestProc.hh
 )
 
 set( testing_SOURCES
     TestControlAccess.cc
     TestPrimaryProcessor.cc
     TestProcessor.cc
+    TestProcessorToolbox.cc
     TestSignalSlot.cc
     UseCatch.cc
 )
