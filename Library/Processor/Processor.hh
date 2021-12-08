@@ -86,7 +86,7 @@ namespace Nymph
         return new scarab::registrar< Processor, XDerivedProc, const std::string& >( name );
     }
 
-#define KT_REGISTER_PROCESSOR(proc_class, proc_name) \
+#define REGISTER_PROCESSOR(proc_class, proc_name) \
         static ::scarab::registrar< ::Nymph::Processor, proc_class, const std::string& > sProc##proc_class##Registrar( proc_name );
 
 } /* namespace Nymph */
