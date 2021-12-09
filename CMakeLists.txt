@@ -89,9 +89,9 @@ endif( Nymph_ENABLE_PYTHON )
 # Cereal
 ########
 
-set( JUST_INSTALL_CEREAL ON CACHE BOOL "Cereal option: only install library" FORCE)
-add_subdirectory( External/cereal )
-include_directories( External/cereal/include )
+#set( JUST_INSTALL_CEREAL ON CACHE BOOL "Cereal option: only install library" FORCE)
+#add_subdirectory( External/cereal )
+#include_directories( External/cereal/include )
 
 
 #####################
@@ -115,7 +115,7 @@ pbuilder_add_submodule( Scarab Scarab )
 pbuilder_use_sm_library( Scarab Scarab )
 
 # this is needed for anything that wants to read or write JSON files
-get_directory_property( RAPIDJSON_FILE_BUFFER_SIZE DIRECTORY Scarab/library DEFINITION RAPIDJSON_FILE_BUFFER_SIZE )
+get_directory_property( RAPIDJSON_FILE_BUFFER_SIZE DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Scarab DEFINITION RAPIDJSON_FILE_BUFFER_SIZE )
 set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
 
 
@@ -125,13 +125,9 @@ set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
 
 add_subdirectory( Library )
 
-if (Nymph_ENABLE_TESTING)
-    add_subdirectory( Executables/Validation )
-endif (Nymph_ENABLE_TESTING)
-
-if (Nymph_ENABLE_EXECUTABLES)
-    add_subdirectory( Executables/Main )
-endif (Nymph_ENABLE_EXECUTABLES )
+#if (Nymph_ENABLE_EXECUTABLES)
+#    add_subdirectory( Executables/Main )
+#endif (Nymph_ENABLE_EXECUTABLES )
 
 
 #########
