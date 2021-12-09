@@ -40,9 +40,7 @@ namespace Nymph
             XReturnType Get( const std::string& aName, XReturnType aDefault ) const;
 
         private:
-            scarab::param_node* fMasterConfig;
-
-            mutable scarab::param* fParamBuffer;
+            scarab::param_node fMasterConfig;
 
             std::string fStringBuffer;
     };
@@ -50,6 +48,7 @@ namespace Nymph
     template< typename XReturnType >
     XReturnType KTConfigurator::Get( const std::string& aName ) const
     {
+<<<<<<< HEAD:Library_v1/Application/KTConfigurator.hh
         try
         {
             fParamBuffer = &const_cast< scarab::param& >( (*fMasterConfig)[aName] );
@@ -61,11 +60,15 @@ namespace Nymph
         catch( std::exception& e )
         {}
         BOOST_THROW_EXCEPTION( KTException() << "configurator does not have a value for <" << aName << ">" << eom );
+=======
+        return fMasterConfig[ aName ]().as< XReturnType >();
+>>>>>>> develop:Library/Application/KTConfigurator.hh
     }
 
     template< typename XReturnType >
     XReturnType KTConfigurator::Get( const std::string& aName, XReturnType aDefault ) const
     {
+<<<<<<< HEAD:Library_v1/Application/KTConfigurator.hh
         try
         {
             fParamBuffer = &const_cast< scarab::param& >( (*fMasterConfig)[aName] );
@@ -88,6 +91,25 @@ namespace Nymph
     inline scarab::param_node& KTConfigurator::Config()
     {
         return *fMasterConfig;
+=======
+        return fMasterConfig.get_value< XReturnType >( aName, aDefault );
+    }
+
+    inline void KTConfigurator::Merge(const scarab::param_node& aNode)
+    {
+        fMasterConfig.merge(aNode);
+        return;
+    }
+
+    inline scarab::param_node& KTConfigurator::Config()
+    {
+        return fMasterConfig;
+    }
+
+    inline const scarab::param_node& KTConfigurator::Config() const
+    {
+        return fMasterConfig;
+>>>>>>> develop:Library/Application/KTConfigurator.hh
     }
 
     inline const scarab::param_node& KTConfigurator::Config() const

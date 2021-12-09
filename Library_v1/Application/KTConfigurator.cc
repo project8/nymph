@@ -16,15 +16,17 @@ namespace Nymph
     KTLOGGER( conflog, "KTConfigurator" );
 
     KTConfigurator::KTConfigurator() :
-            fMasterConfig( new scarab::param_node() ),
-            fParamBuffer( NULL ),
+            fMasterConfig(),
             fStringBuffer()
     {
     }
 
     KTConfigurator::~KTConfigurator()
     {
+<<<<<<< HEAD:Library_v1/Application/KTConfigurator.cc
         delete fMasterConfig;
+=======
+>>>>>>> develop:Library/Application/KTConfigurator.cc
     }
 
 } /* namespace Nymph */

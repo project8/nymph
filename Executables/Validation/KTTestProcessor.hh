@@ -46,30 +46,6 @@ namespace Nymph
 
             bool Configure(const scarab::param_node& node);
 
-            void SlotFunc1(int);
-            void SlotFunc2(int);
-
-        private:
-            KTSlot< int > fSlot1;
-            KTSlot< int > fSlot2;
-
-            KTSlotWrapper* fSlot1Wrapper;
-            KTSlotWrapper* fSlot2Wrapper;
-    };
-
-    /*!
-     * A simple test processor that has one slot that throws an exception
-     */
-    class KTTestProcessorC : public KTProcessor
-    {
-        public:
-            KTTestProcessorC( const std::string& name = "test-proc-c" );
-            virtual ~KTTestProcessorC();
-
-            bool Configure(const scarab::param_node& node);
-
-            void SlotFunc1(int);
-
         private:
             KTSlot< int > fSlot1;
     };
