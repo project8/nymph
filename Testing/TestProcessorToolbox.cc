@@ -23,24 +23,45 @@ TEST_CASE( "processor_toolbox" )
 
     ProcessorToolbox toolbox;
 
-    SECTION( "Configuration" )
+    SECTION( "AddRemoveProcessors" )
     {
-        REQUIRE_FALSE( toolbox.GetProcessor( "testproc-1" ) );
+        LINFO( testlog, "Add/Remove Processor tests" );
+        
+        std::string procName1( "testproc-1" );
+        std::string procName2( "testproc-2" );
+
+        REQUIRE_FALSE( toolbox.GetProcessor( procName1 ) );
+        REQUIRE_FALSE( toolbox.GetProcessor( procName2 ) );
 
         std::string config_str(
-            "processors:"
-            "- type: test-proc"
+            "processors:\n"
+            "- type: test-proc\n"
             "  name: testproc-1"
         );
 
         scarab::param_translator translator;
-        auto config = translator.read_string( config_str );
+        auto config = translator.read_string( config_str, "yaml" );
 
         toolbox.Configure( config->as_node() );
 
-        REQUIRE( toolbox.GetProcessor( "testproc-1" ) );
+        REQUIRE( toolbox.GetProcessor( procName1 ) );
+        REQUIRE( toolbox.GetProcessor( procName1 )->Name() == procName1 );
 
+        std::shared_ptr< Processor > tp1 = toolbox.ReleaseProcessor( procName1 );
+        REQUIRE_FALSE( toolbox.GetProcessor( procName1 ) );
 
+        REQUIRE( toolbox.AddProcessor( procName1, tp1 ) );
+        REQUIRE( toolbox.GetProcessor( procName1 ) );
+
+        REQUIRE( toolbox.AddProcessor(  "test-proc", procName2 ) );
+        REQUIRE( toolbox.GetProcessor( procName2 ) );
+
+        REQUIRE( toolbox.RemoveProcessor( procName1 ) );
+        REQUIRE_FALSE( toolbox.GetProcessor( procName1 ) );
+        REQUIRE( toolbox.GetProcessor( procName2 ) );
+
+        toolbox.ClearProcessors();
+        REQUIRE_FALSE( toolbox.GetProcessor( procName2 ) );
     }
 
 

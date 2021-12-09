@@ -94,7 +94,7 @@ namespace Nymph
                 {
                     procName = procNode["name"]().as_string();
                 }
-                std::shared_ptr< Processor > newProc ( fProcFactory->create(procType, procType));
+                std::shared_ptr< Processor > newProc ( fProcFactory->create(procType, procName));
                 if (newProc == NULL)
                 {
                     LERROR(proclog, "Unable to create processor of type <" << procType << ">");
