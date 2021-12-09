@@ -49,7 +49,7 @@ namespace Nymph
             KTProcessorTemplate(const std::string& name = "[config-name]");
             virtual ~KTProcessorTemplate();
 
-            bool Configure(const scarab::param_node* node);
+            bool Configure(const scarab::param_node& node);
 
             // Getters and setters for configurable parameters go here
         private:

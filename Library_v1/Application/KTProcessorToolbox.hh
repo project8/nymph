@@ -10,10 +10,13 @@
 #define KTPROCESSORTOOLBOX_HH_
 
 #include "KTConfigurable.hh"
+<<<<<<< HEAD:Library_v1/Application/KTProcessorToolbox.hh
 #include "KTMemberVariable.hh"
 #include "KTThreadReference.hh"
 
 #include "factory.hh"
+=======
+>>>>>>> develop:Library/Application/KTProcessorToolbox.hh
 
 #define BOOST_THREAD_PROVIDES_FUTURE
 #include <boost/thread/future.hpp>
@@ -92,10 +95,6 @@ namespace Nymph
         public:
             KTProcessorToolbox(const std::string& name = "processor-toolbox");
             virtual ~KTProcessorToolbox();
-
-        private:
-            scarab::factory< KTProcessor, const std::string& >* fProcFactory; // singleton; not owned by KTProcessorToolbox
-
 
         public:
             /// Configure the toolbox: create the processors; connnect signals and slots; and setup the run queue.
@@ -307,6 +306,7 @@ namespace Nymph
         return;
     }
 
+<<<<<<< HEAD:Library_v1/Application/KTProcessorToolbox.hh
     inline void KTProcessorToolbox::WaitForContinue( boost_unique_lock& lock )
     {
         //fMasterContSignal.wait();
@@ -325,5 +325,7 @@ namespace Nymph
         fDoRunThread = nullptr;
     }
 
+=======
+>>>>>>> develop:Library/Application/KTProcessorToolbox.hh
 } /* namespace Nymph */
 #endif /* KTPROCESSORTOOLBOX_HH_ */
