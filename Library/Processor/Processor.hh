@@ -86,8 +86,18 @@ namespace Nymph
         return new scarab::registrar< Processor, XDerivedProc, const std::string& >( name );
     }
 
-#define REGISTER_PROCESSOR(proc_class, proc_name) \
+#define REGISTER_PROCESSOR_NONAMEPSACE(proc_class, proc_name) \
         static ::scarab::registrar< ::Nymph::Processor, proc_class, const std::string& > sProc##proc_class##Registrar( proc_name );
+
+#define REGISTER_PROCESSOR_NAMESPACE(proc_namespace, proc_class, proc_name) \
+        static ::scarab::registrar< ::Nymph::Processor, ::proc_namespace::proc_class, const std::string& > sProc##proc_class##Registrar( proc_name );
+
+// Macro overloading trick from here: https://stackoverflow.com/a/11763277
+#define GET_MACRO(_1, _2, _3, NAME, ...) NAME
+/// Processors defined in a namespace need to specify the namespace first:
+///   [no namespace]: REGISTER_PROCESSOR( [class], [name in quotes] )
+///   [with namespace]: REGISTER_PROCESSOR( [namespace], [class], [name in quotes] )
+#define REGISTER_PROCESSOR(...) GET_MACRO(__VA_ARGS__, REGISTER_PROCESSOR_NAMESPACE, REGISTER_PROCESSOR_NONAMESPACE, )(__VA_ARGS__)
 
 } /* namespace Nymph */
 

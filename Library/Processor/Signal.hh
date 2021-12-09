@@ -36,7 +36,7 @@ namespace Nymph
     {
         public:
             using signature = void( XArgs... );
-            using full_signature = void( ControlAccessPtr, XArgs... );
+//            using full_signature = void( ControlAccessPtr, XArgs... );
 
         public:
             /// Unowned signal
@@ -54,8 +54,8 @@ namespace Nymph
             void Emit( XArgs... args );
             void operator()( XArgs... args );
 
-            // TODO: remove this
-            MEMVAR_SHARED_PTR( ControlAccess, ControlAcc );
+            // TODO: remove this  // 12/8/21, NSO: why remove this?  // NSO: oh, because we no longer need to pass ControlAccess between signals and slots before they're used
+            //MEMVAR_SHARED_PTR( ControlAccess, ControlAcc );
     };
 
 
@@ -194,7 +194,8 @@ namespace Nymph
 
         for( auto connection : fConnections )
         {
-            static_cast< Slot< XArgs... >* >(connection)->operator()( fControlAcc, args... );
+//            static_cast< Slot< XArgs... >* >(connection)->operator()( fControlAcc, args... );
+            static_cast< Slot< XArgs... >* >(connection)->operator()( args... );
         }
         return;
     }

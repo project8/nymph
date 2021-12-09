@@ -10,6 +10,7 @@
 #include "ProcessorToolbox.hh"
 
 #include "logger.hh"
+#include "param_codec.hh"
 
 #include "catch.hpp"
 
@@ -27,15 +28,15 @@ TEST_CASE( "processor_toolbox" )
         REQUIRE_FALSE( toolbox.GetProcessor( "testproc-1" ) );
 
         std::string config_str(
-            "processors:\n" +
-            "  - type: test-proc\n" +
-            "    name: testproc-1"
-        )
+            "processors:"
+            "- type: test-proc"
+            "  name: testproc-1"
+        );
 
         scarab::param_translator translator;
         auto config = translator.read_string( config_str );
 
-        toolbox.Configure( config );
+        toolbox.Configure( config->as_node() );
 
         REQUIRE( toolbox.GetProcessor( "testproc-1" ) );
 

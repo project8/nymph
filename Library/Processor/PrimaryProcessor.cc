@@ -23,7 +23,7 @@ namespace Nymph
     PrimaryProcessor::~PrimaryProcessor()
     {}
 
-    void PrimaryProcessor::operator()()// ControlAccessPtr control )
+    void PrimaryProcessor::operator()()// ControlAccessPtr control ) // SharedControl is now accessed in Signal::operator(), so we don't have to pass it from signal to slot to signal, etc
     {
         // pass the control access pointer to every signal in the primary processor
         /*

@@ -17,8 +17,8 @@ namespace Nymph
     class TestProc : public Processor
     {
         public:
-            TestProc() :
-                    Processor( "test" ),
+            TestProc( const std::string& name = "test" ) :
+                    Processor( name ),
                     fValue( 0 ),
                     fSecondValue( 0 ),
                     fValueSig( "value", this ),

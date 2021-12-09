@@ -61,10 +61,9 @@ TEST_CASE( "primary_processor", "[primary_processor]" )
 
     tester.ConnectASlot( "value", tester, "value" );
 
-    ControlAccess control;
-    tester( &control );
+    tester();
 
     REQUIRE( tester.GetValue() == tester.GetNewValue() );
 
-    REQUIRE( tester.ValueSig().GetControl() == &control );
+    //REQUIRE( tester.ValueSig().GetControl() == &control );
 }
