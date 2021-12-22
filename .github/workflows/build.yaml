@@ -78,7 +78,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -yq \
-            libboost-dev \
+            libboost-all-dev \
             libyaml-cpp-dev \
             rapidjson-dev
 
