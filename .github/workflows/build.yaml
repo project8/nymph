@@ -41,7 +41,6 @@ jobs:
       - name: Mac Dependencies
         if: startsWith(matrix.os, 'macos')  # Mac only
         run: |
-          brew update
           brew install \
             boost \
             rapidjson \
