@@ -31,7 +31,7 @@ jobs:
       - name: Build and test
         run: |
           docker build \
-            --target nymph_common \
+            --target nymph_done \
             --build-arg img_repo=${BASE_IMAGE_REPO} \
             --build-arg img_tag=${BASE_IMAGE_TAG} \
             --build-arg build_type=Debug \
@@ -39,7 +39,7 @@ jobs:
             --build-arg nymph_tag=${Nymph_TAG} \
             --tag project8/nymph:${Nymph_TAG} \
             .
-          docker run project8/nymph:${Nymph_TAG} /tmp_source/Testing/RunTests
+          docker run project8/nymph:${Nymph_TAG} /tmp_source/build/Testing/RunTests
 
 
   build:
