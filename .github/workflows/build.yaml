@@ -41,16 +41,20 @@ jobs:
       - name: Mac Dependencies
         if: startsWith(matrix.os, 'macos')  # Mac only
         run: |
-          brew update \
+          brew update
           brew install \
-            boost
+            boost \
+            rapidjson \
+            yaml-cpp
 
       - name: Linux Dependencies
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
           sudo apt-get update
           sudo apt-get install -yq \
-            boost
+            libboost-dev \
+            libyaml-cpp-dev \
+            rapidjson-dev
 
       - name: Configure
         run: |
