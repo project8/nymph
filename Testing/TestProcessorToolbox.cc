@@ -48,7 +48,7 @@ TEST_CASE( "processor_toolbox" )
 {
     using namespace Nymph;
 
-    ProcessorToolbox toolbox;
+    ProcTBRevealer toolbox;
 
     SECTION( "AddRemoveProcessors" )
     {
@@ -98,8 +98,7 @@ TEST_CASE( "processor_toolbox" )
         std::string toParse( "proc:sigslot" );
         std::string parsedProc, parsedSigSlot;
 
-        ProcTBRevealer revealer;
-        revealer.ParseSignalSlotName( toParse, parsedProc, parsedSigSlot );
+        toolbox.ParseSignalSlotName( toParse, parsedProc, parsedSigSlot );
         REQUIRE( parsedProc == "proc" );
         REQUIRE( parsedSigSlot == "sigslot" );
 
@@ -144,6 +143,31 @@ TEST_CASE( "processor_toolbox" )
         REQUIRE( tp1->Slots().at("value")->Connections().size() == 0 );
         REQUIRE( tp1->Signals().at("second-value")->Connections().size() == 0 );
         REQUIRE( tp1->Slots().at("second-value")->Connections().size() == 1 );
+    }
+
+    SECTION( "RunQueue" )
+    {
+        LINFO( "RunQueue Tests" );
+
+        std::string config_str(
+            "processors:\n"
+            "- type: test-primary\n"
+            "  name: testprimary\n"
+            "- type: test-proc\n"
+            "  name: testproc-1\n"
+        );
+
+        scarab::param_translator translator;
+        auto config = translator.read_string( config_str, "yaml" );
+
+        REQUIRE( toolbox.Configure( config->as_node() ) );
+
+        ProcTBRevealer::ThreadSourceGroup group;
+        REQUIRE_FALSE( toolbox.AddProcessorToThreadGroup( "blah", group ) );
+        REQUIRE_FALSE( toolbox.AddProcessorToThreadGroup( "testproc-1", group ) );
+        REQUIRE( toolbox.AddProcessorToThreadGroup( "testprimary", group ) );
+
+        // TODO: test public functions for RunQueue in ProcTB
     }
 
 }
