@@ -40,6 +40,12 @@ namespace Nymph
             {
                 return ProcessorToolbox::StartMultiThreadedRun();
             }
+
+            using ProcessorToolbox::RunQueue;
+            RunQueue& GetRunQueue()
+            {
+                return fRunQueue;
+            }
     };
 }
 
@@ -152,7 +158,9 @@ TEST_CASE( "processor_toolbox" )
         std::string config_str(
             "processors:\n"
             "- type: test-primary\n"
-            "  name: testprimary\n"
+            "  name: testprimary-1\n"
+            "- type: test-primary\n"
+            "  name: testprimary-2\n"
             "- type: test-proc\n"
             "  name: testproc-1\n"
         );
@@ -165,9 +173,27 @@ TEST_CASE( "processor_toolbox" )
         ProcTBRevealer::ThreadSourceGroup group;
         REQUIRE_FALSE( toolbox.AddProcessorToThreadGroup( "blah", group ) );
         REQUIRE_FALSE( toolbox.AddProcessorToThreadGroup( "testproc-1", group ) );
-        REQUIRE( toolbox.AddProcessorToThreadGroup( "testprimary", group ) );
+        REQUIRE( toolbox.AddProcessorToThreadGroup( "testprimary-1", group ) );
+        REQUIRE( group.size() == 1 );
 
-        // TODO: test public functions for RunQueue in ProcTB
+        REQUIRE_FALSE( toolbox.PushBackToRunQueue( "testproc-1" ) );
+        REQUIRE( toolbox.PushBackToRunQueue( "testprimary-1" ) );
+        REQUIRE( toolbox.GetRunQueue().size() == 1 );
+        REQUIRE( toolbox.GetRunQueue().begin()[0].size() == 1 );
+        REQUIRE( toolbox.PushBackToRunQueue( "testprimary-2" ) );
+        REQUIRE( toolbox.GetRunQueue().size() == 2 );
+        REQUIRE( toolbox.GetRunQueue().begin()[0].size() == 1 );
+        
+        toolbox.PopBackOfRunQueue();
+        REQUIRE( toolbox.GetRunQueue().size() == 1 );
+
+        toolbox.ClearRunQueue();
+        REQUIRE( toolbox.GetRunQueue().empty() );
+        
+        REQUIRE( toolbox.PushBackToRunQueue( {"testprimary-1", "testprimary-2"} ) );
+        REQUIRE( toolbox.GetRunQueue().size() == 1 );
+        REQUIRE( toolbox.GetRunQueue()[0].size() == 2 );
+
     }
 
 }
