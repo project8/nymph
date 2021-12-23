@@ -5,6 +5,7 @@
  *      Author: N.S. Oblath
  */
 
+#include "PrimaryProcessor.hh"
 #include "Processor.hh"
 #include "Signal.hh"
 #include "Slot.hh"
@@ -64,4 +65,41 @@ namespace Nymph
             return;
         }
     };
+
+
+    // concrete primary processor class that we can test
+    // implements Configure(), Run(), and has its own signal and slot
+    class TestPrimaryProc : public PrimaryProcessor
+    {
+        public:
+            TestPrimaryProc( const std::string& name = "test" ) :
+                    PrimaryProcessor( name ),
+                    fNewValue( 10 ),
+                    fValue( 0 ),
+                    fValueSig( "value", this ),
+                    fValueSlot( "value", this, &TestPrimaryProc::SetValue )
+            {}
+
+            virtual ~TestPrimaryProc()
+            {}
+
+            void Configure( const scarab::param_node& )
+            {
+                return;
+            }
+
+            bool Run()
+            {
+                fValueSig( fNewValue );
+                return true;
+            }
+
+            MEMVAR( int, NewValue );
+            MEMVAR( int, Value );
+
+            MEMVAR_REF( Signal< int >, ValueSig );
+            MEMVAR_REF( Slot< int >, ValueSlot );
+
+    };
+
 }

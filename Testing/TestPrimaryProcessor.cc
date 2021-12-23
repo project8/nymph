@@ -5,9 +5,7 @@
  *      Author: N.S. Oblath
  */
 
-#include "PrimaryProcessor.hh"
-#include "Signal.hh"
-#include "Slot.hh"
+#include "TestProc.hh"
 
 #include "logger.hh"
 
@@ -15,43 +13,8 @@
 
 LOGGER( testlog, "TestPrimaryProcessor" );
 
-namespace Nymph
-{
-    // concrete processor class that we can test
-    // implements Configure() and has its own signal and slot
-    class TestPrimaryProc : public PrimaryProcessor
-    {
-        public:
-            TestPrimaryProc() :
-                    PrimaryProcessor( "test" ),
-                    fNewValue( 10 ),
-                    fValue( 0 ),
-                    fValueSig( "value", this ),
-                    fValueSlot( "value", this, &TestPrimaryProc::SetValue )
-            {}
+REGISTER_PROCESSOR( Nymph, TestPrimaryProc, "test-primary" );
 
-            virtual ~TestPrimaryProc()
-            {}
-
-            void Configure( const scarab::param_node& )
-            {
-                return;
-            }
-
-            bool Run()
-            {
-                fValueSig( fNewValue );
-                return true;
-            }
-
-            MEMVAR( int, NewValue );
-            MEMVAR( int, Value );
-
-            MEMVAR_REF( Signal< int >, ValueSig );
-            MEMVAR_REF( Slot< int >, ValueSlot );
-
-    };
-}
 
 TEST_CASE( "primary_processor", "[primary_processor]" )
 {
