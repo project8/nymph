@@ -88,14 +88,14 @@ namespace Nymph
     */
     class ProcessorToolbox
     {
-        private:
+        protected:
             typedef std::unique_lock< std::mutex > unique_lock;
 
         public:
             ProcessorToolbox( const std::string& name = "processor-toolbox" );
             virtual ~ProcessorToolbox();
 
-        private:
+        protected:
             scarab::factory< Processor, const std::string& >* fProcFactory; // singleton; not owned by ProcessorToolbox
 
 
@@ -108,7 +108,7 @@ namespace Nymph
 
             MEMVAR( bool, RunSingleThreaded );
 
-        private:
+        protected:
             struct ProcessorInfo
             {
                 std::shared_ptr< Processor > fProc;
@@ -140,7 +140,7 @@ namespace Nymph
             /// Also clears the run queue
             void ClearProcessors();
 
-        private:
+        protected:
             ProcessorMap fProcMap;
 
 
@@ -170,7 +170,7 @@ namespace Nymph
             /// Remove a breakpoint from a signal
             bool RemoveBreakpoint( const std::string& signalProcName, const std::string& signalName );
 
-        private:
+        protected:
             bool ParseSignalSlotName( const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot ) const;
             static const char fSigSlotNameSep = ':';
 
@@ -190,7 +190,7 @@ namespace Nymph
             /// Clear the run queue
             void ClearRunQueue();
 
-        private:
+        protected:
             struct ThreadSource
             {
                 PrimaryProcessor* fProc;
@@ -243,7 +243,7 @@ namespace Nymph
 
             //MEMVAR_SHARED_PTR_CONST( SharedControl, Control );
 
-        private:
+        protected:
             //typedef boost::shared_future< KTDataHandle > Future;
 
             //void StartSingleThreadedRun();

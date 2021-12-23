@@ -17,6 +17,33 @@
 LOGGER( testlog, "TestProcessorToolbox" );
 
 
+namespace Nymph
+{
+    class ProcTBRevealer : public ProcessorToolbox
+    {
+        public:
+            using ProcessorToolbox::ProcessorToolbox;
+
+            bool ParseSignalSlotName( const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot ) const
+            {
+                return ProcessorToolbox::ParseSignalSlotName( toParse, nameOfProc, nameOfSigSlot );
+            }
+
+            using ProcessorToolbox::ThreadSource;
+            using ProcessorToolbox::ThreadSourceGroup;
+            bool AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroup& group )
+            {
+                return ProcessorToolbox::AddProcessorToThreadGroup( name, group );
+            }
+
+            void StartMultiThreadedRun()
+            {
+                return ProcessorToolbox::StartMultiThreadedRun();
+            }
+    };
+}
+
+
 TEST_CASE( "processor_toolbox" )
 {
     using namespace Nymph;
@@ -66,7 +93,15 @@ TEST_CASE( "processor_toolbox" )
 
     SECTION( "Connections" )
     {
-        LINFO( testlog, "Connections Tests")
+        LINFO( testlog, "Connections Tests");
+
+        std::string toParse( "proc:sigslot" );
+        std::string parsedProc, parsedSigSlot;
+
+        ProcTBRevealer revealer;
+        revealer.ParseSignalSlotName( toParse, parsedProc, parsedSigSlot );
+        REQUIRE( parsedProc == "proc" );
+        REQUIRE( parsedSigSlot == "sigslot" );
 
         std::string procName1( "testproc-1" );
         std::string procName2( "testproc-2" );
