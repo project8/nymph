@@ -9,6 +9,14 @@
 #ifndef NYMPH_DATAFRAME_HH_
 #define NYMPH_DATAFRAME_HH_
 
+#include "Data.hh"
+
+#include "MemberVariable.hh"
+
+#include <unordered_map>
+#include <memory>
+#include <typeindex>
+
 namespace Nymph
 {
 
@@ -17,6 +25,10 @@ namespace Nymph
         public:
             DataFrame();
             virtual ~DataFrame();
+
+            // typedef used to avoid problems with the comma in the MEMVAR macro
+            typedef std::unordered_map< std::type_index, std::unique_ptr<Data> > DataMap;
+            MEMVAR_REF( DataMap, DataObjects );
     };
 
 } /* namespace Nymph */

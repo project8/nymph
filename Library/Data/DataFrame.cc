@@ -9,7 +9,8 @@
 
 namespace Nymph
 {
-    DataFrame::DataFrame()
+    DataFrame::DataFrame() :
+        fDataObjects()
     {}
 
     DataFrame::~DataFrame()
