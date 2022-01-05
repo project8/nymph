@@ -60,38 +60,6 @@ namespace Nymph
         return true;
     }
 
-    void KTTestProcessorB::SlotFunc1(int input)
-    {
-        KTINFO(testsiglog, "Slot1: input is " << input);
-        fSlot1Wrapper->GetThreadRef()->Break( KTDataHandle(), fSlot1Wrapper->GetDoBreakpoint());
-        return;
-    }
-
-    void KTTestProcessorB::SlotFunc2(int input)
-    {
-        KTINFO(testsiglog, "Slot2: twice input is " << 2 * input);
-        fSlot2Wrapper->GetThreadRef()->Break( KTDataHandle(), fSlot2Wrapper->GetDoBreakpoint());
-        return;
-    }
-
-
-    KT_REGISTER_PROCESSOR(KTTestProcessorC, "test-proc-c");
-
-    KTTestProcessorC::KTTestProcessorC( const std::string& name ) :
-            KTProcessor( name ),
-            fSlot1("first-slot", this, &KTTestProcessorC::SlotFunc1)
-    {
-    }
-
-    KTTestProcessorC::~KTTestProcessorC()
-    {
-    }
-
-    bool KTTestProcessorC::Configure(const scarab::param_node&)
-    {
-        return true;
-    }
-
     void KTTestProcessorC::SlotFunc1(int input)
     {
         std::shared_ptr< KTThreadReference > ref = fSlot1.GetSlotWrapper()->GetThreadRef();

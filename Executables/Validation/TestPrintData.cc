@@ -5,17 +5,12 @@
  *      Author: nsoblath
  */
 
-#include "KTCut.hh"
 #include "KTLogger.hh"
 #include "KTPrintDataStructure.hh"
 
 #include "KTTestCuts.hh"
-#include "KTTestData.hh"
-
-#include "param.hh"
 
 KTLOGGER(testlog, "TestPrintData");
-
 
 using namespace Nymph;
 using namespace std;

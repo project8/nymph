@@ -1,12 +1,13 @@
-FROM project8/p8compute_dependencies:v0.7.0 as nymph_common
+FROM project8/p8compute_dependencies:v1.2.0 as nymph_common
 
 ARG build_type=Release
 ENV NYMPH_BUILD_TYPE=$build_type
 ARG build_tests_exe=FALSE
 ENV NYMPH_BUILD_TESTS_EXE=$build_tests_exe
 
-ENV NYMPH_TAG=v2.17.0
-ENV NYMPH_BUILD_PREFIX=/usr/local/p8/katydid/$NYMPH_TAG
+ARG nymph_tag=dev
+ENV NYMPH_TAG=$nymph_tag
+ENV NYMPH_BUILD_PREFIX=/usr/local/p8/nymph/$NYMPH_TAG
 
 RUN mkdir -p $NYMPH_BUILD_PREFIX &&\
     chmod -R 777 $NYMPH_BUILD_PREFIX/.. &&\
@@ -24,10 +25,12 @@ FROM nymph_common as nymph_done
 
 COPY cmake /tmp_source/cmake
 COPY Executables /tmp_source/Executables
-COPY External /tmp_source/External
+#COPY External /tmp_source/External
 COPY Library /tmp_source/Library
 COPY Scarab /tmp_source/Scarab
+COPY Testing /tmp_source/Testing
 COPY CMakeLists.txt /tmp_source/CMakeLists.txt
+COPY NymphConfig.cmake.in /tmp_source/NymphConfig.cmake.in
 COPY .git /tmp_source/.git
 
 # repeat the cmake command to get the change of install prefix to set correctly (a package_builder known issue)

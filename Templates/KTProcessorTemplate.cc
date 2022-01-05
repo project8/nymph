@@ -34,10 +34,8 @@ namespace Nymph
     {
     }
 
-    bool KTProcessorTemplate::Configure(const scarab::param_node* node)
+    bool KTProcessorTemplate::Configure(const scarab::param_node& node)
     {
-        if (node == NULL) return false;
-
         // Configure parameters
 
         return true;

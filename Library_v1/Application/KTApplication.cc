@@ -30,7 +30,7 @@ namespace Nymph
     {
     }
 
-    KTApplication::KTApplication(int argC, char** argV, bool requireArgs, scarab::param_node* defaultConfig) :
+    KTApplication::KTApplication(int argC, char** argV, bool requireArgs, const scarab::param_node& defaultConfig) :
             KTConfigurable("app"),
             fCLHandler(KTCommandLineHandler::get_instance()),
             fConfigurator( KTConfigurator::get_instance() ),
@@ -57,10 +57,7 @@ namespace Nymph
         const scarab::param_node* clConfigOverride = fCLHandler->GetConfigOverride();
 
         // Default configuration
-        if (defaultConfig != NULL)
-        {
-            fConfigurator->Merge(*defaultConfig);
-        }
+        fConfigurator->Merge(defaultConfig);
 
         // JSON file configuration
         if (! fConfigFilename.empty())

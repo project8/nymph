@@ -275,6 +275,7 @@ namespace Nymph
                     string nodeName(t_full_name.substr(t_node_start_pos, t_node_sep_pos));
                     if (parentNode.has(nodeName))
                     {
+<<<<<<< HEAD:Library_v1/Application/KTCommandLineHandler.cc
                         parentNode = parentNode[nodeName]().as_node();
                     }
                     else
@@ -282,6 +283,14 @@ namespace Nymph
                         scarab::param_node* newChildNode = new scarab::param_node();
                         parentNode.add(nodeName, newChildNode);
                         parentNode = *newChildNode;
+=======
+                        parentNode = parentNode[nodeName].as_node();
+                    }
+                    else
+                    {
+                        parentNode.add(nodeName, scarab::param_ptr_t( new scarab::param_node()));
+                        parentNode = parentNode[nodeName].as_node();
+>>>>>>> develop:Library/Application/KTCommandLineHandler.cc
                     }
                     t_node_start_pos = t_node_sep_pos + 1;
                     t_node_sep_pos = t_full_name.find_first_of(fNodeSeparator, t_node_start_pos);
