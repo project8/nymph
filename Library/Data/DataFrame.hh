@@ -22,7 +22,12 @@
 
 namespace Nymph
 {
-    struct DataFrameException : virtual public Exception {};
+    class DataFrameException : public BaseException< DataFrameException >
+    {
+        public:
+            using BaseException< DataFrameException >::BaseException;
+            ~DataFrameException() = default;
+    };
 
     /*!
      @class DataFrame
@@ -86,7 +91,7 @@ namespace Nymph
         {
             return static_cast< const XData& >( *fDataObjects.at(typeid(XData) ));
         }
-        BOOST_THROW_EXCEPTION( DataFrameException() << "Data type <" << scarab::type(XData()) << "> is not present when const Get() was called" << eom );
+        THROW_EXCEPT_HERE( DataFrameException() << "Data type <" << scarab::type(XData()) << "> is not present when const Get() was called" );
     }
 
 } /* namespace Nymph */
