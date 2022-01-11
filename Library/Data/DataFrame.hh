@@ -46,6 +46,9 @@ namespace Nymph
             DataFrame();
             virtual ~DataFrame();
 
+            /// Returns true if the frame has no data objects
+            bool Empty() const;
+
             /// Returns true if object of type XData exists in the frame; returns false otherwise
             template< typename XData >
             bool Has() const;
@@ -60,11 +63,36 @@ namespace Nymph
             template< typename XData >
             const XData& Get() const;
 
+            /// Inserts the provided object of type XData into the frame, taking ownership of the object.
+            /// If an object of this type exists, it is replaced.
+            template< typename XData >
+            void Set( XData* ptr );
+
+            /// Inserts the provided object of type XData into the frame, taking ownership of the object.
+            /// If an object of this type exists, it is replaced.
+            template< typename XData >
+            void Set( std::unique_ptr<XData>&& ptr );
+
+            /// Inserts a copy of the provided object of type XData into the frame.
+            /// If an object of this type exists, it is replaced.
+            template< typename XData >
+            void Set( const XData& obj );
+
+            /// Removes and destroys the object of type XData if it exists in the frame.
+            /// Does nothing if the object does not exist.
+            template< typename XData >
+            void Remove();
+
             // typedef used to avoid problems with the comma in the MEMVAR macro
             typedef std::unordered_map< std::type_index, std::unique_ptr<Data> > DataMap;
             MEMVAR_REF( DataMap, DataObjects );
     };
 
+
+    inline bool DataFrame::Empty() const
+    {
+        return fDataObjects.empty();
+    }
 
     template< typename XData >
     bool DataFrame::Has() const
@@ -92,6 +120,32 @@ namespace Nymph
             return static_cast< const XData& >( *fDataObjects.at(typeid(XData) ));
         }
         THROW_EXCEPT_HERE( DataFrameException() << "Data type <" << scarab::type(XData()) << "> is not present when const Get() was called" );
+    }
+
+    template< typename XData >
+    void DataFrame::Set( XData* ptr )
+    {
+        fDataObjects[ typeid(XData) ].reset( ptr );  // take ownership of ptr
+    }
+
+    template< typename XData >
+    void DataFrame::Set( std::unique_ptr< XData >&& ptr )
+    {
+        fDataObjects[ typeid(XData) ] = std::move(ptr);  // take ownership of ptr
+        return;
+    }
+
+    template< typename XData >
+    void DataFrame::Set( const XData& obj )
+    {
+        fDataObjects[ typeid(XData) ].reset( new XData(obj) );  // make a copy of obj
+    }
+
+    template< typename XData >
+    void DataFrame::Remove()
+    {
+        fDataObjects.erase( typeid(XData) );
+        return;
     }
 
 } /* namespace Nymph */
