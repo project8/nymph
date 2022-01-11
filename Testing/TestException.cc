@@ -113,7 +113,85 @@ TEST_CASE( "throw", "[utility]" )
         REQUIRE( e.GetAtLineNumber() == recordLine + 1 );  // line number was recorded just before the throw
     }
     
+}
 
+const unsigned layers = 5;
+const std::string firstThrowText( "First throw" );
+const std::string nestedThrowText( "nested throw at layer " );
+
+void CatchThrow() 
+{
+    //const static unsigned layers = 5;
+    static unsigned count = 0;
+
+    try
+    {
+        if( count == layers )
+        {
+            throw CREATE_EXCEPT_HERE( Nymph::Exception ) << firstThrowText;
+        }
+        else
+        {
+            ++count;
+            CatchThrow();
+            return;
+        }
+    }
+    catch(const Nymph::Exception& e)
+    {
+        if( count == layers )
+        {
+            REQUIRE( e.what() == firstThrowText );
+        }
+        else
+        {
+            std::string what( e.what() );
+            REQUIRE( what.substr(0, nestedThrowText.size()) == nestedThrowText );
+        }
+        std::throw_with_nested( EXCEPT_HERE( Nymph::Exception() << nestedThrowText << count-- ) );
+    }
+}
+
+// recursive print function
+void PrintException( const Nymph::Exception& e, unsigned count = 0 )
+{
+    LINFO( testlog, std::string(count, ' ') << "Exception: " << e.what() );
+    if( count == layers + 1 )
+    {
+        REQUIRE( e.what() == firstThrowText );
+    }
+    else
+    {
+        std::string what( e.what() );
+        REQUIRE( what.substr(0, nestedThrowText.size()) == nestedThrowText );
+    }
+
+    try
+    {
+        std::rethrow_if_nested( e );
+    }
+    catch(const Nymph::Exception& e)
+    {
+        PrintException( e, ++count );
+    }
+    return;
+}
+
+
+TEST_CASE( "nested_throw", "[utility]" )
+{
+    using namespace Nymph;
+
+    try
+    {
+        CatchThrow();
+    }
+    catch(const Exception& e)
+    {
+
+        PrintException(e);
+    }
+    
 }
 
 /* removed for trying home-grown exceptions, 1/10/22
