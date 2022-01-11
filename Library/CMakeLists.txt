@@ -28,7 +28,7 @@ set( NYMPH_HEADERFILES
 )
 
 set( NYMPH_SOURCEFILES
-    ${UTIL_DIR}/Exception.cc
+    #${UTIL_DIR}/Exception.cc
 
     ${PROC_DIR}/ControlAccess.cc
     ${PROC_DIR}/PrimaryProcessor.cc

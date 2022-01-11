@@ -10,6 +10,9 @@
 namespace Nymph
 {
 
+
+
+/* removed for trying home-grown exceptions, 1/10/22
     Exception::Exception() :
             boost::exception(),
             std::exception(),
@@ -26,5 +29,5 @@ namespace Nymph
     Exception::~Exception() throw ()
     {
     }
-
+*/
 }
