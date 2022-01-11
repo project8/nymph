@@ -11,6 +11,7 @@ set( testing_SOURCES
     TestControlAccess.cc
     TestData.cc
     TestDataFrame.cc
+    TestException.cc
     TestPrimaryProcessor.cc
     TestProcessor.cc
     TestSignalSlot.cc
