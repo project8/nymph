@@ -68,8 +68,8 @@ namespace Nymph
         SigMapIt signalIt = fSignals.find(signalName);
         if( signalIt == fSignals.end() )
         {
-            //throw EXCEPT_HERE(SignalException()) << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the signal.\n" <<
-            //                                        "You may have the signal name wrong.";
+            THROW_EXCEPT_HERE( SignalException() << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the signal.\n" <<
+                                                    "You may have the signal name wrong." );
 //       BOOST_THROW_EXCEPTION( SignalException() << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the signal.\n" <<
 //                                                        "You may have the signal name wrong." << eom );
         }
@@ -77,8 +77,8 @@ namespace Nymph
         SlotMapIt slotIt = processor.fSlots.find(slotName);
         if( slotIt == processor.fSlots.end() )
         {
-            //throw EXCEPT_HERE(SlotException()) << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the slot." << 
-            //                                      "You may have the slot name wrong.";
+            THROW_EXCEPT_HERE( SlotException() << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the slot." << 
+                                                  "You may have the slot name wrong." );
 //            BOOST_THROW_EXCEPTION( SlotException() << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the slot." << 
 //                                                      "You may have the slot name wrong." << eom );
         }
@@ -90,22 +90,22 @@ namespace Nymph
         }
         catch( SignalException& e )
         {
-            //std::throw_with_nested( EXCEPT_HERE(SignalException()) << "Unable to connect signal <" << signalName << "> to slot <" << slotName << "> due to a problem with the signal." <<
-            //                                                          "  You may have the signal name wrong." );
+            THROW_NESTED_EXCEPT_HERE( SignalException() << "Unable to connect signal <" << signalName << "> to slot <" << slotName << "> due to a problem with the signal." <<
+                                                           "\tYou may have the signal name wrong." );
         }
         catch( SlotException& e )
         {
-            //std::throw_with_nested( EXCEPT_HERE(SlotException()) << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the slot." <<
-            //                                                        "  You may have the slot name wrong." );
+            THROW_NESTED_EXCEPT_HERE( SlotException() << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the slot." <<
+                                                         "\tYou may have the slot name wrong." );
         }
         catch( ConnectionException& e )
         {
-            //std::throw_with_nested( EXCEPT_HERE(ConnectionException()) <<  "Unable to connect signal <" << signalName << "> to slot <" << slotName << "> due to a problem making the connection." <<
-            //                                                               "  Check that the signatures of the signal and slot match exactly." );
+            THROW_NESTED_EXCEPT_HERE( ConnectionException() <<  "Unable to connect signal <" << signalName << "> to slot <" << slotName << "> due to a problem making the connection." <<
+                                                                "\tCheck that the signatures of the signal and slot match exactly." );
         }
         catch( std::exception& e )
         {
-            //std::throw_with_nested( EXCEPT_HERE(Exception()) <<  "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> for an unknown reason." );
+            THROW_NESTED_EXCEPT_HERE( Exception() <<  "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> for an unknown reason." );
         }
 
         LDEBUG(processorlog, "Connected signal <" << this->Name() << ":" << signalName << "> to slot <" << processor.Name() << ":" << slotName << ">");
@@ -117,12 +117,12 @@ namespace Nymph
     {
         if( ! signal )
         {
-            //throw EXCEPT_HERE(SignalException()) << "Signal pointer was NULL";
+            THROW_EXCEPT_HERE( SignalException() << "Signal pointer was NULL" );
 //            BOOST_THROW_EXCEPTION( SignalException() << "Signal pointer was NULL" << eom );
         }
         if( ! slot )
         {
-            //throw EXCEPT_HERE(SlotException()) << "Slot pointer was NULL";
+            THROW_EXCEPT_HERE( SlotException() << "Slot pointer was NULL" );
 //            BOOST_THROW_EXCEPTION( SlotException() << "Slot pointer was NULL" << eom );
         }
 

@@ -34,8 +34,6 @@ TEST_CASE( "exception", "[utility]" )
     /*EXCEPT_HERE( Exception testEx );*/ 
     // uses of __LINE__ need to be on the same line
     testEx( __FILE__, __LINE__ ); std::string recordFile( __FILE__ ); int recordLine( __LINE__ );
-    LWARN( testlog, "recorded file: " << recordFile );
-    LWARN( testlog, "recorded line: " << recordLine );
     REQUIRE( testEx.AtFilename() == recordFile );
     REQUIRE( testEx.GetAtLineNumber() == recordLine );
 
@@ -148,7 +146,7 @@ void CatchThrow()
             std::string what( e.what() );
             REQUIRE( what.substr(0, nestedThrowText.size()) == nestedThrowText );
         }
-        std::throw_with_nested( EXCEPT_HERE( Nymph::Exception() << nestedThrowText << count-- ) );
+        THROW_NESTED_EXCEPT_HERE( Nymph::Exception() << nestedThrowText << count-- ) ;
     }
 }
 
