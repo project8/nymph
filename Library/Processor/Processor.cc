@@ -68,15 +68,19 @@ namespace Nymph
         SigMapIt signalIt = fSignals.find(signalName);
         if( signalIt == fSignals.end() )
         {
-            BOOST_THROW_EXCEPTION( SignalException() << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the signal.\n" <<
-                                                        "You may have the signal name wrong." << eom );
+            THROW_EXCEPT_HERE( SignalException() << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the signal.\n" <<
+                                                    "You may have the signal name wrong." );
+//       BOOST_THROW_EXCEPTION( SignalException() << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the signal.\n" <<
+//                                                        "You may have the signal name wrong." << eom );
         }
 
         SlotMapIt slotIt = processor.fSlots.find(slotName);
         if( slotIt == processor.fSlots.end() )
         {
-            BOOST_THROW_EXCEPTION( SlotException() << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the slot." << 
-                                                      "You may have the slot name wrong." << eom );
+            THROW_EXCEPT_HERE( SlotException() << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the slot." << 
+                                                  "You may have the slot name wrong." );
+//            BOOST_THROW_EXCEPTION( SlotException() << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the slot." << 
+//                                                      "You may have the slot name wrong." << eom );
         }
 
         try
@@ -86,26 +90,22 @@ namespace Nymph
         }
         catch( SignalException& e )
         {
-            e << ErrorMsgInfo< struct proc_Sig_0 >( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the signal." );
-            e << ErrorMsgInfo< struct proc_Sig_1 >( "You may have the signal name wrong." );
-            throw;
+            THROW_NESTED_EXCEPT_HERE( SignalException() << "Unable to connect signal <" << signalName << "> to slot <" << slotName << "> due to a problem with the signal." <<
+                                                           "\tYou may have the signal name wrong." );
         }
         catch( SlotException& e )
         {
-            e << ErrorMsgInfo< struct proc_Slot_0 >( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the slot." );
-            e << ErrorMsgInfo< struct proc_Slot_1 >( "You may have the slot name wrong." );
-            throw;
+            THROW_NESTED_EXCEPT_HERE( SlotException() << "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem with the slot." <<
+                                                         "\tYou may have the slot name wrong." );
         }
         catch( ConnectionException& e )
         {
-            e << ErrorMsgInfo< struct proc_Conn_0 >( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> due to a problem making the connection." );
-            e << ErrorMsgInfo< struct proc_Conn_1 >( "Check that the signatures of the signal and slot match exactly." );
-            throw;
+            THROW_NESTED_EXCEPT_HERE( ConnectionException() <<  "Unable to connect signal <" << signalName << "> to slot <" << slotName << "> due to a problem making the connection." <<
+                                                                "\tCheck that the signatures of the signal and slot match exactly." );
         }
-        catch( boost::exception& e )
+        catch( std::exception& e )
         {
-            e << ErrorMsgInfo< struct proc_Unkn >( "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> for an unknown reason." );
-            throw;
+            THROW_NESTED_EXCEPT_HERE( Exception() <<  "Unable to connect signal <" + signalName + "> to slot <" + slotName + "> for an unknown reason." );
         }
 
         LDEBUG(processorlog, "Connected signal <" << this->Name() << ":" << signalName << "> to slot <" << processor.Name() << ":" << slotName << ">");
@@ -117,11 +117,13 @@ namespace Nymph
     {
         if( ! signal )
         {
-            BOOST_THROW_EXCEPTION( SignalException() << "Signal pointer was NULL" << eom );
+            THROW_EXCEPT_HERE( SignalException() << "Signal pointer was NULL" );
+//            BOOST_THROW_EXCEPTION( SignalException() << "Signal pointer was NULL" << eom );
         }
         if( ! slot )
         {
-            BOOST_THROW_EXCEPTION( SlotException() << "Slot pointer was NULL" << eom );
+            THROW_EXCEPT_HERE( SlotException() << "Slot pointer was NULL" );
+//            BOOST_THROW_EXCEPTION( SlotException() << "Slot pointer was NULL" << eom );
         }
 
         signal->Connect(slot, groupNum);
