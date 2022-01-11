@@ -9,6 +9,7 @@ set( testing_HEADERS
 
 set( testing_SOURCES
     TestControlAccess.cc
+    TestException.cc
     TestPrimaryProcessor.cc
     TestProcessor.cc
     TestSignalSlot.cc
