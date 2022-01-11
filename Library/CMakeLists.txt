@@ -20,6 +20,9 @@ include_directories( BEFORE
 set( NYMPH_HEADERFILES
     ${UTIL_DIR}/Exception.hh
     ${UTIL_DIR}/MemberVariable.hh
+
+    ${DATA_DIR}/Data.hh
+    ${DATA_DIR}/DataFrame.hh
     
     ${PROC_DIR}/ControlAccess.hh
     ${PROC_DIR}/PrimaryProcessor.hh
@@ -30,6 +33,9 @@ set( NYMPH_HEADERFILES
 set( NYMPH_SOURCEFILES
     #${UTIL_DIR}/Exception.cc
 
+    ${DATA_DIR}/Data.cc
+    ${DATA_DIR}/DataFrame.cc
+    
     ${PROC_DIR}/ControlAccess.cc
     ${PROC_DIR}/PrimaryProcessor.cc
     ${PROC_DIR}/Processor.cc
