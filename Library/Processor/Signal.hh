@@ -141,9 +141,13 @@ namespace Nymph
         // ensure that the slot is of the correct type
         if( ! dynamic_cast< Slot< XArgs... >* >( slot ) )
         {
-            BOOST_THROW_EXCEPTION( ConnectionException() << "Trying to connect signal <" << fName << "> to slot <" << slot->Name() << ">, but cannot make the connection:\n" <<
+            THROW_EXCEPT_HERE( ConnectionException() << "Trying to connect signal <" << fName << "> to slot <" << slot->Name() << ">, but cannot make the connection:\n" <<
                     "\tUnable to cast from SlotBase to this signal's derived type.\n" << 
-                    "\tArgument types do not match" << eom );
+                    "\tArgument types do not match" );
+
+            //BOOST_THROW_EXCEPTION( ConnectionException() << "Trying to connect signal <" << fName << "> to slot <" << slot->Name() << ">, but cannot make the connection:\n" <<
+            //        "\tUnable to cast from SlotBase to this signal's derived type.\n" << 
+            //        "\tArgument types do not match" << eom );
         }
 /*
         Connection connection;

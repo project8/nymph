@@ -9,16 +9,90 @@
 #ifndef NYMPH_EXCEPTION_HH_
 #define NYMPH_EXCEPTION_HH_
 
-#include "macros.hh"
+#include "MemberVariable.hh"
 
-#include <boost/exception/all.hpp>
+#include "base_exception.hh"
 
-#include <exception>
-#include <sstream>
-#include <string>
+//#include <boost/exception/all.hpp>
+
+//#include <exception>
+//#include <sstream>
+//#include <string>
 
 namespace Nymph
 {
+
+    template< typename XDerived >
+    class BaseException : public scarab::base_exception< XDerived >
+    {
+        public:
+            BaseException();
+            BaseException( const std::string& filename, int lineNum );
+            ~BaseException() noexcept;
+
+            XDerived& operator()( const std::string& filename, int lineNum );
+            XDerived& operator%( const std::string& filename );
+            XDerived& operator%( int lineNum );
+
+            MEMVAR_REF( std::string, AtFilename );
+            MEMVAR( int, AtLineNumber );
+    };
+
+    class Exception : public BaseException< Exception >
+    {
+        public:
+            using BaseException< Exception >::BaseException;
+            ~Exception() = default;
+    };
+
+#define CREATE_EXCEPT_HERE( anException )  anException( __FILE__, __LINE__ )
+#define EXCEPT_HERE( anException )  (anException)( __FILE__, __LINE__ )
+
+#define THROW_EXCEPT_HERE( anException ) throw EXCEPT_HERE( anException )
+#define THROW_NESTED_EXCEPT_HERE( anException ) std::throw_with_nested( EXCEPT_HERE( anException ) )
+
+    template< typename XDerived >
+    BaseException< XDerived >::BaseException() :
+            scarab::base_exception< XDerived >(),
+            fAtFilename( "unknown" ),
+            fAtLineNumber( 0 )
+    {}
+
+    template< typename XDerived >
+    BaseException< XDerived >::BaseException( const std::string& filename, int lineNumber ) :
+            scarab::base_exception< XDerived >(),
+            fAtFilename( filename ),
+            fAtLineNumber( lineNumber )
+    {}
+
+    template< typename XDerived >
+    BaseException< XDerived >::~BaseException() noexcept
+    {}
+
+    template< typename XDerived >
+    XDerived& BaseException< XDerived >::operator()( const std::string& filename, int lineNumber )
+    {
+        fAtFilename = filename;
+        fAtLineNumber = lineNumber;
+        return *static_cast< XDerived* >(this);
+    }
+
+    template< typename XDerived >
+    XDerived& BaseException< XDerived >::operator%( const std::string& filename )
+    {
+        fAtFilename = filename;
+        return *static_cast< XDerived* >(this);
+    }
+
+    template< typename XDerived >
+    XDerived& BaseException< XDerived >::operator%( int lineNum )
+    {
+        fAtLineNumber = lineNum;
+        return *static_cast< XDerived* >(this);
+    }
+
+
+/* removed for trying home-grown exceptions, 1/10/22
     struct MessageEnd {};
     static const MessageEnd eom = MessageEnd();
 
@@ -26,8 +100,8 @@ namespace Nymph
 
     template< class XLabel >
     using ErrorMsgInfo = boost::error_info< XLabel, std::string>;
-
-    /*!
+*/
+    /* // removed for trying home-grown exceptions, 1/10/22
      @class Exception
      @author N.S. Oblath
 
@@ -68,7 +142,7 @@ namespace Nymph
           ERROR( my_log, "An exception was caught: " << diagnostic_information( e ) ):
       }
     */
-
+/* removed for trying home-grown exceptions, 1/10/22
     class Exception : virtual public boost::exception, virtual public std::exception
     {
         public:
@@ -121,7 +195,7 @@ namespace Nymph
         }
         return *this;
     }
-
+*/
 }
 
 #endif /* NYMPH_EXCEPTION_HH_ */
