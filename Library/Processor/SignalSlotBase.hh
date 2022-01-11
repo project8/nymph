@@ -19,10 +19,27 @@
 
 namespace Nymph
 {
-    struct SignalException : virtual public Exception {};
-    struct SlotException : virtual public Exception {};
 
-    struct ConnectionException : public Exception {};
+    class SignalException : public BaseException< SignalException >
+    {
+        public:
+            using BaseException< SignalException >::BaseException;
+            ~SignalException() = default;
+    };
+
+    class SlotException : public BaseException< SlotException >
+    {
+        public:
+            using BaseException< SlotException >::BaseException;
+            ~SlotException() = default;
+    };
+
+    class ConnectionException : public BaseException< ConnectionException >
+    {
+        public:
+            using BaseException< ConnectionException >::BaseException;
+            ~ConnectionException() = default;
+    };
 
 
     class SignalBase;
