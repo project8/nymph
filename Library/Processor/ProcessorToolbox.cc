@@ -408,12 +408,12 @@ namespace Nymph
                 signalProc->ConnectASlot(signalName, *slotProc.get(), slotName);
             }
         }
-        catch (boost::exception& e)
+        catch( scarab::base_exception& e )
         {
             LERROR( proclog, "An error occurred while connecting signals and slots:\n"
                     << "\tSignal " << signalName << " from processor " << signalProcName << " (a.k.a. " << signalProc->Name() << ")" << '\n'
-                    << "\tSlot " << slotName << " from processor " << slotProcName << " (a.k.a. " << slotProc->Name() << ")" << '\n'
-                    << '\t' << diagnostic_information( e ) );
+                    << "\tSlot " << slotName << " from processor " << slotProcName << " (a.k.a. " << slotProc->Name() << ")" << '\n' );
+            PrintException( e );
             return false;
         }
 
@@ -446,9 +446,10 @@ namespace Nymph
             signalProc->SetDoBreakpoint( signalName, true );
             return true;
         }
-        catch( boost::exception& e )
+        catch( scarab::base_exception& e )
         {
-            LERROR( proclog, "Unable to set breakpoint: " << diagnostic_information( e ) );
+            LERROR( proclog, "Unable to set breakpoint: " );
+            PrintException( e );
             return false;
         }
     }
@@ -479,9 +480,10 @@ namespace Nymph
             signalProc->SetDoBreakpoint( signalName, false );
             return true;
         }
-        catch( boost::exception& e )
+        catch( scarab::base_exception& e )
         {
-            LERROR( proclog, "Unable to set breakpoint: " << diagnostic_information( e ) );
+            LERROR( proclog, "Unable to set breakpoint: " );
+            PrintException( e );
             return false;
         }
     }
@@ -838,11 +840,12 @@ namespace Nymph
                 //fDoRunPromise.set_exception( boost::current_exception() );
                 return;
             }
-            catch( boost::exception& e )
+            catch( scarab::base_exception& e )
             {
                 // exceptions thrown in this function or from within processors will end up here
                 LERROR( proclog, "Caught boost::exception thrown in a processor or in the multi-threaded run function" );
-                LERROR( proclog, "Diagnostic Information:\n" << diagnostic_information( e ) );
+                LERROR( proclog, "Diagnostic Information:\n" );
+                PrintException( e );
                 SharedControl::get_instance()->Cancel();
                 //LWARN( proclog, "Setting boost::exception of do-run-promise in StartMultiThreadedRun" );
                 //fDoRunPromise.set_exception( boost::current_exception() );

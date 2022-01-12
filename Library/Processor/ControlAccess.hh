@@ -71,7 +71,7 @@ namespace Nymph
         {
             if( ! WaitToContinue() )
             {
-                BOOST_THROW_EXCEPTION( Exception() << "Canceled while waiting to initiate a breakpoint" << eom );
+                THROW_EXCEPT_HERE( Exception() << "Canceled while waiting to initiate a breakpoint" );
             }
         }
 
@@ -86,10 +86,10 @@ namespace Nymph
     template< typename... Args >
     std::tuple< Args&... >& SharedControl::GetReturn()
     {
-        if( ! fReturnPtr ) BOOST_THROW_EXCEPTION( Exception() << "No return available" << eom );
+        if( ! fReturnPtr ) THROW_EXCEPT_HERE( Exception() << "No return available" );
         std::unique_lock< std::mutex > lock( fMutex );
         std::shared_ptr< ReturnBuffer< Args... > > buffer( std::dynamic_pointer_cast< ReturnBuffer< Args... > >(fReturnPtr) );
-        if( buffer == nullptr ) BOOST_THROW_EXCEPTION( Exception() << "Incorrect types used to get return" << eom );
+        if( buffer == nullptr ) THROW_EXCEPT_HERE( Exception() << "Incorrect types used to get return" );
         return buffer->GetReturn();
     }
 

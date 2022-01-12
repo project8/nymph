@@ -142,7 +142,7 @@ namespace Nymph
         {
             return signal->GetDoBreakpoint();
         }
-        BOOST_THROW_EXCEPTION( Exception() << "Signal <" << signalName << "> was not found" << eom );
+        THROW_EXCEPT_HERE( Exception() << "Signal <" << signalName << "> was not found" );
         return false;
     }
 
@@ -153,7 +153,7 @@ namespace Nymph
         {
             return signal->SetDoBreakpoint( flag );
         }
-        BOOST_THROW_EXCEPTION( Exception() << "Signal <" << signalName << "> was not found" << eom );
+        THROW_EXCEPT_HERE( Exception() << "Signal <" << signalName << "> was not found" );
         return;
     }
 

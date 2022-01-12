@@ -34,7 +34,7 @@ set( NYMPH_HEADERFILES
 )
 
 set( NYMPH_SOURCEFILES
-    #${UTIL_DIR}/Exception.cc
+    ${UTIL_DIR}/Exception.cc
 
     ${DATA_DIR}/Data.cc
     ${DATA_DIR}/DataFrame.cc

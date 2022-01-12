@@ -7,8 +7,27 @@
 
 #include "Exception.hh"
 
+#include "logger.hh"
+
+LOGGER( exlog, "Exception" );
+
 namespace Nymph
 {
+    void PrintException( const scarab::base_exception& e, unsigned count )
+    {
+        LINFO( exlog, std::string(count, ' ') << "Exception: " << e.what() );
+        LINFO( exlog, std::string(count, ' ') << "\tThrown at: " << e.where() );
+        try
+        {
+            std::rethrow_if_nested( e );
+        }
+        catch(const Nymph::Exception& e)
+        {
+            PrintException( e, ++count );
+        }
+        return;
+    }
+
 /*
     BaseException::BaseException() :
             std::exception(),

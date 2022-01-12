@@ -60,6 +60,10 @@ namespace Nymph
 
 #define THROW_EXCEPT_HERE( anException ) throw EXCEPT_HERE( anException )
 #define THROW_NESTED_EXCEPT_HERE( anException ) std::throw_with_nested( EXCEPT_HERE( anException ) )
+
+/// Recursive print function for potentially-nested exceptions
+void PrintException( const scarab::base_exception& e, unsigned count = 0 );
+
 /*
     template< typename XDerived >
     TypedException< XDerived >::TypedException() :
