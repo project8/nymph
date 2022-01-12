@@ -20,24 +20,24 @@
 namespace Nymph
 {
 
-    class SignalException : public BaseException< SignalException >
+    class SignalException : public scarab::typed_exception< SignalException >
     {
         public:
-            using BaseException< SignalException >::BaseException;
+            using scarab::typed_exception< SignalException >::typed_exception;
             ~SignalException() = default;
     };
 
-    class SlotException : public BaseException< SlotException >
+    class SlotException : public scarab::typed_exception< SlotException >
     {
         public:
-            using BaseException< SlotException >::BaseException;
+            using scarab::typed_exception< SlotException >::typed_exception;
             ~SlotException() = default;
     };
 
-    class ConnectionException : public BaseException< ConnectionException >
+    class ConnectionException : public scarab::typed_exception< ConnectionException >
     {
         public:
-            using BaseException< ConnectionException >::BaseException;
+            using scarab::typed_exception< ConnectionException >::typed_exception;
             ~ConnectionException() = default;
     };
 

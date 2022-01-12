@@ -9,8 +9,6 @@
 #ifndef NYMPH_EXCEPTION_HH_
 #define NYMPH_EXCEPTION_HH_
 
-#include "MemberVariable.hh"
-
 #include "base_exception.hh"
 
 //#include <boost/exception/all.hpp>
@@ -21,28 +19,40 @@
 
 namespace Nymph
 {
-
-    template< typename XDerived >
-    class BaseException : public scarab::base_exception< XDerived >
+    /*
+    class BaseException : virtual public std::exception
     {
         public:
             BaseException();
-            BaseException( const std::string& filename, int lineNum );
             ~BaseException() noexcept;
-
-            XDerived& operator()( const std::string& filename, int lineNum );
-            XDerived& operator%( const std::string& filename );
-            XDerived& operator%( int lineNum );
 
             MEMVAR_REF( std::string, AtFilename );
             MEMVAR( int, AtLineNumber );
+
+            virtual const char* where() const noexcept;
+
+        private:
+            mutable std::string fBuffer;
     };
 
-    class Exception : public BaseException< Exception >
+    template< typename XDerived >
+    class TypedException : virtual public scarab::base_exception< XDerived >, public BaseException
     {
         public:
-            using BaseException< Exception >::BaseException;
-            ~Exception() = default;
+            TypedException();
+            TypedException( const std::string& filename, int lineNum );
+            ~TypedException() noexcept;
+
+            XDerived& operator()( const std::string& filename, int lineNum );
+
+    };
+    */
+
+    class Exception : public scarab::typed_exception< Exception >
+    {
+        public:
+            using scarab::typed_exception< Exception >::typed_exception;
+            virtual ~Exception() noexcept = default;
     };
 
 #define CREATE_EXCEPT_HERE( anException )  anException( __FILE__, __LINE__ )
@@ -50,48 +60,34 @@ namespace Nymph
 
 #define THROW_EXCEPT_HERE( anException ) throw EXCEPT_HERE( anException )
 #define THROW_NESTED_EXCEPT_HERE( anException ) std::throw_with_nested( EXCEPT_HERE( anException ) )
-
+/*
     template< typename XDerived >
-    BaseException< XDerived >::BaseException() :
+    TypedException< XDerived >::TypedException() :
             scarab::base_exception< XDerived >(),
-            fAtFilename( "unknown" ),
-            fAtLineNumber( 0 )
+            BaseException()
     {}
 
     template< typename XDerived >
-    BaseException< XDerived >::BaseException( const std::string& filename, int lineNumber ) :
+    TypedException< XDerived >::TypedException( const std::string& filename, int lineNumber ) :
             scarab::base_exception< XDerived >(),
-            fAtFilename( filename ),
-            fAtLineNumber( lineNumber )
+            BaseException()
+    {
+        fAtFilename = filename;
+        fAtLineNumber = lineNumber;
+    }
+
+    template< typename XDerived >
+    TypedException< XDerived >::~TypedException() noexcept
     {}
 
     template< typename XDerived >
-    BaseException< XDerived >::~BaseException() noexcept
-    {}
-
-    template< typename XDerived >
-    XDerived& BaseException< XDerived >::operator()( const std::string& filename, int lineNumber )
+    XDerived& TypedException< XDerived >::operator()( const std::string& filename, int lineNumber )
     {
         fAtFilename = filename;
         fAtLineNumber = lineNumber;
         return *static_cast< XDerived* >(this);
     }
-
-    template< typename XDerived >
-    XDerived& BaseException< XDerived >::operator%( const std::string& filename )
-    {
-        fAtFilename = filename;
-        return *static_cast< XDerived* >(this);
-    }
-
-    template< typename XDerived >
-    XDerived& BaseException< XDerived >::operator%( int lineNum )
-    {
-        fAtLineNumber = lineNum;
-        return *static_cast< XDerived* >(this);
-    }
-
-
+*/
 /* removed for trying home-grown exceptions, 1/10/22
     struct MessageEnd {};
     static const MessageEnd eom = MessageEnd();
