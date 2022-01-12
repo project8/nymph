@@ -574,135 +574,11 @@ namespace Nymph
             return;
         }
 
-        //fDoRunPromise = boost::promise< void >();
-        //fDoRunFuture = fDoRunPromise.get_future().share();
-
-        //bool willRunSingleThreaded = fRunSingleThreaded;
-//#ifdef SINGLETHREADED
-        //willRunSingleThreaded = true;
-//#endif
-
-        //if( willRunSingleThreaded )
-        //{
-        //    StartSingleThreadedRun();
-        //}
-        //else
-        //{
         StartMultiThreadedRun();
-        //}
 
         return;
     }
-/*
-    void ProcessorToolbox::StartSingleThreadedRun()
-    {
-        auto singleThreadRun = [&]()
-        {
-            try
-            {
-                LPROG( proclog, "Starting single-threaded processing" );
 
-                for (RunQueue::iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
-                {
-                    for (ThreadGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
-                    {
-                        boost_unique_lock breakContLock( fBreakContMutex );
-
-                        std::string procName( tgIter->fName );
-                        LINFO( proclog, "Starting processor <" << procName << ">" );
-
-                        std::shared_ptr< KTThreadReference > thisThreadRef = std::make_shared< KTThreadReference >();
-                        thisThreadRef->Name() = procName;
-
-                        thisThreadRef->SetInitiateBreakFunc( [&](){ this->InitiateBreak(); } );
-                        thisThreadRef->SetWaitForContinueFunc( [&]( boost_unique_lock& lock ){ this->WaitForContinue( lock ); } );
-
-                        fThreadReferences.push_back( thisThreadRef );
-
-                        boost::condition_variable threadStartedCV;
-                        boost::mutex threadStartedMutex;
-                        bool threadStartedFlag = false;
-
-                        boost_unique_lock threadStartedLock( threadStartedMutex );
-                        boost::thread thread( [&](){ tgIter->fProc->operator()( thisThreadRef, threadStartedCV, threadStartedFlag ); } );
-                        KTDEBUG( proclog, "Thread ID is <" << thread.get_id() << ">; waiting for thread start" );
-                        while( ! threadStartedFlag )
-                        {
-                            threadStartedCV.wait( threadStartedLock );
-                        }
-                        KTDEBUG( proclog, "Thread has started" );
-
-                        KTDEBUG( proclog, "Thread ID is <" << thread.get_id() << ">" );
-
-                        bool stillRunning = true; // determines behavior that depends on whether a return from the thread was temporary or from the thread completing
-                        do
-                        {
-                            boost::future_status status;
-                            do
-                            {
-                                status = fThreadReferences.back()->GetDataPtrRetFuture().wait_for( boost::chrono::milliseconds(500) );
-                            } while (status != boost::future_status::ready);
-
-                            stillRunning = false;
-                            if( fThreadReferences.back()->GetBreakFlag() )
-                            {
-                                KTDEBUG( proclog, "Breakpoint reached (seen first in thread <" << procName << ">; may not be where breakpoint is set)" );
-
-                                WaitForContinue( breakContLock );
-
-                                KTDEBUG( proclog, "Breakpoint finished" );
-                                stillRunning = true;
-                            }
-                            else
-                            {
-                                try
-                                {
-                                    fThreadReferences.back()->GetReturnValue();
-                                    LINFO( proclog, "Thread <" << procName << "> has finished" );
-                                    fThreadReferences.pop_back();
-                                }
-                                catch( boost::exception& e )
-                                {
-                                    e << KTErrorMsgInfo< struct procTB_STRFinishing >( "There was an error while finishing thread <" + procName + "> and retrieving its results" );
-                                    throw;
-                                }
-                                stillRunning = false;
-                            }
-                        } while( stillRunning );
-
-                        LINFO( proclog, "Processor <" << procName << "> has finished" );
-
-                        thread.join();
-                        fThreadReferences.clear();
-                    } // end for loop over the thread group
-                } // end for loop over the run-queue
-
-                LPROG( proclog, "Processing is complete (single-threaded)" );
-            }
-            catch( std::exception& e )
-            {
-                // exceptions thrown in this function or from within processors will end up here
-                LERROR( proclog, "Caught std::exception thrown in a processor or in the single-threaded run function: " << e.what() );
-                LWARN( proclog, "Setting boost::exception of do-run-promise in StartSingleThreadedRun" );
-                fDoRunPromise.set_exception( boost::current_exception() );
-                return;
-            }
-            catch( boost::exception& e )
-            {
-                // exceptions thrown in this function or from within processors will end up here
-                LERROR( proclog, "Caught boost::exception thrown in a processor or in the single-threaded run function" );
-                LWARN( proclog, "Setting boost::exception of do-run-promise in StartSingleThreadedRun" );
-                fDoRunPromise.set_exception( boost::current_exception() );
-                return;
-            }
-            fDoRunPromise.set_value();
-            return;
-        }; // end single-threaded run lambda
-
-        fDoRunThread = new boost::thread( singleThreadRun );
-        return;
-    }
-*/
     void ProcessorToolbox::StartMultiThreadedRun()
     {
         auto multiThreadRun = [&]()
@@ -717,8 +593,6 @@ namespace Nymph
                     std::map< std::string, std::thread > threads;
 
                     { // scope for threadFuturesLock
-                        //boost_unique_lock breakContLock( fBreakContMutex );
-                        //boost_unique_lock threadFuturesLock( fThreadReferencesMutex );
 
                         for (ThreadSourceGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
                         {
@@ -726,29 +600,6 @@ namespace Nymph
                             LINFO( proclog, "Starting processor <" << procName << ">" );
 
                             threads.emplace( procName, std::thread(&PrimaryProcessor::operator(), tgIter->fProc) );
-
-                            //std::shared_ptr< KTThreadReference > thisThreadRef = std::make_shared< KTThreadReference >();
-                            //thisThreadRef->Name() = procName;
-
-                            //thisThreadRef->SetInitiateBreakFunc( [&](){ this->InitiateBreak(); } );
-                            //thisThreadRef->SetWaitForContinueFunc( [&]( boost_unique_lock& lock ){ this->WaitForContinue( lock ); } );
-                            //fThreadReferences.push_back( thisThreadRef );
-
-                            //boost::condition_variable threadStartedCV;
-                            //boost::mutex threadStartedMutex;
-                            //bool threadStartedFlag = false;
-
-                            //boost_unique_lock threadStartedLock( threadStartedMutex );
-                            //boost::thread* thisThread = new boost::thread( [&](){ tgIter->fProc->operator()( thisThreadRef, threadStartedCV, threadStartedFlag ); } );
-                            //KTDEBUG( proclog, "Thread ID is <" << thisThread->get_id() << ">; waiting for thread start" );
-                            //while( ! threadStartedFlag )
-                            //{
-                            //    threadStartedCV.wait( threadStartedLock );
-                            //}
-                            //KTDEBUG( proclog, "Thread has started" );
-
-                            //threads.add_thread( thisThread );
-
                         }// end for loop over the thread group
                     } // end scope for threadFuturesLock
 
@@ -776,57 +627,6 @@ namespace Nymph
                             LDEBUG( proclog, "Detected cancelation while waiting during running" );
                         }
                     }
-
-                    /*
-                    bool stillRunning = true; // determines behavior that depends on whether a return from the thread was temporary or from the thread completing
-                    do
-                    {
-                        auto finishedFuturePtr = boost::wait_for_any( KTThreadRefFutureIterator(fThreadReferences.begin()), KTThreadRefFutureIterator(fThreadReferences.end()) );
-                        boost_unique_lock breakContLock( fBreakContMutex );
-
-                        size_t iThread = finishedFuturePtr - KTThreadRefFutureIterator(fThreadReferences.begin());
-                        auto finishedReferencePtr = fThreadReferences.begin() + iThread;
-                        std::string threadName( (*finishedReferencePtr)->Name() );
-                        KTDEBUG( proclog, "Thread <" << iThread << " (" << threadName << ") > has stopped for some reason" );
-
-                        stillRunning = false;
-                        if( fDoRunBreakFlag )
-                        {
-                            // a breakpoint has been reached
-                            KTDEBUG( proclog, "Breakpoint reached (seen first in thread <" << threadName << ">; may not be where breakpoint is set)" );
-
-                            // wait here for the user to continue
-                            WaitForContinue( breakContLock );
-
-                            KTDEBUG( proclog, "Breakpoint finished" );
-                            stillRunning = true;
-                            //continueSignal = fMasterContSignal; // refresh the local copy of the shared future
-                        }
-                        else
-                        {
-                            // we're finished a thread; get its results
-                            try
-                            {
-                                LINFO( proclog, "Thread <" << threadName << "> has finished" );
-                                finishedFuturePtr->get();
-                                fThreadReferences.erase( finishedReferencePtr );
-                            }
-                            catch( boost::exception& e )
-                            {
-                                e << KTErrorMsgInfo< struct procTB_MTRFinishing >( "There was an error while finishing thread <" + threadName + "> and retrieving its results" );
-                                throw;
-                            }
-
-                            if( fThreadReferences.empty() ) stillRunning = false;
-                            else stillRunning = true;
-                        }
-                    } while( stillRunning );
-
-                    KTDEBUG( proclog, "Joining threads" );
-                    threads.join_all();
-                    boost_unique_lock breakContLock( fBreakContMutex );
-                    fThreadReferences.clear();
-                    */
                 } // end for loop over the run-queue
 
                 LPROG( proclog, "Processing is complete (multi-threaded)" );
@@ -847,12 +647,8 @@ namespace Nymph
                 LERROR( proclog, "Diagnostic Information:\n" );
                 PrintException( e );
                 SharedControl::get_instance()->Cancel();
-                //LWARN( proclog, "Setting boost::exception of do-run-promise in StartMultiThreadedRun" );
-                //fDoRunPromise.set_exception( boost::current_exception() );
                 return;
             }
-            //LWARN( proclog, "Setting value of do-run-promise in StartMultiThreadedRun" );
-            //fDoRunPromise.set_value();
             return;
         }; // end multi-threaded run lambda
 
@@ -864,44 +660,6 @@ namespace Nymph
     bool ProcessorToolbox::WaitForBreakOrCanceled()
     {
         return SharedControl::get_instance()->WaitForBreakOrCanceled();
-        /*
-        boost_unique_lock breakContLock( fBreakContMutex );
-
-        if( fDoRunBreakFlag )
-        {
-            LWARN( proclog, "Can't wait for a break; Already at a breakpoint" );
-            return true;
-        }
-
-        boost::shared_future< void > doRunFuture = fDoRunFuture;
-        if( ! doRunFuture.valid() )
-        {
-            BOOST_THROW_EXCEPTION( KTException() << "Cannot wait for a break in the current state (the \"DoRun\" future does not have a valid shared state)" << eom );
-        }
-
-        breakContLock.unlock();
-
-        // block here until there's a break
-        doRunFuture.wait();
-
-        if( fDoRunBreakFlag )
-        {
-            KTDEBUG( proclog, "Breakpoint reached (the wait is over)" );
-            return true;
-        }
-
-        try
-        {
-            doRunFuture.get();
-            KTDEBUG( proclog, "End-of-run reached (the wait-for-break is over)" );
-            return false;
-        }
-        catch( boost::exception& e )
-        {
-            LERROR( proclog, "An error occurred during processing: " << boost::diagnostic_information( e ) );
-            return false;
-        }
-        */
     }
 
     bool ProcessorToolbox::WaitToContinue()
@@ -911,8 +669,6 @@ namespace Nymph
 
     void ProcessorToolbox::WaitForEndOfRun()
     {
-        // WaitForBreak() and WaitForContinue() throw boost::exception for problems with the future or promise objects
-
         LDEBUG( proclog, "Waiting for end-of-run" );
         while( WaitForBreakOrCanceled() )
         {
@@ -929,84 +685,7 @@ namespace Nymph
     {
         SharedControl::get_instance()->Resume();
         return;
-        /*
-        if( ! fDoRunBreakFlag )
-        {
-            LWARN( proclog, "Not currently at a breakpoint" );
-            return;
-        }
-
-        boost_unique_lock breakContLock( fBreakContMutex );
-
-        // reset all break flags
-        fDoRunBreakFlag = false;
-        std::vector< boost_unique_lock > trLocks;
-        for( auto trIt = fThreadReferences.begin(); trIt != fThreadReferences.end(); ++trIt )
-        {
-            trLocks.emplace_back( (*trIt)->Mutex() );
-            (*trIt)->SetBreakFlag( false );
-            (*trIt)->RefreshDataPtrRet();
-        }
-
-        // reset the do-run promise and future
-        fDoRunPromise = boost::promise< void >();
-        fDoRunFuture = fDoRunPromise.get_future().share();
-
-        LINFO( proclog, "Continuing from breakpoint" );
-        // signal everything to resume
-        fDoContinue = true;
-        fContinueCV.notify_all();
-
-        return;
-        */
     }
-/*
-    KTDataHandle ProcessorToolbox::GetData( const std::string& threadName )
-    {
-        //boost_unique_lock threadFuturesLock( fThreadReferencesMutex );
-        boost_unique_lock breakContLock( fBreakContMutex );
-
-        auto trIt = fThreadReferences.begin();
-        for( ; trIt != fThreadReferences.end(); ++trIt )
-        {
-            if( (*trIt)->Name() == threadName ) break;
-        }
-        if( trIt == fThreadReferences.end() )
-        {
-            LWARN( proclog, "Did not find thread <" << threadName << ">" );
-            BOOST_THROW_EXCEPTION( KTException() << "Did not find thread <" << threadName << ">" << eom );
-        }
-
-        boost_unique_lock lock( (*trIt)->Mutex() );
-        return (*trIt)->GetReturnValue();
-    }
-*/
-/*
-    void ProcessorToolbox::InitiateBreak()
-    {
-        boost_unique_lock breakContLock( fBreakContMutex );
-        if( fDoRunBreakFlag ) return;
-
-        // set the continue flag to false so that things will wait for the continue
-        fDoContinue = false;
-
-        // set all break flags
-        // master break flag
-        fDoRunBreakFlag = true;
-        // thread break flags
-        for( auto trIt = fThreadReferences.begin(); trIt != fThreadReferences.end(); ++trIt )
-        {
-            boost_unique_lock lock( (*trIt)->Mutex() );
-            (*trIt)->SetBreakFlag( true );
-        }
-
-        // use the do-run promise to signal the break
-        LWARN( proclog, "Setting value of do-run-promise" );
-        fDoRunPromise.set_value();
-
-        return;
-    }
-    */
 
    void ProcessorToolbox::JoinRunThread()
    {
@@ -1018,20 +697,11 @@ namespace Nymph
     {
         SharedControl::get_instance()->Cancel();
         return;
-        /*
-        boost_unique_lock breakContLock( fBreakContMutex );
-        for( auto trIt = fThreadReferences.begin(); trIt != fThreadReferences.end(); ++trIt )
-        {
-            boost_unique_lock lock( (*trIt)->Mutex() );
-            (*trIt)->SetCanceled( true );
-        }
-        return;
-        */
     }
 
     bool ProcessorToolbox::Run()
     {
-        // can throw boost::exception
+        // can throw scarab::base_exception
 
         AsyncRun();
 

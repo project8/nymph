@@ -239,66 +239,12 @@ namespace Nymph
 
             // TODO: return value access
 
-            //KTDataHandle GetData( const std::string& threadName );
-
-            //MEMVAR_SHARED_PTR_CONST( SharedControl, Control );
-
         protected:
-            //typedef boost::shared_future< KTDataHandle > Future;
-
-            //void StartSingleThreadedRun();
             void StartMultiThreadedRun();
 
-            // called from KTThreadReference::Break
-            //void InitiateBreak();
-
-            //std::vector< std::shared_ptr< KTThreadReference > > fThreadReferences;
-
-            //boost::condition_variable fContinueCV;
-            //bool fDoContinue;
-            //boost::mutex fBreakContMutex;
-
             std::thread fDoRunThread;
-            //boost::promise< void > fDoRunPromise;
-            //boost::shared_future< void > fDoRunFuture;
-            //bool fDoRunBreakFlag;
 
     };
-
-/*
-    template< class Value, class IIterator >
-    class KTThreadRefFutureIter : public boost::iterator_adaptor< KTThreadRefFutureIter< Value, IIterator >, IIterator, Value, boost::random_access_traversal_tag >
-    {
-        private:
-            // used for the conversion constructor below
-            struct enabler {};
-
-        public:
-            KTThreadRefFutureIter() :
-                    KTThreadRefFutureIter::iterator_adaptor_()
-            {}
-            KTThreadRefFutureIter( const IIterator& other ) :
-                    KTThreadRefFutureIter::iterator_adaptor_( other )
-            {}
-
-            // converts from Iterator to ConstIterator, but the enable_if business prevents converting from ConstIterator to Iterator
-            template< class OtherValue, class OtherIIterator >
-            KTThreadRefFutureIter( const KTThreadRefFutureIter< OtherValue, OtherIIterator > & other, typename boost::enable_if< boost::is_convertible< OtherValue, Value >, enabler >::type = enabler() ) :
-                    KTThreadRefFutureIter::iterator_adaptor_( other.base )
-            {}
-
-        private:
-            friend class boost::iterator_core_access;
-
-            Value& dereference() const
-            {
-                return (*(this->base_reference()))->GetDataPtrRetFuture();
-            }
-    };
-
-    typedef KTThreadRefFutureIter< boost::unique_future< KTDataHandle >, std::vector< std::shared_ptr< KTThreadReference > >::iterator > KTThreadRefFutureIterator;
-    typedef KTThreadRefFutureIter< const boost::unique_future< KTDataHandle >, std::vector< std::shared_ptr< KTThreadReference > >::const_iterator > KTThreadRefFutureConstIterator;
-*/
 
     inline bool ProcessorToolbox::MakeConnection(const std::string& signal, const std::string& slot) 
     {
@@ -321,24 +267,6 @@ namespace Nymph
         fRunQueue.clear();
         return;
     }
-/*
-    inline void ProcessorToolbox::WaitForContinue( boost_unique_lock& lock )
-    {
-        //fMasterContSignal.wait();
-        while( ! fDoContinue )
-        {
-            fContinueCV.wait( lock );
-        }
-        return;
-    }
 
-    inline void ProcessorToolbox::JoinRunThread()
-    {
-        if( fDoRunThread == nullptr ) return;
-        fDoRunThread->join();
-        delete fDoRunThread;
-        fDoRunThread = nullptr;
-    }
-*/
 } /* namespace Nymph */
 #endif /* NYMPH_PROCESSORTOOLBOX_HH_ */
