@@ -15,8 +15,9 @@ namespace Nymph
 {
     void PrintException( const scarab::base_exception& e, unsigned count )
     {
-        LINFO( exlog, std::string(count, ' ') << "Exception: " << e.what() );
-        LINFO( exlog, std::string(count, ' ') << "\tThrown at: " << e.where() );
+        std::string prefix = std::to_string(count) + ": ";
+        LINFO( exlog, prefix << "Thrown at: " << e.where() );
+        LINFO( exlog, prefix << e.what() );
         try
         {
             std::rethrow_if_nested( e );

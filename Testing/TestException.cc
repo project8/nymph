@@ -152,8 +152,9 @@ void CatchThrow()
 
 void PrintExceptionWithTests( const Nymph::Exception& e, unsigned count = 0 )
 {
-    LINFO( testlog, std::string(count, ' ') << "Exception: " << e.what() );
-    LINFO( testlog, std::string(count, ' ') << "\tThrown at: " << e.where() );
+    std::string prefix( count, ' ' );
+    LINFO( testlog, prefix << "Thrown at: " << e.where() );
+    LINFO( testlog, prefix << e.what() );
     if( count == layers + 1 )
     {
         REQUIRE( e.what() == firstThrowText );
@@ -170,7 +171,7 @@ void PrintExceptionWithTests( const Nymph::Exception& e, unsigned count = 0 )
     }
     catch(const Nymph::Exception& e)
     {
-        PrintException( e, ++count );
+        PrintExceptionWithTests( e, ++count );
     }
     return;
 }
