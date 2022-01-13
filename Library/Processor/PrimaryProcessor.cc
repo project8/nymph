@@ -31,15 +31,15 @@ namespace Nymph
         {
             Run();
         }
-        catch( QuitThread& e )
+        catch( const QuitThread& e )
         {
             LINFO( proclog, "Processor thread started by <" << fName << "> is quitting" );
             fExceptionPtr = std::current_exception(); // capture the exception
-            control->DecrementActiveThreads();
+            SharedControl::get_instance()->DecrementActiveThreads();
             // we don't initiate cancellation on QuitThread; this type of quitting has been initiated elsewhere and detected in this thread.
             return;
         }
-        catch( std::exception& e )
+        catch( const std::exception& e )
         {
             LERROR( proclog, "An error occurred during processor running: " << e.what() );
             fExceptionPtr = std::current_exception(); // capture the exception

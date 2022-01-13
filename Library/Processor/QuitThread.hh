@@ -19,7 +19,8 @@ namespace Nymph
             ~QuitThread() = default;
     };
 
-    #define QUIT_THREAD  THROW_EXCEPT_HERE( ::Nymph::QuitThread() )
+    #define QUIT_THREAD  throw ::Nymph::QuitThread()(__FILE__, __LINE__)
+    //THROW_EXCEPT_HERE( ::Nymph::QuitThread() )
 
 } /* namespace Nymph */
 

@@ -13,7 +13,6 @@
 #include "SignalSlotBase.hh"
 
 #include "ControlAccess.hh"
-#include "Exception.hh"
 #include "QuitThread.hh"
 
 #include "logger.hh"
