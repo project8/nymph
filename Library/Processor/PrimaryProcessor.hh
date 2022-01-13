@@ -25,7 +25,9 @@ namespace Nymph
             void operator()();// ControlAccessPtr control ); // SharedControl is now accessed in Signal::operator(), so we don't have to pass it from signal to slot to signal, etc
 
             /// Starts the  main action of the processor
-            virtual bool Run() = 0;
+            virtual void Run() = 0;
+
+            MEMVAR_REF( std::exception_ptr, ExceptionPtr );
 
     };
 
