@@ -5,7 +5,7 @@
  *      Author: N.S. Oblath
  */
 
-#include "TestProc.hh"
+#include "TestProcessorClasses.hh"
 
 #include "ProcessorToolbox.hh"
 
@@ -193,6 +193,26 @@ TEST_CASE( "processor_toolbox" )
         REQUIRE( toolbox.PushBackToRunQueue( {"testprimary-1", "testprimary-2"} ) );
         REQUIRE( toolbox.GetRunQueue().size() == 1 );
         REQUIRE( toolbox.GetRunQueue()[0].size() == 2 );
+
+    }
+
+    SECTION( "DoRun" )
+    {
+        std::string config_str(
+            "processors:\n"
+            "- type: test-primary\n"
+            "  name: pp\n"
+            "connections:\n"
+            "- signal: \"pp:value\"\n"
+            "  slot: \"pp:value\"\n"
+            "run-queue:\n"
+            "- pp"
+        );
+
+        scarab::param_translator translator;
+        auto config = translator.read_string( config_str, "yaml" );
+
+        REQUIRE( toolbox.Configure( config->as_node() ) );
 
     }
 
