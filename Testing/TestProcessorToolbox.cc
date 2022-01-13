@@ -75,7 +75,7 @@ TEST_CASE( "processor_toolbox" )
         scarab::param_translator translator;
         auto config = translator.read_string( config_str, "yaml" );
 
-        REQUIRE( toolbox.Configure( config->as_node() ) );
+        REQUIRE_NOTHROW( toolbox.Configure( config->as_node() ) );
 
         REQUIRE( toolbox.GetProcessor( procName1 ) );
         REQUIRE( toolbox.GetProcessor( procName1 )->Name() == procName1 );
@@ -123,7 +123,7 @@ TEST_CASE( "processor_toolbox" )
         scarab::param_translator translator;
         auto config = translator.read_string( config_str, "yaml" );
 
-        REQUIRE( toolbox.Configure( config->as_node() ) );
+        REQUIRE_NOTHROW( toolbox.Configure( config->as_node() ) );
 
         std::shared_ptr< Processor > tp1 = toolbox.GetProcessor( procName1 );
 
@@ -168,7 +168,7 @@ TEST_CASE( "processor_toolbox" )
         scarab::param_translator translator;
         auto config = translator.read_string( config_str, "yaml" );
 
-        REQUIRE( toolbox.Configure( config->as_node() ) );
+        REQUIRE_NOTHROW( toolbox.Configure( config->as_node() ) );
 
         ProcTBRevealer::ThreadSourceGroup group;
         REQUIRE_FALSE( toolbox.AddProcessorToThreadGroup( "blah", group ) );
@@ -212,7 +212,17 @@ TEST_CASE( "processor_toolbox" )
         scarab::param_translator translator;
         auto config = translator.read_string( config_str, "yaml" );
 
-        REQUIRE( toolbox.Configure( config->as_node() ) );
+        REQUIRE_NOTHROW( toolbox.Configure( config->as_node() ) );
+
+        auto ppProc = std::dynamic_pointer_cast< TestPrimaryProc >( toolbox.GetProcessor( "pp" ) );
+        REQUIRE( ppProc );
+        ppProc->SetTestSelection( TestPrimaryProc::TestType::SignalNewValue );
+
+        // do the run
+        REQUIRE_NOTHROW( toolbox.Run() );
+
+        // check the results
+        REQUIRE( ppProc->GetValue() == ppProc->GetNewValue() );
 
     }
 
