@@ -7,8 +7,8 @@
 
 #include "ProcessorToolbox.hh"
 
-#include "Exception.hh"
 #include "PrimaryProcessor.hh"
+#include "QuitThread.hh"
 
 #include "factory.hh"
 #include "logger.hh"
@@ -591,22 +591,21 @@ namespace Nymph
                 {
                     SharedControl* control = SharedControl::get_instance();
 
-                    //boost::thread_group threads;
-                    std::map< std::string, std::thread > threads;
+                    typedef std::pair< PrimaryProcessor*, std::thread > ThreadBundle;
+                    std::map< std::string, ThreadBundle > threads;
 
-                    { // scope for threadFuturesLock
+                    // iterate over primary processors in this group and launch threads
+                    for (ThreadSourceGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
+                    {
+                        std::string procName( tgIter->fName );
+                        LINFO( proclog, "Starting processor <" << procName << ">" );
 
-                        for (ThreadSourceGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
-                        {
-                            std::string procName( tgIter->fName );
-                            LINFO( proclog, "Starting processor <" << procName << ">" );
+                        threads.emplace( procName, ThreadBundle( tgIter->fProc, std::thread(&PrimaryProcessor::operator(), tgIter->fProc) ) );
 
-                            threads.emplace( procName, std::thread(&PrimaryProcessor::operator(), tgIter->fProc) );
+                        control->IncrementActiveThreads();
+                    }// end for loop over the thread group
 
-                            control->IncrementActiveThreads();
-                        }// end for loop over the thread group
-                    } // end scope for threadFuturesLock
-
+                    // wait here while things are still running
                     bool stillRunning = true;
                     while( stillRunning )
                     {
@@ -631,15 +630,49 @@ namespace Nymph
                         }
                     }
 
+                    // join threads and check for exceptions
+                    // break out of the run-queue iteration loop if there was an exception
+                    bool quitAfterThis = control->IsCanceled();
                     for( auto threadIt = threads.begin(); threadIt != threads.end(); ++threadIt )
                     {
-                        LDEBUG( proclog, "Joining thread for processor <" << threadIt->first << ">" );
-                        threadIt->second.join();
+                        LINFO( proclog, "Cleaning up thread for processor <" << threadIt->first << ">" )
+                        LDEBUG( proclog, "Joining thread" );
+                        threadIt->second.second.join();
+                        if( threadIt->second.first->ExceptionPtr() )
+                        {
+                            try
+                            {
+                                std::rethrow_exception( threadIt->second.first->ExceptionPtr() );
+                            }
+                            catch( const QuitThread& e )
+                            {
+                                // not necessarily an error, so don't set quitAfterThis to true
+                                LINFO( proclog, "Thread exited with QuitThread" );
+                            }
+                            catch( const scarab::base_exception& e )
+                            {
+                                // this is an error, so set quitAfterThis to true
+                                LERROR( proclog, "Thread exited with an exception" );
+                                PrintException( e );
+                                quitAfterThis = true;
+                            }
+                        }
+                        else
+                        {
+                            // this thread did not have an exeption set, so it exited normally
+                            LINFO( proclog, "Thread exited normally" )
+                        }
+                    }
+
+                    if( quitAfterThis )
+                    {
+                        LWARN( proclog, "Exiting from run-queue loop under abnormal conditions" );
+                        break;
                     }
 
                 } // end for loop over the run-queue
 
-                LPROG( proclog, "Processing is complete (multi-threaded)" );
+                LPROG( proclog, "Processing is complete" );
             }
             catch( scarab::base_exception& e )
             {
