@@ -15,6 +15,63 @@ namespace Nymph
 {
     //KTLOGGER(proclog, "Processor");
 
+    ConfigException::ConfigException() noexcept :
+            scarab::typed_exception< ConfigException >(),
+            fConfig(),
+            fConfigStr()
+    {}
+
+    ConfigException::ConfigException( const std::string& a_filename, int a_line ) noexcept :
+            scarab::typed_exception< ConfigException >( a_filename, a_line ),
+            fConfig(),
+            fConfigStr()
+    {}
+
+    ConfigException::ConfigException( const scarab::param_node& node ) noexcept :
+            scarab::typed_exception< ConfigException >(),
+            fConfig(),
+            fConfigStr()
+    {
+        try
+        {
+            fConfig.reset( new scarab::param_node(node) );
+        }
+        catch( ... )
+        {}
+    }
+
+    ConfigException::ConfigException( const ConfigException& orig ) noexcept :
+            scarab::typed_exception< ConfigException >( orig ),
+            fConfig(),
+            fConfigStr()
+    {
+        try
+        {
+            if( orig.fConfig ) fConfig.reset( new scarab::param_node(orig.fConfig->as_node()) );
+        }
+        catch( ... )
+        {}
+        
+    }
+
+    ConfigException::~ConfigException() noexcept
+    {}
+
+    const char* ConfigException::what() const noexcept
+    {
+        try
+        {
+            fConfigStr = f_what + '\n' + fConfig->to_string();
+            return fConfigStr.c_str();
+        }
+        catch( ... )
+        {
+            return f_what.c_str();
+        }
+    }
+
+
+
     Processor::Processor( const std::string& name ) :
             fName( name ),
             fSignals(),

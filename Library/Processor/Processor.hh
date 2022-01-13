@@ -22,6 +22,24 @@ namespace Nymph
 
     struct ProcessorException : virtual public Exception {};
 
+    class ConfigException : public scarab::typed_exception< ConfigException >
+    {
+        public:
+            ConfigException() noexcept;
+            ConfigException( const std::string& a_filename, int a_line ) noexcept;
+            ConfigException( const scarab::param_node& node ) noexcept;
+            ConfigException( const ConfigException& orig ) noexcept;
+            virtual ~ConfigException() noexcept;
+
+            virtual const char* what() const noexcept;
+
+            MEMVAR_REF( scarab::param_ptr_t, Config );
+
+        protected:
+            mutable std::string fConfigStr;
+    };
+
+
     class Processor
     {
         protected:
