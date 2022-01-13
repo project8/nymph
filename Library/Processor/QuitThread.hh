@@ -12,19 +12,14 @@
 
 namespace Nymph
 {
-
-    struct QuitThread
+    class QuitThread : public scarab::typed_exception< QuitThread >
     {
-        std::string fFile;
-        std::string fLine;
-        QuitThread( const std::string& file, const std::string& line ) :
-                fFile( file ),
-                fLine( line )
-        {}
+        public:
+            using scarab::typed_exception< QuitThread >::typed_exception;
+            ~QuitThread() = default;
     };
 
-    #define QUIT_THREAD \
-        throw ::Nymph::QuitThread( TOSTRING(__FILE__), TOSTRING(__LINE__) );
+    #define QUIT_THREAD  THROW_EXCEPT_HERE( ::Nymph::QuitThread() )
 
 } /* namespace Nymph */
 
