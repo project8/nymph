@@ -5,9 +5,7 @@
  *      Author: N.S. Oblath
  */
 
-#include "Processor.hh"
-#include "Signal.hh"
-#include "Slot.hh"
+#include "TestProcessorClasses.hh"
 
 #include "logger.hh"
 
@@ -15,65 +13,14 @@
 
 LOGGER( testlog, "TestProcessor" );
 
-namespace Nymph
-{
-    // concrete processor class that we can test
-    // implements Configure() and has its own signal and slot
-    class TestProc : public Processor
-    {
-        public:
-            TestProc() :
-                    Processor( "test" ),
-                    fValue( 0 ),
-                    fSecondValue( 0 ),
-                    fValueSig( "value", this ),
-                    fValueSlot( "value", this, &TestProc::SetValue ),
-                    fSecondValueSig( "second-value", this ),
-                    fSecondValueSlot( "second-value", this, &TestProc::SecondValueSlotFunction, {"second-value"} ),
-                    fSecondValueSlot2( "second-value-2", this, &TestProc::SetSecondValue )
-            {}
+REGISTER_PROCESSOR(Nymph, TestProc, "test-proc");
 
-            virtual ~TestProc()
-            {}
-
-            void Configure( const scarab::param_node& node )
-            {
-                fValue = node.get_value( "value", fValue );
-                return;
-            }
-
-            MEMVAR( int, Value );
-            MEMVAR( int, SecondValue );
-
-            void SecondValueSlotFunction( int newValue )
-            {
-                fSecondValueSig( newValue );
-            }
-
-            MEMVAR_REF( Signal< int >, ValueSig );
-            MEMVAR_REF( Slot< int >, ValueSlot );
-
-            MEMVAR_REF( Signal< int >, SecondValueSig );
-            MEMVAR_REF( Slot< int >, SecondValueSlot );
-            MEMVAR_REF( Slot< int >, SecondValueSlot2 );
-
-    };
-
-    // external slot function owner
-    struct TestSlotOwner
-    {
-        int fValue = 0;
-        void TestSlotFunc( int input )
-        {
-            fValue = input;
-            return;
-        }
-    };
-}
 
 TEST_CASE( "processor", "[signal],[slot],[processor]" )
 {
     using namespace Nymph;
+
+    SharedControl::get_instance()->Reset();
 
     TestProc tester;
 
@@ -86,11 +33,28 @@ TEST_CASE( "processor", "[signal],[slot],[processor]" )
         int configValue = 5;
         config.add( "value", configValue );
 
-        // perform configuration
-        tester.Configure( config );
-
+        // perform configuration with no value for "string"
+        REQUIRE_NOTHROW( tester.Configure( config ) );
         // check that the value was set correctly
         REQUIRE( tester.GetValue() == configValue );
+
+        // peform configuration with an illegal value for "string"
+        config.add( "string", "illegal value" );
+        REQUIRE_THROWS_AS( tester.Configure( config ), ConfigException );
+        try
+        {
+            tester.Configure( config );
+        }
+        catch( const ConfigException& e )
+        {
+            PrintException(e);
+        }
+        
+        // perform configuration with a legal value for "string"
+        config["string"]().set( "ok value 1" );
+        REQUIRE_NOTHROW( tester.Configure( config ) );
+        REQUIRE( tester.StringValue() == "ok 1" );
+
     }
 
     SECTION( "Signals and Slots" )
@@ -170,8 +134,8 @@ TEST_CASE( "processor", "[signal],[slot],[processor]" )
         // check initial value
         REQUIRE( tester.GetSecondValue() == 0 );
 
-        REQUIRE( tester.Slots().at("second-value")->SignalsUsed().size() == 1 );
-        REQUIRE( tester.Slots().at("second-value")->SignalsUsed()[0] == &tester.SecondValueSig() );
+        //REQUIRE( tester.Slots().at("second-value")->SignalsUsed().size() == 1 );
+        //REQUIRE( tester.Slots().at("second-value")->SignalsUsed()[0] == &tester.SecondValueSig() );
 
         tester.ConnectASlot( "second-value", tester, "second-value-2" );
 

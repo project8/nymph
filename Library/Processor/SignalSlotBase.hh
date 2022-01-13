@@ -8,7 +8,7 @@
 #ifndef NYMPH_SIGNALSLOTBASE_HH_
 #define NYMPH_SIGNALSLOTBASE_HH_
 
-#include "ControlAccess.hh"
+//#include "ControlAccess.hh"
 #include "Exception.hh"
 #include "MemberVariable.hh"
 
@@ -20,24 +20,24 @@
 namespace Nymph
 {
 
-    class SignalException : public BaseException< SignalException >
+    class SignalException : public scarab::typed_exception< SignalException >
     {
         public:
-            using BaseException< SignalException >::BaseException;
+            using scarab::typed_exception< SignalException >::typed_exception;
             ~SignalException() = default;
     };
 
-    class SlotException : public BaseException< SlotException >
+    class SlotException : public scarab::typed_exception< SlotException >
     {
         public:
-            using BaseException< SlotException >::BaseException;
+            using scarab::typed_exception< SlotException >::typed_exception;
             ~SlotException() = default;
     };
 
-    class ConnectionException : public BaseException< ConnectionException >
+    class ConnectionException : public scarab::typed_exception< ConnectionException >
     {
         public:
-            using BaseException< ConnectionException >::BaseException;
+            using scarab::typed_exception< ConnectionException >::typed_exception;
             ~ConnectionException() = default;
     };
 
@@ -59,10 +59,10 @@ namespace Nymph
 
             MEMVAR_REF( std::string, Name );
 
-            typedef std::set< SignalBase* > signal_connections; // to get around the problem of having a comma inside a macro function argument
-            MEMVAR_REF_MUTABLE( signal_connections, Connections );
+            typedef std::set< SignalBase* > SignalConnections; // to get around the problem of having a comma inside a macro function argument
+            MEMVAR_REF_MUTABLE( SignalConnections, Connections );
 
-            MEMVAR_REF( std::vector< SignalBase* >, SignalsUsed );
+            //MEMVAR_REF( std::vector< SignalBase* >, SignalsUsed );
 
         protected:
             friend class SignalBase;
@@ -85,13 +85,15 @@ namespace Nymph
 
             MEMVAR_REF( std::string, Name );
 
-            typedef std::set< SlotBase* > slot_connections; // to get around the problem of having a comma inside a macro function argument
-            MEMVAR_REF_MUTABLE_CONST( slot_connections, Connections );
+            typedef std::set< SlotBase* > SlotConnections; // to get around the problem of having a comma inside a macro function argument
+            MEMVAR_REF_MUTABLE_CONST( SlotConnections, Connections );
 
-            MEMVAR( ControlAccess*, Control ); // doesn't use MEMVAR_PTR because Signal doesn't own the object pointed to by fControl
+            //MEMVAR( ControlAccess*, Control ); // doesn't use MEMVAR_PTR because Signal doesn't own the object pointed to by fControl
+
+            MEMVAR( bool, DoBreakpoint );
 
         protected:
-            friend class SignalBase;
+            friend class SlotBase;
             virtual void AddConnection( SlotBase* slot, int group );
     };
 

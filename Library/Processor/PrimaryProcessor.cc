@@ -7,7 +7,8 @@
 
 #include "PrimaryProcessor.hh"
 
-#include "Exception.hh"
+#include "ControlAccess.hh"
+#include "QuitThread.hh"
 
 #include "logger.hh"
 
@@ -16,37 +17,41 @@ namespace Nymph
     LOGGER( proclog, "PrimaryProcessor" );
 
     PrimaryProcessor::PrimaryProcessor( const std::string& name ) :
-            Processor( name )
+            Processor( name ),
+            fExceptionPtr()
     {}
 
     PrimaryProcessor::~PrimaryProcessor()
     {}
 
-    void PrimaryProcessor::operator()( ControlAccess* control )
+    void PrimaryProcessor::operator()()
     {
-        for( auto signalIt = fSignals.begin(); signalIt != fSignals.end(); ++signalIt )
-        {
-            signalIt->second->SetControl( control );
-        }
-
         // go!
         try
         {
-            if( ! Run() )
-            {
-                LERROR( proclog, "An error occurred during processor running." );
-                //THROW_THREADREF_EXCEPTION( fThreadRef, KTException() << "An error occurred during processor running" );
-            }
-            else
-            {
-                LWARN( proclog, "Valid return" );
-                //fThreadRef->SetReturnValue( KTDataHandle() );
-            }
+            Run();
         }
-        catch( boost::exception& e )
+        catch( const QuitThread& e )
         {
-            //fThreadRef->SetReturnException( boost::current_exception() );
+            LINFO( proclog, "Processor thread started by <" << fName << "> is quitting" );
+            fExceptionPtr = std::current_exception(); // capture the exception
+            SharedControl::get_instance()->DecrementActiveThreads();
+            // we don't initiate cancellation on QuitThread; this type of quitting has been initiated elsewhere and detected in this thread.
+            return;
         }
+        catch( const std::exception& e )
+        {
+            LERROR( proclog, "An error occurred during processor running: " << e.what() );
+            fExceptionPtr = std::current_exception(); // capture the exception
+            SharedControl* control = SharedControl::get_instance();
+            control->DecrementActiveThreads();
+            control->Cancel();
+            return;
+        }
+
+        SharedControl::get_instance()->DecrementActiveThreads();
+        LWARN( proclog, "Valid return" );
+
         return;
     }
 

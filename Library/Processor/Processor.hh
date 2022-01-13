@@ -22,6 +22,24 @@ namespace Nymph
 
     struct ProcessorException : virtual public Exception {};
 
+    class ConfigException : public scarab::typed_exception< ConfigException >
+    {
+        public:
+            ConfigException() noexcept;
+            ConfigException( const std::string& a_filename, int a_line ) noexcept;
+            ConfigException( const scarab::param_node& node ) noexcept;
+            ConfigException( const ConfigException& orig ) noexcept;
+            virtual ~ConfigException() noexcept;
+
+            virtual const char* what() const noexcept;
+
+            MEMVAR_REF( scarab::param_ptr_t, Config );
+
+        protected:
+            mutable std::string fConfigStr;
+    };
+
+
     class Processor
     {
         protected:
@@ -58,8 +76,8 @@ namespace Nymph
             /// Register a slot object with this processor
             void RegisterSlot( std::string name, SlotBase* slot, std::initializer_list< std::string > signals = {} );
 
-            //bool GetDoBreakpoint( const std::string& slotName );
-            //void SetDoBreakpoint( const std::string& slotName, bool flag );
+            bool GetDoBreakpoint( const std::string& signalName );
+            void SetDoBreakpoint( const std::string& signalName, bool flag );
 
             MEMVAR_REF( std::string, Name );
 
@@ -68,8 +86,8 @@ namespace Nymph
 
             // this is used only to hold pointers to slots waiting for signals
             // the keys are the names of the signals being waited for, and the values are the slot pointers
-            typedef std::multimap< std::string, SlotBase* > WaitingSlotMap;
-            MEMVAR_REF_CONST( WaitingSlotMap, SlotsWaitingForSignals );
+            //typedef std::multimap< std::string, SlotBase* > WaitingSlotMap;
+            //MEMVAR_REF_CONST( WaitingSlotMap, SlotsWaitingForSignals );
 
     };
 
@@ -86,8 +104,18 @@ namespace Nymph
         return new scarab::registrar< Processor, XDerivedProc, const std::string& >( name );
     }
 
-#define KT_REGISTER_PROCESSOR(proc_class, proc_name) \
+#define REGISTER_PROCESSOR_NONAMEPSACE(proc_class, proc_name) \
         static ::scarab::registrar< ::Nymph::Processor, proc_class, const std::string& > sProc##proc_class##Registrar( proc_name );
+
+#define REGISTER_PROCESSOR_NAMESPACE(proc_namespace, proc_class, proc_name) \
+        static ::scarab::registrar< ::Nymph::Processor, ::proc_namespace::proc_class, const std::string& > sProc##proc_class##Registrar( proc_name );
+
+// Macro overloading trick from here: https://stackoverflow.com/a/11763277
+#define GET_MACRO(_1, _2, _3, NAME, ...) NAME
+/// Processors defined in a namespace need to specify the namespace first:
+///   [no namespace]: REGISTER_PROCESSOR( [class], [name in quotes] )
+///   [with namespace]: REGISTER_PROCESSOR( [namespace], [class], [name in quotes] )
+#define REGISTER_PROCESSOR(...) GET_MACRO(__VA_ARGS__, REGISTER_PROCESSOR_NAMESPACE, REGISTER_PROCESSOR_NONAMESPACE, )(__VA_ARGS__)
 
 } /* namespace Nymph */
 

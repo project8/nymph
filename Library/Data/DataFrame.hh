@@ -22,10 +22,10 @@
 
 namespace Nymph
 {
-    class DataFrameException : public BaseException< DataFrameException >
+    class DataFrameException : public scarab::typed_exception< DataFrameException >
     {
         public:
-            using BaseException< DataFrameException >::BaseException;
+            using scarab::typed_exception< DataFrameException >::typed_exception;
             ~DataFrameException() = default;
     };
 

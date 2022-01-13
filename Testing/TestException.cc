@@ -19,12 +19,12 @@ TEST_CASE( "exception", "[utility]" )
 
     Exception blankEx;
     REQUIRE( blankEx.what() == std::string() );
-    REQUIRE( blankEx.AtFilename() == "unknown" );
-    REQUIRE( blankEx.GetAtLineNumber() == 0 );
+    REQUIRE( blankEx.filename().empty() );
+    REQUIRE( blankEx.line() == 0 );
 
     Exception testEx( "some_file", 1 );
-    REQUIRE( testEx.AtFilename() == "some_file" );
-    REQUIRE( testEx.GetAtLineNumber() == 1 );
+    REQUIRE( testEx.filename() == "some_file" );
+    REQUIRE( testEx.line() == 1 );
 
     std::string testMessage("test message 2: ");
     int testInt = 5;
@@ -34,12 +34,12 @@ TEST_CASE( "exception", "[utility]" )
     /*EXCEPT_HERE( Exception testEx );*/ 
     // uses of __LINE__ need to be on the same line
     testEx( __FILE__, __LINE__ ); std::string recordFile( __FILE__ ); int recordLine( __LINE__ );
-    REQUIRE( testEx.AtFilename() == recordFile );
-    REQUIRE( testEx.GetAtLineNumber() == recordLine );
+    REQUIRE( testEx.filename() == recordFile );
+    REQUIRE( testEx.line() == recordLine );
 
     EXCEPT_HERE( testEx ); recordFile = std::string(__FILE__); recordLine = __LINE__;
-    REQUIRE( testEx.AtFilename() == recordFile );
-    REQUIRE( testEx.GetAtLineNumber() == recordLine );
+    REQUIRE( testEx.filename() == recordFile );
+    REQUIRE( testEx.line() == recordLine );
 }
 
 TEST_CASE( "throw", "[utility]" )
@@ -53,8 +53,8 @@ TEST_CASE( "throw", "[utility]" )
     catch(const Exception& e)
     {
         REQUIRE( e.what() == std::string() );
-        REQUIRE( e.AtFilename() == "unknown" );
-        REQUIRE( e.GetAtLineNumber() == 0 );
+        REQUIRE( e.filename().empty() );
+        REQUIRE( e.line() == 0 );
     }
     
     std::string recordFile;
@@ -68,8 +68,8 @@ TEST_CASE( "throw", "[utility]" )
     catch(const Exception& e)
     {
         REQUIRE( e.what() == std::string("test message") );
-        REQUIRE( e.AtFilename() == recordFile );
-        REQUIRE( e.GetAtLineNumber() == recordLine + 1 );  // line number was recorded just before the throw
+        REQUIRE( e.filename() == recordFile );
+        REQUIRE( e.line() == recordLine + 1 );  // line number was recorded just before the throw
     }
     
     // Give CREATE_EXCEPT_HERE the class name
@@ -81,8 +81,8 @@ TEST_CASE( "throw", "[utility]" )
     catch(const Exception& e)
     {
         REQUIRE( e.what() == std::string() );
-        REQUIRE( e.AtFilename() == recordFile );
-        REQUIRE( e.GetAtLineNumber() == recordLine + 1 );  // line number was recorded just before the throw
+        REQUIRE( e.filename() == recordFile );
+        REQUIRE( e.line() == recordLine + 1 );  // line number was recorded just before the throw
     }
     
     // Give EXCEPT_HERE an exception
@@ -94,8 +94,8 @@ TEST_CASE( "throw", "[utility]" )
     catch(const Exception& e)
     {
         REQUIRE( e.what() == std::string("test message") );
-        REQUIRE( e.AtFilename() == recordFile );
-        REQUIRE( e.GetAtLineNumber() == recordLine + 1 );  // line number was recorded just before the throw
+        REQUIRE( e.filename() == recordFile );
+        REQUIRE( e.line() == recordLine + 1 );  // line number was recorded just before the throw
     }
     
     // THROW macro
@@ -107,8 +107,8 @@ TEST_CASE( "throw", "[utility]" )
     catch(const Exception& e)
     {
         REQUIRE( e.what() == std::string("test message") );
-        REQUIRE( e.AtFilename() == recordFile );
-        REQUIRE( e.GetAtLineNumber() == recordLine + 1 );  // line number was recorded just before the throw
+        REQUIRE( e.filename() == recordFile );
+        REQUIRE( e.line() == recordLine + 1 );  // line number was recorded just before the throw
     }
     
 }
@@ -150,10 +150,11 @@ void CatchThrow()
     }
 }
 
-// recursive print function
-void PrintException( const Nymph::Exception& e, unsigned count = 0 )
+void PrintExceptionWithTests( const Nymph::Exception& e, unsigned count = 0 )
 {
-    LINFO( testlog, std::string(count, ' ') << "Exception: " << e.what() );
+    std::string prefix( count, ' ' );
+    LINFO( testlog, prefix << "Thrown at: " << e.where() );
+    LINFO( testlog, prefix << e.what() );
     if( count == layers + 1 )
     {
         REQUIRE( e.what() == firstThrowText );
@@ -170,11 +171,10 @@ void PrintException( const Nymph::Exception& e, unsigned count = 0 )
     }
     catch(const Nymph::Exception& e)
     {
-        PrintException( e, ++count );
+        PrintExceptionWithTests( e, ++count );
     }
     return;
 }
-
 
 TEST_CASE( "nested_throw", "[utility]" )
 {
@@ -187,7 +187,7 @@ TEST_CASE( "nested_throw", "[utility]" )
     catch(const Exception& e)
     {
 
-        PrintException(e);
+        PrintExceptionWithTests(e);
     }
     
 }

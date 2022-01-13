@@ -12,7 +12,8 @@
 
 #include "SignalSlotBase.hh"
 
-#include "Exception.hh"
+#include "ControlAccess.hh"
+#include "QuitThread.hh"
 
 #include "logger.hh"
 
@@ -34,7 +35,7 @@ namespace Nymph
     {
         public:
             using signature = void( XArgs... );
-            using full_signature = void( ControlAccess*, XArgs... );
+//            using full_signature = void( ControlAccessPtr, XArgs... );
 
         public:
             /// Unowned signal
@@ -52,7 +53,8 @@ namespace Nymph
             void Emit( XArgs... args );
             void operator()( XArgs... args );
 
-            MEMVAR( bool, DoBreakpoint );
+            // TODO: remove this  // 12/8/21, NSO: why remove this?  // NSO: oh, because we no longer need to pass ControlAccess between signals and slots before they're used
+            //MEMVAR_SHARED_PTR( ControlAccess, ControlAcc );
     };
 
 
@@ -110,15 +112,13 @@ namespace Nymph
 
     template< typename... XArgs >
     Signal< XArgs... >::Signal( const std::string& name ) :
-            SignalBase( name ),
-            fDoBreakpoint( false )
+            SignalBase( name )
     {}
 
     template< typename... XArgs >
     template< typename XOwner >
     inline Signal< XArgs... >::Signal( const std::string& name, XOwner* owner ) :
-            SignalBase( name ),
-            fDoBreakpoint( false )
+            SignalBase( name )
     {
         owner->RegisterSignal( name, this );
     }
@@ -176,15 +176,34 @@ namespace Nymph
     template< typename... XArgs >
     inline void Signal< XArgs... >::operator()( XArgs... args )
     {
-        if( fDoBreakpoint )
+        SharedControl* control = SharedControl::get_instance();
+
+        // Check for whether we need to quit from external input:
+        // - if we're canceled, then quit the thread
+        // - if we're at a break, then wait to continue;
+        //     once we continue, if we need to quit, then do so
+        if( control->IsCanceled() || (control->IsAtBreak() && ! control->WaitToContinue()) )
         {
-            fControl->SetReturn< XArgs... >( args... );
-            fControl->Break(); // waits for resume or exit
+            QUIT_THREAD; // throws QuitThread; should be caught by PrimaryProcessor::operator()
         }
 
+        // Check for whether this signal emission has a breakpoint
+        if( fDoBreakpoint )
+        {
+            // do the break
+            control->Break( args... );
+            // wait to continue; once we continue, if we need to quit, then do so
+            if( ! control->WaitToContinue() )
+            {
+                QUIT_THREAD; // throws QuitThread; should be caught by PrimaryProcessor::operator()
+            }
+        }
+
+        // Emit signal by calling all connected slots
         for( auto connection : fConnections )
         {
-            static_cast< Slot< XArgs... >* >(connection)->operator()( fControl, args... );
+//            static_cast< Slot< XArgs... >* >(connection)->operator()( fControlAcc, args... );
+            static_cast< Slot< XArgs... >* >(connection)->operator()( args... );
         }
         return;
     }

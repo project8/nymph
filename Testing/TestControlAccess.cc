@@ -44,20 +44,22 @@ TEST_CASE( "control_access", "[control_access]" )
 
     SECTION( "Break" )
     {
+        SharedControl* shared = SharedControl::create_instance();
+
         std::thread thread( [&](){ 
-            control.Break();
-            } );
+            shared->Break();
+        } );
         
         std::this_thread::sleep_for( std::chrono::milliseconds(100) );
-        REQUIRE( control.GetBreakFlag() );
+        REQUIRE( shared->GetBreakFlag() );
 
-        control.Resume();
+        shared->Resume();
         std::this_thread::sleep_for( std::chrono::milliseconds(100) );
-        REQUIRE_FALSE( control.GetBreakFlag() );
+        REQUIRE_FALSE( shared->GetBreakFlag() );
 
         thread.join();
 
-        REQUIRE_FALSE( control.GetBreakFlag() );
+        REQUIRE_FALSE( shared->GetBreakFlag() );
     }
 
 }

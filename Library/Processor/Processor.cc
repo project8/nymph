@@ -7,11 +7,70 @@
 
 #include "Processor.hh"
 
+#include "Exception.hh"
+
 #include <utility>
 
 namespace Nymph
 {
     //KTLOGGER(proclog, "Processor");
+
+    ConfigException::ConfigException() noexcept :
+            scarab::typed_exception< ConfigException >(),
+            fConfig(),
+            fConfigStr()
+    {}
+
+    ConfigException::ConfigException( const std::string& a_filename, int a_line ) noexcept :
+            scarab::typed_exception< ConfigException >( a_filename, a_line ),
+            fConfig(),
+            fConfigStr()
+    {}
+
+    ConfigException::ConfigException( const scarab::param_node& node ) noexcept :
+            scarab::typed_exception< ConfigException >(),
+            fConfig(),
+            fConfigStr()
+    {
+        try
+        {
+            fConfig.reset( new scarab::param_node(node) );
+        }
+        catch( ... )
+        {}
+    }
+
+    ConfigException::ConfigException( const ConfigException& orig ) noexcept :
+            scarab::typed_exception< ConfigException >( orig ),
+            fConfig(),
+            fConfigStr()
+    {
+        try
+        {
+            if( orig.fConfig ) fConfig.reset( new scarab::param_node(orig.fConfig->as_node()) );
+        }
+        catch( ... )
+        {}
+        
+    }
+
+    ConfigException::~ConfigException() noexcept
+    {}
+
+    const char* ConfigException::what() const noexcept
+    {
+        try
+        {
+            fConfigStr = f_what + '\n' + fConfig->to_string();
+            return fConfigStr.c_str();
+        }
+        catch( ... )
+        {
+            return f_what.c_str();
+        }
+    }
+
+
 
     Processor::Processor( const std::string& name ) :
             fName( name ),
@@ -29,11 +88,11 @@ namespace Nymph
         fSignals.insert( SigMapVal(name, signal) );
 
         // give the signal to any slots that are waiting for it
-        auto range = fSlotsWaitingForSignals.equal_range( name );
-        for( auto rangeIt = range.first; rangeIt != range.second; ++rangeIt )
-        {
-            rangeIt->second->SignalsUsed().push_back( signal );
-        }
+        //auto range = fSlotsWaitingForSignals.equal_range( name );
+        //for( auto rangeIt = range.first; rangeIt != range.second; ++rangeIt )
+        //{
+        //    rangeIt->second->SignalsUsed().push_back( signal );
+        //}
 
         return;
     }
@@ -43,6 +102,7 @@ namespace Nymph
         LDEBUG( processorlog, "Registering slot <" << name << "> in processor <" << fName << ">" );
         fSlots.insert( SlotMapVal(name, slot) );
 
+        /*
         // take care of giving signal pointers to the slot, or saving them for later assignment
         for( auto signalIt = signals.begin(); signalIt != signals.end(); ++signalIt )
         {
@@ -58,6 +118,7 @@ namespace Nymph
                 slot->SignalsUsed().push_back( signalPtrIt->second );
             }
         }
+        */
 
         return;
     }
@@ -130,27 +191,27 @@ namespace Nymph
 
         return;
     }
-/*
-    bool Processor::GetDoBreakpoint( const std::string& slotName )
+
+    bool Processor::GetDoBreakpoint( const std::string& signalName )
     {
-        KTSlotBase* slot = GetSlot(slotName);
-        if (slot != nullptr)
+        SignalBase* signal = fSignals.at(signalName  );
+        if (signal != nullptr)
         {
-            return slot->GetDoBreakpoint();
+            return signal->GetDoBreakpoint();
         }
-        BOOST_THROW_EXCEPTION( KTException() << "Slot <" << slotName << "> was not found" << eom );
+        THROW_EXCEPT_HERE( Exception() << "Signal <" << signalName << "> was not found" );
         return false;
     }
 
-    void Processor::SetDoBreakpoint( const std::string& slotName, bool flag )
+    void Processor::SetDoBreakpoint( const std::string& signalName, bool flag )
     {
-        KTSlotBase* slot = GetSlot(slotName);
-        if (slot != nullptr)
+        SignalBase* signal = fSignals.at(signalName  );
+        if( signal != nullptr )
         {
-            return slot->SetDoBreakpoint(flag);
+            return signal->SetDoBreakpoint( flag );
         }
-        BOOST_THROW_EXCEPTION( KTException() << "Slot <" << slotName << "> was not found" << eom );
+        THROW_EXCEPT_HERE( Exception() << "Signal <" << signalName << "> was not found" );
         return;
     }
-*/
+
 } /* namespace Nymph */
