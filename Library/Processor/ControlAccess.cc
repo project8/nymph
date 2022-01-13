@@ -7,9 +7,12 @@
 
 #include "ControlAccess.hh"
 
+#include "logger.hh"
+
 //#include <boost/thread/locks.hpp>
 //#include <boost/thread/lock_types.hpp>
 
+LOGGER( contlog, "ControlAccess" );
 
 namespace Nymph
 {
@@ -19,7 +22,8 @@ namespace Nymph
             fCondVarBreak(),
             fBreakFlag( false ),
             fCanceledFlag( false ),
-            fCycleTimeMS( 500 )
+            fCycleTimeMS( 500 ),
+            fNActiveThreads( 0 )
     {}
 
     SharedControl::~SharedControl()
@@ -28,6 +32,7 @@ namespace Nymph
     void SharedControl::Cancel()
     {
         std::unique_lock< std::mutex > lock( fMutex );
+        LDEBUG( contlog, "CANCEL called" );
         fCanceledFlag = true;
         fCondVarBreak.notify_all();
         return;
@@ -50,29 +55,46 @@ namespace Nymph
         std::unique_lock< std::mutex > lock( fMutex );
         if( fBreakFlag )
         {
-            while( fBreakFlag && ! fCanceledFlag )
+            while( fBreakFlag && ! fCanceledFlag && fNActiveThreads > 0 )
             {
                 fCondVarContinue.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
             }
         }
-        return ! fCanceledFlag; // returns true if the thread should continue; false if it should end
+        return (! fCanceledFlag) && (fNActiveThreads > 0); // returns true if the thread should continue; false if it should end
     }
 
     bool SharedControl::WaitForBreakOrCanceled() const
     {
         std::unique_lock< std::mutex > lock( fMutex );
-        while( ! fBreakFlag && ! fCanceledFlag )
+        while( ! fBreakFlag && ! fCanceledFlag && fNActiveThreads > 0 )
         {
             fCondVarBreak.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
         }
-        return fCanceledFlag ? false : fBreakFlag;
+        return fCanceledFlag || fNActiveThreads == 0 ? false : fBreakFlag;
     }
 
     void SharedControl::Resume()
     {
         std::unique_lock< std::mutex > lock( fMutex );
+        LDEBUG( contlog, "RESUME called" );
         fBreakFlag = false;
         fCondVarContinue.notify_all();
+    }
+
+    void SharedControl::IncrementActiveThreads()
+    {
+        std::unique_lock< std::mutex > lock( fMutex );
+        ++fNActiveThreads;
+        LDEBUG( contlog, "Incremented active threads: " << fNActiveThreads );
+        return;
+    }
+
+    void SharedControl::DecrementActiveThreads()
+    {
+        std::unique_lock< std::mutex > lock( fMutex );
+        if( fNActiveThreads > 0 ) --fNActiveThreads;
+        LDEBUG( contlog, "Decremented active threads: " << fNActiveThreads );
+        return;
     }
 
 

@@ -28,7 +28,7 @@ set( NYMPH_HEADERFILES
     ${PROC_DIR}/PrimaryProcessor.hh
     ${PROC_DIR}/Processor.hh
     ${PROC_DIR}/ProcessorToolbox.hh
-    ${PROC_DIR}/QuitThread.hh
+    #${PROC_DIR}/QuitThread.hh
     ${PROC_DIR}/ReturnBuffer.hh
     ${PROC_DIR}/SignalSlotBase.hh
 )

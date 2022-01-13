@@ -589,6 +589,8 @@ namespace Nymph
 
                 for (RunQueue::iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
                 {
+                    SharedControl* control = SharedControl::get_instance();
+
                     //boost::thread_group threads;
                     std::map< std::string, std::thread > threads;
 
@@ -600,10 +602,11 @@ namespace Nymph
                             LINFO( proclog, "Starting processor <" << procName << ">" );
 
                             threads.emplace( procName, std::thread(&PrimaryProcessor::operator(), tgIter->fProc) );
+
+                            control->IncrementActiveThreads();
                         }// end for loop over the thread group
                     } // end scope for threadFuturesLock
 
-                    SharedControl* control = SharedControl::get_instance();
                     bool stillRunning = true;
                     while( stillRunning )
                     {
@@ -627,9 +630,25 @@ namespace Nymph
                             LDEBUG( proclog, "Detected cancelation while waiting during running" );
                         }
                     }
+
+                    for( auto threadIt = threads.begin(); threadIt != threads.end(); ++threadIt )
+                    {
+                        LDEBUG( proclog, "Joining thread for processor <" << threadIt->first << ">" );
+                        threadIt->second.join();
+                    }
+
                 } // end for loop over the run-queue
 
                 LPROG( proclog, "Processing is complete (multi-threaded)" );
+            }
+            catch( scarab::base_exception& e )
+            {
+                // exceptions thrown in this function or from within processors will end up here
+                LERROR( proclog, "Caught scarab::base_exception thrown in a processor or in the multi-threaded run function" );
+                LERROR( proclog, "Diagnostic Information:\n" );
+                PrintException( e );
+                SharedControl::get_instance()->Cancel();
+                return;
             }
             catch( std::exception& e )
             {
@@ -638,15 +657,6 @@ namespace Nymph
                 SharedControl::get_instance()->Cancel();
                 //LWARN( proclog, "Setting boost::exception of do-run-promise in StartMultiThreadedRun" );
                 //fDoRunPromise.set_exception( boost::current_exception() );
-                return;
-            }
-            catch( scarab::base_exception& e )
-            {
-                // exceptions thrown in this function or from within processors will end up here
-                LERROR( proclog, "Caught boost::exception thrown in a processor or in the multi-threaded run function" );
-                LERROR( proclog, "Diagnostic Information:\n" );
-                PrintException( e );
-                SharedControl::get_instance()->Cancel();
                 return;
             }
             return;

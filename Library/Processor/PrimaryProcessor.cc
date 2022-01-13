@@ -7,7 +7,6 @@
 
 #include "PrimaryProcessor.hh"
 
-#include "QuitThread.hh"
 #include "ControlAccess.hh"
 #include "Exception.hh"
 
@@ -25,26 +24,24 @@ namespace Nymph
     PrimaryProcessor::~PrimaryProcessor()
     {}
 
-    void PrimaryProcessor::operator()()// ControlAccessPtr control ) // SharedControl is now accessed in Signal::operator(), so we don't have to pass it from signal to slot to signal, etc
+    void PrimaryProcessor::operator()()
     {
         // go!
         try
         {
             Run();
         }
-        catch( QuitThread& e )
-        {
-            LDEBUG( proclog, "Thread quit from " << e.fFile << ", line " << e.fLine );
-        }
         catch( std::exception& e )
         {
             LERROR( proclog, "An error occurred during processor running: " << e.what() );
             fExceptionPtr = std::current_exception(); // capture the exception
-            SharedControl::get_instance()->Cancel();
-            //fThreadRef->SetReturnException( boost::current_exception() );
+            SharedControl* control = SharedControl::get_instance();
+            control->DecrementActiveThreads();
+            control->Cancel();
             return;
         }
 
+        SharedControl::get_instance()->DecrementActiveThreads();
         LWARN( proclog, "Valid return" );
 
         return;

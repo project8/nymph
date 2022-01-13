@@ -54,6 +54,9 @@ namespace Nymph
 
             void Resume(); // to be called by the processor toolbox
 
+            void IncrementActiveThreads();
+            void DecrementActiveThreads();
+
             MEMVAR_REF_MUTABLE( std::mutex, Mutex );
             MEMVAR_REF_MUTABLE( std::condition_variable, CondVarContinue );
             MEMVAR_REF_MUTABLE( std::condition_variable, CondVarBreak );
@@ -61,6 +64,7 @@ namespace Nymph
             MEMVAR_NOSET( bool, CanceledFlag );
             MEMVAR( unsigned, CycleTimeMS );
             MEMVAR_SHARED_PTR_CONST( ReturnBufferBase, ReturnPtr );
+            MEMVAR( unsigned, NActiveThreads );
 
     };
 
