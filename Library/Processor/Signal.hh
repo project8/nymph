@@ -179,23 +179,28 @@ namespace Nymph
     {
         SharedControl* control = SharedControl::get_instance();
 
-        // if we're canceled, then quit the thread
-        // if we're at a break, then wait to continue
-        //   once we continue, if we need to quit, then do so
+        // Check for whether we need to quit from external input:
+        // - if we're canceled, then quit the thread
+        // - if we're at a break, then wait to continue;
+        //     once we continue, if we need to quit, then do so
         if( control->IsCanceled() || (control->IsAtBreak() && ! control->WaitToContinue()) )
         {
-            QUIT_THREAD;
+            QUIT_THREAD; // throws QuitThread; should be caught by PrimaryProcessor::operator()
         }
 
+        // Check for whether this signal emission has a breakpoint
         if( fDoBreakpoint )
         {
+            // do the break
             control->Break( args... );
+            // wait to continue; once we continue, if we need to quit, then do so
             if( ! control->WaitToContinue() )
             {
-                QUIT_THREAD;
+                QUIT_THREAD; // throws QuitThread; should be caught by PrimaryProcessor::operator()
             }
         }
 
+        // Emit signal by calling all connected slots
         for( auto connection : fConnections )
         {
 //            static_cast< Slot< XArgs... >* >(connection)->operator()( fControlAcc, args... );
