@@ -5,7 +5,7 @@
  *      Author: N.S. Oblath
  */
 
-#include "TestProc.hh"
+#include "TestProcessorClasses.hh"
 
 #include "logger.hh"
 
@@ -31,11 +31,28 @@ TEST_CASE( "processor", "[signal],[slot],[processor]" )
         int configValue = 5;
         config.add( "value", configValue );
 
-        // perform configuration
-        tester.Configure( config );
-
+        // perform configuration with no value for "string"
+        REQUIRE_NOTHROW( tester.Configure( config ) );
         // check that the value was set correctly
         REQUIRE( tester.GetValue() == configValue );
+
+        // peform configuration with an illegal value for "string"
+        config.add( "string", "illegal value" );
+        REQUIRE_THROWS_AS( tester.Configure( config ), ConfigException );
+        try
+        {
+            tester.Configure( config );
+        }
+        catch( const ConfigException& e )
+        {
+            PrintException(e);
+        }
+        
+        // perform configuration with a legal value for "string"
+        config["string"]().set( "ok value 1" );
+        REQUIRE_NOTHROW( tester.Configure( config ) );
+        REQUIRE( tester.StringValue() == "ok 1" );
+
     }
 
     SECTION( "Signals and Slots" )
