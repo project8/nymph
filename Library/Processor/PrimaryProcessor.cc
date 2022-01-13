@@ -8,6 +8,7 @@
 #include "PrimaryProcessor.hh"
 
 #include "QuitThread.hh"
+#include "ControlAccess.hh"
 #include "Exception.hh"
 
 #include "logger.hh"
@@ -37,8 +38,9 @@ namespace Nymph
         }
         catch( std::exception& e )
         {
-            LERROR( proclog, "An error occurred during processor running." );
+            LERROR( proclog, "An error occurred during processor running: " << e.what() );
             fExceptionPtr = std::current_exception(); // capture the exception
+            SharedControl::get_instance()->Cancel();
             //fThreadRef->SetReturnException( boost::current_exception() );
             return;
         }
