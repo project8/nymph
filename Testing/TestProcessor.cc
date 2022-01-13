@@ -20,6 +20,8 @@ TEST_CASE( "processor", "[signal],[slot],[processor]" )
 {
     using namespace Nymph;
 
+    SharedControl::get_instance()->Reset();
+
     TestProc tester;
 
     SECTION( "Configuration" )

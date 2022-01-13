@@ -20,6 +20,8 @@ TEST_CASE( "primary_processor", "[primary_processor]" )
 {
     using namespace Nymph;
 
+    SharedControl::get_instance()->Reset();
+
     TestPrimaryProc tester;
     REQUIRE_FALSE( tester.ExceptionPtr() );
 

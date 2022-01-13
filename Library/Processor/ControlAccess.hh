@@ -66,6 +66,10 @@ namespace Nymph
             MEMVAR_SHARED_PTR_CONST( ReturnBufferBase, ReturnPtr );
             MEMVAR( unsigned, NActiveThreads );
 
+            // WARNING: This function resets the state of this class to a just-constructed state
+            //          It is intended for use with testing when a single application might use it multiple times
+            void Reset();
+
     };
 
     template< typename... Args >

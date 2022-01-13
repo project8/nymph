@@ -29,6 +29,17 @@ namespace Nymph
     SharedControl::~SharedControl()
     {}
 
+    void SharedControl::Reset()
+    {
+        std::unique_lock< std::mutex > lock( fMutex );
+        LDEBUG( contlog, "Reseting ControlAccess" );
+        fBreakFlag = false;
+        fCanceledFlag = false;
+        fCycleTimeMS = 500;
+        fNActiveThreads = 0;
+        return;
+    }
+
     void SharedControl::Cancel()
     {
         std::unique_lock< std::mutex > lock( fMutex );

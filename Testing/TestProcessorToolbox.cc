@@ -54,6 +54,8 @@ TEST_CASE( "processor_toolbox" )
 {
     using namespace Nymph;
 
+    SharedControl::get_instance()->Reset();
+
     ProcTBRevealer toolbox;
 
     SECTION( "AddRemoveProcessors" )
