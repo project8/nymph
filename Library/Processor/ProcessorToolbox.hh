@@ -11,26 +11,15 @@
 
 #include "ControlAccess.hh"
 #include "MemberVariable.hh"
-//#include "KTThreadReference.hh"
 
 #include "factory.hh"
 #include "param.hh"
-
-//#define BOOST_THREAD_PROVIDES_FUTURE
-//#include <boost/thread/future.hpp>
-//#include <boost/thread/mutex.hpp>
-//#include <boost/thread/thread.hpp>
-
-//#include <boost/iterator/iterator_adaptor.hpp>
-//#include <boost/type_traits/is_convertible.hpp>
-//#include <boost/utility/enable_if.hpp>
 
 #include <deque>
 #include <initializer_list>
 #include <limits>
 #include <set>
 #include <memory>
-#include <thread>
 
 
 namespace Nymph
@@ -212,38 +201,6 @@ namespace Nymph
             RunQueue fRunQueue;
 
             bool AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroup& group );
-
-
-        public:
-            /// Process the run queue.
-            /// This will call Run() on all of the processors in the queue.
-            bool Run();
-
-            void AsyncRun();
-
-            bool WaitToContinue();
-
-            /// Returns when processing is completed or a breakpoint is reached
-            /// Throws a boost::exception if there's an error with the future object in use
-            /// If the return is true, processing can continue after the break
-            /// If the return is false, processing has ended (either normally or due to an error)
-            bool WaitForBreakOrCanceled();
-
-            void WaitForEndOfRun();
-
-            void Continue();
-
-            void CancelThreads();
-
-            void JoinRunThread();
-
-            // TODO: return value access
-
-        protected:
-            void StartMultiThreadedRun();
-
-            std::thread fDoRunThread;
-
     };
 
     inline bool ProcessorToolbox::MakeConnection(const std::string& signal, const std::string& slot) 
