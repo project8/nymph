@@ -7,7 +7,7 @@
 
 #include "PrimaryProcessor.hh"
 
-#include "ControlAccess.hh"
+//#include "ControlAccess.hh"
 #include "QuitThread.hh"
 
 #include "logger.hh"
@@ -35,7 +35,7 @@ namespace Nymph
         {
             LINFO( proclog, "Processor thread started by <" << fName << "> is quitting" );
             fExceptionPtr = std::current_exception(); // capture the exception
-            SharedControl::get_instance()->DecrementActiveThreads();
+            /////SharedControl::get_instance()->DecrementActiveThreads();
             // we don't initiate cancellation on QuitThread; this type of quitting has been initiated elsewhere and detected in this thread.
             return;
         }
@@ -43,13 +43,13 @@ namespace Nymph
         {
             LERROR( proclog, "An error occurred during processor running: " << e.what() );
             fExceptionPtr = std::current_exception(); // capture the exception
-            SharedControl* control = SharedControl::get_instance();
-            control->DecrementActiveThreads();
-            control->Cancel();
+            /////SharedControl* control = SharedControl::get_instance();
+            /////control->DecrementActiveThreads();
+            /////control->Cancel();
             return;
         }
 
-        SharedControl::get_instance()->DecrementActiveThreads();
+        /////SharedControl::get_instance()->DecrementActiveThreads();
         LWARN( proclog, "Valid return" );
 
         return;

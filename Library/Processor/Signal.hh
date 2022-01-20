@@ -176,27 +176,27 @@ namespace Nymph
     template< typename... XArgs >
     inline void Signal< XArgs... >::operator()( XArgs... args )
     {
-        SharedControl* control = SharedControl::get_instance();
+        /////SharedControl* control = SharedControl::get_instance();
 
         // Check for whether we need to quit from external input:
         // - if we're canceled, then quit the thread
         // - if we're at a break, then wait to continue;
         //     once we continue, if we need to quit, then do so
-        if( control->IsCanceled() || (control->IsAtBreak() && ! control->WaitToContinue()) )
-        {
-            QUIT_THREAD; // throws QuitThread; should be caught by PrimaryProcessor::operator()
-        }
+        /////if( control->IsCanceled() || (control->IsAtBreak() && ! control->WaitToContinue()) )
+        /////{
+        /////    QUIT_THREAD; // throws QuitThread; should be caught by PrimaryProcessor::operator()
+        /////}
 
         // Check for whether this signal emission has a breakpoint
         if( fDoBreakpoint )
         {
             // do the break
-            control->Break( args... );
+            /////control->Break( args... );
             // wait to continue; once we continue, if we need to quit, then do so
-            if( ! control->WaitToContinue() )
-            {
-                QUIT_THREAD; // throws QuitThread; should be caught by PrimaryProcessor::operator()
-            }
+            /////if( ! control->WaitToContinue() )
+            /////{
+            /////    QUIT_THREAD; // throws QuitThread; should be caught by PrimaryProcessor::operator()
+            /////}
         }
 
         // Emit signal by calling all connected slots

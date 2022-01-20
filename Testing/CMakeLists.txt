@@ -13,7 +13,7 @@ set( testing_HEADERS
 )
 
 set( testing_SOURCES
-    TestControlAccess.cc
+#    TestControlAccess.cc
     TestData.cc
     TestDataFrame.cc
     TestException.cc
@@ -21,6 +21,7 @@ set( testing_SOURCES
     TestProcessor.cc
     TestProcessorToolbox.cc
     TestSignalSlot.cc
+#    TestSingleRunController.cc
     UseCatch.cc
 )
 
