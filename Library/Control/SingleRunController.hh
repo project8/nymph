@@ -14,13 +14,9 @@
 #include "ControlAccess.hh"
 #include "ProcessorToolbox.hh"
 
-#include <deque>
-#include <initializer_list>
-#include <limits>
-#include <set>
-#include <memory>
+#include <map>
 #include <thread>
-#include <pair>
+#include <tuple>
 
 
 namespace Nymph
@@ -96,11 +92,11 @@ namespace Nymph
             void JoinRunThread();
 
             /// Notify the control that a chain is quitting
-            virtual void ChainQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
+            virtual void ChainIsQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
 
             // TODO: return value access
 
-            MEMVAR( unsigned, NActiveThreads );
+//            MEMVAR( unsigned, NActiveThreads );
 
         protected:
             void StartMultiThreadedRun();
@@ -120,9 +116,6 @@ namespace Nymph
             template< typename... Args >
             void Break( Args&... args ); // to be called by a working thread
         */
-            void IncrementActiveThreads();
-            void DecrementActiveThreads();
-
 
             // WARNING: This function resets the state of this class to a just-constructed state
             //          It is intended for use with testing when a single application might use it multiple times

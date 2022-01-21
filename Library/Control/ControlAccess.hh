@@ -9,16 +9,12 @@
 #define NYMPH_CONTROLACCESS_HH_
 
 #include "Controller.hh"
+
 #include "Exception.hh"
 #include "MemberVariable.hh"
 #include "ReturnBuffer.hh"
 
-#include "cancelable.hh" // remove when ControlAccess is removed
 #include "singleton.hh"
-
-#include <condition_variable>
-#include <memory>
-#include <mutex>
 
 namespace Nymph
 {
@@ -58,7 +54,7 @@ namespace Nymph
             virtual bool IsAtBreak() const;
 
             /// Notify the control that a chain is quitting
-            virtual void ChainQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
+            virtual void ChainIsQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
 
             MEMVAR_PTR( ControllerInterface, Control );
 

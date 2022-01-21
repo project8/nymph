@@ -68,9 +68,9 @@ namespace Nymph
         return fControl->IsAtBreak();
     }
 
-    void ControlAccess::ChainQuitting( const std::string& name, std::exception_ptr ePtr )
+    void ControlAccess::ChainIsQuitting( const std::string& name, std::exception_ptr ePtr )
     {
-        fControl->ChainQuitting( name, ePtr );
+        fControl->ChainIsQuitting( name, ePtr );
         return;
     }
 

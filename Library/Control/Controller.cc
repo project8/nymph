@@ -112,7 +112,7 @@ namespace Nymph
         return fBreakFlag;
     }
 
-    void Controller::ChainQuitting( const std::string& name, std::exception_ptr ePtr )
+    void Controller::ChainIsQuitting( const std::string& name, std::exception_ptr ePtr )
     {
         std::unique_lock< std::mutex > lock( fMutex );
         LDEBUG( contlog, "Chain <" << name << "> is quitting" );

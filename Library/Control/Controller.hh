@@ -50,7 +50,7 @@ namespace Nymph
             virtual bool IsAtBreak() const = 0;
 
             /// Notify the control that a chain is quitting
-            virtual void ChainQuitting( const std::string& name, std::exception_ptr ePtr ) = 0;
+            virtual void ChainIsQuitting( const std::string& name, std::exception_ptr ePtr ) = 0;
     };
 
     class Controller : public ControllerInterface, public scarab::cancelable
@@ -90,7 +90,7 @@ namespace Nymph
             virtual bool IsAtBreak() const;
 
             /// Notify the control that a chain is quitting
-            virtual void ChainQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
+            virtual void ChainIsQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
 
             MEMVAR_REF_MUTABLE( std::mutex, Mutex );
             MEMVAR_REF_MUTABLE( std::condition_variable, CondVarContinue );

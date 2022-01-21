@@ -9,16 +9,12 @@
 
 #include "logger.hh"
 
-#include <map>
-#include <thread>
-
-
 namespace Nymph
 {
     LOGGER( contlog, "SingleRunController");
 
     SingleRunController::SingleRunController( const std::string& name ) :
-            fNActiveThreads( 0 ),
+    //        fNActiveThreads( 0 ),
             fDoRunThread(),
             fChainThreads()
     {
@@ -48,7 +44,7 @@ namespace Nymph
         return;
     }
 
-    void SingleRunController::ChainQuitting( const std::string& name, std::exception_ptr ePtr )
+    void SingleRunController::ChainIsQuitting( const std::string& name, std::exception_ptr ePtr )
     {
         std::unique_lock< std::mutex > lock( fMutex );
         LDEBUG( contlog, "Chain <" << name << "> is quitting" );
@@ -73,7 +69,7 @@ namespace Nymph
             }
         }
 
-        --fNActiveThreads;
+//        --fNActiveThreads;
 
         return;
     }
@@ -92,7 +88,7 @@ namespace Nymph
                         std::unique_lock< std::mutex > lock( fMutex );
 
                         // iterate over primary processors in this group and launch threads
-                        for (ThreadSourceGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
+                        for( ThreadSourceGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter )
                         {
                             std::string procName( tgIter->fName );
                             LINFO( proclog, "Starting processor <" << procName << ">" );
@@ -105,7 +101,7 @@ namespace Nymph
                                     std::exception_ptr() 
                                 ) 
                             );
-                            ++fNActiveThreads;
+//                            ++fNActiveThreads;
                         }// end for loop over the thread group
                     }
 
@@ -189,6 +185,9 @@ namespace Nymph
 
                 } // end for loop over the run-queue
 
+                // we have to cancel on success to make sure anything waiting on the control in some way finishes up
+                this->Cancel( RETURN_SUCCESS );
+
                 LPROG( proclog, "Processing is complete" );
             }
             catch( scarab::base_exception& e )
@@ -235,23 +234,6 @@ namespace Nymph
     }
 
 
-    void SingleRunController::IncrementActiveThreads()
-    {
-        std::unique_lock< std::mutex > lock( fMutex );
-        ++fNActiveThreads;
-        LDEBUG( contlog, "Incremented active threads: " << fNActiveThreads );
-        return;
-    }
-
-    void SingleRunController::DecrementActiveThreads()
-    {
-        std::unique_lock< std::mutex > lock( fMutex );
-        if( fNActiveThreads > 0 ) --fNActiveThreads;
-        LDEBUG( contlog, "Decremented active threads: " << fNActiveThreads );
-        return;
-    }
-
-
 
     void SharedControl::Reset()
     {
@@ -260,7 +242,7 @@ namespace Nymph
         fBreakFlag = false;
         fCanceledFlag = false;
         fCycleTimeMS = 500;
-        fNActiveThreads = 0;
+//        fNActiveThreads = 0;
         return;
     }
 
