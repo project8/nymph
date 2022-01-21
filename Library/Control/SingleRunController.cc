@@ -31,7 +31,20 @@ namespace Nymph
 
     }
 
-    void SingleRunController::AsyncRun()
+    bool SingleRunController::Run( const ProcessorToolbox& procTB )
+    {
+        // can throw scarab::base_exception
+
+        StartMultiThreadedRun( procTB );
+
+        WaitForEndOfRun();
+
+        JoinRunThread();
+
+        return true;
+    }
+
+    void SingleRunController::StartMultiThreadedRun( const ProcessorToolbox& procTB )
     {
         if( fDoRunThread.joinable() )
         {
@@ -39,56 +52,19 @@ namespace Nymph
             return;
         }
 
-        StartMultiThreadedRun();
-
-        return;
-    }
-
-    void SingleRunController::ChainIsQuitting( const std::string& name, std::exception_ptr ePtr )
-    {
-        std::unique_lock< std::mutex > lock( fMutex );
-        LDEBUG( contlog, "Chain <" << name << "> is quitting" );
-        
-        if( ePtr )
-        {
-            try
-            {
-                std::rethrow_exception( ePtr );
-            }
-            catch( const QuitChain& e )
-            {
-                // not necessarily an error, so don't set quitAfterThis to true
-                LINFO( contlog, "Chain <" << name << "> exited with QuitChain" );
-            }
-            catch( const scarab::base_exception& e )
-            {
-                // this is an error, so set quitAfterThis to true
-                LERROR( contlog, "Chain <" << name << "> exited with an exception" );
-                PrintException( e );
-                this->Cancel( RETURN_ERROR );
-            }
-        }
-
-//        --fNActiveThreads;
-
-        return;
-    }
-
-    void SingleRunController::StartMultiThreadedRun()
-    {
         auto multiThreadRun = [&]()
         {
             try
             {
                 LPROG( proclog, "Starting multi-threaded processing" );
 
-                for (RunQueue::iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
+                for (auto rqIter = procTB.RunQueue().begin(); rqIter != procTB.RunQueue().begin().end(); ++rqIter)
                 {
                     { // scope for mutex lock
                         std::unique_lock< std::mutex > lock( fMutex );
 
                         // iterate over primary processors in this group and launch threads
-                        for( ThreadSourceGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter )
+                        for( auto tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter )
                         {
                             std::string procName( tgIter->fName );
                             LINFO( proclog, "Starting processor <" << procName << ">" );
@@ -213,25 +189,41 @@ namespace Nymph
         return;
     }
 
+    void SingleRunController::ChainIsQuitting( const std::string& name, std::exception_ptr ePtr )
+    {
+        std::unique_lock< std::mutex > lock( fMutex );
+        LDEBUG( contlog, "Chain <" << name << "> is quitting" );
+        
+        if( ePtr )
+        {
+            try
+            {
+                std::rethrow_exception( ePtr );
+            }
+            catch( const QuitChain& e )
+            {
+                // not necessarily an error, so don't set quitAfterThis to true
+                LINFO( contlog, "Chain <" << name << "> exited with QuitChain" );
+            }
+            catch( const scarab::base_exception& e )
+            {
+                // this is an error, so set quitAfterThis to true
+                LERROR( contlog, "Chain <" << name << "> exited with an exception" );
+                PrintException( e );
+                this->Cancel( RETURN_ERROR );
+            }
+        }
+
+//        --fNActiveThreads;
+
+        return;
+    }
 
    void SingleRunController::JoinRunThread()
    {
        fDoRunThread.join();
        return;
    }
-
-    bool SingleRunController::Run()
-    {
-        // can throw scarab::base_exception
-
-        AsyncRun();
-
-        WaitForEndOfRun();
-
-        JoinRunThread();
-
-        return true;
-    }
 
 
 

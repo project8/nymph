@@ -85,9 +85,7 @@ namespace Nymph
         public:
             /// Process the run queue.
             /// This will call Run() on all of the primary processors in the queue.
-            void Run();
-
-            void AsyncRun();
+            void Run( const ProcessorToolbox& procTB );
 
             void JoinRunThread();
 
@@ -99,7 +97,7 @@ namespace Nymph
 //            MEMVAR( unsigned, NActiveThreads );
 
         protected:
-            void StartMultiThreadedRun();
+            void StartMultiThreadedRun( const ProcessorToolbox& procTB );
 
             std::thread fDoRunThread;
 
