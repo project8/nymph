@@ -35,12 +35,6 @@ namespace Nymph
             {
                 return ProcessorToolbox::AddProcessorToThreadGroup( name, group );
             }
-
-            using ProcessorToolbox::RunQueue;
-            RunQueue& GetRunQueue()
-            {
-                return fRunQueue;
-            }
     };
 }
 
@@ -175,21 +169,21 @@ TEST_CASE( "processor_toolbox" )
 
         REQUIRE_FALSE( toolbox.PushBackToRunQueue( "testproc-1" ) );
         REQUIRE( toolbox.PushBackToRunQueue( "testprimary-1" ) );
-        REQUIRE( toolbox.GetRunQueue().size() == 1 );
-        REQUIRE( toolbox.GetRunQueue().begin()[0].size() == 1 );
+        REQUIRE( toolbox.RunQueue().size() == 1 );
+        REQUIRE( toolbox.RunQueue().begin()[0].size() == 1 );
         REQUIRE( toolbox.PushBackToRunQueue( "testprimary-2" ) );
-        REQUIRE( toolbox.GetRunQueue().size() == 2 );
-        REQUIRE( toolbox.GetRunQueue().begin()[0].size() == 1 );
+        REQUIRE( toolbox.RunQueue().size() == 2 );
+        REQUIRE( toolbox.RunQueue().begin()[0].size() == 1 );
         
         toolbox.PopBackOfRunQueue();
-        REQUIRE( toolbox.GetRunQueue().size() == 1 );
+        REQUIRE( toolbox.RunQueue().size() == 1 );
 
         toolbox.ClearRunQueue();
-        REQUIRE( toolbox.GetRunQueue().empty() );
+        REQUIRE( toolbox.RunQueue().empty() );
         
         REQUIRE( toolbox.PushBackToRunQueue( {"testprimary-1", "testprimary-2"} ) );
-        REQUIRE( toolbox.GetRunQueue().size() == 1 );
-        REQUIRE( toolbox.GetRunQueue()[0].size() == 2 );
+        REQUIRE( toolbox.RunQueue().size() == 1 );
+        REQUIRE( toolbox.RunQueue()[0].size() == 2 );
 
     }
 

@@ -77,6 +77,26 @@ namespace Nymph
     */
     class ProcessorToolbox
     {
+        public:
+            struct ThreadSource
+            {
+                PrimaryProcessor* fProc;
+                std::string fName;
+                //ControlAccessPtr fControlAccess;
+                ThreadSource( PrimaryProcessor* proc, const std::string& name ) : 
+                        fProc(proc), fName(name)//, fControlAccess( new ControlAccess() )
+                {}
+            };
+            struct CompareThreadSource
+            {
+                bool operator()( const ThreadSource& lhs, const ThreadSource& rhs ) const
+                {
+                    return lhs.fProc < rhs.fProc;
+                }
+            };
+            typedef std::set< ThreadSource, CompareThreadSource > ThreadSourceGroupT;
+            typedef std::deque< ThreadSourceGroupT > RunQueueT;
+
         protected:
             typedef std::unique_lock< std::mutex > unique_lock;
 
@@ -163,7 +183,6 @@ namespace Nymph
             bool ParseSignalSlotName( const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot ) const;
             static const char fSigSlotNameSep = ':';
 
-
         public:
             /// Push a single processor to the back of the run queue
             bool PushBackToRunQueue( const std::string& name );
@@ -179,28 +198,13 @@ namespace Nymph
             /// Clear the run queue
             void ClearRunQueue();
 
-        protected:
-            struct ThreadSource
-            {
-                PrimaryProcessor* fProc;
-                std::string fName;
-                //ControlAccessPtr fControlAccess;
-                ThreadSource( PrimaryProcessor* proc, const std::string& name ) : 
-                        fProc(proc), fName(name)//, fControlAccess( new ControlAccess() )
-                {}
-            };
-            struct CompareThreadSource
-            {
-                bool operator()( const ThreadSource& lhs, const ThreadSource& rhs ) const
-                {
-                    return lhs.fProc < rhs.fProc;
-                }
-            };
-            typedef std::set< ThreadSource, CompareThreadSource > ThreadSourceGroup;
-            typedef std::deque< ThreadSourceGroup > RunQueue;
-            RunQueue fRunQueue;
+            /// Const access to the run queue
+            const RunQueue& RunQueue() const;
 
-            bool AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroup& group );
+        protected:
+            RunQueueT fRunQueue;
+
+            bool AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroupT& group );
     };
 
     inline bool ProcessorToolbox::MakeConnection(const std::string& signal, const std::string& slot) 
