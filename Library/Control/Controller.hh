@@ -60,10 +60,13 @@ namespace Nymph
             virtual ~Controller();
 
 
-        public:    
+        public:   
+            /// Use this to make a thread wait on a break
+            /// If the return is true, processing should continue after the break
+            /// If the return is false, processing has ended (either normally or due to an error) 
             virtual bool WaitToContinue();
 
-            /// Returns when processing is completed or a breakpoint is reached
+            /// Use this to wait for a breakpoint to be reached or for cancellation
             /// If the return is true, processing can continue after the break
             /// If the return is false, processing has ended (either normally or due to an error)
             virtual bool WaitForBreakOrCanceled();

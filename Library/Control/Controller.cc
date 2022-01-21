@@ -39,24 +39,21 @@ namespace Nymph
     bool Controller::WaitForBreakOrCanceled()
     {
         std::unique_lock< std::mutex > lock( fMutex );
-        while( ! fBreakFlag && ! is_canceled() && fNActiveThreads > 0 )
+        while( ! fBreakFlag && ! is_canceled() )
         {
             fCondVarBreak.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
         }
-        return is_canceled() || fNActiveThreads == 0 ? false : fBreakFlag;
+        return is_canceled() ? false : fBreakFlag; // returns true if the thread should continue; false if it should end
     }
 
     bool Controller::WaitToContinue()
     {
         std::unique_lock< std::mutex > lock( fMutex );
-        if( fBreakFlag )
+        while( fBreakFlag && ! is_canceled() )
         {
-            while( fBreakFlag && ! is_canceled() && fNActiveThreads > 0 )
-            {
-                fCondVarContinue.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
-            }
+            fCondVarContinue.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
         }
-        return (! is_canceled()) && (fNActiveThreads > 0); // returns true if the thread should continue; false if it should end
+        return ! is_canceled(); // returns true if the thread should continue; false if it should end
     }
 
     void Controller::WaitForEndOfRun()
@@ -65,7 +62,7 @@ namespace Nymph
         while( WaitForBreakOrCanceled() )
         {
             LDEBUG( contlog, "Reached breakpoint; waiting for continue" );
-            WaitToContinue();
+            if( ! WaitToContinue() ) break;
             LDEBUG( contlog, "Processing resuming; waiting for end-of-run" );
         }
         LDEBUG( contlog, "End-of-run reached" );
