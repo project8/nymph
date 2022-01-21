@@ -18,14 +18,8 @@ namespace Nymph
     LOGGER( contlog, "SingleRunController");
 
     SingleRunController::SingleRunController( const std::string& name ) :
-            fDoRunThread(),
-            fMutex(),
-            fCondVarContinue(),
-            fCondVarBreak(),
-            fBreakFlag( false ),
-            fCanceledFlag( false ),
-            fCycleTimeMS( 500 ),
-            fNActiveThreads( 0 )
+            fNActiveThreads( 0 ),
+            fDoRunThread()
     {
     }
 
@@ -33,7 +27,7 @@ namespace Nymph
     {
     }
 
-    void ProcessorToolbox::Configure( const scarab::param_node& node )
+    void SingleRunController::Configure( const scarab::param_node& node )
     {
         LPROG( proclog, "Configuring run control" );
 
@@ -42,7 +36,7 @@ namespace Nymph
 
 
 
-    void ProcessorToolbox::AsyncRun()
+    void SingleRunController::AsyncRun()
     {
         if( fDoRunThread.joinable() )
         {
@@ -55,7 +49,7 @@ namespace Nymph
         return;
     }
 
-    void ProcessorToolbox::StartMultiThreadedRun()
+    void SingleRunController::StartMultiThreadedRun()
     {
         auto multiThreadRun = [&]()
         {
@@ -176,49 +170,19 @@ namespace Nymph
     }
 
 
-    bool ProcessorToolbox::WaitForBreakOrCanceled()
-    {
-        return SharedControl::get_instance()->WaitForBreakOrCanceled();
-    }
-
-    bool ProcessorToolbox::WaitToContinue()
-    {
-        return SharedControl::get_instance()->WaitToContinue();
-    }
-
-    void ProcessorToolbox::WaitForEndOfRun()
-    {
-        LDEBUG( proclog, "Waiting for end-of-run" );
-        while( WaitForBreakOrCanceled() )
-        {
-            LDEBUG( proclog, "Reached breakpoint; waiting for continue" );
-            WaitToContinue();
-            LDEBUG( proclog, "Processing resuming; waiting for end-of-run" );
-        }
-        LDEBUG( proclog, "End-of-run reached" );
-
-        return;
-    }
-
-    void ProcessorToolbox::Continue()
-    {
-        SharedControl::get_instance()->Resume();
-        return;
-    }
-
-   void ProcessorToolbox::JoinRunThread()
+   void SingleRunController::JoinRunThread()
    {
        fDoRunThread.join();
        return;
    }
 
-    void ProcessorToolbox::CancelThreads()
+    void SingleRunController::CancelThreads()
     {
         SharedControl::get_instance()->Cancel();
         return;
     }
 
-    bool ProcessorToolbox::Run()
+    bool SingleRunController::Run()
     {
         // can throw scarab::base_exception
 
@@ -232,9 +196,25 @@ namespace Nymph
     }
 
 
+    void SingleRunController::IncrementActiveThreads()
+    {
+        std::unique_lock< std::mutex > lock( fMutex );
+        ++fNActiveThreads;
+        LDEBUG( contlog, "Incremented active threads: " << fNActiveThreads );
+        return;
+    }
+
+    void SingleRunController::DecrementActiveThreads()
+    {
+        std::unique_lock< std::mutex > lock( fMutex );
+        if( fNActiveThreads > 0 ) --fNActiveThreads;
+        LDEBUG( contlog, "Decremented active threads: " << fNActiveThreads );
+        return;
+    }
 
 
-        void SharedControl::Reset()
+
+    void SharedControl::Reset()
     {
         std::unique_lock< std::mutex > lock( fMutex );
         LDEBUG( contlog, "Reseting ControlAccess" );
@@ -245,73 +225,7 @@ namespace Nymph
         return;
     }
 
-    void SharedControl::Cancel()
-    {
-        std::unique_lock< std::mutex > lock( fMutex );
-        LDEBUG( contlog, "CANCEL called" );
-        fCanceledFlag = true;
-        fCondVarBreak.notify_all();
-        return;
-    }
 
-    bool SharedControl::IsAtBreak() const
-    {
-        std::unique_lock< std::mutex > lock( fMutex );
-        return fBreakFlag;
-    }
-
-    bool SharedControl::IsCanceled() const
-    {
-        std::unique_lock< std::mutex > lock( fMutex );
-        return fCanceledFlag;
-    }
-
-    bool SharedControl::WaitToContinue() const
-    {
-        std::unique_lock< std::mutex > lock( fMutex );
-        if( fBreakFlag )
-        {
-            while( fBreakFlag && ! fCanceledFlag && fNActiveThreads > 0 )
-            {
-                fCondVarContinue.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
-            }
-        }
-        return (! fCanceledFlag) && (fNActiveThreads > 0); // returns true if the thread should continue; false if it should end
-    }
-
-    bool SharedControl::WaitForBreakOrCanceled() const
-    {
-        std::unique_lock< std::mutex > lock( fMutex );
-        while( ! fBreakFlag && ! fCanceledFlag && fNActiveThreads > 0 )
-        {
-            fCondVarBreak.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
-        }
-        return fCanceledFlag || fNActiveThreads == 0 ? false : fBreakFlag;
-    }
-
-    void SharedControl::Resume()
-    {
-        std::unique_lock< std::mutex > lock( fMutex );
-        LDEBUG( contlog, "RESUME called" );
-        fBreakFlag = false;
-        fCondVarContinue.notify_all();
-    }
-
-    void SharedControl::IncrementActiveThreads()
-    {
-        std::unique_lock< std::mutex > lock( fMutex );
-        ++fNActiveThreads;
-        LDEBUG( contlog, "Incremented active threads: " << fNActiveThreads );
-        return;
-    }
-
-    void SharedControl::DecrementActiveThreads()
-    {
-        std::unique_lock< std::mutex > lock( fMutex );
-        if( fNActiveThreads > 0 ) --fNActiveThreads;
-        LDEBUG( contlog, "Decremented active threads: " << fNActiveThreads );
-        return;
-    }
 
 
 

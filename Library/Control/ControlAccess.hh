@@ -8,15 +8,13 @@
 #ifndef NYMPH_CONTROLACCESS_HH_
 #define NYMPH_CONTROLACCESS_HH_
 
+#include "Controller.hh"
 #include "Exception.hh"
 #include "MemberVariable.hh"
 #include "ReturnBuffer.hh"
 
 #include "cancelable.hh" // remove when ControlAccess is removed
 #include "singleton.hh"
-
-//#include <boost/thread/condition_variable.hpp>
-//#include <boost/thread/mutex.hpp>
 
 #include <condition_variable>
 #include <memory>
@@ -25,27 +23,55 @@
 namespace Nymph
 {
 
-    class SharedControl : public scarab::singleton< SharedControl >
+    class ControlAccess : public scarab::singleton< ControlAccess >, public ControllerInterface
     {
         protected:
-            allow_singleton_access( SharedControl );
+            allow_singleton_access( ControlAccess );
 
-            SharedControl();
-            virtual ~SharedControl();
+            ControlAccess();
+            virtual ~ControlAccess();
 
         public:
+            virtual bool WaitToContinue();
 
+            /// Returns when processing is completed or a breakpoint is reached
+            /// If the return is true, processing can continue after the break
+            /// If the return is false, processing has ended (either normally or due to an error)
+            virtual bool WaitForBreakOrCanceled();
+
+            /// Use this to have a thread wait for the end of a run
+            virtual void WaitForEndOfRun();
+
+            /// Instruct the Controller to continue after a breakpoint
+            virtual void Continue();
+
+            /// Cancel all threads and end the run
+            virtual void Cancel( int code = 0 );
+
+            /// Reports whether controls is canceled
+            virtual bool IsCanceled() const;
+
+            /// Initiate a break
+            virtual void Break();
+
+            /// Reports whether control is at a breakpoint
+            virtual bool IsAtBreak() const;
+
+            /// Notify the control that a chain is quitting
+            virtual void ChainQuitting( std::exception_ptr ePtr );
+
+            MEMVAR_PTR( ControllerInterface, Control );
 
     };
 
 
 
-    class ControlAccess : public scarab::cancelable
+    class ReturnAccess : public scarab::cancelable
     {
         public:
-            ControlAccess();
+            ReturnAccess();
 
-            virtual ~ControlAccess();
+            virtual ~ReturnAccess();
 
             template< typename... Args >
             void SetReturn( Args&... arg );
@@ -64,14 +90,14 @@ namespace Nymph
 
 
     template< typename... Args >
-    void ControlAccess::SetReturn( Args&... args )
+    void ReturnAccess::SetReturn( Args&... args )
     {
         fReturn = std::make_shared< ReturnBuffer< Args... > >( args... );
         return;
     }
 
     template< typename... Args >
-    std::tuple< Args&... >& ControlAccess::GetReturn()
+    std::tuple< Args&... >& ReturnAccess::GetReturn()
     {
         std::shared_ptr< ReturnBuffer< Args... > > buffer( std::dynamic_pointer_cast< ReturnBuffer< Args... > >(fReturn) );
         if( buffer == nullptr ) throw std::exception();

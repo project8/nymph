@@ -78,8 +78,8 @@ namespace Nymph
     class SingleRunController : public Controller
     {
         public:
-            ProcessorToolbox( const std::string& name = "processor-toolbox" );
-            virtual ~ProcessorToolbox();
+            SingleRunController( const std::string& name = "single-run-controller" );
+            virtual ~SingleRunController();
 
         public:
             /// Configure the controller
@@ -88,66 +88,34 @@ namespace Nymph
         public:
             /// Process the run queue.
             /// This will call Run() on all of the primary processors in the queue.
-            bool Run();
+            void Run();
 
             void AsyncRun();
-
-            bool WaitToContinue();
-
-            /// Returns when processing is completed or a breakpoint is reached
-            /// Throws a boost::exception if there's an error with the future object in use
-            /// If the return is true, processing can continue after the break
-            /// If the return is false, processing has ended (either normally or due to an error)
-            bool WaitForBreakOrCanceled();
-
-            void WaitForEndOfRun();
-
-            void Continue();
-
-            void CancelThreads();
 
             void JoinRunThread();
 
             // TODO: return value access
+
+            MEMVAR( unsigned, NActiveThreads );
 
         protected:
             void StartMultiThreadedRun();
 
             std::thread fDoRunThread;
 
+            void do_cancellation( int code );
 
         public:
+        /*
             template< typename... Args >
             std::tuple< Args&... >& GetReturn();
 
             template< typename... Args >
             void Break( Args&... args ); // to be called by a working thread
-
-            void Cancel(); // to be called by a working thread
-
-            bool IsAtBreak() const; // to be called by a working thread
-
-            bool IsCanceled() const; // to be called by a working thread
-
-            // return: true = continue; false = cancel
-            bool WaitToContinue() const; // to be called by a working thread
-
-            // return: true = was a break; false = cancel
-            bool WaitForBreakOrCanceled() const; // to be called by the processor toolbox
-
-            void Resume(); // to be called by the processor toolbox
-
+        */
             void IncrementActiveThreads();
             void DecrementActiveThreads();
 
-            MEMVAR_REF_MUTABLE( std::mutex, Mutex );
-            MEMVAR_REF_MUTABLE( std::condition_variable, CondVarContinue );
-            MEMVAR_REF_MUTABLE( std::condition_variable, CondVarBreak );
-            MEMVAR_NOSET( bool, BreakFlag );
-            MEMVAR_NOSET( bool, CanceledFlag );
-            MEMVAR( unsigned, CycleTimeMS );
-            MEMVAR_SHARED_PTR_CONST( ReturnBufferBase, ReturnPtr );
-            MEMVAR( unsigned, NActiveThreads );
 
             // WARNING: This function resets the state of this class to a just-constructed state
             //          It is intended for use with testing when a single application might use it multiple times
@@ -155,34 +123,6 @@ namespace Nymph
 
     };
 
-    template< typename... Args >
-    void SharedControl::Break( Args&... args )
-    {
-        while( IsAtBreak() && ! IsCanceled() )
-        {
-            if( ! WaitToContinue() )
-            {
-                THROW_EXCEPT_HERE( Exception() << "Canceled while waiting to initiate a breakpoint" );
-            }
-        }
-
-        std::unique_lock< std::mutex > lock( fMutex );
-        fBreakFlag = true;
-        fCondVarBreak.notify_all();
-        return;
-    }
-
-
-
-    template< typename... Args >
-    std::tuple< Args&... >& SharedControl::GetReturn()
-    {
-        if( ! fReturnPtr ) THROW_EXCEPT_HERE( Exception() << "No return available" );
-        std::unique_lock< std::mutex > lock( fMutex );
-        std::shared_ptr< ReturnBuffer< Args... > > buffer( std::dynamic_pointer_cast< ReturnBuffer< Args... > >(fReturnPtr) );
-        if( buffer == nullptr ) THROW_EXCEPT_HERE( Exception() << "Incorrect types used to get return" );
-        return buffer->GetReturn();
-    }
 
 
 } /* namespace Nymph */
