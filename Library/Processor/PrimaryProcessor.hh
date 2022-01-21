@@ -27,7 +27,7 @@ namespace Nymph
             /// Starts the  main action of the processor
             virtual void Run() = 0;
 
-            MEMVAR_REF( std::exception_ptr, ExceptionPtr );
+//            MEMVAR_REF( std::exception_ptr, ExceptionPtr );
 
     };
 

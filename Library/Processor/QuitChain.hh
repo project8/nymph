@@ -8,7 +8,7 @@
 #ifndef NYMPH_QUITCHAIN_HH_
 #define NYMPH_QUITCHAIN_HH_
 
-#include <string>
+#include "base_exception.hh"
 
 namespace Nymph
 {

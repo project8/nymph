@@ -191,18 +191,18 @@ namespace Nymph
         if( fDoBreakpoint )
         {
             // do the break
-            /////control->Break( args... );
+            //control->Break( args... );
+            control->Break();
             // wait to continue; once we continue, if we need to quit, then do so
-            /////if( ! control->WaitToContinue() )
-            /////{
-            /////    QUIT_CHAIN; // throws QuitThread; should be caught by PrimaryProcessor::operator()
-            /////}
+            if( ! control->WaitToContinue() )
+            {
+                QUIT_CHAIN; // throws QuitThread; should be caught by PrimaryProcessor::operator()
+            }
         }
 
         // Emit signal by calling all connected slots
         for( auto connection : fConnections )
         {
-//            static_cast< Slot< XArgs... >* >(connection)->operator()( fControlAcc, args... );
             static_cast< Slot< XArgs... >* >(connection)->operator()( args... );
         }
         return;

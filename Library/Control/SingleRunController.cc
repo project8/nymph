@@ -19,7 +19,8 @@ namespace Nymph
 
     SingleRunController::SingleRunController( const std::string& name ) :
             fNActiveThreads( 0 ),
-            fDoRunThread()
+            fDoRunThread(),
+            fChainThreads()
     {
     }
 
@@ -34,8 +35,6 @@ namespace Nymph
 
     }
 
-
-
     void SingleRunController::AsyncRun()
     {
         if( fDoRunThread.joinable() )
@@ -45,6 +44,36 @@ namespace Nymph
         }
 
         StartMultiThreadedRun();
+
+        return;
+    }
+
+    void SingleRunController::ChainQuitting( const std::string& name, std::exception_ptr ePtr )
+    {
+        std::unique_lock< std::mutex > lock( fMutex );
+        LDEBUG( contlog, "Chain <" << name << "> is quitting" );
+        
+        if( ePtr )
+        {
+            try
+            {
+                std::rethrow_exception( ePtr );
+            }
+            catch( const QuitChain& e )
+            {
+                // not necessarily an error, so don't set quitAfterThis to true
+                LINFO( contlog, "Chain <" << name << "> exited with QuitChain" );
+            }
+            catch( const scarab::base_exception& e )
+            {
+                // this is an error, so set quitAfterThis to true
+                LERROR( contlog, "Chain <" << name << "> exited with an exception" );
+                PrintException( e );
+                this->Cancel( RETURN_ERROR );
+            }
+        }
+
+        --fNActiveThreads;
 
         return;
     }
@@ -59,21 +88,26 @@ namespace Nymph
 
                 for (RunQueue::iterator rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
                 {
-                    SharedControl* control = SharedControl::get_instance();
+                    { // scope for mutex lock
+                        std::unique_lock< std::mutex > lock( fMutex );
 
-                    typedef std::pair< PrimaryProcessor*, std::thread > ThreadBundle;
-                    std::map< std::string, ThreadBundle > threads;
+                        // iterate over primary processors in this group and launch threads
+                        for (ThreadSourceGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
+                        {
+                            std::string procName( tgIter->fName );
+                            LINFO( proclog, "Starting processor <" << procName << ">" );
 
-                    // iterate over primary processors in this group and launch threads
-                    for (ThreadSourceGroup::iterator tgIter = rqIter->begin(); tgIter != rqIter->end(); ++tgIter)
-                    {
-                        std::string procName( tgIter->fName );
-                        LINFO( proclog, "Starting processor <" << procName << ">" );
-
-                        threads.emplace( procName, ThreadBundle( tgIter->fProc, std::thread(&PrimaryProcessor::operator(), tgIter->fProc) ) );
-
-                        control->IncrementActiveThreads();
-                    }// end for loop over the thread group
+                            fChainThreads.emplace( 
+                                procName, 
+                                ThreadBundle( 
+                                    tgIter->fProc, 
+                                    std::thread(&PrimaryProcessor::operator(), tgIter->fProc),
+                                    std::exception_ptr() 
+                                ) 
+                            );
+                            ++fNActiveThreads;
+                        }// end for loop over the thread group
+                    }
 
                     // wait here while things are still running
                     bool stillRunning = true;
@@ -100,29 +134,42 @@ namespace Nymph
                         }
                     }
 
+                    // ok, we're not running anymore.  join all threads and move along.
+
                     // join threads and check for exceptions
                     // break out of the run-queue iteration loop if there was an exception
-                    bool quitAfterThis = control->IsCanceled();
+                    bool quitAfterThis = is_canceled();
                     for( auto threadIt = threads.begin(); threadIt != threads.end(); ++threadIt )
                     {
                         LINFO( proclog, "Cleaning up thread for processor <" << threadIt->first << ">" )
-                        LDEBUG( proclog, "Joining thread" );
-                        threadIt->second.second.join();
-                        if( threadIt->second.first->ExceptionPtr() )
+
+                        std::thread thread( std::move(std::get<1>( threadIt->second )) );
+                        if( ! thread.joinable() )
+                        {
+                            LDEBUG( contlog, "Thread for processor <" << threadIt->first << "> is not joinable" );
+                        }
+                        else
+                        {
+                            LDEBUG( proclog, "Joining thread, ID = " << thread.thread_id() );
+                            thread.join();
+                        }
+
+                        std::exception_ptr exPtr( std::move(std::get<2>( threadIt->second )) );
+                        if( exPtr )
                         {
                             try
                             {
-                                std::rethrow_exception( threadIt->second.first->ExceptionPtr() );
+                                std::rethrow_exception( exPtr );
                             }
                             catch( const QuitThread& e )
                             {
                                 // not necessarily an error, so don't set quitAfterThis to true
-                                LINFO( proclog, "Thread exited with QuitThread" );
+                                LINFO( proclog, "Thread had exited with QuitThread" );
                             }
                             catch( const scarab::base_exception& e )
                             {
                                 // this is an error, so set quitAfterThis to true
-                                LERROR( proclog, "Thread exited with an exception" );
+                                LERROR( proclog, "Thread had exited with an exception" );
                                 PrintException( e );
                                 quitAfterThis = true;
                             }
@@ -130,7 +177,7 @@ namespace Nymph
                         else
                         {
                             // this thread did not have an exeption set, so it exited normally
-                            LINFO( proclog, "Thread exited normally" )
+                            LINFO( proclog, "Thread had exited normally" )
                         }
                     }
 
@@ -158,8 +205,6 @@ namespace Nymph
                 // exceptions thrown in this function or from within processors will end up here
                 LERROR( proclog, "Caught std::exception thrown in a processor or in the multi-threaded run function: " << e.what() );
                 SharedControl::get_instance()->Cancel();
-                //LWARN( proclog, "Setting boost::exception of do-run-promise in StartMultiThreadedRun" );
-                //fDoRunPromise.set_exception( boost::current_exception() );
                 return;
             }
             return;
@@ -175,12 +220,6 @@ namespace Nymph
        fDoRunThread.join();
        return;
    }
-
-    void SingleRunController::CancelThreads()
-    {
-        SharedControl::get_instance()->Cancel();
-        return;
-    }
 
     bool SingleRunController::Run()
     {

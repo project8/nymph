@@ -58,7 +58,7 @@ namespace Nymph
             virtual bool IsAtBreak() const;
 
             /// Notify the control that a chain is quitting
-            virtual void ChainQuitting( std::exception_ptr ePtr );
+            virtual void ChainQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
 
             MEMVAR_PTR( ControllerInterface, Control );
 

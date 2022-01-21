@@ -20,6 +20,7 @@
 #include <set>
 #include <memory>
 #include <thread>
+#include <pair>
 
 
 namespace Nymph
@@ -94,6 +95,9 @@ namespace Nymph
 
             void JoinRunThread();
 
+            /// Notify the control that a chain is quitting
+            virtual void ChainQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
+
             // TODO: return value access
 
             MEMVAR( unsigned, NActiveThreads );
@@ -102,6 +106,9 @@ namespace Nymph
             void StartMultiThreadedRun();
 
             std::thread fDoRunThread;
+
+            typedef std::tuple< PrimaryProcessor*, std::thread, std::exception_ptr > ThreadBundle;
+            std::map< std::string, ThreadBundle > fChainThreads;
 
             void do_cancellation( int code );
 

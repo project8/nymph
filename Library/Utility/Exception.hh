@@ -11,11 +11,6 @@
 
 #include "base_exception.hh"
 
-//#include <boost/exception/all.hpp>
-
-//#include <exception>
-//#include <sstream>
-//#include <string>
 
 namespace Nymph
 {

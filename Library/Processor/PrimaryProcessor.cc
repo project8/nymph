@@ -17,8 +17,8 @@ namespace Nymph
     LOGGER( proclog, "PrimaryProcessor" );
 
     PrimaryProcessor::PrimaryProcessor( const std::string& name ) :
-            Processor( name ),
-            fExceptionPtr()
+            Processor( name )//,
+//            fExceptionPtr()
     {}
 
     PrimaryProcessor::~PrimaryProcessor()
@@ -35,19 +35,19 @@ namespace Nymph
         {
             LINFO( proclog, "Processor chain started by <" << fName << "> is quitting" );
             fExceptionPtr = std::current_exception(); // capture the exception
-            ControlAccess::get_instance()->ChainQuitting( fExceptionPtr );
+            ControlAccess::get_instance()->ChainQuitting( fName, fExceptionPtr );
             return;
         }
         catch( const std::exception& e )
         {
             LERROR( proclog, "An error occurred during processor running: " << e.what() );
             fExceptionPtr = std::current_exception(); // capture the exception
-            ControlAccess::get_instance()->ChainQuitting( fExceptionPtr );
+            ControlAccess::get_instance()->ChainQuitting( fName, fExceptionPtr );
             return;
         }
 
-        /////SharedControl::get_instance()->DecrementActiveThreads();
         LWARN( proclog, "Valid return" );
+        ControlAccess::get_instance()->ChainQuitting( fName );
 
         return;
     }

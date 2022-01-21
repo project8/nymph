@@ -7,7 +7,7 @@
 
 #include "Controller.hh"
 
-#include "Exception.hh"
+#include "QuitChain.hh"
 
 #include "logger.hh"
 
@@ -39,11 +39,11 @@ namespace Nymph
     bool Controller::WaitForBreakOrCanceled()
     {
         std::unique_lock< std::mutex > lock( fMutex );
-        while( ! fBreakFlag && ! fCanceledFlag && fNActiveThreads > 0 )
+        while( ! fBreakFlag && ! is_canceled() && fNActiveThreads > 0 )
         {
             fCondVarBreak.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
         }
-        return fCanceledFlag || fNActiveThreads == 0 ? false : fBreakFlag;
+        return is_canceled() || fNActiveThreads == 0 ? false : fBreakFlag;
     }
 
     bool Controller::WaitToContinue()
@@ -51,12 +51,12 @@ namespace Nymph
         std::unique_lock< std::mutex > lock( fMutex );
         if( fBreakFlag )
         {
-            while( fBreakFlag && ! fCanceledFlag && fNActiveThreads > 0 )
+            while( fBreakFlag && ! is_canceled() && fNActiveThreads > 0 )
             {
                 fCondVarContinue.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
             }
         }
-        return (! fCanceledFlag) && (fNActiveThreads > 0); // returns true if the thread should continue; false if it should end
+        return (! is_canceled()) && (fNActiveThreads > 0); // returns true if the thread should continue; false if it should end
     }
 
     void Controller::WaitForEndOfRun()
@@ -115,9 +115,32 @@ namespace Nymph
         return fBreakFlag;
     }
 
-    void Controller::ChainQuitting( std::exception_ptr ePtr )
+    void Controller::ChainQuitting( const std::string& name, std::exception_ptr ePtr )
     {
+        std::unique_lock< std::mutex > lock( fMutex );
+        LDEBUG( contlog, "Chain <" << name << "> is quitting" );
 
+        if( ePtr )
+        {
+            try
+            {
+                std::rethrow_exception( ePtr );
+            }
+            catch( const QuitChain& e )
+            {
+                // not necessarily an error, so don't set quitAfterThis to true
+                LINFO( contlog, "Chain exited with QuitChain" );
+            }
+            catch( const scarab::base_exception& e )
+            {
+                // this is an error, so set quitAfterThis to true
+                LERROR( contlog, "Chain exited with an exception" );
+                PrintException( e );
+                this->Cancel( RETURN_ERROR );
+            }
+        }
+
+        return;
     }
 
     void Controller::do_cancellation( int code )
