@@ -14,6 +14,7 @@ set( testing_HEADERS
 
 set( testing_SOURCES
 #    TestControlAccess.cc
+    TestController.cc
     TestData.cc
     TestDataFrame.cc
     TestException.cc

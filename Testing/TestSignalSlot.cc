@@ -8,12 +8,17 @@
 #include "Signal.hh"
 #include "Slot.hh"
 
+#include "TestControllerClasses.hh"
+
 #include "catch.hpp"
 
 
 TEST_CASE( "signal_slot", "[signal],[slot],[processor]" )
 {
     using namespace Nymph;
+
+    // need a controller to exist
+    CIQThrowController controller;
 
     int testValue = 0;
 

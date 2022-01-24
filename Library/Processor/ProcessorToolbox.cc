@@ -8,7 +8,7 @@
 #include "ProcessorToolbox.hh"
 
 #include "PrimaryProcessor.hh"
-#include "QuitThread.hh"
+#include "QuitChain.hh"
 
 #include "factory.hh"
 #include "logger.hh"
@@ -492,7 +492,7 @@ namespace Nymph
 
     bool ProcessorToolbox::PushBackToRunQueue( const std::string& name )
     {
-        ThreadSourceGroup threadGroup;
+        ThreadSourceGroupT threadGroup;
 
         if( ! AddProcessorToThreadGroup( name, threadGroup ) )
         {
@@ -513,7 +513,7 @@ namespace Nymph
 
     bool ProcessorToolbox::PushBackToRunQueue( std::vector< std::string > names )
     {
-        ThreadSourceGroup threadGroup;
+        ThreadSourceGroupT threadGroup;
 
         std::stringstream toPrint;
         for( const std::string& name : names )
@@ -533,7 +533,7 @@ namespace Nymph
         return true;
     }
 
-    bool ProcessorToolbox::AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroup& group )
+    bool ProcessorToolbox::AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroupT& group )
     {
         std::shared_ptr< Processor > procForRunQueue = GetProcessor( name );
         LDEBUG( proclog, "Attempting to add processor <" << name << "> to the run queue" );

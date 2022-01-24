@@ -30,8 +30,8 @@ namespace Nymph
             }
 
             using ProcessorToolbox::ThreadSource;
-            using ProcessorToolbox::ThreadSourceGroup;
-            bool AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroup& group )
+            using ProcessorToolbox::ThreadSourceGroupT;
+            bool AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroupT& group )
             {
                 return ProcessorToolbox::AddProcessorToThreadGroup( name, group );
             }
@@ -161,7 +161,7 @@ TEST_CASE( "processor_toolbox" )
 
         REQUIRE_NOTHROW( toolbox.Configure( config->as_node() ) );
 
-        ProcTBRevealer::ThreadSourceGroup group;
+        ProcTBRevealer::ThreadSourceGroupT group;
         REQUIRE_FALSE( toolbox.AddProcessorToThreadGroup( "blah", group ) );
         REQUIRE_FALSE( toolbox.AddProcessorToThreadGroup( "testproc-1", group ) );
         REQUIRE( toolbox.AddProcessorToThreadGroup( "testprimary-1", group ) );

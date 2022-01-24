@@ -5,6 +5,7 @@
  *      Author: N.S. Oblath
  */
 
+#include "TestControllerClasses.hh"
 #include "TestProcessorClasses.hh"
 
 #include "logger.hh"
@@ -23,7 +24,7 @@ TEST_CASE( "primary_processor", "[primary_processor]" )
     //SharedControl::get_instance()->Reset();
 
     TestPrimaryProc tester;
-    REQUIRE_FALSE( tester.ExceptionPtr() );
+    CIQThrowController controller;
 
     // SignalNewValue test
     tester.SetTestSelection( TestPrimaryProc::TestType::SignalNewValue );
@@ -37,17 +38,8 @@ TEST_CASE( "primary_processor", "[primary_processor]" )
 
     // ThrowExcept test
     tester.SetTestSelection( TestPrimaryProc::TestType::ThrowExcept );
-    REQUIRE_NOTHROW( tester() ); // the exception should be caught by operator() and stored as the exception ptr
-    REQUIRE( tester.ExceptionPtr() ); // the exception ptr should now be set
-    try
-    {
-        std::rethrow_exception( tester.ExceptionPtr() );
-    }
-    catch( const scarab::base_exception& e )
-    {
-        PrintException( e );
-        REQUIRE( std::string(e.what()) == std::string("PrimaryProcessor test function: throw Exception") );
-    }
+    REQUIRE_THROWS_AS( tester(), TestPPException );
+
     
     
 

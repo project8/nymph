@@ -13,7 +13,7 @@
 #include "SignalSlotBase.hh"
 
 #include "ControlAccess.hh"
-#include "QuitThread.hh"
+#include "QuitChain.hh"
 
 #include "logger.hh"
 
@@ -182,7 +182,7 @@ namespace Nymph
         // - if we're canceled, then quit the thread
         // - if we're at a break, then wait to continue;
         //     once we continue, if we need to quit, then do so
-        if( control->is_canceled() || (control->IsAtBreak() && ! control->WaitToContinue()) )
+        if( control->IsCanceled() || (control->IsAtBreak() && ! control->WaitToContinue()) )
         {
             QUIT_CHAIN; // throws QuitThread; should be caught by PrimaryProcessor::operator()
         }

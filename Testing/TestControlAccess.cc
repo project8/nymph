@@ -12,7 +12,7 @@
 
 #include "catch.hpp"
 
-
+/*
 TEST_CASE( "control_access", "[control_access]" )
 {
     using namespace Nymph;
@@ -41,6 +41,7 @@ TEST_CASE( "control_access", "[control_access]" )
         REQUIRE( std::get< 0 >(control.GetReturn< int, double >()) == return1 );
         REQUIRE( std::get< 1 >(control.GetReturn< int, double >()) == return2 );
     }
+*/
 
     SECTION( "Break" )
     {

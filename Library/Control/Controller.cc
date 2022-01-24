@@ -7,6 +7,8 @@
 
 #include "Controller.hh"
 
+#include "ControlAccess.hh"
+#include "Exception.hh"
 #include "QuitChain.hh"
 
 #include "logger.hh"
@@ -16,13 +18,6 @@ namespace Nymph
 {
     LOGGER( contlog, "Controller" );
 
-    ControllerInterface::ControllerInterface()
-    {}
-
-    ControllerInterface::~ControllerInterface()
-    {}
-
-
     Controller::Controller() :
             ControllerInterface(),
             scarab::cancelable(),
@@ -31,20 +26,12 @@ namespace Nymph
             fCondVarBreak(),
             fBreakFlag( false ),
             fCycleTimeMS( 500 )
-    {}
+    {
+        ControlAccess::get_instance()->SetControl( this );
+    }
 
     Controller::~Controller()
     {}
-
-    bool Controller::WaitForBreakOrCanceled()
-    {
-        std::unique_lock< std::mutex > lock( fMutex );
-        while( ! fBreakFlag && ! is_canceled() )
-        {
-            fCondVarBreak.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
-        }
-        return is_canceled() ? false : fBreakFlag; // returns true if the thread should continue; false if it should end
-    }
 
     bool Controller::WaitToContinue()
     {
@@ -54,6 +41,16 @@ namespace Nymph
             fCondVarContinue.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
         }
         return ! is_canceled(); // returns true if the thread should continue; false if it should end
+    }
+
+    bool Controller::WaitForBreakOrCanceled()
+    {
+        std::unique_lock< std::mutex > lock( fMutex );
+        while( ! fBreakFlag && ! is_canceled() )
+        {
+            fCondVarBreak.wait_for( lock, std::chrono::milliseconds(fCycleTimeMS) );
+        }
+        return is_canceled() ? false : fBreakFlag; // returns true if the thread should continue; false if it should end
     }
 
     void Controller::WaitForEndOfRun()
@@ -114,7 +111,6 @@ namespace Nymph
 
     void Controller::ChainIsQuitting( const std::string& name, std::exception_ptr ePtr )
     {
-        std::unique_lock< std::mutex > lock( fMutex );
         LDEBUG( contlog, "Chain <" << name << "> is quitting" );
 
         if( ePtr )
@@ -144,7 +140,6 @@ namespace Nymph
     {
         std::unique_lock< std::mutex > lock( fMutex );
         LDEBUG( contlog, "CANCEL called" );
-        f_canceled.store( true );
         fCondVarBreak.notify_all();
         return;
     }

@@ -7,6 +7,7 @@
 
 #include "PrimaryProcessor.hh"
 #include "Processor.hh"
+#include "QuitChain.hh"
 #include "Signal.hh"
 #include "Slot.hh"
 
@@ -83,6 +84,14 @@ namespace Nymph
     };
 
 
+    class TestPPException : public scarab::typed_exception< TestPPException >
+    {
+        public:
+            using scarab::typed_exception< TestPPException >::typed_exception;
+            ~TestPPException() = default;
+    };
+
+
     // concrete primary processor class that we can test
     // implements Configure(), Run(), and has its own signal and slot
     class TestPrimaryProc : public PrimaryProcessor
@@ -92,7 +101,8 @@ namespace Nymph
             {
                 SignalNewValue,
                 WaitTwoSec,
-                ThrowExcept
+                ThrowExcept,
+                QuitChain
             };
 
             TestPrimaryProc( const std::string& name = "test" ) :
@@ -137,6 +147,9 @@ namespace Nymph
                     case TestType::ThrowExcept:
                         TestThrowExcept();
                         return;
+                    case TestType::QuitChain:
+                        TestQuitChain();
+                        return;
                     default:
                         LERROR( testprocclasses_h_log, "Invalid test choice" );
                         THROW_EXCEPT_HERE( Exception() << "Invalid test choice" );
@@ -158,8 +171,13 @@ namespace Nymph
 
             void TestThrowExcept()
             {
-                THROW_EXCEPT_HERE( Exception() << "PrimaryProcessor test function: throw Exception" );
+                THROW_EXCEPT_HERE( TestPPException() << "PrimaryProcessor test function: throw Exception" );
                 return;
+            }
+
+            void TestQuitChain()
+            {
+                QUIT_CHAIN;
             }
 
             MEMVAR( TestType, TestSelection );

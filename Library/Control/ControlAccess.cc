@@ -18,7 +18,7 @@ namespace Nymph
             ControllerInterface(),
             fControl( nullptr )
     {
-        fControl = Controller::
+
     }
 
     ControlAccess::~ControlAccess()
@@ -26,51 +26,60 @@ namespace Nymph
 
     bool ControlAccess::WaitToContinue()
     {
-        return fControl->WaitToContinue();
+        if( fControl ) return fControl->WaitToContinue();
+        THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
     }
 
     bool ControlAccess::WaitForBreakOrCanceled()
     {
-        return fControl->WaitForBreakOrCanceled();
+        if( fControl ) return fControl->WaitForBreakOrCanceled();
+        THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
     }
 
     void ControlAccess::WaitForEndOfRun()
     {
-        fControl->WaitForEndOfRun();
+        if( fControl ) fControl->WaitForEndOfRun();
+        else THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
         return;
     }
 
     void ControlAccess::Continue()
     {
-        fControl->Continue();
+        if( fControl ) fControl->Continue();
+        else THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
         return;
     }
 
     void ControlAccess::Cancel( int code )
     {
-        fControl->Cancel( code );
+        if( fControl ) fControl->Cancel( code );
+        else THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
         return;
     }
 
     bool ControlAccess::IsCanceled() const
     {
-        return fControl->IsCanceled();
+        if( fControl ) return fControl->IsCanceled();
+        THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
     }
 
     void ControlAccess::Break()
     {
-        fControl->Break();
+        if( fControl ) fControl->Break();
+        else THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
         return;
     }
 
     bool ControlAccess::IsAtBreak() const
     {
-        return fControl->IsAtBreak();
+        if( fControl ) return fControl->IsAtBreak();
+        THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
     }
 
     void ControlAccess::ChainIsQuitting( const std::string& name, std::exception_ptr ePtr )
     {
-        fControl->ChainIsQuitting( name, ePtr );
+        if( fControl ) fControl->ChainIsQuitting( name, ePtr );
+        else THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
         return;
     }
 

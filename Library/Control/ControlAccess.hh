@@ -56,7 +56,7 @@ namespace Nymph
             /// Notify the control that a chain is quitting
             virtual void ChainIsQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
 
-            MEMVAR_PTR( ControllerInterface, Control );
+            MEMVAR( ControllerInterface*, Control );
 
     };
 

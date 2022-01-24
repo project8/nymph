@@ -7,7 +7,7 @@
 
 #include "PrimaryProcessor.hh"
 
-//#include "ControlAccess.hh"
+#include "ControlAccess.hh"
 #include "QuitChain.hh"
 
 #include "logger.hh"
@@ -34,20 +34,18 @@ namespace Nymph
         catch( const QuitChain& e )
         {
             LINFO( proclog, "Processor chain started by <" << fName << "> is quitting" );
-            fExceptionPtr = std::current_exception(); // capture the exception
-            ControlAccess::get_instance()->ChainQuitting( fName, fExceptionPtr );
+            ControlAccess::get_instance()->ChainIsQuitting( fName, std::current_exception() );
             return;
         }
         catch( const std::exception& e )
         {
             LERROR( proclog, "An error occurred during processor running: " << e.what() );
-            fExceptionPtr = std::current_exception(); // capture the exception
-            ControlAccess::get_instance()->ChainQuitting( fName, fExceptionPtr );
+            ControlAccess::get_instance()->ChainIsQuitting( fName, std::current_exception() );
             return;
         }
 
         LWARN( proclog, "Valid return" );
-        ControlAccess::get_instance()->ChainQuitting( fName );
+        ControlAccess::get_instance()->ChainIsQuitting( fName );
 
         return;
     }

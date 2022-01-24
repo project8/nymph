@@ -11,18 +11,19 @@
 
 #include "Controller.hh"
 
-#include "ControlAccess.hh"
-#include "ProcessorToolbox.hh"
-
 #include <map>
 #include <thread>
 #include <tuple>
 
+namespace scarab
+{
+    class param_node;
+}
 
 namespace Nymph
 {
     class PrimaryProcessor;
-    class Processor;
+    class ProcessorToolbox;
 
     /*!
      @class ProcessorToolbox
@@ -104,7 +105,7 @@ namespace Nymph
             typedef std::tuple< PrimaryProcessor*, std::thread, std::exception_ptr > ThreadBundle;
             std::map< std::string, ThreadBundle > fChainThreads;
 
-            void do_cancellation( int code );
+//            void do_cancellation( int code );
 
         public:
         /*
@@ -121,6 +122,11 @@ namespace Nymph
 
     };
 
+   inline void SingleRunController::JoinRunThread()
+    {
+        fDoRunThread.join();
+        return;
+    }
 
 
 } /* namespace Nymph */

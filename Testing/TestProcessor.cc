@@ -5,6 +5,7 @@
  *      Author: N.S. Oblath
  */
 
+#include "TestControllerClasses.hh"
 #include "TestProcessorClasses.hh"
 
 #include "logger.hh"
@@ -19,6 +20,9 @@ REGISTER_PROCESSOR(Nymph, TestProc, "test-proc");
 TEST_CASE( "processor", "[signal],[slot],[processor]" )
 {
     using namespace Nymph;
+
+    // need a controller to exist
+    CIQThrowController controller;
 
     //SharedControl::get_instance()->Reset();
 

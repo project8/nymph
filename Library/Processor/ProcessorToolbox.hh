@@ -199,7 +199,7 @@ namespace Nymph
             void ClearRunQueue();
 
             /// Const access to the run queue
-            const RunQueue& RunQueue() const;
+            const RunQueueT& RunQueue() const;
 
         protected:
             RunQueueT fRunQueue;
@@ -227,6 +227,11 @@ namespace Nymph
     {
         fRunQueue.clear();
         return;
+    }
+
+    inline const ProcessorToolbox::RunQueueT& ProcessorToolbox::RunQueue() const
+    {
+        return fRunQueue;
     }
 
 } /* namespace Nymph */
