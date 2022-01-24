@@ -150,3 +150,5 @@ TEST_CASE( "controller", "[control]" )
         REQUIRE_THROWS_AS( control.ChainIsQuitting( "TestController::ChainIsQuitting::QuitChain", runtimePtr ), std::runtime_error );
 
     }
+
+}
