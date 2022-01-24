@@ -94,6 +94,40 @@ TEST_CASE( "controller", "[control]" )
 
     SECTION( "BreakContinue" )
     {
+        REQUIRE_FALSE( control.GetBreakFlag() );
+        REQUIRE_FALSE( control.IsCanceled() );
+
+        // This thread will do the breaking and continuing
+        std::thread thread( [&](){ 
+            std::this_thread::sleep_for( std::chrono::milliseconds(1000) );
+
+            control.Break(); // step 1
+
+            std::this_thread::sleep_for( std::chrono::milliseconds(1000) );
+
+            control.Continue(); // step 2
+
+            std::this_thread::sleep_for( std::chrono::milliseconds(1000) );
+
+            control.Cancel( 0 ); // step 3
+        } );
+        
+        // Waiting for break (step 1)
+        REQUIRE( control.WaitForBreakOrCanceled() );
+        REQUIRE( control.GetBreakFlag() );
+        REQUIRE_FALSE( control.IsCanceled() );
+
+        // Waiting for continue (step 2)
+        control.WaitToContinue();
+        REQUIRE_FALSE( control.GetBreakFlag() );
+        REQUIRE_FALSE( control.IsCanceled() );
+
+        // Waiting for cancelation (step 3)
+        REQUIRE_FALSE( control.WaitForBreakOrCanceled() );
+        REQUIRE_FALSE( control.GetBreakFlag() );
+        REQUIRE( control.IsCanceled() );
+
+        thread.join();
 
     }
 
@@ -116,71 +150,3 @@ TEST_CASE( "controller", "[control]" )
         REQUIRE_THROWS_AS( control.ChainIsQuitting( "TestController::ChainIsQuitting::QuitChain", runtimePtr ), std::runtime_error );
 
     }
-
-/*
-                virtual bool WaitToContinue();
-
-            /// Use this to wait for a breakpoint to be reached or for cancellation
-            /// If the return is true, processing can continue after the break
-            /// If the return is false, processing has ended (either normally or due to an error)
-            virtual bool WaitForBreakOrCanceled();
-
-            /// Use this to have a thread wait for the end of a run
-            virtual void WaitForEndOfRun();
-
-            /// Instruct the Controller to continue after a breakpoint
-            virtual void Continue();
-
-            /// Cancel all threads and end the run
-            virtual void Cancel( int code = 0 );
-
-            /// Reports whether controls is canceled
-            virtual bool IsCanceled() const;
-
-            /// Inititate a break
-            virtual void Break();
-
-            /// Reports whether control is at a breakpoint
-            virtual bool IsAtBreak() const;
-
-            /// Notify the control that a chain is quitting
-            virtual void ChainIsQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
-
-            MEMVAR_REF_MUTABLE( std::mutex, Mutex );
-            MEMVAR_REF_MUTABLE( std::condition_variable, CondVarContinue );
-            MEMVAR_REF_MUTABLE( std::condition_variable, CondVarBreak );
-            MEMVAR_NOSET( bool, BreakFlag );
-            MEMVAR( unsigned, CycleTimeMS );
-            //MEMVAR_SHARED_PTR_CONST( ReturnBufferBase, ReturnPtr );
-*/
-}
-
-/*
-TEST_CASE( "controller", "[control]" )
-{
-    using namespace Nymph;
-
-    Controller control;
-
-    SECTION( "Break" )
-    {
-        REQUIRE_FALSE( control.GetBreakFlag() );
-
-        std::thread thread( [&](){ 
-            control.Break();
-        } );
-        
-        std::this_thread::sleep_for( std::chrono::milliseconds(100) );
-        REQUIRE( control.GetBreakFlag() );
-
-        control.Continue();
-        std::this_thread::sleep_for( std::chrono::milliseconds(100) );
-        REQUIRE_FALSE( control.GetBreakFlag() );
-
-        thread.join();
-
-        REQUIRE_FALSE( control.GetBreakFlag() );
-    }
-
-}
-*/
