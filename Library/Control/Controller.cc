@@ -122,12 +122,12 @@ namespace Nymph
             catch( const QuitChain& e )
             {
                 // not necessarily an error, so don't set quitAfterThis to true
-                LINFO( contlog, "Chain exited with QuitChain" );
+                LINFO( contlog, "Chain <" << name << "> exited with QuitChain" );
             }
             catch( const scarab::base_exception& e )
             {
                 // this is an error, so set quitAfterThis to true
-                LERROR( contlog, "Chain exited with an exception" );
+                LERROR( contlog, "Chain <" << name << "> exited with an exception" );
                 PrintException( e );
                 this->Cancel( RETURN_ERROR );
             }

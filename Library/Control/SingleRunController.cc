@@ -99,9 +99,9 @@ namespace Nymph
                     // wait here while things are still running
                     while( ! is_canceled() && fNActiveThreads > 0 )
                     {
-                        LDEBUG( contlog, "Not canceled and nthreads = " << fNActiveThreads );
                         std::this_thread::sleep_for( std::chrono::milliseconds(fCycleTimeMS) );
                     }
+                    LDEBUG( contlog, "Past the wait for threads to stop.\nEither canceled (" << is_canceled() << ") or no active threads remain (# active threads: " << fNActiveThreads << ")" );
 
                     // ok, we're not running anymore.  join all threads and move along.
 
@@ -191,27 +191,7 @@ namespace Nymph
 
     void SingleRunController::ChainIsQuitting( const std::string& name, std::exception_ptr ePtr )
     {
-        LDEBUG( contlog, "Chain <" << name << "> is quitting" );
-        
-        if( ePtr )
-        {
-            try
-            {
-                std::rethrow_exception( ePtr );
-            }
-            catch( const QuitChain& e )
-            {
-                // not necessarily an error, so don't set quitAfterThis to true
-                LINFO( contlog, "Chain <" << name << "> exited with QuitChain" );
-            }
-            catch( const scarab::base_exception& e )
-            {
-                // this is an error, so set quitAfterThis to true
-                LERROR( contlog, "Chain <" << name << "> exited with an exception" );
-                PrintException( e );
-                this->Cancel( RETURN_ERROR );
-            }
-        }
+        Controller::ChainIsQuitting( name, ePtr );
 
         --fNActiveThreads;
 
