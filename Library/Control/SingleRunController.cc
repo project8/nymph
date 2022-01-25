@@ -20,7 +20,7 @@ namespace Nymph
     LOGGER( contlog, "SingleRunController");
 
     SingleRunController::SingleRunController( const std::string& name ) :
-    //        fNActiveThreads( 0 ),
+            fNActiveThreads( 0 ),
             fDoRunThread(),
             fChainThreads()
     {
@@ -43,9 +43,12 @@ namespace Nymph
 
         StartMultiThreadedRun( procTB );
 
-        WaitForEndOfRun();
+        if( fDoRunThread.joinable() ) 
+        {
+            WaitForEndOfRun();
 
-        JoinRunThread();
+            JoinRunThread();
+        }
 
         return;
     }
@@ -58,7 +61,7 @@ namespace Nymph
             return;
         }
 
-        if( fChainThreads.empty() )
+        if( ! fChainThreads.empty() )
         {
             LERROR( contlog, "Chain threads map is not empty; cannot start new threads" );
             return;
@@ -89,33 +92,15 @@ namespace Nymph
                                     std::exception_ptr() 
                                 ) 
                             );
-//                            ++fNActiveThreads;
+                            ++fNActiveThreads;
                         }// end for loop over the thread group
                     }
 
                     // wait here while things are still running
-                    bool stillRunning = true;
-                    while( stillRunning )
+                    while( ! is_canceled() && fNActiveThreads > 0 )
                     {
-                        bool breakOrCanceled = ControlAccess::get_instance()->WaitForBreakOrCanceled();
-                        if( breakOrCanceled )
-                        {
-                            // then at a breakpoint
-                            stillRunning = true;
-                            LDEBUG( contlog, "At a breakpoint" );
-                            // TODO: do we need to do anything while at a breakpoint?
-                            if( ! ControlAccess::get_instance()->WaitToContinue() )
-                            {
-                                stillRunning = false;
-                                LDEBUG( contlog, "Detected cancelation while waiting at breakpoint" );
-                            }
-                        }
-                        else
-                        {
-                            // then canceled
-                            stillRunning = false;
-                            LDEBUG( contlog, "Detected cancelation while waiting during running" );
-                        }
+                        LDEBUG( contlog, "Not canceled and nthreads = " << fNActiveThreads );
+                        std::this_thread::sleep_for( std::chrono::milliseconds(fCycleTimeMS) );
                     }
 
                     // ok, we're not running anymore.  join all threads and move along.
@@ -228,7 +213,7 @@ namespace Nymph
             }
         }
 
-//        --fNActiveThreads;
+        --fNActiveThreads;
 
         return;
     }

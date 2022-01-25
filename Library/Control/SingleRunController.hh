@@ -95,7 +95,7 @@ namespace Nymph
 
             // TODO: return value access
 
-//            MEMVAR( unsigned, NActiveThreads );
+            MEMVAR( unsigned, NActiveThreads );
 
         protected:
             void StartMultiThreadedRun( const ProcessorToolbox& procTB );

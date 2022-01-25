@@ -7,6 +7,7 @@
 
 #include "TestProcessorClasses.hh"
 
+#include "ProcessorToolbox.hh"
 #include "SingleRunController.hh"
 
 #include "logger.hh"
@@ -24,20 +25,21 @@ namespace Nymph
         public:
             using SingleRunController::SingleRunController;
 
-            void StartMultiThreadedRun()
+            void StartMultiThreadedRun( const ProcessorToolbox& procTB )
             {
-                return SingleRunController::StartMultiThreadedRun();
+                return SingleRunController::StartMultiThreadedRun( procTB );
             }
 
     };
 }
 
 
-TEST_CASE( "processor_toolbox" )
+TEST_CASE( "single_run_controller" )
 {
     using namespace Nymph;
 
     SRCRevealer controller;
+    ProcessorToolbox toolbox;
 
     SECTION( "DoRun" )
     {
@@ -62,7 +64,7 @@ TEST_CASE( "processor_toolbox" )
         ppProc->SetTestSelection( TestPrimaryProc::TestType::SignalNewValue );
 
         // do the run
-        REQUIRE_NOTHROW( toolbox.Run() );
+        REQUIRE_NOTHROW( controller.Run( toolbox ) );
 
         // check the results
         REQUIRE( ppProc->GetValue() == ppProc->GetNewValue() );

@@ -22,7 +22,7 @@ set( testing_SOURCES
     TestProcessor.cc
     TestProcessorToolbox.cc
     TestSignalSlot.cc
-#    TestSingleRunController.cc
+    TestSingleRunController.cc
     UseCatch.cc
 )
 
