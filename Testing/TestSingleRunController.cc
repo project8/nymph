@@ -18,27 +18,11 @@
 LOGGER( testlog, "TestSingleRunController" );
 
 
-namespace Nymph
-{
-    class SRCRevealer : public SingleRunController
-    {
-        public:
-            using SingleRunController::SingleRunController;
-
-            void StartMultiThreadedRun( const ProcessorToolbox& procTB )
-            {
-                return SingleRunController::StartMultiThreadedRun( procTB );
-            }
-
-    };
-}
-
-
 TEST_CASE( "single_run_controller" )
 {
     using namespace Nymph;
 
-    SRCRevealer controller;
+    SingleRunController controller;
     ProcessorToolbox toolbox;
 
     SECTION( "DoRun" )

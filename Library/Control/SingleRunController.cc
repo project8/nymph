@@ -34,14 +34,14 @@ namespace Nymph
     {
         LPROG( contlog, "Configuring run control" );
 
+        Controller::Configure( node );
 
+        return;
     }
 
     void SingleRunController::Run( const ProcessorToolbox& procTB )
     {
-        // can throw scarab::base_exception
-
-        StartMultiThreadedRun( procTB );
+        StartRun( procTB );
 
         if( fDoRunThread.joinable() ) 
         {
@@ -53,7 +53,7 @@ namespace Nymph
         return;
     }
 
-    void SingleRunController::StartMultiThreadedRun( const ProcessorToolbox& procTB )
+    void SingleRunController::StartRun( const ProcessorToolbox& procTB )
     {
         if( fDoRunThread.joinable() )
         {
@@ -197,25 +197,5 @@ namespace Nymph
 
         return;
     }
-
-//    void SingleRunController::do_cancellation( int code )
-//    {
-//    }
-
-/*
-    void SharedControl::Reset()
-    {
-        std::unique_lock< std::mutex > lock( fMutex );
-        LDEBUG( contlog, "Reseting ControlAccess" );
-        fBreakFlag = false;
-        fCanceledFlag = false;
-        fCycleTimeMS = 500;
-//        fNActiveThreads = 0;
-        return;
-    }
-*/
-
-
-
 
 } /* namespace Nymph */
