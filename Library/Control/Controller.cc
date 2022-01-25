@@ -21,17 +21,24 @@ namespace Nymph
     Controller::Controller() :
             ControllerInterface(),
             scarab::cancelable(),
+            fCycleTimeMS( 500 ),
             fMutex(),
             fCondVarContinue(),
             fCondVarBreak(),
-            fBreakFlag( false ),
-            fCycleTimeMS( 500 )
+            fBreakFlag( false )
     {
         ControlAccess::get_instance()->SetControl( this );
     }
 
     Controller::~Controller()
     {}
+
+    void Controller::Configure( const scarab::param_node& node )
+    {
+        SetCycleTimeMS( node.get_value( "cycle-time-ms", fCycleTimeMS ) );
+
+        return;
+    }
 
     bool Controller::WaitToContinue()
     {

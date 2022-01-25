@@ -11,6 +11,8 @@
 #include "Exception.hh"
 #include "QuitChain.hh"
 
+#include "param_codec.hh"
+
 #include <thread>
 
 #include "catch.hpp"
@@ -52,18 +54,30 @@ TEST_CASE( "controller", "[control]" )
 
     SECTION( "Basics" )
     {
+        control.SetCycleTimeMS( 100 );
+        REQUIRE( control.GetCycleTimeMS() == 100 );
+        control.SetCycleTimeMS( 500 );
+
         REQUIRE_NOTHROW( control.Mutex().lock() );
         REQUIRE_NOTHROW( control.Mutex().unlock() );
 
         REQUIRE_FALSE( control.GetBreakFlag() );
 
-        control.SetCycleTimeMS( 100 );
-        REQUIRE( control.GetCycleTimeMS() == 100 );
-        control.SetCycleTimeMS( 500 );
-
         REQUIRE_FALSE( control.IsCanceled() );
         control.Cancel( 5 );
         REQUIRE( control.IsCanceled() );
+    }
+
+    SECTION( "Configure" )
+    {
+        std::string config_str(
+            "controller:\n"
+            "  cycle-time-ms: 10\n"        );
+
+        scarab::param_translator translator;
+        auto config = translator.read_string( config_str, "yaml" );
+
+        REQUIRE_NOTHROW( control.Configure( config->as_node() ) );
     }
 
     SECTION( "WaitToContinue" )

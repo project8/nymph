@@ -13,6 +13,7 @@
 #include "MemberVariable.hh"
 
 #include "cancelable.hh"
+#include "param.hh"
 
 #include <condition_variable>
 #include <mutex>
@@ -26,6 +27,11 @@ namespace Nymph
             Controller();
             virtual ~Controller();
 
+        public:
+            /// Configure the controller
+            void Configure( const scarab::param_node& node );
+
+            MEMVAR( unsigned, CycleTimeMS );
 
         public:   
             /// Use this to make a thread wait on a break
@@ -63,7 +69,6 @@ namespace Nymph
             MEMVAR_REF_MUTABLE( std::condition_variable, CondVarContinue );
             MEMVAR_REF_MUTABLE( std::condition_variable, CondVarBreak );
             MEMVAR_NOSET( bool, BreakFlag );
-            MEMVAR( unsigned, CycleTimeMS );
             //MEMVAR_SHARED_PTR_CONST( ReturnBufferBase, ReturnPtr );
 
         protected:
