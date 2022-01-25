@@ -71,7 +71,6 @@ namespace Nymph
                  <li>processor name -- add a processor to the run queue, or </li>
                  <li>array of processor names -- add a group of processors to the run queue.</li>
              </ul>
-             In single-threaded mode, all processors will be run sequentially, in the order specified.
          </li>
      </ul>
     */

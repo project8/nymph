@@ -22,6 +22,18 @@ namespace Nymph
 
     struct ProcessorException : virtual public Exception {};
 
+    /*!
+     @class ConfigException
+     @author N. S. Oblath
+
+     @brief An exception class for use with errors that occur during configuration.
+
+     @details
+
+     The param_node of the configuration in question can be attached to the exception using the constructor 
+     or the function Config().  
+
+    */
     class ConfigException : public scarab::typed_exception< ConfigException >
     {
         public:

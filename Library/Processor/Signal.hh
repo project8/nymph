@@ -25,17 +25,20 @@ namespace Nymph
     template< typename... XArgs >
     class Slot;
 
-    /// A Signal object may call multiple slots with the
-    /// same signature. You can connect functions to the Signal
-    /// that will be called when the emit() method on the
-    /// Signal object is invoked. Any argument passed to emit()
-    /// will be passed to the given functions.
+    /*!
+     @class Signal
+     @author N. S. Oblath
+
+     @brief A signal object may call multiple slots with the same signature.  You can connect functions to the Signal 
+     that will be called when the `emit()` method on the Signal object is invoked.  Any argument passed to `emit()`
+     will be passed to the given functions.
+
+    */
     template< typename... XArgs >
     class Signal : public SignalBase
     {
         public:
             using signature = void( XArgs... );
-//            using full_signature = void( ControlAccessPtr, XArgs... );
 
         public:
             /// Unowned signal
@@ -52,9 +55,6 @@ namespace Nymph
             // calls all connected functions
             void Emit( XArgs... args );
             void operator()( XArgs... args );
-
-            // TODO: remove this  // 12/8/21, NSO: why remove this?  // NSO: oh, because we no longer need to pass ControlAccess between signals and slots before they're used
-            //MEMVAR_SHARED_PTR( ControlAccess, ControlAcc );
     };
 
 
@@ -144,10 +144,6 @@ namespace Nymph
             THROW_EXCEPT_HERE( ConnectionException() << "Trying to connect signal <" << fName << "> to slot <" << slot->Name() << ">, but cannot make the connection:\n" <<
                     "\tUnable to cast from SlotBase to this signal's derived type.\n" << 
                     "\tArgument types do not match" );
-
-            //BOOST_THROW_EXCEPTION( ConnectionException() << "Trying to connect signal <" << fName << "> to slot <" << slot->Name() << ">, but cannot make the connection:\n" <<
-            //        "\tUnable to cast from SlotBase to this signal's derived type.\n" << 
-            //        "\tArgument types do not match" << eom );
         }
 /*
         Connection connection;

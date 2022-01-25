@@ -25,12 +25,18 @@ namespace Nymph
     LOGGER(slotlog, "Slot");
 
     // Type XOwner is the class that owns the Slot object
+    /*!
+     @class Slot
+     @author N. S. Oblath
+
+     @brief A Slot is connected to and called by a Signal with the same signature.
+
+    */
     template< typename... XArgs >
     class Slot : public SlotBase
     {
         public:
             using signature = void( XArgs... );
-//            using full_signature = void( ControlAccessPtr, XArgs... );
             using signal_list = std::initializer_list< std::string >;
 
         public:
@@ -57,18 +63,14 @@ namespace Nymph
 
             void ConnectTo( SignalBase* signal, int group = -1 );
 
-            /// execute fFunction without using a ControlAccess object
+            /// execute fFunction
             void operator()( XArgs... args );
-
-            /// execute fFunction with a ControlAccess object
-//            void operator()( ControlAccessPtr access, XArgs... args );
 
             MEMVAR_REF( boost::function< signature >, Function );
 
             MEMVAR( bool, DoBreakpoint );
 
         protected:
-//            void SlotFuncWrapper( ControlAccessPtr access, XArgs... args );
             void SlotFuncWrapper( XArgs... args );
     };
 

@@ -43,6 +43,13 @@ namespace Nymph
     };
     */
 
+    /*!
+     @class Exception
+     @author N. S. Oblath
+
+     @brief Basic exception class for use in Nymph and derived packages
+
+    */
     class Exception : public scarab::typed_exception< Exception >
     {
         public:

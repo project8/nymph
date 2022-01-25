@@ -21,6 +21,13 @@
 namespace Nymph
 {
 
+    /*!
+     @class Controller
+     @author N. S. Oblath
+
+     @brief Base class for Controller classes, with basic break/continue/cancel functionality
+
+    */
     class Controller : public ControllerInterface, public scarab::cancelable
     {
         public:

@@ -14,6 +14,13 @@
 namespace Nymph
 {
 
+    /*!
+     @class ControllerInterface
+     @author N. S. Oblath
+
+     @brief Interface for controller classes: break/continue/cancel functionality
+
+    */
     class ControllerInterface
     {
         public:

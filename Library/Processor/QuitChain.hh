@@ -12,7 +12,14 @@
 
 namespace Nymph
 {
-    /// QuitChain is used to communicate within a Chain that the chain should stop running from the top (i.e. from the PrimaryProcessor)
+    /*!
+     @class QuitChain
+     @author N. S. Oblath
+
+     @brief Thrown from a Processor chain to communicate within the chain that the chain 
+     should stop running from the top (i.e. from the Primary Processor)
+
+    */
     class QuitChain : public scarab::typed_exception< QuitChain >
     {
         public:
