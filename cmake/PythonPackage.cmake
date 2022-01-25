@@ -6,6 +6,8 @@ include (PackageBuilder)
 
 # macro to get python develop dependencies
 # TODO for now this is a copy/paste of what I'm already doing, should make it sarter
+# This is currently just a copy of what B. H. LaRoque created will need to be modified
+
 macro( python_package_find_python VALUE )
     execute_process(COMMAND python${VALUE}-config --includes COMMAND awk "{print substr($1,3)}" OUTPUT_VARIABLE PYTHON_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
     execute_process(COMMAND python${VALUE}-config --ldflags COMMAND awk "{print substr($1,3)\"/lib\"substr($2,3)}" OUTPUT_VARIABLE PYTHON_LIBRARY_base OUTPUT_STRIP_TRAILING_WHITESPACE)

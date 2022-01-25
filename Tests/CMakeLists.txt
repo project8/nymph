@@ -1,28 +1,28 @@
-# CMakeLists for Nymph/Executables/Validation
+# CMakeLists for Nymph/Tests
 # Author: N. Oblath
 
 ############################
 # Config files
 ############################
 
-set (VALIDATION_CONFIGFILES
+set (TESTS_CONFIGFILES
     ConfigFiles/TestConfigurator.json
 )
 
-pbuilder_install_config (${VALIDATION_CONFIGFILES})
+pbuilder_install_config (${TESTS_CONFIGFILES})
 
 
 ############################
-# NymphValidation library files
+# NymphTests library files
 ############################
 
-set (VALIDATION_HEADERFILES
+set (TESTS_HEADERFILES
     KTTestConfigurable.hh
     KTTestCuts.hh
     KTTestProcessor.hh
 )
 
-set (VALIDATION_SOURCEFILES
+set (TEST_SOURCEFILES
     KTTestConfigurable.cc
     KTTestCuts.cc
     KTTestProcessor.cc
@@ -33,7 +33,7 @@ set( LIB_DEPENDENCIES
 )
 
 ############################
-# NymphValidation library 
+# NymphTests library 
 ############################
 
 include_directories( BEFORE 
@@ -41,17 +41,17 @@ include_directories( BEFORE
 )
 
 pbuilder_library( 
-    TARGET NymphValidation 
-    SOURCES ${VALIDATION_SOURCEFILES}
+    TARGET NymphTests
+    SOURCES ${TEST_SOURCEFILES}
     PROJECT_LIBRARIES ${LIB_DEPENDENCIES}
 )
 
 pbuilder_component_install_and_export( 
-    COMPONENT Validation
-    LIBTARGETS NymphValidation
+    COMPONENT Tests
+    LIBTARGETS NymphTests
 )
 
-pbuilder_install_headers( ${VALIDATION_HEADERFILES} )
+pbuilder_install_headers( ${TESTS_HEADERFILES} )
 
 
 ############################

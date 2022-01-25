@@ -88,6 +88,8 @@ set( NYMPH_SOURCEFILES
     ${APPL_DIR}/KTThroughputProfiler.cc
 )
 
+
+## TODO - these need to be changed for python package
 #set( NYMPH_PY_HEADERFILES
 #    ${DATA_DIR}/KTDataPy.hh
 #    ${PROC_DIR}/KTProcessorPy.hh
