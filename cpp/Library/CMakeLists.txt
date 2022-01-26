@@ -1,7 +1,5 @@
-# CMakeLists for Nymph/Library
-# Author: N. Oblath
-
-include( PythonPackage )
+# CMakeLists for Nymph/cpp/Library
+# Author: N.S. Oblath
 
 set( UTIL_DIR Utility )
 set( DATA_DIR Data )
@@ -9,7 +7,31 @@ set( PROC_DIR Processor )
 set( IO_DIR IO )
 set( APPL_DIR Application )
 
+include_directories( BEFORE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/${UTIL_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/${DATA_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/${PROC_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/${IO_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/${APPL_DIR}
+)
+
 set( NYMPH_HEADERFILES
+    ${UTIL_DIR}/Exception.hh
+    ${UTIL_DIR}/MemberVariable.hh
+
+    ${DATA_DIR}/Data.hh
+    ${DATA_DIR}/DataFrame.hh
+    
+    ${PROC_DIR}/ControlAccess.hh
+    ${PROC_DIR}/PrimaryProcessor.hh
+    ${PROC_DIR}/Processor.hh
+    ${PROC_DIR}/ProcessorToolbox.hh
+    ${PROC_DIR}/QuitThread.hh
+    ${PROC_DIR}/ReturnBuffer.hh
+    ${PROC_DIR}/SignalSlotBase.hh
+
+# Below are the v1 Library files
+
 #    ${UTIL_DIR}/KTCacheDirectory.hh
 #    ${UTIL_DIR}/KTConcurrentQueue.hh
 #    ${UTIL_DIR}/KTConfigurable.hh
@@ -52,11 +74,23 @@ set( NYMPH_HEADERFILES
 #    ${APPL_DIR}/KTProcessorToolbox.hh
 #    ${APPL_DIR}/KTRunNymph.hh
 #    ${APPL_DIR}/KTThroughputProfiler.hh
-    ${UTIL_DIR}/Exception.hh
-    ${UTIL_DIR}/MemberVariable.hh
 )
 
 set( NYMPH_SOURCEFILES
+    ${UTIL_DIR}/Exception.cc
+
+    ${DATA_DIR}/Data.cc
+    ${DATA_DIR}/DataFrame.cc
+    
+    ${PROC_DIR}/ControlAccess.cc
+    ${PROC_DIR}/PrimaryProcessor.cc
+    ${PROC_DIR}/Processor.cc
+    ${PROC_DIR}/ProcessorToolbox.cc
+    ${PROC_DIR}/ReturnBuffer.cc
+    ${PROC_DIR}/SignalSlotBase.cc
+
+# Below are the v1 Library files
+
 #    ${UTIL_DIR}/KTCacheDirectory.cc
 #    ${UTIL_DIR}/KTConfigurable.cc
 #    ${UTIL_DIR}/KTDirectory.cc
@@ -86,36 +120,20 @@ set( NYMPH_SOURCEFILES
 #    ${APPL_DIR}/KTProcessorToolbox.cc
 #    ${APPL_DIR}/KTRunNymph.cc
 #    ${APPL_DIR}/KTThroughputProfiler.cc
-    ${UTIL_DIR}/Exception.cc
 )
 
-# Python binding headers
-set( NYMPH_PYBINDING_HEADERFILES
-    #${UTIL_DIR}/KTConfigurablePybind.hh
-    ${UTIL_DIR}/KTParamPybind.hh
-    ${PROC_DIR}/KTProcessorPybind.hh
-    ${PROC_DIR}/KTPyProcessor.hh
-)
-
-# Python bindings
-set( NYMPH_PYBINDING_SOURCEFILES
-    ${PROC_DIR}/KTProcessorPybind.cc
-    NymphPybind.cc
-)
 
 ##################################################
 
-pbuilder_library( Nymph NYMPH_SOURCEFILES "" )
+pbuilder_library( 
+    TARGET Nymph 
+    SOURCES ${NYMPH_SOURCEFILES}
+    PUBLIC_EXTERNAL_LIBRARIES ${PUBLIC_EXT_LIBS}
+)
+
+pbuilder_component_install_and_export( 
+    COMPONENT Library
+    LIBTARGETS Nymph
+)
+
 pbuilder_install_headers( ${NYMPH_HEADERFILES} )
-
-if( Nymph_ENABLE_PYTHON )
-    set( LIB_DEPENDENCIES Nymph )
-
-    configure_file( AddLibPythonPath.sh.in AddLibPythonPath.sh @ONLY)
-    install( FILES ${CMAKE_CURRENT_BINARY_DIR}/AddLibPythonPath.sh DESTINATION ${BIN_INSTALL_DIR} )
-    
-    pybind11_add_module( py_nymph MODULE ${NYMPH_PYBINDING_SOURCEFILES} )
-    target_link_libraries( py_nymph PRIVATE ${LIB_DEPENDENCIES} ${EXTERNAL_LIBRARIES} )
-    pbuilder_install_libraries( py_nymph )
-    pbuilder_install_headers( ${NYMPH_PYBINDING_HEADERFILES} )
-endif( Nymph_ENABLE_PYTHON )
