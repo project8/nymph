@@ -86,7 +86,7 @@ namespace Nymph
             void RegisterSignal( std::string name, SignalBase* signal );
 
             /// Register a slot object with this processor
-            void RegisterSlot( std::string name, SlotBase* slot, std::initializer_list< std::string > signals = {} );
+            void RegisterSlot( std::string name, SlotBase* slot );
 
             bool GetDoBreakpoint( const std::string& signalName );
             void SetDoBreakpoint( const std::string& signalName, bool flag );
