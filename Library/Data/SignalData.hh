@@ -38,7 +38,7 @@ namespace Nymph
 
      That's it!
     */
-    typedef KTSignal< DataFrame > SignalData;
+    typedef Signal< DataFrame > SignalData;
 
 } /* namespace Nymph */
 

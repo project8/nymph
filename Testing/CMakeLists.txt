@@ -23,6 +23,7 @@ set( testing_SOURCES
     TestProcessorToolbox.cc
     TestSignalSlot.cc
     TestSingleRunController.cc
+    TestSlotData.cc
     UseCatch.cc
 )
 
