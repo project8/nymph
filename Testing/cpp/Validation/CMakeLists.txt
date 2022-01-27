@@ -1,4 +1,4 @@
-# CMakeLists for Nymph/Executables/Validation
+# CMakeLists for Nymph/Testing/cpp/Validation
 # Author: N. Oblath
 
 ############################

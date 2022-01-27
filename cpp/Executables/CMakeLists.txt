@@ -1,4 +1,4 @@
-# CMakeLists for Nymph/Executables/Main
+# CMakeLists for Nymph/cpp/Executables
 # Author: N. Oblath
 
 if( NOT Nymph_AS_SUBMODULE )

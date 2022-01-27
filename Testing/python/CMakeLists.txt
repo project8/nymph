@@ -1,31 +1,31 @@
-# CMakeLists for Nymph/Executables/Validation
+# CMakeLists for Nymph/Testing/python
 # Author: N. Oblath
 
 ############################
 # Config files
 ############################
 
-set (VALIDATION_CONFIGFILES
+set (TESTING_CONFIGFILES
     ConfigFiles/TestConfigurator.json
 )
 
-pbuilder_install_config (${VALIDATION_CONFIGFILES})
+pbuilder_install_config (${TESTING_CONFIGFILES})
 
 
 ############################
-# NymphValidation library files
+# NymphPythonTesting library files
 ############################
 
-set (VALIDATION_HEADERFILES
-    KTTestConfigurable.hh
-    KTTestCuts.hh
-    KTTestProcessor.hh
+set (PYTHONTESTING_HEADERFILES
+    KTPyTestClass.hh
+    KTPyTestClassPybind.hh
+    KTTestPythonBasics.hh
 )
 
-set (VALIDATION_SOURCEFILES
-    KTTestConfigurable.cc
-    KTTestCuts.cc
-    KTTestProcessor.cc
+set (PYTHONTESTING_SOURCEFILES
+    KTPyTestClass.cc
+    KTPyTestClassPybind.cc
+    KTTestPythonBasics.cc
 )
 
 set( LIB_DEPENDENCIES
@@ -33,7 +33,7 @@ set( LIB_DEPENDENCIES
 )
 
 ############################
-# NymphValidation library 
+# NymphPythonTesting library 
 ############################
 
 include_directories( BEFORE 
@@ -41,17 +41,17 @@ include_directories( BEFORE
 )
 
 pbuilder_library( 
-    TARGET NymphValidation 
-    SOURCES ${VALIDATION_SOURCEFILES}
+    TARGET NymphPythonTesting
+    SOURCES ${PYTHONTESTING_SOURCEFILES}
     PROJECT_LIBRARIES ${LIB_DEPENDENCIES}
 )
 
 pbuilder_component_install_and_export( 
-    COMPONENT Validation
-    LIBTARGETS NymphValidation
+    COMPONENT PythonTesting
+    LIBTARGETS NymphPythonTesting
 )
 
-pbuilder_install_headers( ${VALIDATION_HEADERFILES} )
+pbuilder_install_headers( ${PYTHONTESTING_HEADERFILES} )
 
 
 ############################
@@ -59,33 +59,34 @@ pbuilder_install_headers( ${VALIDATION_HEADERFILES} )
 ############################
 
 set( LIB_DEPENDENCIES
-    NymphValidation
+    NymphPythonTesting
 )
 
-set( TEST_SOURCES
-    TestApplication.cc
-    TestApplyCut.cc
-    TestCacheDirectory.cc
-    TestCut.cc
-    TestCutFilter.cc
-    TestLogger.cc
-    TestPrintData.cc
-    TestSignalsAndSlots.cc
-    TestThroughputProfiler.cc
-)
+#
+#set( TEST_SOURCES
+#    TestApplication.cc
+#    TestApplyCut.cc
+#    TestCacheDirectory.cc
+#    TestCut.cc
+#    TestCutFilter.cc
+#    TestLogger.cc
+#    TestPrintData.cc
+#    TestSignalsAndSlots.cc
+#    TestThroughputProfiler.cc
+#)
 
-pbuilder_executables( TEST_PROGRAMS LIB_DEPENDENCIES )
+#pbuilder_executables( TEST_PROGRAMS LIB_DEPENDENCIES )
 
-set( TEST_PROGRAMS )
-pbuilder_executables( 
-    SOURCES ${TEST_SOURCES}
-    TARGETS_VAR TEST_PROGRAMS
-    PROJECT_LIBRARIES ${LIB_DEPENDENCIES}
-    PUBLIC_EXTERNAL_LIBRARIES ${Nymph_EXE_LIBRARIES}
+#set( TEST_PROGRAMS )
+#pbuilder_executables( 
+#    SOURCES ${TEST_SOURCES}
+#    TARGETS_VAR TEST_PROGRAMS
+#    PROJECT_LIBRARIES ${LIB_DEPENDENCIES}
+#    PUBLIC_EXTERNAL_LIBRARIES ${Nymph_EXE_LIBRARIES}
 #        PRIVATE_EXTERNAL_LIBRARIES ${PRIVATE_EXT_LIBS}
-)
+#)
 
-pbuilder_component_install_and_export( 
-    COMPONENT Validation
-    EXETARGETS ${TEST_PROGRAMS}
-)
+#pbuilder_component_install_and_export( 
+#    COMPONENT Validation
+#    EXETARGETS ${TEST_PROGRAMS}
+#)

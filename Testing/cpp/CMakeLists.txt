@@ -1,4 +1,4 @@
-# CMakeLists.txt for Nymph/Testing
+# CMakeLists.txt for Nymph/cpp/Testing
 # Author: N.S. Oblath
 # Created: Aug 23, 2019
 
