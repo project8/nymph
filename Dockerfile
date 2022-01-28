@@ -27,7 +27,7 @@ COPY cmake /tmp_source/cmake
 COPY python /tmp_source/python
 COPY cpp /tmp_source/cpp 
 #COPY Executables /tmp_source/cpp/Executables
-#COPY External /tmp_source/External
+COPY External /tmp_source/External
 #COPY Library /tmp_source/cpp/Library
 COPY Scarab /tmp_source/Scarab
 COPY Testing /tmp_source/Testing
