@@ -12,10 +12,6 @@
 
 #include "DataPresent.hh"
 
-//#include "KTException.hh"
-//#include "KTNymphSignals.hh"
-//#include "KTProcessor.hh"
-
 namespace Nymph
 {
     template< class... XTypes >

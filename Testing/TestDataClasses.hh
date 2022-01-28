@@ -11,7 +11,6 @@
 #include "Data.hh"
 #include "MemberVariable.hh"
 
-#include <iostream>
 namespace Nymph
 {
     class TestData1 : public Data
@@ -21,9 +20,7 @@ namespace Nymph
                     Data(),
                     fIValue1( 0 ),
                     fIValue2( 5 )
-            {
-                std::cerr << "in test data 1 constuctor" << std::endl;
-            }
+            {}
 
             virtual ~TestData1()
             {}

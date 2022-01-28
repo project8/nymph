@@ -127,7 +127,6 @@ namespace Nymph
     Slot< XArgs... >::Slot( const std::string& name, const boost::function< signature >& func ) :
             SlotBase( name ),
             fFunction( func ),
-            //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint( false )
     {}
 
@@ -136,7 +135,6 @@ namespace Nymph
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) ) :
             SlotBase( name ),
             fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);} ),
-            //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint(false)
     {
         owner->RegisterSlot( name, this );
@@ -147,7 +145,6 @@ namespace Nymph
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) const ) :
             SlotBase( name ),
             fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);}  ),
-            //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint(false)
     {
         owner->RegisterSlot( name, this );
@@ -158,7 +155,6 @@ namespace Nymph
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, const boost::function< signature >& func ) :
             SlotBase( name ),
             fFunction( func ),
-            //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint(false)
     {
         owner->RegisterSlot( name, this );
@@ -169,7 +165,6 @@ namespace Nymph
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ) ) :
             SlotBase( name ),
             fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
-            //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint(false)
     {
         owner->RegisterSlot( name, this );
@@ -180,7 +175,6 @@ namespace Nymph
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ) const ) :
             SlotBase( name ),
             fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
-            //fThreadRef( std::make_shared< ThreadReference >() ),
             fDoBreakpoint(false)
     {
         owner->RegisterSlot( name, this );
