@@ -17,30 +17,30 @@ namespace Nymph
     template< class... NoOtherDataTypes >
     struct DataPresentHelper
     {
-        static bool DataPresent( const DataFrame& );
+        static bool DataPresent( const DataHandle& );
     };
 
     template< class XDataType, class... XOtherDataTypes >
     struct DataPresentHelper< XDataType, XOtherDataTypes... >
     {
-        static bool DataPresent( const DataFrame& frame );
+        static bool DataPresent( const DataHandle& handle );
     };
 
     template< class... NoOtherDataTypes >
-    bool DataPresentHelper< NoOtherDataTypes... >::DataPresent( const DataFrame& )
+    bool DataPresentHelper< NoOtherDataTypes... >::DataPresent( const DataHandle& )
     {
         return true;
     }
 
     template< class XDataType, class... XOtherDataTypes >
-    bool DataPresentHelper< XDataType, XOtherDataTypes... >::DataPresent( const DataFrame& frame )
+    bool DataPresentHelper< XDataType, XOtherDataTypes... >::DataPresent( const DataHandle& handle )
     {
-        if( ! frame.Has< XDataType >() )
+        if( ! handle->Has< XDataType >() )
         {
             LERROR( dplog_h, "Data not found with type <" << scarab::type(XDataType()) << ">" );
             return false;
         }
-        return DataPresentHelper< XOtherDataTypes... >::DataPresent( frame );
+        return DataPresentHelper< XOtherDataTypes... >::DataPresent( handle );
     }
 
 } /* namespace Nymph */

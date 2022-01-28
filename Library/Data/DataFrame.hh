@@ -29,6 +29,12 @@ namespace Nymph
             ~DataFrameException() = default;
     };
 
+    // forward declare so we can define DataHandle here
+    class DataFrame;
+
+    /// Pointer object to use for passing between Processors
+    typedef std::shared_ptr< DataFrame > DataHandle;
+
     /*!
      @class DataFrame
 

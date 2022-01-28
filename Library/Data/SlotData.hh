@@ -36,7 +36,7 @@ namespace Nymph
      @class SlotData
      @author N. S. Oblath
 
-     @brief Creates a slot that takes a DataFrame object as the argument; the function that gets called should take 0 or more DataType&'s as its argument.
+     @brief Creates a slot that takes a DataHandle as the argument; the function that gets called should take 0 or more DataType&'s as its argument.
 
      @details
      Usage:
@@ -53,7 +53,7 @@ namespace Nymph
      Also optionally, a signal to be emitted after the return of the member function can be specified as the last argument.
     */
     template< template<class...> class XInList, template<class...> class XOutList, class... XInTypes, class... XOutTypes >
-    class SlotData< XInList<XInTypes...>, XOutList<XOutTypes...> > : public Slot< DataFrame >
+    class SlotData< XInList<XInTypes...>, XOutList<XOutTypes...> > : public Slot< DataHandle >
     {
         public:
             template< class XFuncOwnerType >
@@ -61,16 +61,16 @@ namespace Nymph
 
         public:
             /// Constructor for the case where the processor has the function that will be called by the slot
-            template< class XFuncOwnerType >
-            SlotData( const std::string& name, XFuncOwnerType* owner, Signature< XFuncOwnerType > func, SignalData* signalPtr = nullptr );
+            template< class XOwnerType >
+            SlotData( const std::string& name, XOwnerType* owner, Signature< XOwnerType > func, SignalData* signalPtr = nullptr );
 
             /// Constructor for the case where the processor has the function that will be called by the slot
             //template< class XFuncOwnerType, class... XFuncDataTypes >
             //KTSlotData( const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& ) );
 
             /// Constructor for the case where the processor and the object with the function that will be called are different
-            template< class XFuncOwnerType >
-            SlotData( const std::string& name, Processor* proc, XFuncOwnerType* owner, Signature< XFuncOwnerType > func, SignalData* signalPtr = nullptr );
+            template< class XSlotOwnerType, class XFuncOwnerType >
+            SlotData( const std::string& name, XSlotOwnerType* proc, XFuncOwnerType* inst, Signature< XFuncOwnerType > func, SignalData* signalPtr = nullptr );
 
             /// Constructor for the case where the processor and the object with the function that will be called are different
             //template< class XFuncOwnerType, class... XFuncDataTypes >
@@ -78,17 +78,59 @@ namespace Nymph
 
             virtual ~SlotData();
 
-            void operator()( DataFrame frame );
+            void operator()( DataHandle handle );
 
         protected:
             template< class... XDataTypes >
-            bool DataPresent( const DataFrame& frame ) const;
+            bool DataPresent( const DataHandle& handle ) const;
 
             //function_signature fFunc;
-            std::function< void (const XInTypes&..., XOutTypes&... ) > fFunc;
+            std::function< void (XInTypes&..., XOutTypes&... ) > fFunc;
 
             SignalData* fSignalPtr;
     };
+
+
+/*
+    template< template<class...> class XInList, template<class...> class XOutList, class... XInTypes >
+    class SlotData< XInList<XInTypes...>, XOutList<> > : public Slot< DataHandle >
+    {
+        public:
+            template< class XFuncOwnerType >
+            using Signature = void (XFuncOwnerType::*)( XInTypes&... );
+
+        public:
+            /// Constructor for the case where the processor has the function that will be called by the slot
+            template< class XOwnerType >
+            SlotData( const std::string& name, XOwnerType* owner, Signature< XOwnerType > func, SignalData* signalPtr = nullptr );
+
+            /// Constructor for the case where the processor has the function that will be called by the slot
+            //template< class XFuncOwnerType, class... XFuncDataTypes >
+            //KTSlotData( const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& ) );
+
+            /// Constructor for the case where the processor and the object with the function that will be called are different
+            template< class XSlotOwnerType, class XFuncOwnerType >
+            SlotData( const std::string& name, XSlotOwnerType* proc, XFuncOwnerType* inst, Signature< XFuncOwnerType > func, SignalData* signalPtr = nullptr );
+
+            /// Constructor for the case where the processor and the object with the function that will be called are different
+            //template< class XFuncOwnerType, class... XFuncDataTypes >
+            //KTSlotData( const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& ) );
+
+            virtual ~SlotData();
+
+            void operator()( DataHandle handle );
+
+        protected:
+            template< class... XDataTypes >
+            bool DataPresent( const DataHandle& handle ) const;
+
+            //function_signature fFunc;
+            std::function< void (XInTypes&... ) > fFunc;
+
+            SignalData* fSignalPtr;
+    };
+*/
+
 /*
     // partial specialization for no new data type
     template< class... XDataArgs >
@@ -174,10 +216,10 @@ namespace Nymph
     // KTSlotData
 
     template< template<class...> class XInList, template<class...> class XOutList, class... XInTypes, class... XOutTypes >
-    template< class XFuncOwnerType >
-    SlotData< XInList<XInTypes...>, XOutList<XOutTypes...> >::SlotData(const std::string& name, XFuncOwnerType* owner, SlotData< XInList<XInTypes...>, XOutList<XOutTypes...> >::Signature< XFuncOwnerType > func, SignalData* signalPtr ) :
-            Slot( name, this, &SlotData::operator() ),
-            fFunc( [func, owner]( XInTypes&... inArgs, XOutTypes&... outArgs ){ owner->func( inArgs..., outArgs... ); } ),
+    template< class XOwnerType >
+    SlotData< XInList<XInTypes...>, XOutList<XOutTypes...> >::SlotData(const std::string& name, XOwnerType* owner, SlotData< XInList<XInTypes...>, XOutList<XOutTypes...> >::Signature< XOwnerType > func, SignalData* signalPtr ) :
+            Slot( name, owner, this, &SlotData::operator() ),
+            fFunc( [func, owner]( XInTypes&... inArgs, XOutTypes&... outArgs ){ (owner->*func)( inArgs..., outArgs... ); } ),
             fSignalPtr( signalPtr )
     {
     }
@@ -192,10 +234,10 @@ namespace Nymph
     }
 */
     template< template<class...> class XInList, template<class...> class XOutList, class... XInTypes, class... XOutTypes >
-    template< class XFuncOwnerType >
-    SlotData< XInList<XInTypes...>, XOutList<XOutTypes...> >::SlotData(const std::string& name, Processor* proc, XFuncOwnerType* owner, SlotData< XInList<XInTypes...>, XOutList<XOutTypes...> >::Signature< XFuncOwnerType > func, SignalData* signalPtr ) :
-            Slot( name, proc, this, &SlotData::operator(), { signalPtr->Name()} ),
-            fFunc( [func, owner]( XInTypes&... inArgs, XOutTypes&... outArgs ){ owner->func( inArgs..., outArgs... ); } ),
+    template< class XSlotOwnerType, class XFuncOwnerType >
+    SlotData< XInList<XInTypes...>, XOutList<XOutTypes...> >::SlotData(const std::string& name, XSlotOwnerType* owner, XFuncOwnerType* inst, SlotData< XInList<XInTypes...>, XOutList<XOutTypes...> >::Signature< XFuncOwnerType > func, SignalData* signalPtr ) :
+            Slot( name, owner, this, &SlotData::operator() ),
+            fFunc( [func, inst]( XInTypes&... inArgs, XOutTypes&... outArgs ){ (inst->*func)( inArgs..., outArgs... ); } ),
             fSignalPtr( signalPtr )
     {
     }
@@ -215,12 +257,12 @@ namespace Nymph
     }
 
     template< template<class...> class XInList, template<class...> class XOutList, class... XInTypes, class... XOutTypes >
-    void SlotData< XInList<XInTypes...>, XOutList<XOutTypes...> >::operator()( DataFrame frame )
+    void SlotData< XInList<XInTypes...>, XOutList<XOutTypes...> >::operator()( DataHandle handle )
     {
         // Standard data slot pattern:
 
         // Check to ensure that the required data type is present
-        if( ! DataPresent< XInTypes... >( frame ) )
+        if( ! DataPresent< XInTypes... >( handle ) )
         {
             THROW_EXCEPT_HERE( Exception() << "Failed to find all of the necessary data types in slot <" << fName << ">. Aborting." );
             return;
@@ -229,7 +271,7 @@ namespace Nymph
         // Call the function
         try
         {
-            fFunc( frame.Get< XInTypes >()... , frame.Get< XOutTypes >()... );
+            fFunc( handle->Get< XInTypes >()... , handle->Get< XOutTypes >()... );
         }
         catch( scarab::base_exception& )
         {
@@ -240,17 +282,110 @@ namespace Nymph
         // If there's a signal pointer, emit the signal
         if( fSignalPtr )
         {
-            (*fSignalPtr)( frame );
+            (*fSignalPtr)( handle );
         }
         return;
     }
 
     template< template<class...> class XInList, template<class...> class XOutList, class... XInTypes, class... XOutTypes >
     template< class... XDataTypes >
-    bool SlotData< XInList<XInTypes...>, XOutList<XOutTypes...> >::DataPresent( const DataFrame& frame ) const
+    bool SlotData< XInList<XInTypes...>, XOutList<XOutTypes...> >::DataPresent( const DataHandle& handle ) const
     {
-        return DataPresentHelper< XDataTypes... >::DataPresent( frame );
+        return DataPresentHelper< XDataTypes... >::DataPresent( handle );
     }
+
+
+
+
+
+
+    // KTSlotData
+    // No output types
+/*
+    template< template<class...> class XInList, template<class...> class XOutList, class... XInTypes >
+    template< class XOwnerType >
+    SlotData< XInList<XInTypes...>, XOutList<> >::SlotData(const std::string& name, XOwnerType* owner, SlotData< XInList<XInTypes...>, XOutList<> >::Signature< XOwnerType > func, SignalData* signalPtr ) :
+            Slot( name, owner, this, &SlotData::operator() ),
+            fFunc( [func, owner]( XInTypes&... inArgs ){ (owner->*func)( inArgs... ); } ),
+            fSignalPtr( signalPtr )
+    {
+    }
+/*
+    template< class XReturnType, class... XDataTypes >
+    template< class XFuncOwnerType, class... XFuncDataTypes >
+    KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& )) :
+            KTSlot( name, owner, this, &KTSlotData::operator() ),
+            fFunc( [func, owner]( const XDataTypes&... args ){ return (owner->*func)(args...);} ),
+            fSignalPtr( nullptr )
+    {
+    }
+*//*
+    template< template<class...> class XInList, template<class...> class XOutList, class... XInTypes >
+    template< class XSlotOwnerType, class XFuncOwnerType >
+    SlotData< XInList<XInTypes...>, XOutList<> >::SlotData(const std::string& name, XSlotOwnerType* owner, XFuncOwnerType* inst, SlotData< XInList<XInTypes...>, XOutList<> >::Signature< XFuncOwnerType > func, SignalData* signalPtr ) :
+            Slot( name, owner, this, &SlotData::operator(), { signalPtr->Name()} ),
+            fFunc( [func, inst]( XInTypes&... inArgs ){ (inst->*func)( inArgs... ); } ),
+            fSignalPtr( signalPtr )
+    {
+    }
+/*
+    template< class XReturnType, class... XDataTypes >
+    template< class XFuncOwnerType, class... XFuncDataTypes >
+    KTSlotData< XReturnType, XDataTypes... >::KTSlotData(const std::string& name, KTProcessor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( const XFuncDataTypes&..., XReturnType& )) :
+            KTSlot( name, proc, this, &KTSlotData::operator() ),
+            fFunc( [func, owner]( const XDataTypes&... args ){return (owner->*func) (args... );} ),
+            fSignalPtr( nullptr )
+    {
+    }
+*//*
+    template< template<class...> class XInList, template<class...> class XOutList, class... XInTypes >
+    SlotData< XInList<XInTypes...>, XOutList<> >::~SlotData()
+    {
+    }
+
+    template< template<class...> class XInList, template<class...> class XOutList, class... XInTypes >
+    void SlotData< XInList<XInTypes...>, XOutList<> >::operator()( DataHandle handle )
+    {
+        // Standard data slot pattern:
+
+        // Check to ensure that the required data type is present
+        if( ! DataPresent< XInTypes... >( handle ) )
+        {
+            THROW_EXCEPT_HERE( Exception() << "Failed to find all of the necessary data types in slot <" << fName << ">. Aborting." );
+            return;
+        }
+
+        // Call the function
+        try
+        {
+            fFunc( handle->Get< XInTypes >()... );
+        }
+        catch( scarab::base_exception& )
+        {
+            THROW_NESTED_EXCEPT_HERE( Exception() << "Something went wrong in slot <" + fName + ">. Aborting." );
+            return;
+        }
+
+        // If there's a signal pointer, emit the signal
+        if( fSignalPtr )
+        {
+            (*fSignalPtr)( handle );
+        }
+        return;
+    }
+
+    template< template<class...> class XInList, template<class...> class XOutList, class... XInTypes >
+    template< class... XDataTypes >
+    bool SlotData< XInList<XInTypes...>, XOutList<> >::DataPresent( const DataHandle& handle ) const
+    {
+        return DataPresentHelper< XDataTypes... >::DataPresent( handle );
+    }
+*/
+
+
+
+
+
 
 /*
     // KTSlotData with no return type

@@ -38,7 +38,7 @@ namespace Nymph
 
      That's it!
     */
-    typedef Signal< DataFrame > SignalData;
+    typedef Signal< DataHandle > SignalData;
 
 } /* namespace Nymph */
 
