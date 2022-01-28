@@ -44,7 +44,10 @@ namespace Nymph
     {
         public:
             DataFrame();
+            DataFrame( const DataFrame& ) = delete;
             virtual ~DataFrame();
+
+            DataFrame& operator=( const DataFrame& ) = delete;
 
             /// Returns true if the frame has no data objects
             bool Empty() const;
