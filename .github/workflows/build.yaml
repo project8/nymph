@@ -96,7 +96,7 @@ jobs:
       - name: Run tests
         run: |
           cd build
-          Testing/cpp/RunTests
+          Testing/RunTests
 
 # For debugging
       - name: Setup tmate session
