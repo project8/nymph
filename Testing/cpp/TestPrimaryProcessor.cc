@@ -1,72 +1,55 @@
 /*
  * TestPrimaryProcessor.cc
  *
- *  Created on: May 4, 2017
+ *  Created on: Sept 15, 2019
  *      Author: N.S. Oblath
  */
 
-#include "KTTestPrimaryProcessor.hh"
-#include "KTTestProcessor.hh"
+#include "TestProcessorClasses.hh"
 
-#include "KTLogger.hh"
+#include "logger.hh"
 
-#include <boost/thread.hpp>
+#include "catch.hpp"
 
-using namespace Nymph;
+LOGGER( testlog, "TestPrimaryProcessor" );
 
-KTLOGGER( testpplog, "TestPrimaryProcessor" )
+REGISTER_PROCESSOR( Nymph, TestPrimaryProc, "test-primary" );
 
-int main()
+
+TEST_CASE( "primary_processor", "[primary_processor]" )
 {
+    using namespace Nymph;
 
+    SharedControl::get_instance()->Reset();
+
+    TestPrimaryProc tester;
+    REQUIRE_FALSE( tester.ExceptionPtr() );
+
+    // SignalNewValue test
+    tester.SetTestSelection( TestPrimaryProc::TestType::SignalNewValue );
+    tester.ConnectASlot( "value", tester, "value" );
+    tester();
+    REQUIRE( tester.GetValue() == tester.GetNewValue() );
+
+    // WaitTwoSec test
+    // -- no test implemented here right now --
+    //tester.SetTestSelection( TestPrimaryProc::TestType::WaitTwoSec );
+
+    // ThrowExcept test
+    tester.SetTestSelection( TestPrimaryProc::TestType::ThrowExcept );
+    REQUIRE_NOTHROW( tester() ); // the exception should be caught by operator() and stored as the exception ptr
+    REQUIRE( tester.ExceptionPtr() ); // the exception ptr should now be set
     try
     {
-        KTTestPrimaryProcessor tpp;
-        KTTestProcessorB tp;
-
-        KTINFO( testpplog, "Connecting the-signal to first-slot" );
-        tpp.ConnectASlot( "the-signal", &tp, "first-slot", 20 );
-
-        // setup to execute processors asynchronously
-        std::shared_ptr< KTThreadReference > exeThreadRef( std::make_shared< KTThreadReference >() );
-        exeThreadRef->Name() = std::string( "tpp" );
-
-        // run the thread
-        boost::condition_variable threadStartedCV;
-        boost::mutex threadStartedMutex;
-        bool threadStartedFlag = false;
-
-        boost::unique_lock< boost::mutex > threadStartedLock( threadStartedMutex );
-        boost::thread thread( [&](){ tpp( exeThreadRef, threadStartedCV, threadStartedFlag ); } );
-
-        while( ! threadStartedFlag )
-        {
-            threadStartedCV.wait( threadStartedLock );
-        }
-        KTDEBUG( testpplog, "Thread has started" );
-
-        // wait for a result to be set
-        exeThreadRef->GetDataPtrRetFuture().wait();
-
-        try
-        {
-            exeThreadRef->GetReturnValue();
-        }
-        catch( boost::exception& e )
-        {
-            exeThreadRef->SetCanceled( true );
-            KTERROR( testpplog, "An error occurred while running a processor: " << diagnostic_information( e ) );
-        }
-
-        thread.join();
-
-        KTINFO( testpplog, "Tests complete" );
+        std::rethrow_exception( tester.ExceptionPtr() );
     }
-    catch( boost::exception& e )
+    catch( const scarab::base_exception& e )
     {
-        KTERROR( testpplog, "Exception caught: " << diagnostic_information( e ) );
-        return -1;
+        PrintException( e );
+        REQUIRE( std::string(e.what()) == std::string("PrimaryProcessor test function: throw Exception") );
     }
+    
+    
 
-    return 0;
+    //REQUIRE( tester.ValueSig().GetControl() == &control );
 }

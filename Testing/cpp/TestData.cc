@@ -1,25 +1,28 @@
 /*
  * TestData.cc
  *
- *  Created on: Feb 10, 2018
- *      Author: obla999
+ *  Created on: Jan 6, 2022
+ *      Author: N.S. Oblath
  */
 
-#include "KTTestData.hh"
+#include "TestDataClasses.hh"
 
-#include "KTLogger.hh"
+#include "catch.hpp"
 
-using namespace Nymph;
 
-LOGGER(testlog, "TestData")
-
-int main()
+TEST_CASE( "data", "[data]" )
 {
+    using namespace Nymph;
 
-    KTCoreDataExt data;
-    KTTestDataExt& testData = data.Of< KTTestDataExt >();
-    KTINFO(testlog, data.Name());
-    KTINFO(testlog, testData.Name());
+    TestData1 data1;
+    REQUIRE( data1.GetIValue1() == 0 );
+    REQUIRE( data1.GetIValue2() == 5 );
 
-    return 0;
+    data1.SetIValue1( 50 );
+    REQUIRE( data1.GetIValue1() == 50 );
+
+    TestData2 data2;
+    REQUIRE( data2.GetDValue1() == Approx( 0.0 ) );
+    REQUIRE( data2.GetDValue2() == Approx( 10.0 ) );
+
 }
