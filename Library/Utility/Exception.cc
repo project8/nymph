@@ -22,53 +22,34 @@ namespace Nymph
         {
             std::rethrow_if_nested( e );
         }
-        catch(const Nymph::Exception& e)
+        catch(const scarab::base_exception& e)
+        {
+            PrintException( e, ++count );
+        }
+        catch(const std::exception& e)
         {
             PrintException( e, ++count );
         }
         return;
     }
 
-/*
-    BaseException::BaseException() :
-            std::exception(),
-            fAtFilename( "unknown" ),
-            fAtLineNumber( 0 ),
-            fBuffer()
-    {}
-
-    BaseException::~BaseException() noexcept
-    {}
-
-    const char* BaseException::where() const noexcept
+    void PrintException( const std::exception& e, unsigned count )
     {
+        std::string prefix = std::to_string(count) + ": ";
+        LINFO( exlog, prefix << e.what() );
         try
         {
-            fBuffer = fAtFilename + "(" + std::to_string(fAtLineNumber) + ")";
+            std::rethrow_if_nested( e );
         }
-        catch(const std::bad_alloc& e)
+        catch(const scarab::base_exception& e)
         {
-            fBuffer = fAtFilename;
+            PrintException( e, ++count );
         }
-        return fBuffer.c_str();
-    }
-*/
-/* removed for trying home-grown exceptions, 1/10/22
-    Exception::Exception() :
-            boost::exception(),
-            std::exception(),
-            fMsgBuffer()
-    {
-    }
-    Exception::Exception( const Exception& an_exception ) :
-            boost::exception( an_exception ),
-            std::exception( an_exception ),
-            fMsgBuffer( an_exception.fMsgBuffer )
-    {
+        catch(const std::exception& e)
+        {
+            PrintException( e, ++count );
+        }
+        return;
     }
 
-    Exception::~Exception() throw ()
-    {
-    }
-*/
 }
