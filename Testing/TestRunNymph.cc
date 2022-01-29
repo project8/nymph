@@ -19,16 +19,6 @@ TEST_CASE( "run_nymph" )
 {
     using namespace Nymph;
 
-    SECTION( "Missing ProcTB")
-    {
-
-    }
-
-    SECTION( "Missing Cont" )
-    {
-
-    }
-
     SECTION( "DoRun" )
     {
         std::string config_str(
