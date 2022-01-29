@@ -21,6 +21,7 @@ set( testing_SOURCES
     TestPrimaryProcessor.cc
     TestProcessor.cc
     TestProcessorToolbox.cc
+    TestRunNymph.cc
     TestSignalSlot.cc
     TestSingleRunController.cc
     TestSlotData.cc
