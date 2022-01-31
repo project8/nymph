@@ -1,34 +1,30 @@
 # CMakeLists for Nymph/Testing
 # Author: N.S. Oblath
 
-set( PY_DIR python )
-set( CPP_DIR cpp )
+set( PY_DIR Python )
+set( CPP_DIR Cpp )
 
 include_directories( BEFORE 
     ${CMAKE_CURRENT_SOURCE_DIR}/${PY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/${CPP_DIR}
 )
 
-set (pytesting_CONFIGFILES
-    ${PY_DIR}/ConfigFiles/TestConfigurator.json
-)
+#set (pytesting_CONFIGFILES
+#    ${PY_DIR}/ConfigFiles/TestConfigurator.json
+#)
 
-pbuilder_install_config (${pytesting_CONFIGFILES})
+#pbuilder_install_config (${pytesting_CONFIGFILES})
 
 set( testing_HEADERS
     ${CPP_DIR}/TestProc.hh
 )
 
 #set (pytesting_HEADERS
-    #${PY_DIR}/KTPyTestClass.hh
-    #${PY_DIR}/KTPyTestClassPybind.hh
-    #${PY_DIR}/KTTestPythonBasics.hh
+#  
 #)
 
 #set (pytesting_SOURCES
-    #${PY_DIR}/KTPyTestClass.cc
-    #e${PY_DIR}/KTPyTestClassPybind.cc
-    #${PY_DIR}/KTTestPythonBasics.cc
+#
 #)
 
 set( testing_SOURCES

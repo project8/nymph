@@ -24,8 +24,8 @@ RUN mkdir -p $NYMPH_BUILD_PREFIX &&\
 FROM nymph_common as nymph_done
 
 COPY cmake /tmp_source/cmake
-COPY python /tmp_source/python
-COPY cpp /tmp_source/cpp 
+COPY Python /tmp_source/Python
+COPY Cpp /tmp_source/Cpp 
 #COPY Executables /tmp_source/cpp/Executables
 COPY External /tmp_source/External
 #COPY Library /tmp_source/cpp/Library
