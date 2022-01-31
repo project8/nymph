@@ -18,6 +18,9 @@ namespace Nymph
         public:
             ReturnBufferBase();
             virtual ~ReturnBufferBase();
+
+            template< class... XArgs >
+            std::tuple< XArgs&... >& GetReturn();
     };
 
     template< typename... Args >
@@ -57,6 +60,16 @@ namespace Nymph
             return;
         }
     };
+
+
+    template< class... XArgs >
+    std::tuple< XArgs&... >& ReturnBufferBase::GetReturn()
+    {
+        ReturnBuffer< XArgs... >* typedBuffer = dynamic_cast< ReturnBuffer< XArgs... >* >(this);
+        if( ! typedBuffer ) THROW_EXCEPT_HERE( Exception() << "Invalid set of arguments for this return buffer" );
+        return typedBuffer->GetReturn();
+    }
+
 
 } /* namespace Nymph */
 

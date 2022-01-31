@@ -64,7 +64,7 @@ namespace Nymph
             virtual bool IsCanceled() const;
 
             /// Inititate a break
-            virtual void Break();
+            virtual void InitiateBreak();
 
             /// Reports whether control is at a breakpoint
             virtual bool IsAtBreak() const;

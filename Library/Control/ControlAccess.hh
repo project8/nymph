@@ -48,7 +48,10 @@ namespace Nymph
             virtual bool IsCanceled() const;
 
             /// Initiate a break
-            virtual void Break();
+            virtual void InitiateBreak();
+
+            template< typename... Args >
+            void Break( Args&... args ); // to be called by a working thread
 
             /// Reports whether control is at a breakpoint
             virtual bool IsAtBreak() const;
@@ -60,6 +63,11 @@ namespace Nymph
 
     };
 
+    template< class... XArgs >
+    void ControlAccess::Break( Args&... args )
+    {
+        
+    }
 
 
     class ReturnAccess : public scarab::cancelable
