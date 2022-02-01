@@ -90,8 +90,6 @@ TEST_CASE( "controller", "[control]" )
         control.SetBreakFlag( true );
         control.SetCanceled( true );
         REQUIRE_FALSE( control.WaitToContinue() );    
-
-        // TODO: test with fBreakFlag==true && cancelled==false requires a thread
     }
 
     SECTION( "WaitForBreakOrCanceled" )

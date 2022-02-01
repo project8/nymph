@@ -13,7 +13,7 @@ set( testing_HEADERS
 )
 
 set( testing_SOURCES
-#    TestControlAccess.cc
+    TestControlAccess.cc
     TestController.cc
     TestData.cc
     TestDataFrame.cc
