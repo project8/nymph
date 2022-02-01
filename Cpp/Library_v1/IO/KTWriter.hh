@@ -1,0 +1,140 @@
+/*
+ * KTWriter.hh
+ *
+ *  Created on: Aug 24, 2012
+ *      Author: nsoblath
+ */
+
+#ifndef KTWRITER_HH_
+#define KTWRITER_HH_
+
+#include "KTProcessor.hh"
+
+#include "KTTIFactory.hh"
+
+#include "factory.hh"
+
+#include <map>
+#include <typeinfo>
+
+namespace Nymph
+{
+    class KTTypeWriter
+    {
+        public:
+            KTTypeWriter();
+            virtual ~KTTypeWriter();
+
+            virtual void RegisterSlots() = 0;
+    };
+
+
+    template< class XWriter >
+    class KTDerivedTypeWriter : public KTTypeWriter
+    {
+        public:
+            KTDerivedTypeWriter(XWriter* writer);
+            virtual ~KTDerivedTypeWriter();
+
+            void SetWriter(XWriter* writer);
+
+        protected:
+            XWriter* fWriter;
+    };
+
+
+    template< class XWriter >
+    KTDerivedTypeWriter< XWriter >::KTDerivedTypeWriter(XWriter* writer) :
+            KTTypeWriter(),
+            fWriter(writer)
+    {
+    }
+
+    template< class XWriter >
+    KTDerivedTypeWriter< XWriter >::~KTDerivedTypeWriter()
+    {
+    }
+
+    template< class XWriter >
+    void KTDerivedTypeWriter< XWriter >::SetWriter(XWriter* writer)
+    {
+        fWriter = writer;
+        return;
+    }
+
+
+
+
+    class KTWriter : public KTProcessor
+    {
+        public:
+            KTWriter(const std::string& name = "default-writer-name");
+            virtual ~KTWriter();
+
+    };
+
+    template< class XWriter, class XTypist >
+    class KTWriterWithTypists : public KTWriter
+    {
+        protected:
+            typedef std::map< const std::type_info*, XTypist* > TypeWriterMap;
+        public:
+            KTWriterWithTypists(const std::string& name = "default-writer-with-typists-name");
+            virtual ~KTWriterWithTypists();
+
+            template< class XTypeWriter >
+            XTypeWriter* GetTypeWriter();
+
+        protected:
+            TypeWriterMap fTypeWriters;
+
+    };
+
+
+    template< class XWriter, class XTypist >
+    KTWriterWithTypists< XWriter, XTypist >::KTWriterWithTypists(const std::string& name) :
+            KTWriter(name),
+            fTypeWriters()
+    {
+        KTTIFactory< XTypist, XWriter* >* twFactory = KTTIFactory< XTypist, XWriter* >::get_instance();
+        for (typename KTTIFactory< XTypist, XWriter* >::FactoryCIt factoryIt = twFactory->GetFactoryMapBegin();
+                factoryIt != twFactory->GetFactoryMapEnd();
+                factoryIt++)
+        {
+            XTypist* newTypeWriter = twFactory->Create(factoryIt, static_cast< XWriter* >(this));
+            //newTypeWriter->SetWriter(static_cast< XWriter* >(this));
+            newTypeWriter->RegisterSlots();
+            fTypeWriters.insert(typename TypeWriterMap::value_type(factoryIt->first, newTypeWriter));
+        }
+    }
+
+    template< class XWriter, class XTypist >
+    KTWriterWithTypists< XWriter, XTypist >::~KTWriterWithTypists()
+    {
+        while (! fTypeWriters.empty())
+        {
+            delete fTypeWriters.begin()->second;
+            fTypeWriters.erase(fTypeWriters.begin());
+        }
+    }
+
+    template< class XWriter, class XTypist >
+    template< class XTypeWriter >
+    XTypeWriter* KTWriterWithTypists< XWriter, XTypist >::GetTypeWriter()
+    {
+        typename TypeWriterMap::const_iterator it = fTypeWriters.find(&typeid(XTypeWriter));
+        if (it == fTypeWriters.end())
+        {
+            return NULL;
+        }
+        return static_cast< XTypeWriter* >(it->second);
+    }
+
+#define KT_REGISTER_TYPE_WRITER(writer_class, type_writer_base_class, typist) \
+        static ::Nymph::KTTIRegistrar< type_writer_base_class, type_writer_base_class##typist, writer_class* > s##type_writer_base_class##typist##Registrar;
+
+#define KT_REGISTER_WRITER(writer_class, writer_name) \
+        static ::scarab::registrar< ::Nymph::KTWriter, writer_class, const std::string& > s##writer_class##WriterRegistrar(writer_name);
+
+} /* namespace Nymph */
+#endif /* KTWRITER_HH_ */
