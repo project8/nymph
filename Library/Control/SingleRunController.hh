@@ -68,16 +68,6 @@ namespace Nymph
             typedef std::tuple< PrimaryProcessor*, std::thread, std::exception_ptr > ThreadBundle;
             std::map< std::string, ThreadBundle > fChainThreads;
 
-        public:
-            template< typename... Args >
-            std::tuple< Args&... >& GetReturn();
-
-            template< typename... Args >
-            void Break( Args&... args ); // to be called by a working thread
-
-        protected:
-            std::unique_ptr< ReturnBufferBase > fReturnBuffer;
-
     };
 
    inline void SingleRunController::JoinRunThread()
@@ -85,15 +75,6 @@ namespace Nymph
         fDoRunThread.join();
         return;
     }
-
-    template< typename... XArgs >
-    void SingleRunController::Break( Args&... args )
-    {
-        Controller::InitiateBreak();
-        fReturnBuffer.reset( new ReturnBuffer( args... ) );
-        return;
-    }
-
 
 } /* namespace Nymph */
 

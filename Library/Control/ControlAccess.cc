@@ -15,7 +15,6 @@ namespace Nymph
 {
     ControlAccess::ControlAccess() :
             scarab::singleton< ControlAccess >(),
-            ControllerInterface(),
             fControl( nullptr )
     {
 
@@ -84,7 +83,7 @@ namespace Nymph
     }
 
 
-
+/*
     ReturnAccess::ReturnAccess() :
             fReturn( new ReturnBuffer< int >() )//,
             //fControl()
@@ -92,5 +91,5 @@ namespace Nymph
 
     ReturnAccess::~ReturnAccess()
     {}
-
+*/
 } /* namespace Nymph */

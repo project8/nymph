@@ -19,13 +19,14 @@ namespace Nymph
     LOGGER( contlog, "Controller" );
 
     Controller::Controller() :
-            ControllerInterface(),
             scarab::cancelable(),
             fCycleTimeMS( 500 ),
             fMutex(),
             fCondVarContinue(),
             fCondVarBreak(),
-            fBreakFlag( false )
+            fBreakFlag( false ),
+            fReturnBuffer(),
+            fReturnMutex()
     {
         ControlAccess::get_instance()->SetControl( this );
     }

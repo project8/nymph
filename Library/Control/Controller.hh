@@ -8,9 +8,8 @@
 #ifndef NYMPH_CONTROLLER_HH_
 #define NYMPH_CONTROLLER_HH_
 
-#include "ControllerInterface.hh"
-
 #include "MemberVariable.hh"
+#include "ReturnBuffer.hh"
 
 #include "cancelable.hh"
 #include "param.hh"
@@ -28,7 +27,7 @@ namespace Nymph
      @brief Base class for Controller classes, with basic break/continue/cancel functionality
 
     */
-    class Controller : public ControllerInterface, public scarab::cancelable
+    class Controller : public scarab::cancelable
     {
         public:
             Controller();
@@ -64,7 +63,11 @@ namespace Nymph
             virtual bool IsCanceled() const;
 
             /// Inititate a break
-            virtual void InitiateBreak();
+            virtual void Break();
+
+            /// Initiate a break with a return
+            template< typename... XArgs >
+            void BreakAndReturn( XArgs&... args );
 
             /// Reports whether control is at a breakpoint
             virtual bool IsAtBreak() const;
@@ -81,7 +84,30 @@ namespace Nymph
         protected:
             void do_cancellation( int code );
 
+        public:
+            template< typename... XArgs >
+            std::tuple< XArgs&... >& GetReturn();
+
+        protected:
+            std::unique_ptr< ReturnBufferBase > fReturnBuffer;
+            MEMVAR_REF_MUTABLE( std::mutex, ReturnMutex );
+
     };
+
+    template< typename... XArgs >
+    void Controller::BreakAndReturn( XArgs&... args )
+    {
+        this->Break();
+        fReturnBuffer.reset( new ReturnBuffer( args... ) );
+        return;
+    }
+
+    template< class... XArgs >
+    std::tuple< XArgs&... >& Controller::GetReturn()
+    {
+        std::unique_lock< std::mutex > lock( fReturnMutex );
+        return fReturnBuffer->GetReturn< XArgs... >();
+    }
 
 /*
     template< typename... Args >

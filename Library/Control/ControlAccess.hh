@@ -19,7 +19,7 @@
 namespace Nymph
 {
 
-    class ControlAccess : public scarab::singleton< ControlAccess >, public ControllerInterface
+    class ControlAccess : public scarab::singleton< ControlAccess >
     {
         protected:
             allow_singleton_access( ControlAccess );
@@ -33,43 +33,46 @@ namespace Nymph
             /// Returns when processing is completed or a breakpoint is reached
             /// If the return is true, processing can continue after the break
             /// If the return is false, processing has ended (either normally or due to an error)
-            virtual bool WaitForBreakOrCanceled();
+            bool WaitForBreakOrCanceled();
 
             /// Use this to have a thread wait for the end of a run
-            virtual void WaitForEndOfRun();
+            void WaitForEndOfRun();
 
             /// Instruct the Controller to continue after a breakpoint
-            virtual void Continue();
+            void Continue();
 
             /// Cancel all threads and end the run
-            virtual void Cancel( int code = 0 );
+            void Cancel( int code = 0 );
 
             /// Reports whether controls is canceled
-            virtual bool IsCanceled() const;
+            bool IsCanceled() const;
 
             /// Initiate a break
-            virtual void InitiateBreak();
+            void Break();
 
+            /// Initiate a break with a return
             template< typename... Args >
-            void Break( Args&... args ); // to be called by a working thread
+            void BreakAndReturn( Args&... args );
 
             /// Reports whether control is at a breakpoint
-            virtual bool IsAtBreak() const;
+            bool IsAtBreak() const;
 
             /// Notify the control that a chain is quitting
-            virtual void ChainIsQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
+            void ChainIsQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
 
-            MEMVAR( ControllerInterface*, Control );
+            MEMVAR( Controller*, Control );
 
     };
 
     template< class... XArgs >
-    void ControlAccess::Break( Args&... args )
+    void ControlAccess::BreakAndReturn( XArgs&... args )
     {
-        
+        if( fControl ) fControl->BreakAndReturn( args... );
+        else THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
+        return;
     }
 
-
+/*
     class ReturnAccess : public scarab::cancelable
     {
         public:
@@ -107,7 +110,7 @@ namespace Nymph
         if( buffer == nullptr ) throw std::exception();
         return buffer->GetReturn();
     }
-
+*/
 } /* namespace Nymph */
 
 #endif /* NYMPH_CONTROLACCESS_HH_ */
