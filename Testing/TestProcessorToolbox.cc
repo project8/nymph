@@ -58,7 +58,6 @@ TEST_CASE( "processor_toolbox" )
         REQUIRE_FALSE( toolbox.GetProcessor( procName2 ) );
 
         std::string config_str(
-            "processors:\n"
             "- type: test-proc\n"
             "  name: testproc-1"
         );
@@ -66,7 +65,7 @@ TEST_CASE( "processor_toolbox" )
         scarab::param_translator translator;
         auto config = translator.read_string( config_str, "yaml" );
 
-        REQUIRE_NOTHROW( toolbox.Configure( config->as_node() ) );
+        REQUIRE_NOTHROW( toolbox.ConfigureProcessors( config->as_array() ) );
 
         REQUIRE( toolbox.GetProcessor( procName1 ) );
         REQUIRE( toolbox.GetProcessor( procName1 )->Name() == procName1 );
@@ -102,19 +101,22 @@ TEST_CASE( "processor_toolbox" )
         std::string procName1( "testproc-1" );
         std::string procName2( "testproc-2" );
 
-        std::string config_str(
-            "processors:\n"
+        std::string p_config_str(
             "- type: test-proc\n"
-            "  name: testproc-1\n"
-            "connections:\n"
+            "  name: testproc-1"
+        );
+
+        std::string c_config_str(
             "- signal: \"testproc-1:value\"\n"
             "  slot: \"testproc-1:second-value\""
         );
 
         scarab::param_translator translator;
-        auto config = translator.read_string( config_str, "yaml" );
+        auto p_config = translator.read_string( p_config_str, "yaml" );
+        auto c_config = translator.read_string( c_config_str, "yaml" );
 
-        REQUIRE_NOTHROW( toolbox.Configure( config->as_node() ) );
+        REQUIRE_NOTHROW( toolbox.ConfigureProcessors( p_config->as_array() ) );
+        REQUIRE_NOTHROW( toolbox.ConfigureConnections( c_config->as_array() ) );
 
         std::shared_ptr< Processor > tp1 = toolbox.GetProcessor( procName1 );
 
@@ -147,7 +149,6 @@ TEST_CASE( "processor_toolbox" )
         LINFO( "RunQueue Tests" );
 
         std::string config_str(
-            "processors:\n"
             "- type: test-primary\n"
             "  name: testprimary-1\n"
             "- type: test-primary\n"
@@ -159,7 +160,7 @@ TEST_CASE( "processor_toolbox" )
         scarab::param_translator translator;
         auto config = translator.read_string( config_str, "yaml" );
 
-        REQUIRE_NOTHROW( toolbox.Configure( config->as_node() ) );
+        REQUIRE_NOTHROW( toolbox.ConfigureProcessors( config->as_array() ) );
 
         ProcTBRevealer::ThreadSourceGroupT group;
         REQUIRE_FALSE( toolbox.AddProcessorToThreadGroup( "blah", group ) );
@@ -184,6 +185,50 @@ TEST_CASE( "processor_toolbox" )
         REQUIRE( toolbox.PushBackToRunQueue( {"testprimary-1", "testprimary-2"} ) );
         REQUIRE( toolbox.RunQueue().size() == 1 );
         REQUIRE( toolbox.RunQueue()[0].size() == 2 );
+
+    }
+
+    SECTION( "FullConfig" )
+    {
+        std::string testprimaryName( "testprimary" );
+        std::string testprocName( "testproc" );
+
+        std::string config_str(
+            "processors:\n"
+            "- type: test-primary\n"
+            "  name: testprimary\n"
+            "- type: test-proc\n"
+            "  name: testproc\n"
+            "connections:\n"
+            "- signal: \"testprimary:value\"\n"
+            "  slot: \"testproc:value\"\n"
+            "run-queue:\n"
+            "- testprimary"
+        );
+
+        scarab::param_translator translator;
+        auto config = translator.read_string( config_str, "yaml" );
+
+        REQUIRE_NOTHROW( toolbox.Configure( config->as_node() ) );
+
+        // processors
+        REQUIRE( toolbox.GetProcessor( testprimaryName ) );
+        REQUIRE( toolbox.GetProcessor( testprimaryName )->Name() == testprimaryName );
+
+        REQUIRE( toolbox.GetProcessor( testprocName ) );
+        REQUIRE( toolbox.GetProcessor( testprocName )->Name() == testprocName );
+
+        // connections
+        std::shared_ptr< Processor > testprimary = toolbox.GetProcessor( testprimaryName );
+        REQUIRE( testprimary->Signals().at("value")->Connections().size() == 1 );
+
+        std::shared_ptr< Processor > testproc = toolbox.GetProcessor( testprocName );
+        REQUIRE( testproc->Signals().at("value")->Connections().size() == 0 );
+        REQUIRE( testproc->Slots().at("value")->Connections().size() == 1 );
+
+        // run queue
+        REQUIRE( toolbox.RunQueue().size() == 1 );
+        REQUIRE( toolbox.RunQueue().begin()[0].size() == 1 );
 
     }
 
