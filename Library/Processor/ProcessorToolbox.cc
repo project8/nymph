@@ -8,22 +8,12 @@
 #include "ProcessorToolbox.hh"
 
 #include "PrimaryProcessor.hh"
-#include "QuitChain.hh"
 
 #include "factory.hh"
 #include "logger.hh"
 #include "param_codec.hh"
 
 #include <map>
-#include <thread>
-
-//#include <boost/exception/get_error_info.hpp>
-//#include <boost/thread.hpp>
-
-using std::deque;
-using std::set;
-using std::string;
-using std::vector;
 
 namespace Nymph
 {
@@ -86,14 +76,12 @@ namespace Nymph
         {
             if( ! procIt->is_node() )
             {
-                LERROR( proclog, "Invalid processor entry (not a node): " << *procIt );
                 THROW_EXCEPT_HERE( ConfigException(node) << "Invalid processor entry (not a node): " << *procIt );
             }
             const scarab::param_node& procNode = procIt->as_node();
 
             if( ! procNode.has("type") )
             {
-                LERROR( proclog, "Unable to create processor: no processor type given" );
                 THROW_EXCEPT_HERE( ConfigException(node) << "Unable to create processor: no processor type given" );
             }
             string procType = procNode["type"]().as_string();
@@ -111,7 +99,6 @@ namespace Nymph
             std::shared_ptr< Processor > newProc ( fProcFactory->create(procType, procName) );
             if( newProc == nullptr )
             {
-                LERROR( proclog, "Unable to create processor of type <" << procType << ">" );
                 THROW_EXCEPT_HERE( ConfigException(node) << "Unable to create processor of type <" << procType << ">" );
             }
 
@@ -127,7 +114,6 @@ namespace Nymph
 
             if( ! AddProcessor( procName, newProc ) )
             {
-                LERROR( proclog, "Unable to add processor <" << procName << ">" );
                 THROW_EXCEPT_HERE( ConfigException(node) << "Unable to add processor <" << procName << ">" );
             }
         }
@@ -143,14 +129,12 @@ namespace Nymph
         {
             if( ! connIt->is_node() )
             {
-                LERROR( proclog, "Invalid connection entry: not a node" << *connIt );
                 THROW_EXCEPT_HERE( ConfigException(node) << "Invalid connection entry: not a node" << *connIt );
             }
             const scarab::param_node& connNode = connIt->as_node();
 
             if( ! connNode.has("signal") || ! connNode.has("slot") )
             {
-                LERROR( proclog, "Signal/Slot connection information is incomplete!" );
                 std::string sigSlotMessage( "signal = " );
                 if (connNode.has("signal"))
                 {
@@ -170,7 +154,6 @@ namespace Nymph
                 {
                     sigSlotMessage += "MISSING";
                 }
-                LERROR( proclog, sigSlotMessage );
                 THROW_EXCEPT_HERE( ConfigException(node) << "Signal/Slot connection information is incomplete!\n" << sigSlotMessage );
             }
 
@@ -185,7 +168,6 @@ namespace Nymph
             }
             if( ! connReturn )
             {
-                LERROR( proclog, "Unable to make connection <" << connNode["signal"]() << "> --> <" << connNode["slot"]() << ">" );
                 THROW_EXCEPT_HERE( ConfigException(node) << "Unable to make connection <" << connNode["signal"]() << "> --> <" << connNode["slot"]() << ">" );
             }
 
@@ -193,7 +175,6 @@ namespace Nymph
             {
                 if (! SetBreakpoint( connNode["slot"]().as_string() ) )
                 {
-                    LERROR( proclog, "Unable to set breakpoint on <" << connNode["slot"]() );
                     THROW_EXCEPT_HERE( ConfigException(node) << "Unable to set breakpoint on <" << connNode["slot"]() );
                 }
             }
@@ -213,7 +194,6 @@ namespace Nymph
             {
                 if( ! PushBackToRunQueue( (*rqIt)().as_string() ) )
                 {
-                    LERROR( proclog, "Unable to process run-queue entry: could not add processor to the queue" );
                     THROW_EXCEPT_HERE( ConfigException(node) << "Unable to process run-queue entry: could not add processor to the queue" );
                 }
             }
@@ -226,7 +206,6 @@ namespace Nymph
                 {
                     if( ! rqArrayIt->is_value() )
                     {
-                        LERROR( proclog, "Invalid run-queue array entry: not a value" );
                         THROW_EXCEPT_HERE( ConfigException(node) << "Invalid run-queue array entry: not a value" );
                     }
                     names.push_back( (*rqArrayIt)().as_string() );
@@ -234,13 +213,11 @@ namespace Nymph
 
                 if( ! PushBackToRunQueue(names) )
                 {
-                    LERROR( proclog, "Unable to process run-queue entry: could not add list of processors to the queue" );
                     THROW_EXCEPT_HERE( ConfigException(node) << "Unable to process run-queue entry: could not add list of processors to the queue" );
                 }
             }
             else
             {
-                LERROR( proclog, "Invalid run-queue entry: not a value or array" );
                 THROW_EXCEPT_HERE( ConfigException(node) << "Invalid run-queue entry: not a value or array" );
             }
         }
@@ -254,7 +231,7 @@ namespace Nymph
         if( it == fProcMap.end() )
         {
             LWARN( proclog, "Processor <" << procName << "> was not found." );
-            return NULL;
+            return nullptr;
         }
         return it->second.fProc;
     }
@@ -265,7 +242,7 @@ namespace Nymph
         if (it == fProcMap.end())
         {
             LWARN( proclog, "Processor <" << procName << "> was not found." );
-            return NULL;
+            return nullptr;
         }
         return it->second.fProc;
     }
@@ -291,7 +268,7 @@ namespace Nymph
         if( it == fProcMap.end() )
         {
             std::shared_ptr< Processor > newProc ( fProcFactory->create(procType, procType) );
-            if( newProc == NULL )
+            if( newProc == nullptr )
             {
                 LERROR( proclog, "Unable to create processor of type <" << procType << ">" );
                 return false;
@@ -299,7 +276,6 @@ namespace Nymph
             if( ! AddProcessor(procName, newProc) )
             {
                 LERROR( proclog, "Unable to add processor <" << procName << ">" );
-                //delete newProc;
                 return false;
             }
             return true;
@@ -311,11 +287,10 @@ namespace Nymph
     bool ProcessorToolbox::RemoveProcessor( const std::string& procName )
     {
         std::shared_ptr< Processor > procToRemove = ReleaseProcessor( procName );
-        if( procToRemove == NULL )
+        if( procToRemove == nullptr )
         {
             return false;
         }
-        //delete procToRemove;
         LDEBUG( proclog, "Processor <" << procName << "> deleted." );
         return true;
     }
@@ -326,7 +301,7 @@ namespace Nymph
         if( it == fProcMap.end() )
         {
             LWARN( proclog, "Processor <" << procName << "> was not found." );
-            return NULL;
+            return nullptr;
         }
         std::shared_ptr< Processor > procToRelease = it->second.fProc;
         fProcMap.erase( it );
@@ -335,10 +310,6 @@ namespace Nymph
 
     void ProcessorToolbox::ClearProcessors()
     {
-        /*for (ProcMapIt it = fProcMap.begin(); it != fProcMap.end(); it++)
-        {
-            delete it->second.fProc;
-        }*/ //not required for smart pointers
         fProcMap.clear();
         fRunQueue.clear();
         return;
@@ -544,7 +515,6 @@ namespace Nymph
             LERROR( proclog, "Processor <" << name << "> is not a primary processor." );
             return false;
         }
-        //group.insert(primaryProc);
         group.insert( ThreadSource(primaryProc, name) );
         return true;
     }
