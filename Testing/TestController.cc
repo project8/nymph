@@ -78,6 +78,7 @@ TEST_CASE( "controller", "[control]" )
         auto config = translator.read_string( config_str, "yaml" );
 
         REQUIRE_NOTHROW( control.Configure( config->as_node() ) );
+        REQUIRE( control.GetCycleTimeMS() == 10 );
     }
 
     SECTION( "WaitToContinue" )
