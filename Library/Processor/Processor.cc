@@ -27,14 +27,14 @@ namespace Nymph
             fConfigStr()
     {}
 
-    ConfigException::ConfigException( const scarab::param_node& node ) noexcept :
+    ConfigException::ConfigException( const scarab::param& config ) noexcept :
             scarab::typed_exception< ConfigException >(),
             fConfig(),
             fConfigStr()
     {
         try
         {
-            fConfig.reset( new scarab::param_node(node) );
+            fConfig = config.clone();
         }
         catch( ... )
         {}
@@ -47,7 +47,7 @@ namespace Nymph
     {
         try
         {
-            if( orig.fConfig ) fConfig.reset( new scarab::param_node(orig.fConfig->as_node()) );
+            if( orig.fConfig ) fConfig = orig.fConfig->clone();
         }
         catch( ... )
         {}
