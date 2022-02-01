@@ -59,7 +59,9 @@ TEST_CASE( "processor_toolbox" )
 
         std::string config_str(
             "- type: test-proc\n"
-            "  name: testproc-1"
+            "  name: testproc-1\n"
+            "  value: 5\n"
+            "  string: ok value 1"
         );
 
         scarab::param_translator translator;
@@ -67,8 +69,14 @@ TEST_CASE( "processor_toolbox" )
 
         REQUIRE_NOTHROW( toolbox.ConfigureProcessors( config->as_array() ) );
 
-        REQUIRE( toolbox.GetProcessor( procName1 ) );
-        REQUIRE( toolbox.GetProcessor( procName1 )->Name() == procName1 );
+        auto proc = toolbox.GetProcessor( procName1 );
+        REQUIRE( proc );
+        REQUIRE( proc->Name() == procName1 );
+
+        auto testProc = std::dynamic_pointer_cast< TestProc >( proc );
+        REQUIRE( testProc );
+        REQUIRE( testProc->GetValue() == 5 );
+        REQUIRE( testProc->StringValue() == "ok 1" );
 
         std::shared_ptr< Processor > tp1 = toolbox.ReleaseProcessor( procName1 );
         REQUIRE_FALSE( toolbox.GetProcessor( procName1 ) );
