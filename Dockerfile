@@ -24,9 +24,11 @@ RUN mkdir -p $NYMPH_BUILD_PREFIX &&\
 FROM nymph_common as nymph_done
 
 COPY cmake /tmp_source/cmake
-COPY Executables /tmp_source/Executables
-#COPY External /tmp_source/External
-COPY Library /tmp_source/Library
+COPY Python /tmp_source/Python
+COPY Cpp /tmp_source/Cpp 
+#COPY Executables /tmp_source/cpp/Executables
+COPY External /tmp_source/External
+#COPY Library /tmp_source/cpp/Library
 COPY Scarab /tmp_source/Scarab
 COPY Testing /tmp_source/Testing
 COPY CMakeLists.txt /tmp_source/CMakeLists.txt
