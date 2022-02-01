@@ -51,8 +51,8 @@ namespace Nymph
             void Break();
 
             /// Initiate a break with a return
-            template< typename... Args >
-            void BreakAndReturn( Args&... args );
+            template< typename... XArgs >
+            void BreakAndReturn( XArgs&... args );
 
             /// Reports whether control is at a breakpoint
             bool IsAtBreak() const;
@@ -67,6 +67,7 @@ namespace Nymph
     template< class... XArgs >
     void ControlAccess::BreakAndReturn( XArgs&... args )
     {
+        std::cerr << "#### ControlAccess::BreakAndReturn()" << std::endl;
         if( fControl ) fControl->BreakAndReturn( args... );
         else THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
         return;

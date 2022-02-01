@@ -78,6 +78,20 @@ TEST_CASE( "signal_slot", "[signal],[slot],[processor]" )
             controller.Cancel();
         } );
         REQUIRE_THROWS_AS( signal.Emit( 3 ), QuitChain );
+        controller.reset_cancel();
+
+        // test return from break
+        std::cerr << "#### TestSignalSlot starting return test" << std::endl;
+        asyncReturn = std::async( std::launch::async, [&controller](){
+            controller.WaitForBreakOrCanceled();
+            REQUIRE( controller.HasReturn() );
+            auto theReturn = controller.GetReturn< int >();
+            REQUIRE( std::get<0>( theReturn ) == 4 );
+            std::this_thread::sleep_for( std::chrono::milliseconds(200) );
+            controller.Cancel();
+        } );
+        REQUIRE_NOTHROW( signal.Emit( 4 ) );
+        controller.WaitForEndOfRun();
 
     }
 

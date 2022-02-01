@@ -17,6 +17,8 @@
 #include <condition_variable>
 #include <mutex>
 
+#include <iostream>
+
 namespace Nymph
 {
 
@@ -85,6 +87,10 @@ namespace Nymph
             void do_cancellation( int code );
 
         public:
+            /// Checks whether the return buffer has been filled
+            bool HasReturn() const;
+
+            /// Get the return buffer
             template< typename... XArgs >
             std::tuple< XArgs&... >& GetReturn();
 
@@ -94,11 +100,19 @@ namespace Nymph
 
     };
 
+    inline bool Controller::HasReturn() const
+    {
+        return fReturnBuffer.operator bool();
+    }
+
     template< typename... XArgs >
     void Controller::BreakAndReturn( XArgs&... args )
     {
+        std::cerr << "#### Controller::BreakAndReturn()" << std::endl;
         this->Break();
+        std::cerr << "#### Controller::BreakAndReturn() break initiated" << std::endl;
         fReturnBuffer.reset( new ReturnBuffer( args... ) );
+        std::cerr << "#### Controller::BreakAndReturn() return set" << std::endl;
         return;
     }
 

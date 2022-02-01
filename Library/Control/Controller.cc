@@ -80,6 +80,8 @@ namespace Nymph
         std::unique_lock< std::mutex > lock( fMutex );
         LDEBUG( contlog, "RESUME called" );
         fBreakFlag = false;
+        std::unique_lock< std::mutex > retLock( fReturnMutex );
+        fReturnBuffer.reset();
         fCondVarContinue.notify_all();
         return;
     }
