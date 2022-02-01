@@ -15,6 +15,8 @@
 
 #include <map>
 
+using std::string;
+
 namespace Nymph
 {
     LOGGER(proclog, "ProcessorToolbox");
@@ -40,7 +42,7 @@ namespace Nymph
         }
         else
         {
-            ConfigureProcessors( node["processors"].as_node() );
+            ConfigureProcessors( node["processors"].as_array() );
         }
 
         // Then deal with connections"
@@ -50,7 +52,7 @@ namespace Nymph
         }
         else
         {
-            ConfigureConnections( node["connections"].as_node() );
+            ConfigureConnections( node["connections"].as_array() );
         }
 
         // Finally, deal with processor-run specifications
@@ -62,27 +64,26 @@ namespace Nymph
         }
         else
         {
-            ConfigureRunQueue( node["run-queue"].as_node() );
+            ConfigureRunQueue( node["run-queue"].as_array() );
         }
 
         return;
     }
 
 
-    void ProcessorToolbox::ConfigureProcessors( const scarab::param_node& node )
+    void ProcessorToolbox::ConfigureProcessors( const scarab::param_array& array )
     {
-        const scarab::param_array& procArray = node["processors"].as_array();
-        for( scarab::param_array::const_iterator procIt = procArray.begin(); procIt != procArray.end(); ++procIt )
+        for( auto procIt = array.begin(); procIt != array.end(); ++procIt )
         {
             if( ! procIt->is_node() )
             {
-                THROW_EXCEPT_HERE( ConfigException(node) << "Invalid processor entry (not a node): " << *procIt );
+                THROW_EXCEPT_HERE( ConfigException(array) << "Invalid processor entry (not a node): " << *procIt );
             }
             const scarab::param_node& procNode = procIt->as_node();
 
             if( ! procNode.has("type") )
             {
-                THROW_EXCEPT_HERE( ConfigException(node) << "Unable to create processor: no processor type given" );
+                THROW_EXCEPT_HERE( ConfigException(array) << "Unable to create processor: no processor type given" );
             }
             string procType = procNode["type"]().as_string();
 
@@ -96,16 +97,17 @@ namespace Nymph
             {
                 procName = procNode["name"]().as_string();
             }
+
             std::shared_ptr< Processor > newProc ( fProcFactory->create(procType, procName) );
             if( newProc == nullptr )
             {
-                THROW_EXCEPT_HERE( ConfigException(node) << "Unable to create processor of type <" << procType << ">" );
+                THROW_EXCEPT_HERE( ConfigException(array) << "Unable to create processor of type <" << procType << ">" );
             }
 
-            LDEBUG( proclog, "Attempting to configure processor <" << iter->first << ">" );
+            LDEBUG( proclog, "Attempting to configure processor <" << procName << ">" );
             try
             {
-                iter->second.fProc->Configure(subNode);
+                newProc->Configure(procNode);
             }
             catch( scarab::base_exception& e )
             {
@@ -114,7 +116,7 @@ namespace Nymph
 
             if( ! AddProcessor( procName, newProc ) )
             {
-                THROW_EXCEPT_HERE( ConfigException(node) << "Unable to add processor <" << procName << ">" );
+                THROW_EXCEPT_HERE( ConfigException(array) << "Unable to add processor <" << procName << ">" );
             }
         }
 
@@ -122,14 +124,13 @@ namespace Nymph
     }
 
 
-    void ProcessorToolbox::ConfigureConnections( const scarab::param_node& node )
+    void ProcessorToolbox::ConfigureConnections( const scarab::param_array& array )
     {
-        const scarab::param_array& connArray = node["connections"].as_array();
-        for( scarab::param_array::const_iterator connIt = connArray.begin(); connIt != connArray.end(); ++connIt )
+        for( auto connIt = array.begin(); connIt != array.end(); ++connIt )
         {
             if( ! connIt->is_node() )
             {
-                THROW_EXCEPT_HERE( ConfigException(node) << "Invalid connection entry: not a node" << *connIt );
+                THROW_EXCEPT_HERE( ConfigException(array) << "Invalid connection entry: not a node" << *connIt );
             }
             const scarab::param_node& connNode = connIt->as_node();
 
@@ -154,7 +155,7 @@ namespace Nymph
                 {
                     sigSlotMessage += "MISSING";
                 }
-                THROW_EXCEPT_HERE( ConfigException(node) << "Signal/Slot connection information is incomplete!\n" << sigSlotMessage );
+                THROW_EXCEPT_HERE( ConfigException(array) << "Signal/Slot connection information is incomplete!\n" << sigSlotMessage );
             }
 
             bool connReturn = false;
@@ -168,14 +169,14 @@ namespace Nymph
             }
             if( ! connReturn )
             {
-                THROW_EXCEPT_HERE( ConfigException(node) << "Unable to make connection <" << connNode["signal"]() << "> --> <" << connNode["slot"]() << ">" );
+                THROW_EXCEPT_HERE( ConfigException(array) << "Unable to make connection <" << connNode["signal"]() << "> --> <" << connNode["slot"]() << ">" );
             }
 
             if( connNode.has("breakpoint") )
             {
                 if (! SetBreakpoint( connNode["slot"]().as_string() ) )
                 {
-                    THROW_EXCEPT_HERE( ConfigException(node) << "Unable to set breakpoint on <" << connNode["slot"]() );
+                    THROW_EXCEPT_HERE( ConfigException(array) << "Unable to set breakpoint on <" << connNode["slot"]() );
                 }
             }
 
@@ -185,16 +186,15 @@ namespace Nymph
         return;
     }
 
-    void ProcessorToolbox::ConfigureRunQueue( const scarab::param_node& node )
+    void ProcessorToolbox::ConfigureRunQueue( const scarab::param_array& array )
     {
-        const scarab::param_array& rqArray = node["run-queue"].as_array();
-        for( scarab::param_array::const_iterator rqIt = rqArray.begin(); rqIt != rqArray.end(); ++rqIt )
+        for( auto rqIt = array.begin(); rqIt != array.end(); ++rqIt )
         {
             if( rqIt->is_value() )
             {
                 if( ! PushBackToRunQueue( (*rqIt)().as_string() ) )
                 {
-                    THROW_EXCEPT_HERE( ConfigException(node) << "Unable to process run-queue entry: could not add processor to the queue" );
+                    THROW_EXCEPT_HERE( ConfigException(array) << "Unable to process run-queue entry: could not add processor to the queue" );
                 }
             }
             else if( rqIt->is_array() )
@@ -206,19 +206,19 @@ namespace Nymph
                 {
                     if( ! rqArrayIt->is_value() )
                     {
-                        THROW_EXCEPT_HERE( ConfigException(node) << "Invalid run-queue array entry: not a value" );
+                        THROW_EXCEPT_HERE( ConfigException(array) << "Invalid run-queue array entry: not a value" );
                     }
                     names.push_back( (*rqArrayIt)().as_string() );
                 }
 
                 if( ! PushBackToRunQueue(names) )
                 {
-                    THROW_EXCEPT_HERE( ConfigException(node) << "Unable to process run-queue entry: could not add list of processors to the queue" );
+                    THROW_EXCEPT_HERE( ConfigException(array) << "Unable to process run-queue entry: could not add list of processors to the queue" );
                 }
             }
             else
             {
-                THROW_EXCEPT_HERE( ConfigException(node) << "Invalid run-queue entry: not a value or array" );
+                THROW_EXCEPT_HERE( ConfigException(array) << "Invalid run-queue entry: not a value or array" );
             }
         }
 

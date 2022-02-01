@@ -123,7 +123,7 @@ namespace Nymph
 
         public:
             /// Create processors and configure each according to the `processors` configuration block
-            void ConfigureProcessors( const scarab::param_node& node );
+            void ConfigureProcessors( const scarab::param_array& node );
 
             /// Get a pointer to a processor in the toolbox
             std::shared_ptr< Processor > GetProcessor( const std::string& procName );
@@ -154,7 +154,7 @@ namespace Nymph
             // for the MakeConnection overloading, extra overloading is used instead of default parameters so that the python interface works
 
             /// Make connections between processors according to the `connections` configuration block
-            void ConfigureConnections( const scarab::param_node& node );
+            void ConfigureConnections( const scarab::param_array& node );
 
             /// Make a connection between the signal from one processor and the slot from another processor
             /// Both processors should already have been added to the Toolbox
@@ -185,7 +185,7 @@ namespace Nymph
 
         public:
             /// Setup the run queue according to the `run-queue` configuration block
-            bool ConfigureRunQueue( const scarab::param_node& node );
+            void ConfigureRunQueue( const scarab::param_array& node );
 
             /// Push a single processor to the back of the run queue
             bool PushBackToRunQueue( const std::string& name );
