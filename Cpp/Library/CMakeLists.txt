@@ -1,22 +1,20 @@
-# CMakeLists for Nymph/Library
+# CMakeLists for Nymph/Cpp/Library
 # Author: N.S. Oblath
-
-#include( PythonPackage )
 
 set( UTIL_DIR Utility )
 set( DATA_DIR Data )
 set( PROC_DIR Processor )
 set( CONT_DIR Control )
-set( IO_DIR IO )
-set( APPL_DIR Application )
+#set( IO_DIR IO )
+#set( APPL_DIR Application )
 
 include_directories( BEFORE 
     ${CMAKE_CURRENT_SOURCE_DIR}/${UTIL_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/${DATA_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/${PROC_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/${CONT_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/${IO_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/${APPL_DIR}
+#    ${CMAKE_CURRENT_SOURCE_DIR}/${IO_DIR}
+#    ${CMAKE_CURRENT_SOURCE_DIR}/${APPL_DIR}
 )
 
 set( NYMPH_HEADERFILES
