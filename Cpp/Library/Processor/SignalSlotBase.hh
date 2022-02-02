@@ -44,6 +44,13 @@ namespace Nymph
 
     class SignalBase;
 
+    /*!
+     @class SlotBase
+     @author N. S. Oblath
+
+     @brief Provides the basic slot interface, including connect/disconnect, and storage of connections.
+
+    */
     class SlotBase
     {
         public:
@@ -70,6 +77,13 @@ namespace Nymph
     };
 
 
+    /*!
+     @class SignalBase
+     @author N. S. Oblath
+
+     @brief Provides the basic signal interface, including connect/disconnect, storage of connections, and the option to perform a breakpoint.
+
+    */
     class SignalBase
     {
         public:

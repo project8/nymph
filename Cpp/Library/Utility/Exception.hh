@@ -11,11 +11,6 @@
 
 #include "base_exception.hh"
 
-//#include <boost/exception/all.hpp>
-
-//#include <exception>
-//#include <sstream>
-//#include <string>
 
 namespace Nymph
 {
@@ -48,6 +43,13 @@ namespace Nymph
     };
     */
 
+    /*!
+     @class Exception
+     @author N. S. Oblath
+
+     @brief Basic exception class for use in Nymph and derived packages
+
+    */
     class Exception : public scarab::typed_exception< Exception >
     {
         public:

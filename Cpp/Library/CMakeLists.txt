@@ -4,6 +4,7 @@
 set( UTIL_DIR Utility )
 set( DATA_DIR Data )
 set( PROC_DIR Processor )
+set( CONT_DIR Control )
 #set( IO_DIR IO )
 #set( APPL_DIR Application )
 
@@ -11,8 +12,9 @@ include_directories( BEFORE
     ${CMAKE_CURRENT_SOURCE_DIR}/${UTIL_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/${DATA_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/${PROC_DIR}
-    #${CMAKE_CURRENT_SOURCE_DIR}/${IO_DIR}
-    #${CMAKE_CURRENT_SOURCE_DIR}/${APPL_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/${CONT_DIR}
+#    ${CMAKE_CURRENT_SOURCE_DIR}/${IO_DIR}
+#    ${CMAKE_CURRENT_SOURCE_DIR}/${APPL_DIR}
 )
 
 set( NYMPH_HEADERFILES
@@ -22,14 +24,17 @@ set( NYMPH_HEADERFILES
     ${DATA_DIR}/Data.hh
     ${DATA_DIR}/DataFrame.hh
     
-    ${PROC_DIR}/ControlAccess.hh
     ${PROC_DIR}/PrimaryProcessor.hh
     ${PROC_DIR}/Processor.hh
     ${PROC_DIR}/ProcessorToolbox.hh
-    ${PROC_DIR}/QuitThread.hh
-    ${PROC_DIR}/ReturnBuffer.hh
+    ${PROC_DIR}/QuitChain.hh
     ${PROC_DIR}/SignalSlotBase.hh
 
+    ${CONT_DIR}/ControlAccess.hh
+    ${CONT_DIR}/Controller.hh
+    ${CONT_DIR}/ControllerInterface.hh
+    ${CONT_DIR}/ReturnBuffer.hh
+    ${CONT_DIR}/SingleRunController.hh
 )
 
 set( NYMPH_SOURCEFILES
@@ -38,12 +43,17 @@ set( NYMPH_SOURCEFILES
     ${DATA_DIR}/Data.cc
     ${DATA_DIR}/DataFrame.cc
     
-    ${PROC_DIR}/ControlAccess.cc
     ${PROC_DIR}/PrimaryProcessor.cc
     ${PROC_DIR}/Processor.cc
     ${PROC_DIR}/ProcessorToolbox.cc
-    ${PROC_DIR}/ReturnBuffer.cc
     ${PROC_DIR}/SignalSlotBase.cc
+
+
+    ${CONT_DIR}/ControlAccess.cc
+    ${CONT_DIR}/Controller.cc
+    ${CONT_DIR}/ControllerInterface.cc
+    ${CONT_DIR}/ReturnBuffer.cc
+    ${CONT_DIR}/SingleRunController.cc
 )
 
 

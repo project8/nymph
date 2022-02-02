@@ -11,26 +11,15 @@
 
 #include "ControlAccess.hh"
 #include "MemberVariable.hh"
-//#include "KTThreadReference.hh"
 
 #include "factory.hh"
 #include "param.hh"
-
-//#define BOOST_THREAD_PROVIDES_FUTURE
-//#include <boost/thread/future.hpp>
-//#include <boost/thread/mutex.hpp>
-//#include <boost/thread/thread.hpp>
-
-//#include <boost/iterator/iterator_adaptor.hpp>
-//#include <boost/type_traits/is_convertible.hpp>
-//#include <boost/utility/enable_if.hpp>
 
 #include <deque>
 #include <initializer_list>
 #include <limits>
 #include <set>
 #include <memory>
-#include <thread>
 
 
 namespace Nymph
@@ -82,12 +71,31 @@ namespace Nymph
                  <li>processor name -- add a processor to the run queue, or </li>
                  <li>array of processor names -- add a group of processors to the run queue.</li>
              </ul>
-             In single-threaded mode, all processors will be run sequentially, in the order specified.
          </li>
      </ul>
     */
     class ProcessorToolbox
     {
+        public:
+            struct ThreadSource
+            {
+                PrimaryProcessor* fProc;
+                std::string fName;
+                //ControlAccessPtr fControlAccess;
+                ThreadSource( PrimaryProcessor* proc, const std::string& name ) : 
+                        fProc(proc), fName(name)//, fControlAccess( new ControlAccess() )
+                {}
+            };
+            struct CompareThreadSource
+            {
+                bool operator()( const ThreadSource& lhs, const ThreadSource& rhs ) const
+                {
+                    return lhs.fProc < rhs.fProc;
+                }
+            };
+            typedef std::set< ThreadSource, CompareThreadSource > ThreadSourceGroupT;
+            typedef std::deque< ThreadSourceGroupT > RunQueueT;
+
         protected:
             typedef std::unique_lock< std::mutex > unique_lock;
 
@@ -174,7 +182,6 @@ namespace Nymph
             bool ParseSignalSlotName( const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot ) const;
             static const char fSigSlotNameSep = ':';
 
-
         public:
             /// Push a single processor to the back of the run queue
             bool PushBackToRunQueue( const std::string& name );
@@ -190,60 +197,13 @@ namespace Nymph
             /// Clear the run queue
             void ClearRunQueue();
 
-        protected:
-            struct ThreadSource
-            {
-                PrimaryProcessor* fProc;
-                std::string fName;
-                //ControlAccessPtr fControlAccess;
-                ThreadSource( PrimaryProcessor* proc, const std::string& name ) : 
-                        fProc(proc), fName(name)//, fControlAccess( new ControlAccess() )
-                {}
-            };
-            struct CompareThreadSource
-            {
-                bool operator()( const ThreadSource& lhs, const ThreadSource& rhs ) const
-                {
-                    return lhs.fProc < rhs.fProc;
-                }
-            };
-            typedef std::set< ThreadSource, CompareThreadSource > ThreadSourceGroup;
-            typedef std::deque< ThreadSourceGroup > RunQueue;
-            RunQueue fRunQueue;
-
-            bool AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroup& group );
-
-
-        public:
-            /// Process the run queue.
-            /// This will call Run() on all of the processors in the queue.
-            bool Run();
-
-            void AsyncRun();
-
-            bool WaitToContinue();
-
-            /// Returns when processing is completed or a breakpoint is reached
-            /// Throws a boost::exception if there's an error with the future object in use
-            /// If the return is true, processing can continue after the break
-            /// If the return is false, processing has ended (either normally or due to an error)
-            bool WaitForBreakOrCanceled();
-
-            void WaitForEndOfRun();
-
-            void Continue();
-
-            void CancelThreads();
-
-            void JoinRunThread();
-
-            // TODO: return value access
+            /// Const access to the run queue
+            const RunQueueT& RunQueue() const;
 
         protected:
-            void StartMultiThreadedRun();
+            RunQueueT fRunQueue;
 
-            std::thread fDoRunThread;
-
+            bool AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroupT& group );
     };
 
     inline bool ProcessorToolbox::MakeConnection(const std::string& signal, const std::string& slot) 
@@ -266,6 +226,11 @@ namespace Nymph
     {
         fRunQueue.clear();
         return;
+    }
+
+    inline const ProcessorToolbox::RunQueueT& ProcessorToolbox::RunQueue() const
+    {
+        return fRunQueue;
     }
 
 } /* namespace Nymph */

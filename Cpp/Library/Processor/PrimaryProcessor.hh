@@ -14,6 +14,19 @@
 namespace Nymph
 {
 
+    /*!
+     @class PrimaryProcessor
+     @author N. S. Oblath
+
+     @brief Base class for PrimaryProcessors.  Each processor chain is headed by a PrimaryProcessor.
+
+     @details
+
+     Exceptions thrown during the run by any Processors in this PP's chain are caught by PrimaryProcessor::operator()().   
+     This class catches any exceptions inheriting from scarab::base_exception.
+     It also catches QuitChain for situations where the quitting has been requested from outside of the chain (e.g. cancelation from another thread).
+
+    */
     class PrimaryProcessor : public Processor
     {
         public:
@@ -27,7 +40,7 @@ namespace Nymph
             /// Starts the  main action of the processor
             virtual void Run() = 0;
 
-            MEMVAR_REF( std::exception_ptr, ExceptionPtr );
+//            MEMVAR_REF( std::exception_ptr, ExceptionPtr );
 
     };
 

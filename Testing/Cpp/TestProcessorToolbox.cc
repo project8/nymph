@@ -30,21 +30,10 @@ namespace Nymph
             }
 
             using ProcessorToolbox::ThreadSource;
-            using ProcessorToolbox::ThreadSourceGroup;
-            bool AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroup& group )
+            using ProcessorToolbox::ThreadSourceGroupT;
+            bool AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroupT& group )
             {
                 return ProcessorToolbox::AddProcessorToThreadGroup( name, group );
-            }
-
-            void StartMultiThreadedRun()
-            {
-                return ProcessorToolbox::StartMultiThreadedRun();
-            }
-
-            using ProcessorToolbox::RunQueue;
-            RunQueue& GetRunQueue()
-            {
-                return fRunQueue;
             }
     };
 }
@@ -54,7 +43,7 @@ TEST_CASE( "processor_toolbox" )
 {
     using namespace Nymph;
 
-    SharedControl::get_instance()->Reset();
+    //SharedControl::get_instance()->Reset();
 
     ProcTBRevealer toolbox;
 
@@ -172,7 +161,7 @@ TEST_CASE( "processor_toolbox" )
 
         REQUIRE_NOTHROW( toolbox.Configure( config->as_node() ) );
 
-        ProcTBRevealer::ThreadSourceGroup group;
+        ProcTBRevealer::ThreadSourceGroupT group;
         REQUIRE_FALSE( toolbox.AddProcessorToThreadGroup( "blah", group ) );
         REQUIRE_FALSE( toolbox.AddProcessorToThreadGroup( "testproc-1", group ) );
         REQUIRE( toolbox.AddProcessorToThreadGroup( "testprimary-1", group ) );
@@ -180,51 +169,21 @@ TEST_CASE( "processor_toolbox" )
 
         REQUIRE_FALSE( toolbox.PushBackToRunQueue( "testproc-1" ) );
         REQUIRE( toolbox.PushBackToRunQueue( "testprimary-1" ) );
-        REQUIRE( toolbox.GetRunQueue().size() == 1 );
-        REQUIRE( toolbox.GetRunQueue().begin()[0].size() == 1 );
+        REQUIRE( toolbox.RunQueue().size() == 1 );
+        REQUIRE( toolbox.RunQueue().begin()[0].size() == 1 );
         REQUIRE( toolbox.PushBackToRunQueue( "testprimary-2" ) );
-        REQUIRE( toolbox.GetRunQueue().size() == 2 );
-        REQUIRE( toolbox.GetRunQueue().begin()[0].size() == 1 );
+        REQUIRE( toolbox.RunQueue().size() == 2 );
+        REQUIRE( toolbox.RunQueue().begin()[0].size() == 1 );
         
         toolbox.PopBackOfRunQueue();
-        REQUIRE( toolbox.GetRunQueue().size() == 1 );
+        REQUIRE( toolbox.RunQueue().size() == 1 );
 
         toolbox.ClearRunQueue();
-        REQUIRE( toolbox.GetRunQueue().empty() );
+        REQUIRE( toolbox.RunQueue().empty() );
         
         REQUIRE( toolbox.PushBackToRunQueue( {"testprimary-1", "testprimary-2"} ) );
-        REQUIRE( toolbox.GetRunQueue().size() == 1 );
-        REQUIRE( toolbox.GetRunQueue()[0].size() == 2 );
-
-    }
-
-    SECTION( "DoRun" )
-    {
-        std::string config_str(
-            "processors:\n"
-            "- type: test-primary\n"
-            "  name: pp\n"
-            "connections:\n"
-            "- signal: \"pp:value\"\n"
-            "  slot: \"pp:value\"\n"
-            "run-queue:\n"
-            "- pp"
-        );
-
-        scarab::param_translator translator;
-        auto config = translator.read_string( config_str, "yaml" );
-
-        REQUIRE_NOTHROW( toolbox.Configure( config->as_node() ) );
-
-        auto ppProc = std::dynamic_pointer_cast< TestPrimaryProc >( toolbox.GetProcessor( "pp" ) );
-        REQUIRE( ppProc );
-        ppProc->SetTestSelection( TestPrimaryProc::TestType::SignalNewValue );
-
-        // do the run
-        REQUIRE_NOTHROW( toolbox.Run() );
-
-        // check the results
-        REQUIRE( ppProc->GetValue() == ppProc->GetNewValue() );
+        REQUIRE( toolbox.RunQueue().size() == 1 );
+        REQUIRE( toolbox.RunQueue()[0].size() == 2 );
 
     }
 

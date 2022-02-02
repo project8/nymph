@@ -29,6 +29,7 @@ set( testing_HEADERS
 
 set( testing_SOURCES
     ${CPP_DIR}/TestControlAccess.cc
+    ${CPP_DIR}/TestController.cc
     ${CPP_DIR}/TestData.cc
     ${CPP_DIR}/TestDataFrame.cc
     ${CPP_DIR}/TestException.cc
@@ -36,6 +37,7 @@ set( testing_SOURCES
     ${CPP_DIR}/TestProcessor.cc
     ${CPP_DIR}/TestProcessorToolbox.cc
     ${CPP_DIR}/TestSignalSlot.cc
+    ${CPP_DIR}/TestSingleRunController.cc
     ${CPP_DIR}/UseCatch.cc
 )
 

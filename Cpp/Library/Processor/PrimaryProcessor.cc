@@ -8,7 +8,7 @@
 #include "PrimaryProcessor.hh"
 
 #include "ControlAccess.hh"
-#include "QuitThread.hh"
+#include "QuitChain.hh"
 
 #include "logger.hh"
 
@@ -17,8 +17,8 @@ namespace Nymph
     LOGGER( proclog, "PrimaryProcessor" );
 
     PrimaryProcessor::PrimaryProcessor( const std::string& name ) :
-            Processor( name ),
-            fExceptionPtr()
+            Processor( name )//,
+//            fExceptionPtr()
     {}
 
     PrimaryProcessor::~PrimaryProcessor()
@@ -31,26 +31,21 @@ namespace Nymph
         {
             Run();
         }
-        catch( const QuitThread& e )
+        catch( const QuitChain& e )
         {
-            LINFO( proclog, "Processor thread started by <" << fName << "> is quitting" );
-            fExceptionPtr = std::current_exception(); // capture the exception
-            SharedControl::get_instance()->DecrementActiveThreads();
-            // we don't initiate cancellation on QuitThread; this type of quitting has been initiated elsewhere and detected in this thread.
+            LINFO( proclog, "Processor chain started by <" << fName << "> is quitting" );
+            ControlAccess::get_instance()->ChainIsQuitting( fName, std::current_exception() );
             return;
         }
         catch( const std::exception& e )
         {
             LERROR( proclog, "An error occurred during processor running: " << e.what() );
-            fExceptionPtr = std::current_exception(); // capture the exception
-            SharedControl* control = SharedControl::get_instance();
-            control->DecrementActiveThreads();
-            control->Cancel();
+            ControlAccess::get_instance()->ChainIsQuitting( fName, std::current_exception() );
             return;
         }
 
-        SharedControl::get_instance()->DecrementActiveThreads();
         LWARN( proclog, "Valid return" );
+        ControlAccess::get_instance()->ChainIsQuitting( fName );
 
         return;
     }
