@@ -71,13 +71,14 @@ TEST_CASE( "controller", "[control]" )
     SECTION( "Configure" )
     {
         std::string config_str(
-            "controller:\n"
-            "  cycle-time-ms: 10\n"        );
+            "cycle-time-ms: 10\n"
+        );
 
         scarab::param_translator translator;
         auto config = translator.read_string( config_str, "yaml" );
 
         REQUIRE_NOTHROW( control.Configure( config->as_node() ) );
+        REQUIRE( control.GetCycleTimeMS() == 10 );
     }
 
     SECTION( "WaitToContinue" )
@@ -89,8 +90,6 @@ TEST_CASE( "controller", "[control]" )
         control.SetBreakFlag( true );
         control.SetCanceled( true );
         REQUIRE_FALSE( control.WaitToContinue() );    
-
-        // TODO: test with fBreakFlag==true && cancelled==false requires a thread
     }
 
     SECTION( "WaitForBreakOrCanceled" )
