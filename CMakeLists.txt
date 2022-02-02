@@ -89,9 +89,9 @@ endif( Nymph_ENABLE_PYTHON )
 # Cereal
 ########
 
-#set( JUST_INSTALL_CEREAL ON CACHE BOOL "Cereal option: only install library" FORCE)
-#add_subdirectory( External/cereal )
-#include_directories( External/cereal/include )
+set( JUST_INSTALL_CEREAL ON CACHE BOOL "Cereal option: only install library" FORCE)
+add_subdirectory( External/cereal )
+include_directories( External/cereal/include )
 
 
 #####################
@@ -123,10 +123,10 @@ set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
 # Build Nymph #
 ###############
 
-add_subdirectory( Library )
+add_subdirectory( Cpp/Library )
 
 #if (Nymph_ENABLE_EXECUTABLES)
-#    add_subdirectory( Executables/Main )
+#    add_subdirectory( Cpp/Executables_v1 )
 #endif (Nymph_ENABLE_EXECUTABLES )
 
 

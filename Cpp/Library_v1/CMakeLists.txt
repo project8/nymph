@@ -1,4 +1,4 @@
-# CMakeLists for Nymph/Library
+# CMakeLists for Nymph/Library_v1
 # Author: N. Oblath
 
 include( PythonPackage )
