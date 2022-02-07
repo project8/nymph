@@ -108,11 +108,8 @@ namespace Nymph
     template< typename... XArgs >
     void Controller::BreakAndReturn( XArgs&... args )
     {
-        std::cerr << "#### Controller::BreakAndReturn()" << std::endl;
         this->Break();
-        std::cerr << "#### Controller::BreakAndReturn() break initiated" << std::endl;
         fReturnBuffer.reset( new ReturnBuffer( args... ) );
-        std::cerr << "#### Controller::BreakAndReturn() return set" << std::endl;
         return;
     }
 
