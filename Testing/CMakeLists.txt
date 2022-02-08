@@ -37,6 +37,7 @@ set( testing_SOURCES
     ${CPP_DIR}/TestProcessor.cc
     ${CPP_DIR}/TestProcessorToolbox.cc
     ${CPP_DIR}/TestReturnBuffer.cc
+    ${CPP_DIR}/TestRunNymph.cc
     ${CPP_DIR}/TestSignalSlot.cc
     ${CPP_DIR}/TestSingleRunController.cc
     ${CPP_DIR}/TestSlotData.cc
@@ -52,7 +53,7 @@ set( lib_dependencies
 # https://stackoverflow.com/questions/34896891/catch-lib-unit-testing-and-ctest-cmake-integration/34900012#34900012
 
 add_library( Catch INTERFACE )
-target_include_directories( Catch INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/${CPP_DIR}/Catch )
+target_include_directories( Catch INTERFACE ${Scarab_LOCATION}/testing/catch )
 
 add_executable( RunTests ${testing_SOURCES} )
 target_link_libraries( RunTests ${lib_dependencies} )
