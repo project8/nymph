@@ -33,6 +33,9 @@ namespace Nymph
      that will be called when the `emit()` method on the Signal object is invoked.  Any argument passed to `emit()`
      will be passed to the given functions.
 
+     @details
+     An owned slot will register itself with the owner.  The owner must have a `RegisterSignal()` function that can be called.
+     
     */
     template< typename... XArgs >
     class Signal : public SignalBase

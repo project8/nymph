@@ -23,12 +23,17 @@ set( NYMPH_HEADERFILES
 
     ${DATA_DIR}/Data.hh
     ${DATA_DIR}/DataFrame.hh
+    ${DATA_DIR}/DataPresent.hh
+    ${DATA_DIR}/SignalData.hh
+    ${DATA_DIR}/SlotData.hh
     
     ${PROC_DIR}/PrimaryProcessor.hh
     ${PROC_DIR}/Processor.hh
     ${PROC_DIR}/ProcessorToolbox.hh
     ${PROC_DIR}/QuitChain.hh
+    ${PROC_DIR}/Signal.hh
     ${PROC_DIR}/SignalSlotBase.hh
+    ${PROC_DIR}/Slot.hh
 
     ${CONT_DIR}/ControlAccess.hh
     ${CONT_DIR}/Controller.hh

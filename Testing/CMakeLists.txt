@@ -38,6 +38,7 @@ set( testing_SOURCES
     ${CPP_DIR}/TestProcessorToolbox.cc
     ${CPP_DIR}/TestSignalSlot.cc
     ${CPP_DIR}/TestSingleRunController.cc
+    ${CPP_DIR}/TestSlotData.cc
     ${CPP_DIR}/UseCatch.cc
 )
 
