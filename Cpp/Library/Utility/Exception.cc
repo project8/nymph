@@ -22,13 +22,13 @@ namespace Nymph
         {
             std::rethrow_if_nested( e );
         }
-        catch(const scarab::base_exception& e)
+        catch(const scarab::base_exception& eNext)
         {
-            PrintException( e, ++count );
+            PrintException( eNext, ++count );
         }
-        catch(const std::exception& e)
+        catch(const std::exception& eNext)
         {
-            PrintException( e, ++count );
+            PrintException( eNext, ++count );
         }
         return;
     }
@@ -41,13 +41,13 @@ namespace Nymph
         {
             std::rethrow_if_nested( e );
         }
-        catch(const scarab::base_exception& e)
+        catch(const scarab::base_exception& eNext)
         {
-            PrintException( e, ++count );
+            PrintException( eNext, ++count );
         }
-        catch(const std::exception& e)
+        catch(const std::exception& eNext)
         {
-            PrintException( e, ++count );
+            PrintException( eNext, ++count );
         }
         return;
     }
