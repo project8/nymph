@@ -29,6 +29,12 @@ namespace Nymph
             ~DataFrameException() = default;
     };
 
+    // forward declare so we can define DataHandle here
+    class DataFrame;
+
+    /// Pointer object to use for passing between Processors
+    typedef std::shared_ptr< DataFrame > DataHandle;
+
     /*!
      @class DataFrame
 
@@ -44,7 +50,10 @@ namespace Nymph
     {
         public:
             DataFrame();
+            DataFrame( const DataFrame& ) = delete;
             virtual ~DataFrame();
+
+            DataFrame& operator=( const DataFrame& ) = delete;
 
             /// Returns true if the frame has no data objects
             bool Empty() const;
@@ -97,54 +106,61 @@ namespace Nymph
     template< typename XData >
     bool DataFrame::Has() const
     {
-        return fDataObjects.count( typeid(XData) ) != 0;
+        typedef std::remove_const_t< XData > XDataNoConst;
+        return fDataObjects.count( typeid(XDataNoConst) ) != 0;
     }
 
     template< typename XData >
     XData& DataFrame::Get()
     {
-        if( Has< XData >() )
+        typedef std::remove_const_t< XData > XDataNoConst;
+        if( ! Has< XDataNoConst >() )
         {
-            return static_cast< XData& >( *fDataObjects[typeid(XData)] );
+            fDataObjects[ typeid(XDataNoConst) ].reset( new XDataNoConst() );
         }
-
-        fDataObjects[ typeid(XData) ].reset( new XData() );
-        return static_cast< XData& >( *fDataObjects[typeid(XData)] );
+        return static_cast< XDataNoConst& >( *fDataObjects[typeid(XDataNoConst)] );
     }
 
     template< typename XData >
     const XData& DataFrame::Get() const
     {
-        if( Has< XData >() )
+        typedef std::remove_const_t< XData > XDataNoConst;
+        if( Has< XDataNoConst >() )
         {
-            return static_cast< const XData& >( *fDataObjects.at(typeid(XData) ));
+            return static_cast< const XDataNoConst& >( *fDataObjects.at(typeid(XDataNoConst)) );
         }
-        THROW_EXCEPT_HERE( DataFrameException() << "Data type <" << scarab::type(XData()) << "> is not present when const Get() was called" );
+        THROW_EXCEPT_HERE( DataFrameException() << "Data type <" << scarab::type(XDataNoConst()) << "> is not present when const Get() was called" );
     }
 
     template< typename XData >
     void DataFrame::Set( XData* ptr )
     {
-        fDataObjects[ typeid(XData) ].reset( ptr );  // take ownership of ptr
+        typedef std::remove_const_t< XData > XDataNoConst;
+        fDataObjects[ typeid(XDataNoConst) ].reset( ptr );  // take ownership of ptr
+        return;
     }
 
     template< typename XData >
     void DataFrame::Set( std::unique_ptr< XData >&& ptr )
     {
-        fDataObjects[ typeid(XData) ] = std::move(ptr);  // take ownership of ptr
+        typedef std::remove_const_t< XData > XDataNoConst;
+        fDataObjects[ typeid(XDataNoConst) ] = std::move(ptr);  // take ownership of ptr
         return;
     }
 
     template< typename XData >
     void DataFrame::Set( const XData& obj )
     {
-        fDataObjects[ typeid(XData) ].reset( new XData(obj) );  // make a copy of obj
+        typedef std::remove_const_t< XData > XDataNoConst;
+        fDataObjects[ typeid(XDataNoConst) ].reset( new XDataNoConst(obj) );  // make a copy of obj
+        return;
     }
 
     template< typename XData >
     void DataFrame::Remove()
     {
-        fDataObjects.erase( typeid(XData) );
+        typedef std::remove_const_t< XData > XDataNoConst;
+        fDataObjects.erase( typeid(XDataNoConst) );
         return;
     }
 
