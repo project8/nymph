@@ -125,9 +125,9 @@ set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
 
 add_subdirectory( Cpp/Library )
 
-#if (Nymph_ENABLE_EXECUTABLES)
-#    add_subdirectory( Cpp/Executables_v1 )
-#endif (Nymph_ENABLE_EXECUTABLES )
+if (Nymph_ENABLE_EXECUTABLES)
+    add_subdirectory( Cpp/Executables/Main )
+endif (Nymph_ENABLE_EXECUTABLES )
 
 
 #########
