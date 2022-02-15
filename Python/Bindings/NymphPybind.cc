@@ -9,9 +9,13 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(_nymph, m) {
-	m.doc() = "nymph module";
+PYBIND11_MODULE(_nymph, nymphToplvl) {
 
+	nymphToplvl.doc() = "Nymph package";
 
-
+	auto nymphControl = nymphToplvl.def_submodule("control", "Control module");
+	auto nymphData = nymphToplvl.def_submodule("data", "Data module");
+	auto nymphImplementation = nymphToplvl.def_submodule("implementation", "Implementation module");
+	auto nymphProcessor = nymphToplvl.def_submodule("processor", "Processor module");
+	auto nymphUtility = nymphToplvl.def_submodule("utility", "Utility module");
 }
