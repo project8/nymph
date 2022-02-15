@@ -82,7 +82,6 @@ add_definitions( -DBOOST_ALL_DYN_LINK )
 if( Nymph_ENABLE_PYTHON )
     set_option( Scarab_BUILD_PYTHON TRUE )
     find_package( pybind11 REQUIRED )
-    add_subdirectory( Python/Bindings )
 else( Nymph_ENABLE_PYTHON )
     set_option( Scarab_BUILD_PYTHON FALSE )
 endif( Nymph_ENABLE_PYTHON )
@@ -131,6 +130,9 @@ add_subdirectory( Cpp/Library )
 #    add_subdirectory( Cpp/Executables_v1 )
 #endif (Nymph_ENABLE_EXECUTABLES )
 
+if( Nymph_ENABLE_PYTHON )
+	add_subdirectory( Python/Bindings )
+endif( Nymph_ENABLE_PYTHON )
 
 #########
 # Tests #
