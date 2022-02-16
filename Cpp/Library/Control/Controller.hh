@@ -81,7 +81,6 @@ namespace Nymph
             MEMVAR_REF_MUTABLE( std::condition_variable, CondVarContinue );
             MEMVAR_REF_MUTABLE( std::condition_variable, CondVarBreak );
             MEMVAR_NOSET( bool, BreakFlag );
-            //MEMVAR_SHARED_PTR_CONST( ReturnBufferBase, ReturnPtr );
 
         protected:
             void do_cancellation( int code );
@@ -119,37 +118,6 @@ namespace Nymph
         std::unique_lock< std::mutex > lock( fReturnMutex );
         return fReturnBuffer->GetReturn< XArgs... >();
     }
-
-/*
-    template< typename... Args >
-    void SharedControl::Break( Args&... args )
-    {
-        while( IsAtBreak() && ! IsCanceled() )
-        {
-            if( ! WaitToContinue() )
-            {
-                THROW_EXCEPT_HERE( Exception() << "Canceled while waiting to initiate a breakpoint" );
-            }
-        }
-
-        std::unique_lock< std::mutex > lock( fMutex );
-        fBreakFlag = true;
-        fCondVarBreak.notify_all();
-        return;
-    }
-
-
-
-    template< typename... Args >
-    std::tuple< Args&... >& SharedControl::GetReturn()
-    {
-        if( ! fReturnPtr ) THROW_EXCEPT_HERE( Exception() << "No return available" );
-        std::unique_lock< std::mutex > lock( fMutex );
-        std::shared_ptr< ReturnBuffer< Args... > > buffer( std::dynamic_pointer_cast< ReturnBuffer< Args... > >(fReturnPtr) );
-        if( buffer == nullptr ) THROW_EXCEPT_HERE( Exception() << "Incorrect types used to get return" );
-        return buffer->GetReturn();
-    }
-*/
 
 } /* namespace Nymph */
 
