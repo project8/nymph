@@ -28,6 +28,13 @@ namespace Nymph
 
      @brief Base class for Controller classes, with basic break/continue/cancel functionality
 
+     @details
+     A Controller can:
+
+     * Cancel operations: typically used by either a Processor chain's thread (usually via ControlAccess) or the client of the Controller, this will result in the full cancelation, from the top down, of all Nymph-based operations
+     * Initiate a break: used mostly by a Processor chain's thread where a breakpoint is set, a breakpoint can be initiated with control returned to the client; parameters (e.g. data) can be returned at the break to provide access to the client
+     * Waiting on a break/cancellation/continuation: the Controller can be used to cause a thread to wait on any of those conditions; cancellation will interupt all wait conditions
+     * Be notified of a quitting Processor chain: when a Processor chain quits, it notifies the Controller (via ControlAccess) that it is quitting; if there's an exception, that should be provided to properly forward error conditions
     */
     class Controller : public scarab::cancelable
     {

@@ -15,19 +15,43 @@
 namespace Nymph
 {
 
+    /*!
+     @class ReturnBufferBase
+     @author N. S. Oblath
+
+     @brief Base class for ReturnBuffers, providing access to the returned parameters
+
+     @details
+     ReturnBuffers are a type-erasure mechanism for returning parameters at a breakpoint in Nymph operations.
+
+     This base class provides the type erasure while grating access to the returned paramters via a templated GetREturn() function.
+    */
     class ReturnBufferBase
     {
         public:
             ReturnBufferBase();
             virtual ~ReturnBufferBase();
 
+            /// Provides access to the returned parameters
+            /// Throws Nymph::Exception if the buffer is empty or if XArgs... does not match the stored contents
             template< class... XArgs >
             std::tuple< XArgs&... >& GetReturn();
 
+            /// Provides const access to the returned parameters
+            /// Throws Nymph::Exception if the buffer is empty or if XArgs... does not match the stored contents
             template< class... XArgs >
             const std::tuple< XArgs&... >& GetReturn() const;
     };
 
+    /*!
+     @class ReturnBuffer<XArgs...>
+     @author N. S. Oblath
+
+     @brief Provides storage for returned parameters
+
+     @details
+     Parameters are stored as a `std::tuple<XArgs...>`.
+    */
     template< class... XArgs >
     class ReturnBuffer : public ReturnBufferBase
     {
@@ -36,8 +60,12 @@ namespace Nymph
             ReturnBuffer( XArgs&... retval );
             virtual ~ReturnBuffer();
 
+            /// Provides access to the returned parameters
+            /// Throws Nymph::Exception if the buffer is empty
             std::tuple< XArgs&... >& GetReturn();
 
+            /// Provides const access to the returned parameters
+            /// Throws Nymph::Exception if the buffer is empty
             const std::tuple< XArgs&... >& GetReturn() const;
 
         protected:

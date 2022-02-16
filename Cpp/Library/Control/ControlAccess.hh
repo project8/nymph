@@ -19,6 +19,23 @@
 namespace Nymph
 {
 
+    /*!
+     @class ControlAccess
+     @author N. S. Oblath
+
+     @brief Global access to primary control functionality
+
+     @details
+     This is a singleton class that allows access to the active Controller from anywhere in a Nymph-based application.
+
+     Specific functionatity includes:
+     * Initiating a break and (optionally) returning parameters
+     * Continuing from a break
+     * Canceling operations
+     * Waiting for a break/continuation/cancelation
+     * Notifying the Controller that a Processor chain is quitting
+
+    */
     class ControlAccess : public scarab::singleton< ControlAccess >
     {
         protected:
