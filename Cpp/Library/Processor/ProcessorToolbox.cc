@@ -8,22 +8,14 @@
 #include "ProcessorToolbox.hh"
 
 #include "PrimaryProcessor.hh"
-#include "QuitChain.hh"
 
 #include "factory.hh"
 #include "logger.hh"
 #include "param_codec.hh"
 
 #include <map>
-#include <thread>
 
-//#include <boost/exception/get_error_info.hpp>
-//#include <boost/thread.hpp>
-
-using std::deque;
-using std::set;
 using std::string;
-using std::vector;
 
 namespace Nymph
 {
@@ -31,16 +23,13 @@ namespace Nymph
 
     ProcessorToolbox::ProcessorToolbox( const std::string& name ) :
             fProcFactory( scarab::factory< Processor, const std::string& >::get_instance() ),
-            fRunSingleThreaded( false ),
             fRunQueue(),
             fProcMap()
     {
     }
 
     ProcessorToolbox::~ProcessorToolbox()
-    {
-        ClearProcessors();
-    }
+    {}
 
     void ProcessorToolbox::Configure( const scarab::param_node& node )
     {
@@ -53,48 +42,8 @@ namespace Nymph
         }
         else
         {
-            const scarab::param_array& procArray = node["processors"].as_array();
-            for( scarab::param_array::const_iterator procIt = procArray.begin(); procIt != procArray.end(); ++procIt )
-            {
-                if( ! procIt->is_node() )
-                {
-                    LERROR( proclog, "Invalid processor entry (not a node): " << *procIt );
-                    THROW_EXCEPT_HERE( ConfigException(node) << "Invalid processor entry (not a node): " << *procIt );
-                }
-                const scarab::param_node& procNode = procIt->as_node();
-
-                if( ! procNode.has("type") )
-                {
-                    LERROR( proclog, "Unable to create processor: no processor type given" );
-                    THROW_EXCEPT_HERE( ConfigException(node) << "Unable to create processor: no processor type given" );
-                }
-                string procType = procNode["type"]().as_string();
-
-                string procName;
-                if( ! procNode.has("name") )
-                {
-                    LINFO(proclog, "No name given for processor of type <" << procType << ">; using type as name.");
-                    procName = procType;
-                }
-                else
-                {
-                    procName = procNode["name"]().as_string();
-                }
-                std::shared_ptr< Processor > newProc ( fProcFactory->create(procType, procName) );
-                if( newProc == nullptr )
-                {
-                    LERROR( proclog, "Unable to create processor of type <" << procType << ">" );
-                    THROW_EXCEPT_HERE( ConfigException(node) << "Unable to create processor of type <" << procType << ">" );
-                }
-
-                if( ! AddProcessor( procName, newProc ) )
-                {
-                    LERROR( proclog, "Unable to add processor <" << procName << ">" );
-                    THROW_EXCEPT_HERE( ConfigException(node) << "Unable to add processor <" << procName << ">" );
-                }
-            }
+            ConfigureProcessors( node["processors"].as_array() );
         }
-
 
         // Then deal with connections"
         if( ! node.has("connections") )
@@ -103,154 +52,177 @@ namespace Nymph
         }
         else
         {
-            const scarab::param_array& connArray = node["connections"].as_array();
-            for( scarab::param_array::const_iterator connIt = connArray.begin(); connIt != connArray.end(); ++connIt )
-            {
-                if( ! connIt->is_node() )
-                {
-                    LERROR( proclog, "Invalid connection entry: not a node" << *connIt );
-                    THROW_EXCEPT_HERE( ConfigException(node) << "Invalid connection entry: not a node" << *connIt );
-                }
-                const scarab::param_node& connNode = connIt->as_node();
-
-                if( ! connNode.has("signal") || ! connNode.has("slot") )
-                {
-                    LERROR( proclog, "Signal/Slot connection information is incomplete!" );
-                    std::string sigSlotMessage( "signal = " );
-                    if (connNode.has("signal"))
-                    {
-                        sigSlotMessage += connNode["signal"]().as_string();
-                    }
-                    else
-                    {
-                        sigSlotMessage += "MISSING";
-                    }
-
-                    sigSlotMessage += "\nslot = ";
-                    if (connNode.has("slot"))
-                    {
-                        sigSlotMessage += connNode["slot"]().as_string();
-                    }
-                    else
-                    {
-                        sigSlotMessage += "MISSING";
-                    }
-                    LERROR( proclog, sigSlotMessage );
-                    THROW_EXCEPT_HERE( ConfigException(node) << "Signal/Slot connection information is incomplete!\n" << sigSlotMessage );
-                }
-
-                bool connReturn = false;
-                if( connNode.has("order") )
-                {
-                    connReturn = MakeConnection( connNode["signal"]().as_string(), connNode["slot"]().as_string(), connNode["order"]().as_int() );
-                }
-                else
-                {
-                    connReturn = MakeConnection( connNode["signal"]().as_string(), connNode["slot"]().as_string() );
-                }
-                if( ! connReturn )
-                {
-                    LERROR( proclog, "Unable to make connection <" << connNode["signal"]() << "> --> <" << connNode["slot"]() << ">" );
-                    THROW_EXCEPT_HERE( ConfigException(node) << "Unable to make connection <" << connNode["signal"]() << "> --> <" << connNode["slot"]() << ">" );
-                }
-
-                if( connNode.has("breakpoint") )
-                {
-                    if (! SetBreakpoint( connNode["slot"]().as_string() ) )
-                    {
-                        LERROR( proclog, "Unable to set breakpoint on <" << connNode["slot"]() );
-                        THROW_EXCEPT_HERE( ConfigException(node) << "Unable to set breakpoint on <" << connNode["slot"]() );
-                    }
-                }
-
-                LINFO( proclog, "Signal <" << connNode["signal"]() << "> connected to slot <" << connNode["slot"]() << ">" );
-            }
+            ConfigureConnections( node["connections"].as_array() );
         }
-
 
         // Finally, deal with processor-run specifications
         // The run queue is an array of processor names, or groups of names, which will be run sequentially.
         // If names are grouped (in another array), those in that group will be run in parallel.
-        // In single threaded mode all threads will be run sequentially in the order they were specified.
         if( ! node.has("run-queue") )
         {
             LWARN( proclog, "Run queue was not specified" );
         }
         else
         {
-            const scarab::param_array& rqArray = node["run-queue"].as_array();
-            for( scarab::param_array::const_iterator rqIt = rqArray.begin(); rqIt != rqArray.end(); ++rqIt )
+            ConfigureRunQueue( node["run-queue"].as_array() );
+        }
+
+        return;
+    }
+
+
+    void ProcessorToolbox::ConfigureProcessors( const scarab::param_array& array )
+    {
+        for( auto procIt = array.begin(); procIt != array.end(); ++procIt )
+        {
+            if( ! procIt->is_node() )
             {
-                if( rqIt->is_value() )
-                {
-                    if( ! PushBackToRunQueue( (*rqIt)().as_string() ) )
-                    {
-                        LERROR( proclog, "Unable to process run-queue entry: could not add processor to the queue" );
-                        THROW_EXCEPT_HERE( ConfigException(node) << "Unable to process run-queue entry: could not add processor to the queue" );
-                    }
-                }
-                else if( rqIt->is_array() )
-                {
-                    const scarab::param_array* rqNode = &( rqIt->as_array() );
-                    std::vector< std::string > names;
+                THROW_EXCEPT_HERE( ConfigException(array) << "Invalid processor entry (not a node): " << *procIt );
+            }
+            const scarab::param_node& procNode = procIt->as_node();
 
-                    for( scarab::param_array::const_iterator rqArrayIt = rqNode->begin(); rqArrayIt != rqNode->end(); ++rqArrayIt )
-                    {
-                        if( ! rqArrayIt->is_value() )
-                        {
-                            LERROR( proclog, "Invalid run-queue array entry: not a value" );
-                            THROW_EXCEPT_HERE( ConfigException(node) << "Invalid run-queue array entry: not a value" );
-                        }
-                        names.push_back( (*rqArrayIt)().as_string() );
-                    }
+            if( ! procNode.has("type") )
+            {
+                THROW_EXCEPT_HERE( ConfigException(array) << "Unable to create processor: no processor type given" );
+            }
+            string procType = procNode["type"]().as_string();
 
-                    if( ! PushBackToRunQueue(names) )
-                    {
-                        LERROR( proclog, "Unable to process run-queue entry: could not add list of processors to the queue" );
-                        THROW_EXCEPT_HERE( ConfigException(node) << "Unable to process run-queue entry: could not add list of processors to the queue" );
-                    }
-                }
-                else
-                {
-                    LERROR( proclog, "Invalid run-queue entry: not a value or array" );
-                    THROW_EXCEPT_HERE( ConfigException(node) << "Invalid run-queue entry: not a value or array" );
-                }
+            string procName;
+            if( ! procNode.has("name") )
+            {
+                LINFO(proclog, "No name given for processor of type <" << procType << ">; using type as name.");
+                procName = procType;
+            }
+            else
+            {
+                procName = procNode["name"]().as_string();
+            }
+
+            std::shared_ptr< Processor > newProc ( fProcFactory->create(procType, procName) );
+            if( newProc == nullptr )
+            {
+                THROW_EXCEPT_HERE( ConfigException(array) << "Unable to create processor of type <" << procType << ">" );
+            }
+
+            LDEBUG( proclog, "Attempting to configure processor <" << procName << ">" );
+            try
+            {
+                newProc->Configure(procNode);
+            }
+            catch( scarab::base_exception& e )
+            {
+                THROW_NESTED_EXCEPT_HERE( Exception() << "An error occurred while configuring processor <" << procName << ">" );
+            }
+
+            if( ! AddProcessor( procName, newProc ) )
+            {
+                THROW_EXCEPT_HERE( ConfigException(array) << "Unable to add processor <" << procName << ">" );
             }
         }
 
         return;
     }
 
-    bool ProcessorToolbox::ConfigureProcessors( const scarab::param_node& node )
+
+    void ProcessorToolbox::ConfigureConnections( const scarab::param_array& array )
     {
-        for( ProcMapIt iter = fProcMap.begin(); iter != fProcMap.end(); ++iter )
+        for( auto connIt = array.begin(); connIt != array.end(); ++connIt )
         {
-            LDEBUG( proclog, "Attempting to configure processor <" << iter->first << ">" );
-            string procName = iter->first;
-            string nameUsed(procName);
-            if( ! node.has(nameUsed) )
+            if( ! connIt->is_node() )
             {
-                nameUsed = iter->second.fProc->Name();
-                if( ! node.has(nameUsed) )
+                THROW_EXCEPT_HERE( ConfigException(array) << "Invalid connection entry: not a node" << *connIt );
+            }
+            const scarab::param_node& connNode = connIt->as_node();
+
+            if( ! connNode.has("signal") || ! connNode.has("slot") )
+            {
+                std::string sigSlotMessage( "signal = " );
+                if (connNode.has("signal"))
                 {
-                    LWARN( proclog, "Did not find a parameter node <" << procName << "> or <" << nameUsed << ">\n"
-                            "\tProcessor <" << procName << "> was not configured." );
-                    continue;
+                    sigSlotMessage += connNode["signal"]().as_string();
+                }
+                else
+                {
+                    sigSlotMessage += "MISSING";
+                }
+
+                sigSlotMessage += "\nslot = ";
+                if (connNode.has("slot"))
+                {
+                    sigSlotMessage += connNode["slot"]().as_string();
+                }
+                else
+                {
+                    sigSlotMessage += "MISSING";
+                }
+                THROW_EXCEPT_HERE( ConfigException(array) << "Signal/Slot connection information is incomplete!\n" << sigSlotMessage );
+            }
+
+            bool connReturn = false;
+            if( connNode.has("order") )
+            {
+                connReturn = MakeConnection( connNode["signal"]().as_string(), connNode["slot"]().as_string(), connNode["order"]().as_int() );
+            }
+            else
+            {
+                connReturn = MakeConnection( connNode["signal"]().as_string(), connNode["slot"]().as_string() );
+            }
+            if( ! connReturn )
+            {
+                THROW_EXCEPT_HERE( ConfigException(array) << "Unable to make connection <" << connNode["signal"]() << "> --> <" << connNode["slot"]() << ">" );
+            }
+
+            if( connNode.has("breakpoint") )
+            {
+                if (! SetBreakpoint( connNode["slot"]().as_string() ) )
+                {
+                    THROW_EXCEPT_HERE( ConfigException(array) << "Unable to set breakpoint on <" << connNode["slot"]() );
                 }
             }
-            const scarab::param_node& subNode = node[nameUsed].as_node();
-            try
+
+            LINFO( proclog, "Signal <" << connNode["signal"]() << "> connected to slot <" << connNode["slot"]() << ">" );
+        }
+
+        return;
+    }
+
+    void ProcessorToolbox::ConfigureRunQueue( const scarab::param_array& array )
+    {
+        for( auto rqIt = array.begin(); rqIt != array.end(); ++rqIt )
+        {
+            if( rqIt->is_value() )
             {
-                iter->second.fProc->Configure(subNode);
+                if( ! PushBackToRunQueue( (*rqIt)().as_string() ) )
+                {
+                    THROW_EXCEPT_HERE( ConfigException(array) << "Unable to process run-queue entry: could not add processor to the queue" );
+                }
             }
-            catch( const Exception& e )
+            else if( rqIt->is_array() )
             {
-                LERROR( proclog, "An error occurred while configuring processor <" << procName << "> with parameter node <" << nameUsed << ">" );
-                LERROR( proclog, e.what() );
-                return false;
+                const scarab::param_array* rqNode = &( rqIt->as_array() );
+                std::vector< std::string > names;
+
+                for( scarab::param_array::const_iterator rqArrayIt = rqNode->begin(); rqArrayIt != rqNode->end(); ++rqArrayIt )
+                {
+                    if( ! rqArrayIt->is_value() )
+                    {
+                        THROW_EXCEPT_HERE( ConfigException(array) << "Invalid run-queue array entry: not a value" );
+                    }
+                    names.push_back( (*rqArrayIt)().as_string() );
+                }
+
+                if( ! PushBackToRunQueue(names) )
+                {
+                    THROW_EXCEPT_HERE( ConfigException(array) << "Unable to process run-queue entry: could not add list of processors to the queue" );
+                }
+            }
+            else
+            {
+                THROW_EXCEPT_HERE( ConfigException(array) << "Invalid run-queue entry: not a value or array" );
             }
         }
-        return true;
+
+        return;
     }
 
     std::shared_ptr< Processor > ProcessorToolbox::GetProcessor( const std::string& procName )
@@ -259,7 +231,7 @@ namespace Nymph
         if( it == fProcMap.end() )
         {
             LWARN( proclog, "Processor <" << procName << "> was not found." );
-            return NULL;
+            return nullptr;
         }
         return it->second.fProc;
     }
@@ -270,7 +242,7 @@ namespace Nymph
         if (it == fProcMap.end())
         {
             LWARN( proclog, "Processor <" << procName << "> was not found." );
-            return NULL;
+            return nullptr;
         }
         return it->second.fProc;
     }
@@ -296,7 +268,7 @@ namespace Nymph
         if( it == fProcMap.end() )
         {
             std::shared_ptr< Processor > newProc ( fProcFactory->create(procType, procType) );
-            if( newProc == NULL )
+            if( newProc == nullptr )
             {
                 LERROR( proclog, "Unable to create processor of type <" << procType << ">" );
                 return false;
@@ -304,7 +276,6 @@ namespace Nymph
             if( ! AddProcessor(procName, newProc) )
             {
                 LERROR( proclog, "Unable to add processor <" << procName << ">" );
-                //delete newProc;
                 return false;
             }
             return true;
@@ -316,11 +287,10 @@ namespace Nymph
     bool ProcessorToolbox::RemoveProcessor( const std::string& procName )
     {
         std::shared_ptr< Processor > procToRemove = ReleaseProcessor( procName );
-        if( procToRemove == NULL )
+        if( procToRemove == nullptr )
         {
             return false;
         }
-        //delete procToRemove;
         LDEBUG( proclog, "Processor <" << procName << "> deleted." );
         return true;
     }
@@ -331,7 +301,7 @@ namespace Nymph
         if( it == fProcMap.end() )
         {
             LWARN( proclog, "Processor <" << procName << "> was not found." );
-            return NULL;
+            return nullptr;
         }
         std::shared_ptr< Processor > procToRelease = it->second.fProc;
         fProcMap.erase( it );
@@ -340,10 +310,6 @@ namespace Nymph
 
     void ProcessorToolbox::ClearProcessors()
     {
-        /*for (ProcMapIt it = fProcMap.begin(); it != fProcMap.end(); it++)
-        {
-            delete it->second.fProc;
-        }*/ //not required for smart pointers
         fProcMap.clear();
         fRunQueue.clear();
         return;
@@ -549,7 +515,6 @@ namespace Nymph
             LERROR( proclog, "Processor <" << name << "> is not a primary processor." );
             return false;
         }
-        //group.insert(primaryProc);
         group.insert( ThreadSource(primaryProc, name) );
         return true;
     }

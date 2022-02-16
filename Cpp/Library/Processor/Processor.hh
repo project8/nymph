@@ -39,7 +39,7 @@ namespace Nymph
         public:
             ConfigException() noexcept;
             ConfigException( const std::string& a_filename, int a_line ) noexcept;
-            ConfigException( const scarab::param_node& node ) noexcept;
+            ConfigException( const scarab::param& config ) noexcept;
             ConfigException( const ConfigException& orig ) noexcept;
             virtual ~ConfigException() noexcept;
 
