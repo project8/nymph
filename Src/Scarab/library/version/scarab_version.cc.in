@@ -1,0 +1,34 @@
+/*
+ * scarab_version.cc
+ *
+ *  Created on: Mar 21, 2014
+ *      Author: N.S. Oblath
+ */
+
+#define SCARAB_API_EXPORTS
+
+#include "scarab_version.hh"
+
+#include "macros.hh"
+
+namespace scarab
+{
+
+    version::version() :
+            version_semantic()
+    {
+        f_major_ver = @Scarab_VERSION_MAJOR@;
+        f_minor_ver = @Scarab_VERSION_MINOR@;
+        f_patch_ver = @Scarab_VERSION_PATCH@;
+        f_version = TOSTRING(@Scarab_VERSION@);
+        f_package = TOSTRING(@Scarab_PACKAGE_NAME@);
+        f_commit = TOSTRING(@Scarab_GIT_COMMIT@);
+    }
+
+    version::~version()
+    {
+    }
+
+} /* namespace scarab */
+
+
