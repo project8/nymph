@@ -1,6 +1,6 @@
-[submodule "Src/Scarab"]
-	path = Src/Scarab
+[submodule "Scarab"]
+	path = Scarab
 	url = https://github.com/project8/scarab
-[submodule "Src/External/cereal"]
-	path = Src/External/cereal
+[submodule "External/cereal"]
+	path = External/cereal
 	url = https://github.com/USCiLab/cereal.git

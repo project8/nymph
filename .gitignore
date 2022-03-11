@@ -42,3 +42,7 @@
 # Build directories
 build*/
 
+# Python Package
+dist*/
+Python/nymph/*.egg-info
+

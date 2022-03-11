@@ -55,6 +55,6 @@ macro (nymph_process_options)
 endmacro ()
 
 macro (nymph_build_executables)
-	add_subdirectory (${NYMPH_DIR}/Src/Cpp/Executables_v1)
+	add_subdirectory (${NYMPH_DIR}/Cpp/Executables_v1)
 endmacro ()
 

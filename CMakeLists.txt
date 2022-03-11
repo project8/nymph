@@ -11,7 +11,7 @@ cmake_minimum_required (VERSION 3.12)
 cmake_policy( SET CMP0048 NEW ) # version in project()
 project( Nymph VERSION 1.5.2 )
 
-list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Src/Scarab/cmake )
+list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Scarab/cmake )
 include( PackageBuilder )
 
 # Nymph CMake files
@@ -81,6 +81,7 @@ add_definitions( -DBOOST_ALL_DYN_LINK )
 
 if( Nymph_ENABLE_PYTHON )
     set_option( Scarab_BUILD_PYTHON TRUE )
+    add_subdirectory( Python )
 else( Nymph_ENABLE_PYTHON )
     set_option( Scarab_BUILD_PYTHON FALSE )
 endif( Nymph_ENABLE_PYTHON )
@@ -90,8 +91,8 @@ endif( Nymph_ENABLE_PYTHON )
 ########
 
 set( JUST_INSTALL_CEREAL ON CACHE BOOL "Cereal option: only install library" FORCE)
-add_subdirectory( Src/External/cereal )
-include_directories( Src/External/cereal/include )
+add_subdirectory( External/cereal )
+include_directories( External/cereal/include )
 
 
 #####################
@@ -109,13 +110,13 @@ pbuilder_prepare_project()
 # Scarab
 ########
 
-pbuilder_add_submodule( Scarab Src/Scarab )
+pbuilder_add_submodule( Scarab Scarab )
 
 # all parts of midge use Scarab, so include it here
-pbuilder_use_sm_library( Scarab Src/Scarab )
+pbuilder_use_sm_library( Scarab Scarab )
 
 # this is needed for anything that wants to read or write JSON files
-get_directory_property( RAPIDJSON_FILE_BUFFER_SIZE DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Src/Scarab DEFINITION RAPIDJSON_FILE_BUFFER_SIZE )
+get_directory_property( RAPIDJSON_FILE_BUFFER_SIZE DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} Scarab DEFINITION RAPIDJSON_FILE_BUFFER_SIZE )
 set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
 
 
@@ -123,10 +124,10 @@ set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
 # Build Nymph #
 ###############
 
-add_subdirectory( Src/Cpp/Library )
+add_subdirectory( Cpp/Library )
 
 #if (Nymph_ENABLE_EXECUTABLES)
-#    add_subdirectory( Src/Cpp/Executables_v1 )
+#    add_subdirectory( Cpp/Executables_v1 )
 #endif (Nymph_ENABLE_EXECUTABLES )
 
 

@@ -62,18 +62,11 @@ class CMakeBuild(build_ext):
         print("should make a build call:")
         print(['cmake', '--build', '.'] + build_args, 'cwd={}'.format(self.build_temp))
         #subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
-        subprocess.check_call(['make', 'install', 'VERBOSE=1'], cwd=self.build_temp)
-
-#packages = ["nymph"] + ["nymph."+i_package for i_package in find_packages("dripline")]
-#print('packages are: {}'.format(packages))
+        subprocess.check_call(['make', 'install'], cwd=self.build_temp)
 
 if __name__ == "__main__":
 
     setup(
-
         ext_modules=[CMakeExtension('nymph', sourcedir='')],
         cmdclass=dict(build_ext=CMakeBuild),
-        #install_requires=requirements,
-        #packages=packages,
-        #scripts=["bin/dl-serve"]
     )
