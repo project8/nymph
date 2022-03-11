@@ -2,40 +2,28 @@
 # Author: A. Ziegler
 # Created on: Feb 4, 2022
 
-# Minimum cmake verison 3.12 required by Scarab
-cmake_minimum_required (VERSION 3.12)
+if ( Nymph_ENABLE_PYTHON )
 
-#########
-# Setup #
-#########
-cmake_policy( SET CMP0048 NEW ) # version in project()
-project( Nymph VERSION 2.0.0 )
+    message( "Building Python bindings")
 
-#list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../Scarab/cmake )
-include( PackageBuilder )
+    set( dir ${CMAKE_CURRENT_SOURCE_DIR} )
 
-###############
-# Build Nymph #
-###############
+    # Python binding headers
+    set( PYBINDING_HEADERFILES
+        ${dir}/nymph/nymph_pybind.hh
+    )
 
-message( "Building Python bindings")
+    # Python bindings
+    set( PYBINDING_SOURCEFILES
+        ${dir}/nymph/nymph_pybind.cc
+    )
 
-set( dir ${CMAKE_CURRENT_SOURCE_DIR} )
+    set( PROJECT_LIBRARIES Nymph )
 
-# Python binding headers
-set( PYBINDING_HEADERFILES
+    pbuilder_add_pybind11_module( nymph ${PROJECT_LIBRARIES} )
 
-)
+    pbuilder_install_headers( ${PYBINDING_HEADERFILES} )
 
-# Python bindings
-set( PYBINDING_SOURCEFILES
+    message( "Done with Python bindings" )
 
-)
-
-#set( PROJECT_LIBRARIES Nymph )
-
-#pbuilder_add_pybind11_module( Nymph ${PROJECT_LIBRARIES} )
-
-pbuilder_install_headers( ${PYBINDING_HEADERFILES} )
-
-message( "Done with Python bindings" )
+endif( Nymph_ENABLE_PYTHON )

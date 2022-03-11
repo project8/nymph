@@ -80,8 +80,15 @@ add_definitions( -DBOOST_ALL_DYN_LINK )
 ##########
 
 if( Nymph_ENABLE_PYTHON )
+
+    find_package( Python3 REQUIRED COMPONENTS Interpreter Development )
+    set(PYBIND11_PYTHON_VERSION ${Python3_VERSION} CACHE STRING "")
+    find_package( pybind11 REQUIRED )
+    include_directories( ${Python3_INCLUDE_DIRS} )
+
     set_option( Scarab_BUILD_PYTHON TRUE )
     add_subdirectory( Python )
+    
 else( Nymph_ENABLE_PYTHON )
     set_option( Scarab_BUILD_PYTHON FALSE )
 endif( Nymph_ENABLE_PYTHON )
