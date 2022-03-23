@@ -44,5 +44,5 @@ build*/
 
 # Python Package
 dist*/
-Python/nymph/*.egg-info
+Python/*.egg-info
 

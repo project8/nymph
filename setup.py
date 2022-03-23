@@ -15,7 +15,6 @@ class CMakeExtension(Extension):
         self.sourcedir = os.path.abspath(sourcedir)
         print(self.sourcedir)
 
-
 class CMakeBuild(build_ext):
     def run(self):
         try:
@@ -69,4 +68,9 @@ if __name__ == "__main__":
     setup(
         ext_modules=[CMakeExtension('nymph', sourcedir='')],
         cmdclass=dict(build_ext=CMakeBuild),
+        packages = find_packages(
+            where='Python',
+            include=['nymph'],
+        ),
+        package_dir={'': 'Python'}
     )
