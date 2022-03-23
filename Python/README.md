@@ -1,7 +1,7 @@
-NymphPy
+Nymph
 =====
 
-NymphPy is a Python extension of the C++-based Nymph data analysis framework.
+Nymph is a Python extension of the C++-based Nymph data analysis framework.
 
 
 Dependencies
@@ -23,11 +23,19 @@ Operating System Support
 Directory Structure
 -------------------
 
-*  nymph - nymph-py modules.
+*  nymph - nymph modules.
 
 Installing
 ----------
-python -m build
+To build the python package use
+
+python -m build 
+
+To install and build the python package use
+
+pip install .
+
+in the directory where the setup.py script is located.
 
 Instructions for Use
 --------------------
