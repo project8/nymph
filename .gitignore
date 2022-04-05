@@ -42,3 +42,5 @@
 # Build directories
 build*/
 
+# python ignores
+__pycache__
