@@ -12,14 +12,14 @@
 namespace py = pybind11;
 
 
-PYBIND11_MODULE(_nymph, nymphToplvl) {
+PYBIND11_MODULE(_nymph, nymphPackage) {
 
-	nymphToplvl.doc() = "Nymph package";
+	nymphPackage.doc() = "Nymph package";
 
-	auto nymphControl = nymphToplvl.def_submodule("control", "Control module");
-	auto nymphData = nymphToplvl.def_submodule("data", "Data module");
-	auto nymphImplementation = nymphToplvl.def_submodule("implementation", "Implementation module");
-	auto nymphProcessor = nymphToplvl.def_submodule("processor", "Processor module");
+	auto nymphControl = nymphPackage.def_submodule("control", "Control module");
+	auto nymphData = nymphPackage.def_submodule("data", "Data module");
+	auto nymphImplementation = nymphPackage.def_submodule("implementation", "Implementation module");
+	auto nymphProcessor = nymphPackage.def_submodule("processor", "Processor module");
 	NymphPybind::ExportProcessor(nymphProcessor);
-	auto nymphUtility = nymphToplvl.def_submodule("utility", "Utility module");
+	auto nymphUtility = nymphPackage.def_submodule("utility", "Utility module");
 }
