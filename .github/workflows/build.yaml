@@ -74,6 +74,7 @@ jobs:
             yaml-cpp \
             pybind11
 
+
       - name: Linux Dependencies
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
@@ -81,8 +82,8 @@ jobs:
           sudo apt-get install -yq \
             libboost-all-dev \
             libyaml-cpp-dev \
-            rapidjson-dev
-          python -m pip install pybind11 --user
+            rapidjson-dev \
+          
 
       - name: Configure CMake
         run: |
@@ -103,6 +104,7 @@ jobs:
       - name: Python Build
         run: |
           python -m pip install build --user
+          pip install pybind11 --user
           python -m build
 
 
