@@ -100,7 +100,9 @@ jobs:
 
       - name: Python Build
         run: |
+          python -m pip install build --user
           python -m build
+
 
 # For debugging
 #      - name: Setup tmate session
