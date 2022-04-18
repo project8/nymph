@@ -71,7 +71,8 @@ jobs:
           brew install \
             boost \
             rapidjson \
-            yaml-cpp 
+            yaml-cpp \
+            pybind11
 
       - name: Linux Dependencies
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
@@ -81,7 +82,7 @@ jobs:
             libboost-all-dev \
             libyaml-cpp-dev \
             rapidjson-dev \
-            pybind11
+            python-pybind11
 
       - name: Configure CMake
         run: |
