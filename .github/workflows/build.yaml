@@ -71,8 +71,7 @@ jobs:
           brew install \
             boost \
             rapidjson \
-            yaml-cpp \
-            python-pybind11
+            yaml-cpp 
 
       - name: Linux Dependencies
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
@@ -103,6 +102,7 @@ jobs:
       - name: Python Build
         run: |
           python -m pip install build --user
+          python -m pip install pybind11 --user
           python -m build
 
 
