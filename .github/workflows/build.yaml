@@ -83,7 +83,7 @@ jobs:
             libboost-all-dev \
             libyaml-cpp-dev \
             rapidjson-dev 
-          pip install "pybind11[global]"
+            pybind11-dev
           
 
       - name: Configure CMake
