@@ -72,7 +72,7 @@ jobs:
             boost \
             rapidjson \
             yaml-cpp \
-            pybind11
+            python-pybind11
 
       - name: Linux Dependencies
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
