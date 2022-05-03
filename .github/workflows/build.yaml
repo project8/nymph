@@ -159,7 +159,7 @@ jobs:
 
       - name: Python Build
         run: |
-          sudo python -m build
+          python -m build
 
       #- name: Run tests
       #  run: |
