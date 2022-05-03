@@ -42,7 +42,7 @@ jobs:
           docker run project8/nymph:${Nymph_TAG} /tmp_source/build/Testing/RunTests
 
 
-  build:
+  build_cpp:
     name: Build and Test Cpp
 
     runs-on: ${{ matrix.os }}
@@ -109,7 +109,7 @@ jobs:
       #    python -m build
 
 
-    build:
+    build_python:
       name: Build and Test Python
 
       runs-on: ${{ matrix.os }}
