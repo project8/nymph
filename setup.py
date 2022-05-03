@@ -13,7 +13,6 @@ class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
         Extension.__init__(self, name, sources=[])
         self.sourcedir = os.path.abspath(sourcedir)
-        print(self.sourcedir)
 
 class CMakeBuild(build_ext):
     def run(self):
@@ -33,10 +32,13 @@ class CMakeBuild(build_ext):
 
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+        build_env_dir = sys.executable.split('/bin/python')[0]
+        #print(build_env_dir)
+        
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       '-DCMAKE_INSTALL_PREFIX:PATH=/usr/local',
-                      '-DNymph_ENABLE_PYTHON:bool=1',
+                      '-DNymph_ENABLE_PYTHON:bool=1'
                      ]
 
         cfg = 'Debug' if self.debug else 'Release'

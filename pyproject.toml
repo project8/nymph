@@ -2,9 +2,8 @@
 requires = [
     "setuptools>=42", 
     "wheel",
-    "cmake>=3.12",
-    "pybind11>=2.3.0",
-    "PyYAML",
+    "pybind11",
     "python-rapidjson",
+    "pyyaml",
 ]
 build-backend = "setuptools.build_meta"
