@@ -42,8 +42,8 @@ jobs:
           docker run project8/nymph:${Nymph_TAG} /tmp_source/build/Testing/RunTests
 
 
-  build-cpp:
-    name: Build and Test Cpp
+  build:
+    name: Build and Test
 
     runs-on: ${{ matrix.os }}
 
@@ -84,6 +84,7 @@ jobs:
             libyaml-cpp-dev \
             rapidjson-dev \
             pybind11-dev 
+          pip install "pybind11[global]"
           
 
       - name: Configure CMake
@@ -102,68 +103,11 @@ jobs:
           cd build
           Testing/RunTests
 
-  build-python:
-    name: Build and Test Python
-
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-20.04, macOS-10.15]
-        python-version: [3.9]
-
-    steps:
-
-      - name: Checkout reposistory
-        uses: actions/checkout@master
-        with:
-          submodules: recursive
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Mac Dependencies
-        if: startsWith(matrix.os, 'macos')  # Mac only
-        run: |
-          brew install \
-            boost \
-            rapidjson \
-            yaml-cpp \
-            pybind11
-
-          python -m pip install build
-
-
-      - name: Linux Dependencies
-        if: startsWith(matrix.os, 'ubuntu')  # Linux only
-        run: |
-          sudo apt-get update
-          sudo apt-get install -yq \
-            libboost-all-dev \
-            libyaml-cpp-dev \
-            rapidjson-dev \
-            pybind11-dev
-
-          python -m pip install build
-          
-
-      #- name: Configure CMake
-      #  run: |
-      #    mkdir -p build
-      #    cd build
-      #    cmake -DNymph_BUILD_NYMPH_EXE=${Nymph_BUILD_NYMPH_EXE} -DNymph_ENABLE_EXECUTABLES=${Nymph_ENABLE_EXECUTABLES} -DNymph_ENABLE_PYTHON=${Nymph_ENABLE_PYTHON} -DNymph_ENABLE_TESTING=${Nymph_ENABLE_TESTING} -DNymph_SINGLETHREADED=${Nymph_SINGLETHREADED} ..
-
       - name: Python Build
         run: |
-          python -m build
+          python -m pip install build --user
+          python -m build 
 
-      #- name: Run tests
-      #  run: |
-      #    cd build
-      #   Testing/RunTests
 
 # For debugging
 #      - name: Setup tmate session
