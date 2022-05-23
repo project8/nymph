@@ -1,4 +1,4 @@
-# CMakeLists for Nymph/Src/Cpp/Library
+# CMakeLists for Nymph/Cpp/Library
 # Author: N.S. Oblath
 
 set( UTIL_DIR Utility )
