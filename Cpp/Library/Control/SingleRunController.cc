@@ -193,6 +193,8 @@ namespace Nymph
     {
         Controller::ChainIsQuitting( name, ePtr );
 
+        std::get<2>( fChainThreads.at(name) ) = std::move(ePtr); 
+
         --fNActiveThreads;
 
         return;

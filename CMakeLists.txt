@@ -23,8 +23,8 @@ include( Nymph )
 # Nymph options #
 #################
 
-# require C++11
-set( CMAKE_CXX_STANDARD 11 )
+# require C++17 (for: if constexpr)
+set( CMAKE_CXX_STANDARD 17 )
 
 # Build the Nymph executable (also requires Nymph_ENABLE_EXECUTABLES)
 option( Nymph_BUILD_NYMPH_EXE "Flag to build the Nymph executable; also requires Nymph_ENABLE_EXECUTABLES" ON )

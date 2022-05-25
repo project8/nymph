@@ -97,7 +97,7 @@ namespace Nymph
         return;
     }
 
-    void Processor::RegisterSlot( std::string name, SlotBase* slot, std::initializer_list< std::string > signals )
+    void Processor::RegisterSlot( std::string name, SlotBase* slot )
     {
         LDEBUG( processorlog, "Registering slot <" << name << "> in processor <" << fName << ">" );
         fSlots.insert( SlotMapVal(name, slot) );

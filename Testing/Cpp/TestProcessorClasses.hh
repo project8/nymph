@@ -32,7 +32,7 @@ namespace Nymph
                     fValueSig( "value", this ),
                     fValueSlot( "value", this, &TestProc::SetValue ),
                     fSecondValueSig( "second-value", this ),
-                    fSecondValueSlot( "second-value", this, &TestProc::SecondValueSlotFunction, {"second-value"} ),
+                    fSecondValueSlot( "second-value", this, &TestProc::SecondValueSlotFunction ),
                     fSecondValueSlot2( "second-value-2", this, &TestProc::SetSecondValue )
             {}
 
