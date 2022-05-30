@@ -80,8 +80,15 @@ add_definitions( -DBOOST_ALL_DYN_LINK )
 ##########
 
 if( Nymph_ENABLE_PYTHON )
-    set_option( Scarab_BUILD_PYTHON TRUE )
+
+    find_package( Python3 REQUIRED COMPONENTS Interpreter Development )
+    set(PYBIND11_PYTHON_VERSION ${Python3_VERSION} CACHE STRING "")
     find_package( pybind11 REQUIRED )
+    include_directories( ${Python3_INCLUDE_DIRS} )
+
+    set_option( Scarab_BUILD_PYTHON TRUE )
+    add_subdirectory( Python/Bindings )
+
 else( Nymph_ENABLE_PYTHON )
     set_option( Scarab_BUILD_PYTHON FALSE )
 endif( Nymph_ENABLE_PYTHON )
@@ -116,7 +123,7 @@ pbuilder_add_submodule( Scarab Scarab )
 pbuilder_use_sm_library( Scarab Scarab )
 
 # this is needed for anything that wants to read or write JSON files
-get_directory_property( RAPIDJSON_FILE_BUFFER_SIZE DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Scarab DEFINITION RAPIDJSON_FILE_BUFFER_SIZE )
+get_directory_property( RAPIDJSON_FILE_BUFFER_SIZE DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} Scarab DEFINITION RAPIDJSON_FILE_BUFFER_SIZE )
 set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
 
 
@@ -130,9 +137,6 @@ add_subdirectory( Cpp/Library )
 #    add_subdirectory( Cpp/Executables_v1 )
 #endif (Nymph_ENABLE_EXECUTABLES )
 
-if( Nymph_ENABLE_PYTHON )
-	add_subdirectory( Python/Bindings )
-endif( Nymph_ENABLE_PYTHON )
 
 #########
 # Tests #

@@ -42,5 +42,7 @@
 # Build directories
 build*/
 
-# python ignores
+# Python Package
+dist*/
+Python/*.egg-info
 __pycache__

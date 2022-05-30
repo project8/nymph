@@ -8,13 +8,6 @@
 
 __all__ = []
 
-import sys
-
-build_path = sys.argv[1]
-
-sys.path.append(build_path + '/Scarab/python')
-sys.path.append(build_path + '/Python/Bindings')
-
 import _nymph
 import scarab
 

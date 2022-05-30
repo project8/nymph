@@ -1,14 +1,30 @@
-# CMakeLists for Nymph/Python/Bindings
-# Author: F. Thomas
+# CMakeLists.txt file for Nymph/Python/Bindings
+# Author: A. Ziegler
+# Created on: Feb 4, 2022
 
-set( NYMPH_BINDING_SOURCEFILES
-    NymphPybind.cc
+
+message( "Building Python bindings")
+
+# Python binding headers
+#set( PYBINDING_HEADERFILES
+	#nymph_pybind_template.hh
+#)
+
+# Python bindings
+set( PYBINDING_SOURCEFILES
+	NymphPybind.cc
 )
 
-set( lib_dependencies 
-    Nymph
-)
+set( PROJECT_LIBRARIES Nymph )
 
-pybind11_add_module( _nymph ${NYMPH_BINDING_SOURCEFILES} )
+pbuilder_add_pybind11_module( _nymph ${PROJECT_LIBRARIES} )
 
-target_link_libraries( _nymph PRIVATE Nymph )
+#pbuilder_install_headers( ${PYBINDING_HEADERFILES} )
+
+if( NOT DEFINED PBUILDER_PY_INSTALL_IN_SITELIB )
+	message( STATUS "Installing add_lib_python_path.sh since python modules will not be installed in the site-package directory" )
+	configure_file( add_lib_python_path.sh.in add_lib_python_path.sh @ONLY)
+	install( FILES ${CMAKE_CURRENT_BINARY_DIR}/add_lib_python_path.sh DESTINATION ${BIN_INSTALL_DIR} )
+endif( NOT DEFINED PBUILDER_PY_INSTALL_IN_SITELIB )
+
+message( "Done with Python bindings" )
