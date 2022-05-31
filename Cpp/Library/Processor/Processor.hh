@@ -116,7 +116,7 @@ namespace Nymph
         return new scarab::registrar< Processor, XDerivedProc, const std::string& >( name );
     }
 
-#define REGISTER_PROCESSOR_NONAMEPSACE(proc_class, proc_name) \
+#define REGISTER_PROCESSOR_NONAMESPACE(proc_class, proc_name) \
         static ::scarab::registrar< ::Nymph::Processor, proc_class, const std::string& > sProc##proc_class##Registrar( proc_name );
 
 #define REGISTER_PROCESSOR_NAMESPACE(proc_namespace, proc_class, proc_name) \
