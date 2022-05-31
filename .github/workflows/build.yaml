@@ -145,8 +145,9 @@ jobs:
           sudo apt-get install -yq \
             libboost-all-dev \
             libyaml-cpp-dev \
-            rapidjson-dev \
-            pybind11-dev 
+            rapidjson-dev
+          
+          pip install pybind11 
           
           python -m pip install build
           
