@@ -147,7 +147,7 @@ jobs:
             libyaml-cpp-dev \
             rapidjson-dev
           
-          pip install pybind11 
+          pip install "pybind11[global]" 
           
           python -m pip install build
           
