@@ -14,6 +14,7 @@ build_path = sys.argv[1]
 
 sys.path.append(build_path + '/Scarab/python')
 sys.path.append(build_path + '/Python/Bindings')
+sys.path.append(build_path + '/Testing')
 
 import _nymph
 import scarab
@@ -28,6 +29,7 @@ class TestProcessor(_nymph.processor._Processor):
 def main(args):
     
     testprocessor = TestProcessor('test')
+    test2 = _nymph.processor.get_processor('test-proc', 'name')
     
     param = scarab.ParamValue( 1.0 )
     param_node = scarab.ParamNode()

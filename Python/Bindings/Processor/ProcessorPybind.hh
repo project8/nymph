@@ -12,6 +12,7 @@
 #include <memory>
 
 #include "Processor.hh"
+#include "TestProcessorClasses.hh"
 #include "factory.hh"
 
 namespace py = pybind11;
@@ -56,6 +57,11 @@ namespace NymphPybind
 				//.def_property_readonly("name", &Nymph::Processor::Name);
 		
 		nymphProcessor.def("get_processor", &get_processor);
+		
+		//unfortunately this has to go into library code
+		//for some reason the factory in the wrapped get_processor function above 
+		//cannot find the test-proc when it is registered after the library was compiled
+		REGISTER_PROCESSOR(Nymph, TestProc, "test-proc");
 	}
 
 }
