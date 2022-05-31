@@ -2,8 +2,13 @@
 # Author: A. Ziegler
 # Created on: Feb 4, 2022
 
-
 message( "Building Python bindings")
+
+set( TEST_DIR Testing/Cpp )
+
+include_directories( BEFORE 
+    ${CMAKE_SOURCE_DIR}/${TEST_DIR}
+)
 
 # Python binding headers
 #set( PYBINDING_HEADERFILES
