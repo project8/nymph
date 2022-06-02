@@ -56,7 +56,7 @@ namespace Nymph
     class ReturnBuffer : public ReturnBufferBase
     {
         public:
-            ReturnBuffer();
+            ReturnBuffer() = delete;
             ReturnBuffer( XArgs&... retval );
             virtual ~ReturnBuffer();
 
@@ -69,19 +69,15 @@ namespace Nymph
             const std::tuple< XArgs&... >& GetReturn() const;
 
         protected:
-            std::tuple< XArgs&... >* fReturn;
+            std::tuple< XArgs&... > fReturn;
     };
 
 
     // ReturnBuffer
-    template< class... XArgs >
-    ReturnBuffer< XArgs... >::ReturnBuffer() :
-            fReturn( nullptr )
-    {}
 
     template< class... XArgs >
     ReturnBuffer< XArgs... >::ReturnBuffer( XArgs&... retval ) :
-            fReturn( new std::tuple< XArgs&... >( retval... ) )
+            fReturn( retval... )
     {}
 
     template< class... XArgs >
@@ -91,15 +87,13 @@ namespace Nymph
     template< class... XArgs >
     std::tuple< XArgs&... >& ReturnBuffer< XArgs... >::GetReturn()
     {
-        if( fReturn == nullptr ) THROW_EXCEPT_HERE( Exception() << "No return is present" );
-        return *fReturn;
+        return fReturn;
     }
 
     template< class... XArgs >
     const std::tuple< XArgs&... >& ReturnBuffer< XArgs... >::GetReturn() const
     {
-        if( fReturn == nullptr ) THROW_EXCEPT_HERE( Exception() << "No return is present" );
-        return *fReturn;
+        return fReturn;
     }
 
 

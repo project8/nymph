@@ -115,7 +115,7 @@ namespace Nymph
     void Controller::BreakAndReturn( XArgs&... args )
     {
         this->Break();
-        fReturnBuffer.reset( new ReturnBuffer( args... ) );
+        fReturnBuffer = std::make_unique< ReturnBuffer<XArgs...> >(  args... );
         return;
     }
 
