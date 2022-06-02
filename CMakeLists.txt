@@ -123,7 +123,7 @@ pbuilder_add_submodule( Scarab Scarab )
 pbuilder_use_sm_library( Scarab Scarab )
 
 # this is needed for anything that wants to read or write JSON files
-get_directory_property( RAPIDJSON_FILE_BUFFER_SIZE DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} Scarab DEFINITION RAPIDJSON_FILE_BUFFER_SIZE )
+get_directory_property( RAPIDJSON_FILE_BUFFER_SIZE DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Scarab DEFINITION RAPIDJSON_FILE_BUFFER_SIZE )
 set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
 
 
