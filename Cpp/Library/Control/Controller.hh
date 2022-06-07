@@ -76,7 +76,7 @@ namespace Nymph
 
             /// Initiate a break with a return
             template< typename... XArgs >
-            void BreakAndReturn( XArgs&... args );
+            std::tuple< XArgs&... >&  BreakAndReturn( XArgs&... args );
 
             /// Reports whether control is at a breakpoint
             virtual bool IsAtBreak() const;
@@ -112,17 +112,19 @@ namespace Nymph
     }
 
     template< typename... XArgs >
-    void Controller::BreakAndReturn( XArgs&... args )
+    std::tuple< XArgs&... >&  Controller::BreakAndReturn( XArgs&... args )
     {
         this->Break();
-        fReturnBuffer = std::make_unique< ReturnBuffer<XArgs...> >(  args... );
-        return;
+        std::unique_lock< std::mutex > lock( fReturnMutex );
+        fReturnBuffer = std::make_unique< ReturnBuffer<XArgs...> >( args... );
+        return fReturnBuffer->GetReturn< XArgs... >();
     }
 
     template< class... XArgs >
     std::tuple< XArgs&... >& Controller::GetReturn()
     {
         std::unique_lock< std::mutex > lock( fReturnMutex );
+        if( ! fReturnBuffer ) THROW_EXCEPT_HERE( Exception() << "Return buffer is currently empty" );
         return fReturnBuffer->GetReturn< XArgs... >();
     }
 
