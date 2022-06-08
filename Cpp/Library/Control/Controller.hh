@@ -112,7 +112,7 @@ namespace Nymph
     }
 
     template< typename... XArgs >
-    std::tuple< XArgs&... >&  Controller::BreakAndReturn( XArgs&... args )
+    std::tuple< XArgs&... >& Controller::BreakAndReturn( XArgs&... args )
     {
         this->Break();
         std::unique_lock< std::mutex > lock( fReturnMutex );

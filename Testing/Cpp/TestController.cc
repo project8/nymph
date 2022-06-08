@@ -172,6 +172,7 @@ TEST_CASE( "controller", "[control]" )
         auto retBuf = control.BreakAndReturn(retval);
         // check that we're now at a break point
         REQUIRE( control.IsAtBreak() );
+        REQUIRE( control.HasReturn() );
         // we can access the return variable through the buffer
         REQUIRE( std::get<0>( retBuf ) == Approx(5.) );
         // we can change the value of the return variable using the buffer

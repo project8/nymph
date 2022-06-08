@@ -94,6 +94,20 @@ TEST_CASE( "control_access", "[control]" )
         REQUIRE_NOTHROW( access->ChainIsQuitting( "TestController::ChainIsQuitting::Exception", exceptPtr ) );
     }
 
-
+    SECTION( "ReturnBuffer" )
+    {
+        REQUIRE_FALSE( access->HasReturn() );
+        REQUIRE_THROWS_AS( access->GetReturn<double>(), Exception ); // have to pick a return argument, so I just picked <double> in this case; it could be anything for this test
+        double retval = 5;
+        auto retBuf = access->BreakAndReturn(retval);
+        // check that we're now at a break point
+        REQUIRE( access->IsAtBreak() );
+        REQUIRE( access->HasReturn() );
+        // we can access the return variable through the buffer
+        REQUIRE( std::get<0>( retBuf ) == Approx(5.) );
+        // we can change the value of the return variable using the buffer
+        std::get<0>( retBuf ) = 10.;
+        REQUIRE( retval == Approx(10.) );
+    }
 
 }

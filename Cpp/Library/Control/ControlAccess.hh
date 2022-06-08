@@ -69,10 +69,17 @@ namespace Nymph
 
             /// Initiate a break with a return
             template< typename... XArgs >
-            void BreakAndReturn( XArgs&... args );
+            std::tuple< XArgs&... >& BreakAndReturn( XArgs&... args );
 
-            /// Reports whether control is at a breakpoint
+            /// Report whether control is at a breakpoint
             bool IsAtBreak() const;
+
+            /// Check whether the return buffer has been filled
+            bool HasReturn() const;
+
+            /// Get the return buffer
+            template< typename... XArgs >
+            std::tuple< XArgs&... >& GetReturn();
 
             /// Notify the control that a chain is quitting
             void ChainIsQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
@@ -82,11 +89,17 @@ namespace Nymph
     };
 
     template< class... XArgs >
-    void ControlAccess::BreakAndReturn( XArgs&... args )
+    std::tuple< XArgs&... >& ControlAccess::BreakAndReturn( XArgs&... args )
     {
-        if( fControl ) fControl->BreakAndReturn( args... );
+        if( fControl ) return fControl->BreakAndReturn( args... );
         else THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
-        return;
+    }
+
+    template< class... XArgs >
+    std::tuple< XArgs&... >& ControlAccess::GetReturn()
+    {
+        if( fControl ) return fControl->GetReturn< XArgs... >();
+        else THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
     }
 
 /*

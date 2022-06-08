@@ -75,6 +75,12 @@ namespace Nymph
         THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
     }
 
+    bool ControlAccess::HasReturn() const
+    {
+        if( fControl ) return fControl->HasReturn();
+        THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
+    }
+
     void ControlAccess::ChainIsQuitting( const std::string& name, std::exception_ptr ePtr )
     {
         if( fControl ) fControl->ChainIsQuitting( name, ePtr );
