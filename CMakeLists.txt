@@ -87,8 +87,8 @@ if( Nymph_ENABLE_PYTHON )
     include_directories( ${Python3_INCLUDE_DIRS} )
 
     set_option( Scarab_BUILD_PYTHON TRUE )
-    add_subdirectory( Python )
-    
+    add_subdirectory( Python/Bindings )
+
 else( Nymph_ENABLE_PYTHON )
     set_option( Scarab_BUILD_PYTHON FALSE )
 endif( Nymph_ENABLE_PYTHON )
