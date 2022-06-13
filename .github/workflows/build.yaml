@@ -162,6 +162,10 @@ jobs:
       - name: Python Build
         run: |
           python -m build
+      
+      - name: Create a Python distributable package
+        run: |
+          pip install dist/nymph-2.0.0-cp39-cp39-*.whl
 
       - name: Run tests
         run: |
