@@ -9,16 +9,35 @@ import unittest
 
 import _nymph
 
-class TestData(_nymph.data._Data):
+'''Data class with integer variables'''
+class TestData1(_nymph.data._Data):
     
-    def __init__(self, test_var=5):
+    def __init__(self, test_var1=0, test_var2=5):
         super().__init__()
-        self.test_var = test_var
+        self.test_var1 = test_var1
+        self.test_var2 = test_var2
 
-class TestDataMethods(unittest.TestCase):
-    data=TestData()
-    def test_data_assignment(self):
-        self.assertEqual(self.data.test_var,5)
+'''Data class with floating point variables'''
+class TestData2(_nymph.data._Data):
+    
+    def __init__(self, test_var1=0.0, test_var2=10.0):
+        super().__init__()
+        self.test_var1 = test_var1
+        self.test_var2 = test_var2
+
+# The way to access member variables need to be modified if getters/setters are used in the python version
+class TestDataMethod(unittest.TestCase):
+    '''Testing of integer type data'''
+    data1=TestData1()
+    def test_idata_assignment(self):
+        self.assertEqual(self.data1.test_var1,0)
+        self.assertEqual(self.data1.test_var2,5)
+    
+    '''Testing of floating point type data'''
+    data2=TestData2()
+    def test_fdata_assignment(self):
+        self.assertAlmostEqual(self.data2.test_var1,0.0)
+        self.assertAlmostEqual(self.data2.test_var2,10.0)
 
 if __name__ == '__main__':
     unittest.main()
