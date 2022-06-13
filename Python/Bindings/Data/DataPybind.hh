@@ -28,7 +28,7 @@ namespace NymphPybind
     void ExportData( py::module_& nymphData)
     {
         py::class_< Nymph::Data, PyData, std::shared_ptr<Nymph::Data> >(nymphData, "_Data")
-                .def(py::init<const std::string& >())
+                .def(py::init< >());
 
     }
 
