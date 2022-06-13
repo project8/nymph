@@ -163,10 +163,10 @@ jobs:
         run: |
           python -m build
 
-      #- name: Run tests
-      #  run: |
-      #    cd build
-      #    Testing/RunTests
+      - name: Run tests
+       run: |
+         cd Testing/Python
+         python -m unittest discover -v
 
       #- name: Python Build
       #  run: |
