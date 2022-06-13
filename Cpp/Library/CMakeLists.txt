@@ -18,6 +18,7 @@ include_directories( BEFORE
 )
 
 set( NYMPH_HEADERFILES
+    ${UTIL_DIR}/ConfigException.hh
     ${UTIL_DIR}/Exception.hh
     ${UTIL_DIR}/MemberVariable.hh
 
@@ -44,6 +45,7 @@ set( NYMPH_HEADERFILES
 )
 
 set( NYMPH_SOURCEFILES
+    ${UTIL_DIR}/ConfigException.cc
     ${UTIL_DIR}/Exception.cc
 
     ${DATA_DIR}/Data.cc
