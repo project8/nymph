@@ -57,6 +57,7 @@ TEST_CASE( "single_run_controller" )
         auto config = translator.read_string( config_str, "yaml" );
 
         REQUIRE_NOTHROW( toolbox.Configure( config->as_node() ) );
+        REQUIRE_NOTHROW( controller.Configure( config->as_node() ) );
 
         auto ppProc = std::dynamic_pointer_cast< TestPrimaryProc >( toolbox.GetProcessor( "pp" ) );
         REQUIRE( ppProc );
