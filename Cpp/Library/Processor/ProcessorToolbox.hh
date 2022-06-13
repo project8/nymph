@@ -15,8 +15,6 @@
 #include "factory.hh"
 #include "param.hh"
 
-#include <deque>
-#include <initializer_list>
 #include <limits>
 #include <set>
 #include <memory>
@@ -76,26 +74,6 @@ namespace Nymph
     */
     class ProcessorToolbox
     {
-        public:
-            struct ThreadSource
-            {
-                PrimaryProcessor* fProc;
-                std::string fName;
-                //ControlAccessPtr fControlAccess;
-                ThreadSource( PrimaryProcessor* proc, const std::string& name ) : 
-                        fProc(proc), fName(name)//, fControlAccess( new ControlAccess() )
-                {}
-            };
-            struct CompareThreadSource
-            {
-                bool operator()( const ThreadSource& lhs, const ThreadSource& rhs ) const
-                {
-                    return lhs.fProc < rhs.fProc;
-                }
-            };
-            typedef std::set< ThreadSource, CompareThreadSource > ThreadSourceGroupT;
-            typedef std::deque< ThreadSourceGroupT > RunQueueT;
-
         protected:
             typedef std::unique_lock< std::mutex > unique_lock;
 
@@ -183,31 +161,6 @@ namespace Nymph
             bool ParseSignalSlotName( const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot ) const;
             static const char fSigSlotNameSep = ':';
 
-        public:
-            /// Setup the run queue according to the `run-queue` configuration block
-            void ConfigureRunQueue( const scarab::param_array& node );
-
-            /// Push a single processor to the back of the run queue
-            bool PushBackToRunQueue( const std::string& name );
-
-            /// Push a set of processors to be run in parallel to the back of the run queue
-            bool PushBackToRunQueue( std::initializer_list< std::string > names );
-            /// Push a set of processors to be run in parallel to the back of the run queue
-            bool PushBackToRunQueue( std::vector< std::string > names );
-
-            /// Remove the last item in the run queue, whether it's a single processor or a group of processors
-            void PopBackOfRunQueue();
-
-            /// Clear the run queue
-            void ClearRunQueue();
-
-            /// Const access to the run queue
-            const RunQueueT& RunQueue() const;
-
-        protected:
-            RunQueueT fRunQueue;
-
-            bool AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroupT& group );
     };
 
     inline bool ProcessorToolbox::MakeConnection(const std::string& signal, const std::string& slot) 
@@ -218,23 +171,6 @@ namespace Nymph
     inline bool ProcessorToolbox::MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName)
     {
         return MakeConnection(signalProcName, signalName, slotProcName, slotName, std::numeric_limits< int >::min()); 
-    }
-
-    inline void ProcessorToolbox::PopBackOfRunQueue()
-    {
-        fRunQueue.pop_back();
-        return;
-    }
-
-    inline void ProcessorToolbox::ClearRunQueue()
-    {
-        fRunQueue.clear();
-        return;
-    }
-
-    inline const ProcessorToolbox::RunQueueT& ProcessorToolbox::RunQueue() const
-    {
-        return fRunQueue;
     }
 
 } /* namespace Nymph */

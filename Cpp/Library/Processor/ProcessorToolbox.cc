@@ -23,7 +23,6 @@ namespace Nymph
 
     ProcessorToolbox::ProcessorToolbox( const std::string& name ) :
             fProcFactory( scarab::factory< Processor, const std::string& >::get_instance() ),
-            fRunQueue(),
             fProcMap()
     {
     }
@@ -53,18 +52,6 @@ namespace Nymph
         else
         {
             ConfigureConnections( node["connections"].as_array() );
-        }
-
-        // Finally, deal with processor-run specifications
-        // The run queue is an array of processor names, or groups of names, which will be run sequentially.
-        // If names are grouped (in another array), those in that group will be run in parallel.
-        if( ! node.has("run-queue") )
-        {
-            LWARN( proclog, "Run queue was not specified" );
-        }
-        else
-        {
-            ConfigureRunQueue( node["run-queue"].as_array() );
         }
 
         return;
@@ -186,45 +173,6 @@ namespace Nymph
         return;
     }
 
-    void ProcessorToolbox::ConfigureRunQueue( const scarab::param_array& array )
-    {
-        for( auto rqIt = array.begin(); rqIt != array.end(); ++rqIt )
-        {
-            if( rqIt->is_value() )
-            {
-                if( ! PushBackToRunQueue( (*rqIt)().as_string() ) )
-                {
-                    THROW_EXCEPT_HERE( ConfigException(array) << "Unable to process run-queue entry: could not add processor to the queue" );
-                }
-            }
-            else if( rqIt->is_array() )
-            {
-                const scarab::param_array* rqNode = &( rqIt->as_array() );
-                std::vector< std::string > names;
-
-                for( scarab::param_array::const_iterator rqArrayIt = rqNode->begin(); rqArrayIt != rqNode->end(); ++rqArrayIt )
-                {
-                    if( ! rqArrayIt->is_value() )
-                    {
-                        THROW_EXCEPT_HERE( ConfigException(array) << "Invalid run-queue array entry: not a value" );
-                    }
-                    names.push_back( (*rqArrayIt)().as_string() );
-                }
-
-                if( ! PushBackToRunQueue(names) )
-                {
-                    THROW_EXCEPT_HERE( ConfigException(array) << "Unable to process run-queue entry: could not add list of processors to the queue" );
-                }
-            }
-            else
-            {
-                THROW_EXCEPT_HERE( ConfigException(array) << "Invalid run-queue entry: not a value or array" );
-            }
-        }
-
-        return;
-    }
-
     std::shared_ptr< Processor > ProcessorToolbox::GetProcessor( const std::string& procName )
     {
         ProcMapIt it = fProcMap.find( procName );
@@ -311,7 +259,6 @@ namespace Nymph
     void ProcessorToolbox::ClearProcessors()
     {
         fProcMap.clear();
-        fRunQueue.clear();
         return;
     }
 
@@ -452,70 +399,6 @@ namespace Nymph
         }
         nameOfProc = toParse.substr( 0, sepPos );
         nameOfSigSlot = toParse.substr( sepPos + 1 );
-        return true;
-    }
-
-
-    bool ProcessorToolbox::PushBackToRunQueue( const std::string& name )
-    {
-        ThreadSourceGroupT threadGroup;
-
-        if( ! AddProcessorToThreadGroup( name, threadGroup ) )
-        {
-            LERROR( proclog, "Unable to add processor <" << name << "> to thread group" );
-            return false;
-        }
-
-        fRunQueue.push_back( threadGroup );
-
-        LINFO( proclog, "Added processor <" << name << "> to the run queue" );
-        return true;
-    }
-
-    bool ProcessorToolbox::PushBackToRunQueue( std::initializer_list< std::string > names )
-    {
-        return PushBackToRunQueue( std::vector< std::string >(names) );
-    }
-
-    bool ProcessorToolbox::PushBackToRunQueue( std::vector< std::string > names )
-    {
-        ThreadSourceGroupT threadGroup;
-
-        std::stringstream toPrint;
-        for( const std::string& name : names )
-        {
-            if(! AddProcessorToThreadGroup( name, threadGroup ) )
-            {
-                LERROR( proclog, "Unable to add processor <" << name << "> to thread group" );
-                return false;
-            }
-            toPrint << name << ", "; // the extra comma at the end is removed below
-        }
-
-        fRunQueue.push_back( threadGroup );
-        std::string toPrintString = toPrint.str();
-        toPrintString.resize( toPrintString.size() - 2 );
-        LINFO( proclog, "Added processors <" << toPrintString << "> to the run queue" );
-        return true;
-    }
-
-    bool ProcessorToolbox::AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroupT& group )
-    {
-        std::shared_ptr< Processor > procForRunQueue = GetProcessor( name );
-        LDEBUG( proclog, "Attempting to add processor <" << name << "> to the run queue" );
-        if( procForRunQueue == nullptr )
-        {
-            LERROR( proclog, "Unable to find processor <" << name << "> requested for the run queue" );
-            return false;
-        }
-
-        PrimaryProcessor* primaryProc = dynamic_cast< PrimaryProcessor* >( procForRunQueue.get() );
-        if( primaryProc == nullptr )
-        {
-            LERROR( proclog, "Processor <" << name << "> is not a primary processor." );
-            return false;
-        }
-        group.insert( ThreadSource(primaryProc, name) );
         return true;
     }
 

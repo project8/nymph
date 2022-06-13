@@ -9,7 +9,6 @@
 
 #include "ControlAccess.hh"
 #include "PrimaryProcessor.hh"
-#include "ProcessorToolbox.hh"
 #include "QuitChain.hh"
 
 #include "logger.hh"
@@ -19,7 +18,10 @@ namespace Nymph
 {
     LOGGER( contlog, "SingleRunController");
 
-    SingleRunController::SingleRunController( const std::string& name ) :
+    SingleRunController::SingleRunController( const ProcessorToolbox& procTB, const std::string& name ) :
+            Controller(),
+            fProcTB( procTB ),
+            fRunQueue(),
             fNActiveThreads( 0 ),
             fDoRunThread(),
             fChainThreads()
@@ -36,12 +38,125 @@ namespace Nymph
 
         Controller::Configure( node );
 
+        // The run queue is an array of processor names, or groups of names, which will be run sequentially.
+        // If names are grouped (in another array), those in that group will be run in parallel.
+        if( ! node.has("run-queue") )
+        {
+            LWARN( contlog, "Run queue was not specified" );
+        }
+        else
+        {
+            ConfigureRunQueue( node["run-queue"].as_array() );
+        }
+
         return;
     }
 
-    void SingleRunController::Run( const ProcessorToolbox& procTB )
+    void SingleRunController::ConfigureRunQueue( const scarab::param_array& array )
     {
-        StartRun( procTB );
+        for( auto rqIt = array.begin(); rqIt != array.end(); ++rqIt )
+        {
+            if( rqIt->is_value() )
+            {
+                if( ! PushBackToRunQueue( (*rqIt)().as_string() ) )
+                {
+                    THROW_EXCEPT_HERE( ConfigException(array) << "Unable to process run-queue entry: could not add processor to the queue" );
+                }
+            }
+            else if( rqIt->is_array() )
+            {
+                const scarab::param_array* rqNode = &( rqIt->as_array() );
+                std::vector< std::string > names;
+
+                for( scarab::param_array::const_iterator rqArrayIt = rqNode->begin(); rqArrayIt != rqNode->end(); ++rqArrayIt )
+                {
+                    if( ! rqArrayIt->is_value() )
+                    {
+                        THROW_EXCEPT_HERE( ConfigException(array) << "Invalid run-queue array entry: not a value" );
+                    }
+                    names.push_back( (*rqArrayIt)().as_string() );
+                }
+
+                if( ! PushBackToRunQueue(names) )
+                {
+                    THROW_EXCEPT_HERE( ConfigException(array) << "Unable to process run-queue entry: could not add list of processors to the queue" );
+                }
+            }
+            else
+            {
+                THROW_EXCEPT_HERE( ConfigException(array) << "Invalid run-queue entry: not a value or array" );
+            }
+        }
+
+        return;
+    }
+
+    bool SingleRunController::PushBackToRunQueue( const std::string& name )
+    {
+        ThreadSourceGroupT threadGroup;
+
+        if( ! AddProcessorToThreadGroup( name, threadGroup ) )
+        {
+            LERROR( contlog, "Unable to add processor <" << name << "> to thread group" );
+            return false;
+        }
+
+        fRunQueue.push_back( threadGroup );
+
+        LINFO( contlog, "Added processor <" << name << "> to the run queue" );
+        return true;
+    }
+
+    bool SingleRunController::PushBackToRunQueue( std::initializer_list< std::string > names )
+    {
+        return PushBackToRunQueue( std::vector< std::string >(names) );
+    }
+
+    bool SingleRunController::PushBackToRunQueue( std::vector< std::string > names )
+    {
+        ThreadSourceGroupT threadGroup;
+
+        std::stringstream toPrint;
+        for( const std::string& name : names )
+        {
+            if(! AddProcessorToThreadGroup( name, threadGroup ) )
+            {
+                LERROR( contlog, "Unable to add processor <" << name << "> to thread group" );
+                return false;
+            }
+            toPrint << name << ", "; // the extra comma at the end is removed below
+        }
+
+        fRunQueue.push_back( threadGroup );
+        std::string toPrintString = toPrint.str();
+        toPrintString.resize( toPrintString.size() - 2 );
+        LINFO( contlog, "Added processors <" << toPrintString << "> to the run queue" );
+        return true;
+    }
+
+    bool SingleRunController::AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroupT& group )
+    {
+        std::shared_ptr< Processor > procForRunQueue = fProcTB.GetProcessor( name );
+        LDEBUG( contlog, "Attempting to add processor <" << name << "> to the run queue" );
+        if( procForRunQueue == nullptr )
+        {
+            LERROR( contlog, "Unable to find processor <" << name << "> requested for the run queue" );
+            return false;
+        }
+
+        PrimaryProcessor* primaryProc = dynamic_cast< PrimaryProcessor* >( procForRunQueue.get() );
+        if( primaryProc == nullptr )
+        {
+            LERROR( contlog, "Processor <" << name << "> is not a primary processor." );
+            return false;
+        }
+        group.insert( ThreadSource(primaryProc, name) );
+        return true;
+    }
+    
+    void SingleRunController::Run()
+    {
+        StartRun();
 
         if( fDoRunThread.joinable() ) 
         {
@@ -53,7 +168,7 @@ namespace Nymph
         return;
     }
 
-    void SingleRunController::StartRun( const ProcessorToolbox& procTB )
+    void SingleRunController::StartRun()
     {
         if( fDoRunThread.joinable() )
         {
@@ -73,7 +188,7 @@ namespace Nymph
             {
                 LPROG( contlog, "Starting multi-threaded processing" );
 
-                for (auto rqIter = procTB.RunQueue().begin(); rqIter != procTB.RunQueue().end(); ++rqIter)
+                for (auto rqIter = fRunQueue.begin(); rqIter != fRunQueue.end(); ++rqIter)
                 {
                     { // scope for mutex lock
                         std::unique_lock< std::mutex > lock( fMutex );
