@@ -8,6 +8,7 @@
 #ifndef NYMPH_PROCESSOR_HH_
 #define NYMPH_PROCESSOR_HH_
 
+#include "ConfigException.hh"
 #include "SignalSlotBase.hh"
 
 #include "factory.hh"
@@ -21,36 +22,6 @@ namespace Nymph
     LOGGER(processorlog, "Processor.hh");
 
     struct ProcessorException : virtual public Exception {};
-
-    /*!
-     @class ConfigException
-     @author N. S. Oblath
-
-     @brief An exception class for use with errors that occur during configuration.
-
-     @details
-
-     The param_node of the configuration in question can be attached to the exception using the constructor 
-     or the function Config().  
-
-    */
-    class ConfigException : public scarab::typed_exception< ConfigException >
-    {
-        public:
-            ConfigException() noexcept;
-            ConfigException( const std::string& a_filename, int a_line ) noexcept;
-            ConfigException( const scarab::param& config ) noexcept;
-            ConfigException( const ConfigException& orig ) noexcept;
-            virtual ~ConfigException() noexcept;
-
-            virtual const char* what() const noexcept;
-
-            MEMVAR_REF( scarab::param_ptr_t, Config );
-
-        protected:
-            mutable std::string fConfigStr;
-    };
-
 
     class Processor
     {

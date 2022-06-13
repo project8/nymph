@@ -28,6 +28,7 @@ set( testing_HEADERS
 #)
 
 set( testing_SOURCES
+    ${CPP_DIR}/TestConfigException.cc
     ${CPP_DIR}/TestControlAccess.cc
     ${CPP_DIR}/TestController.cc
     ${CPP_DIR}/TestData.cc

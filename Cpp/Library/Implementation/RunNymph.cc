@@ -29,7 +29,7 @@ namespace Nymph
 
             // Create and configure the single-run controller.
             LPROG( nlog, "Configuring controller" );
-            SingleRunController controller;
+            SingleRunController controller( procTB );
             if( config.has("controller") )
             {
                 controller.Configure( config["controller"].as_node() );
@@ -38,7 +38,7 @@ namespace Nymph
             LPROG( nlog, "Executing run" );
 
             // Now execute the run
-            controller.Run( procTB );
+            controller.Run();
 
             LPROG( nlog, "That's all, folks!" );
 
