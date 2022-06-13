@@ -36,6 +36,21 @@ namespace Nymph
 
      @brief Performs a single run as specified to the ProcessorToolbox
 
+     @details
+     The SingleRunController performs a run of Katydid as defined by the run queue.  
+     Processors are run in chains headed by a PrimaryProcessor.  
+     The way that PrimaryProcessors are run are specified by the run queue.  
+     PrimaryProcessors can be run serially, or in groups that run in parallel.
+
+     The run queue can be defined in the configuration as follows:
+     <li>run-queue -- (array of strings and arrays of strings) define the queue of processors that will control the running of Nymph.
+     The elements of this array specify processors that are run sequentially.
+     If an element is itself an array, those processors listed in the sub-array will be run in parallel.
+         <ul>
+             <li>processor name -- add a processor to the run queue, or </li>
+             <li>array of processor names -- add a group of processors to the run queue.</li>
+         </ul>
+     </li>
     */
     class SingleRunController : public Controller
     {

@@ -47,30 +47,19 @@ namespace Nymph
      </ol>
 
      Available (nested) configuration values:
-     <ul>
-         <li>run-single-threaded (bool) -- specify whether to run in single-threaded mode (will be ignored if the application has been compiled with the SINGLETHREADED flag set)
-         <li>processors (array of objects) -- create a processor; each object in the array should consist of:
-             <ul>
-                 <li>type -- string specifying the processor type (matches the string given to the Registrar, which should be specified before the class implementation in each processor's .cc file).</li>
-                 <li>name -- string giving the individual processor a name so that multiple processors of the same type can be created.</li>
-             </ul>
-         </li>
-         <li>connection (array of objects) -- connect a signal to a slot; each object should consist of:
-             <ul>
-                 <li>signal -- <i>proc-name:signal-name</i>; name (i.e. the name given in the array of processors above) of the processor, and the signal that will be emitted.</li>
-                 <li>slot -- <i>proc-name:slot-name</li>; name of the processor with the slot that will receive the signal.</li>
-                 <li>group-order -- (optional) integer specifying the order in which slots should be called.
-             </ul>
-         </li>
-         <li>run-queue -- (array of strings and arrays of strings) define the queue of processors that will control the running of Nymph.
-         The elements of this array specify processors that are run sequentially.
-         If an element is itself an array, those processors listed in the sub-array will be run in parallel.
-             <ul>
-                 <li>processor name -- add a processor to the run queue, or </li>
-                 <li>array of processor names -- add a group of processors to the run queue.</li>
-             </ul>
-         </li>
-     </ul>
+     <li>processors (array of objects) -- create a processor; each object in the array should consist of:
+         <ul>
+              <li>type -- string specifying the processor type (matches the string given to the Registrar, which should be specified before the class implementation in each processor's .cc file).</li>
+             <li>name -- string giving the individual processor a name so that multiple processors of the same type can be created.</li>
+         </ul>
+     </li>
+     <li>connection (array of objects) -- connect a signal to a slot; each object should consist of:
+         <ul>
+             <li>signal -- <i>proc-name:signal-name</i>; name (i.e. the name given in the array of processors above) of the processor, and the signal that will be emitted.</li>
+             <li>slot -- <i>proc-name:slot-name</li>; name of the processor with the slot that will receive the signal.</li>
+             <li>group-order -- (optional) integer specifying the order in which slots should be called.
+         </ul>
+     </li>
     */
     class ProcessorToolbox
     {
