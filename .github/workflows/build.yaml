@@ -164,9 +164,9 @@ jobs:
           python -m build
 
       - name: Run tests
-       run: |
-         cd Testing/Python
-         python -m unittest discover -v
+        run: |
+          cd Testing/Python
+          python -m unittest discover -v
 
       #- name: Python Build
       #  run: |
