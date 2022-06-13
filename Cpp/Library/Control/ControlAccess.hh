@@ -19,7 +19,24 @@
 namespace Nymph
 {
 
-    class ControlAccess : public scarab::singleton< ControlAccess >, public ControllerInterface
+    /*!
+     @class ControlAccess
+     @author N. S. Oblath
+
+     @brief Global access to primary control functionality
+
+     @details
+     This is a singleton class that allows access to the active Controller from anywhere in a Nymph-based application.
+
+     Specific functionatity includes:
+     * Initiating a break and (optionally) returning parameters
+     * Continuing from a break
+     * Canceling operations
+     * Waiting for a break/continuation/cancelation
+     * Notifying the Controller that a Processor chain is quitting
+
+    */
+    class ControlAccess : public scarab::singleton< ControlAccess >
     {
         protected:
             allow_singleton_access( ControlAccess );
@@ -33,35 +50,59 @@ namespace Nymph
             /// Returns when processing is completed or a breakpoint is reached
             /// If the return is true, processing can continue after the break
             /// If the return is false, processing has ended (either normally or due to an error)
-            virtual bool WaitForBreakOrCanceled();
+            bool WaitForBreakOrCanceled();
 
             /// Use this to have a thread wait for the end of a run
-            virtual void WaitForEndOfRun();
+            void WaitForEndOfRun();
 
             /// Instruct the Controller to continue after a breakpoint
-            virtual void Continue();
+            void Continue();
 
             /// Cancel all threads and end the run
-            virtual void Cancel( int code = 0 );
+            void Cancel( int code = 0 );
 
             /// Reports whether controls is canceled
-            virtual bool IsCanceled() const;
+            bool IsCanceled() const;
 
             /// Initiate a break
-            virtual void Break();
+            void Break();
 
-            /// Reports whether control is at a breakpoint
-            virtual bool IsAtBreak() const;
+            /// Initiate a break with a return
+            template< typename... XArgs >
+            std::tuple< XArgs&... >& BreakAndReturn( XArgs&... args );
+
+            /// Report whether control is at a breakpoint
+            bool IsAtBreak() const;
+
+            /// Check whether the return buffer has been filled
+            bool HasReturn() const;
+
+            /// Get the return buffer
+            template< typename... XArgs >
+            std::tuple< XArgs&... >& GetReturn();
 
             /// Notify the control that a chain is quitting
-            virtual void ChainIsQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
+            void ChainIsQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
 
-            MEMVAR( ControllerInterface*, Control );
+            MEMVAR( Controller*, Control );
 
     };
 
+    template< class... XArgs >
+    std::tuple< XArgs&... >& ControlAccess::BreakAndReturn( XArgs&... args )
+    {
+        if( fControl ) return fControl->BreakAndReturn( args... );
+        else THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
+    }
 
+    template< class... XArgs >
+    std::tuple< XArgs&... >& ControlAccess::GetReturn()
+    {
+        if( fControl ) return fControl->GetReturn< XArgs... >();
+        else THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
+    }
 
+/*
     class ReturnAccess : public scarab::cancelable
     {
         public:
@@ -99,7 +140,7 @@ namespace Nymph
         if( buffer == nullptr ) throw std::exception();
         return buffer->GetReturn();
     }
-
+*/
 } /* namespace Nymph */
 
 #endif /* NYMPH_CONTROLACCESS_HH_ */

@@ -190,8 +190,8 @@ namespace Nymph
         if( fDoBreakpoint )
         {
             // do the break
-            //control->Break( args... );
-            control->Break();
+            control->BreakAndReturn( args... );
+            //control->Break();
             // wait to continue; once we continue, if we need to quit, then do so
             if( ! control->WaitToContinue() )
             {

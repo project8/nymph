@@ -58,8 +58,6 @@ namespace Nymph
             /// Notify the control that a chain is quitting
             virtual void ChainIsQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() );
 
-            // TODO: return value access
-
             MEMVAR( unsigned, NActiveThreads );
 
         protected:
@@ -68,15 +66,6 @@ namespace Nymph
             typedef std::tuple< PrimaryProcessor*, std::thread, std::exception_ptr > ThreadBundle;
             std::map< std::string, ThreadBundle > fChainThreads;
 
-        public:
-        /*
-            template< typename... Args >
-            std::tuple< Args&... >& GetReturn();
-
-            template< typename... Args >
-            void Break( Args&... args ); // to be called by a working thread
-        */
-
     };
 
    inline void SingleRunController::JoinRunThread()
@@ -84,7 +73,6 @@ namespace Nymph
         fDoRunThread.join();
         return;
     }
-
 
 } /* namespace Nymph */
 

@@ -164,4 +164,20 @@ TEST_CASE( "controller", "[control]" )
 
     }
 
+    SECTION( "ReturnBuffer" )
+    {
+        REQUIRE_FALSE( control.HasReturn() );
+        REQUIRE_THROWS_AS( control.GetReturn<double>(), Exception ); // have to pick a return argument, so I just picked <double> in this case; it could be anything for this test
+        double retval = 5;
+        auto retBuf = control.BreakAndReturn(retval);
+        // check that we're now at a break point
+        REQUIRE( control.IsAtBreak() );
+        REQUIRE( control.HasReturn() );
+        // we can access the return variable through the buffer
+        REQUIRE( std::get<0>( retBuf ) == Approx(5.) );
+        // we can change the value of the return variable using the buffer
+        std::get<0>( retBuf ) = 10.;
+        REQUIRE( retval == Approx(10.) );
+    }
+
 }

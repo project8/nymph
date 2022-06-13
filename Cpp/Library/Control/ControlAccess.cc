@@ -15,7 +15,6 @@ namespace Nymph
 {
     ControlAccess::ControlAccess() :
             scarab::singleton< ControlAccess >(),
-            ControllerInterface(),
             fControl( nullptr )
     {
 
@@ -76,6 +75,12 @@ namespace Nymph
         THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
     }
 
+    bool ControlAccess::HasReturn() const
+    {
+        if( fControl ) return fControl->HasReturn();
+        THROW_EXCEPT_HERE( Exception() << "Control access does not have a valid controller pointer" );
+    }
+
     void ControlAccess::ChainIsQuitting( const std::string& name, std::exception_ptr ePtr )
     {
         if( fControl ) fControl->ChainIsQuitting( name, ePtr );
@@ -84,7 +89,7 @@ namespace Nymph
     }
 
 
-
+/*
     ReturnAccess::ReturnAccess() :
             fReturn( new ReturnBuffer< int >() )//,
             //fControl()
@@ -92,5 +97,5 @@ namespace Nymph
 
     ReturnAccess::~ReturnAccess()
     {}
-
+*/
 } /* namespace Nymph */

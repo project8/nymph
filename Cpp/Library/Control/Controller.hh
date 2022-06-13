@@ -8,15 +8,16 @@
 #ifndef NYMPH_CONTROLLER_HH_
 #define NYMPH_CONTROLLER_HH_
 
-#include "ControllerInterface.hh"
-
 #include "MemberVariable.hh"
+#include "ReturnBuffer.hh"
 
 #include "cancelable.hh"
 #include "param.hh"
 
 #include <condition_variable>
 #include <mutex>
+
+#include <iostream>
 
 namespace Nymph
 {
@@ -27,8 +28,15 @@ namespace Nymph
 
      @brief Base class for Controller classes, with basic break/continue/cancel functionality
 
+     @details
+     A Controller can:
+
+     * Cancel operations: typically used by either a Processor chain's thread (usually via ControlAccess) or the client of the Controller, this will result in the full cancelation, from the top down, of all Nymph-based operations
+     * Initiate a break: used mostly by a Processor chain's thread where a breakpoint is set, a breakpoint can be initiated with control returned to the client; parameters (e.g. data) can be returned at the break to provide access to the client
+     * Waiting on a break/cancellation/continuation: the Controller can be used to cause a thread to wait on any of those conditions; cancellation will interupt all wait conditions
+     * Be notified of a quitting Processor chain: when a Processor chain quits, it notifies the Controller (via ControlAccess) that it is quitting; if there's an exception, that should be provided to properly forward error conditions
     */
-    class Controller : public ControllerInterface, public scarab::cancelable
+    class Controller : public scarab::cancelable
     {
         public:
             Controller();
@@ -66,6 +74,10 @@ namespace Nymph
             /// Inititate a break
             virtual void Break();
 
+            /// Initiate a break with a return
+            template< typename... XArgs >
+            std::tuple< XArgs&... >&  BreakAndReturn( XArgs&... args );
+
             /// Reports whether control is at a breakpoint
             virtual bool IsAtBreak() const;
 
@@ -76,43 +88,45 @@ namespace Nymph
             MEMVAR_REF_MUTABLE( std::condition_variable, CondVarContinue );
             MEMVAR_REF_MUTABLE( std::condition_variable, CondVarBreak );
             MEMVAR_NOSET( bool, BreakFlag );
-            //MEMVAR_SHARED_PTR_CONST( ReturnBufferBase, ReturnPtr );
 
         protected:
             void do_cancellation( int code );
 
+        public:
+            /// Checks whether the return buffer has been filled
+            bool HasReturn() const;
+
+            /// Get the return buffer
+            template< typename... XArgs >
+            std::tuple< XArgs&... >& GetReturn();
+
+        protected:
+            std::unique_ptr< ReturnBufferBase > fReturnBuffer;
+            MEMVAR_REF_MUTABLE( std::mutex, ReturnMutex );
+
     };
 
-/*
-    template< typename... Args >
-    void SharedControl::Break( Args&... args )
+    inline bool Controller::HasReturn() const
     {
-        while( IsAtBreak() && ! IsCanceled() )
-        {
-            if( ! WaitToContinue() )
-            {
-                THROW_EXCEPT_HERE( Exception() << "Canceled while waiting to initiate a breakpoint" );
-            }
-        }
-
-        std::unique_lock< std::mutex > lock( fMutex );
-        fBreakFlag = true;
-        fCondVarBreak.notify_all();
-        return;
+        return fReturnBuffer.operator bool();
     }
 
-
-
-    template< typename... Args >
-    std::tuple< Args&... >& SharedControl::GetReturn()
+    template< typename... XArgs >
+    std::tuple< XArgs&... >& Controller::BreakAndReturn( XArgs&... args )
     {
-        if( ! fReturnPtr ) THROW_EXCEPT_HERE( Exception() << "No return available" );
-        std::unique_lock< std::mutex > lock( fMutex );
-        std::shared_ptr< ReturnBuffer< Args... > > buffer( std::dynamic_pointer_cast< ReturnBuffer< Args... > >(fReturnPtr) );
-        if( buffer == nullptr ) THROW_EXCEPT_HERE( Exception() << "Incorrect types used to get return" );
-        return buffer->GetReturn();
+        this->Break();
+        std::unique_lock< std::mutex > lock( fReturnMutex );
+        fReturnBuffer = std::make_unique< ReturnBuffer<XArgs...> >( args... );
+        return fReturnBuffer->GetReturn< XArgs... >();
     }
-*/
+
+    template< class... XArgs >
+    std::tuple< XArgs&... >& Controller::GetReturn()
+    {
+        std::unique_lock< std::mutex > lock( fReturnMutex );
+        if( ! fReturnBuffer ) THROW_EXCEPT_HERE( Exception() << "Return buffer is currently empty" );
+        return fReturnBuffer->GetReturn< XArgs... >();
+    }
 
 } /* namespace Nymph */
 

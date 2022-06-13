@@ -37,7 +37,6 @@ set( NYMPH_HEADERFILES
     
     ${CONT_DIR}/ControlAccess.hh
     ${CONT_DIR}/Controller.hh
-    ${CONT_DIR}/ControllerInterface.hh
     ${CONT_DIR}/ReturnBuffer.hh
     ${CONT_DIR}/SingleRunController.hh
 
@@ -58,7 +57,6 @@ set( NYMPH_SOURCEFILES
 
     ${CONT_DIR}/ControlAccess.cc
     ${CONT_DIR}/Controller.cc
-    ${CONT_DIR}/ControllerInterface.cc
     ${CONT_DIR}/ReturnBuffer.cc
     ${CONT_DIR}/SingleRunController.cc
 
