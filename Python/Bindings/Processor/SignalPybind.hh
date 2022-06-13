@@ -12,6 +12,7 @@
 #include <memory>
 
 #include "Signal.hh"
+#include "Processor.hh"
 
 namespace py = pybind11;
 
@@ -41,6 +42,7 @@ namespace NymphPybind
         
         py::class_< Nymph::Signal< XArgs... >, std::shared_ptr<Nymph::Signal< XArgs... > > >(nymphProcessor, pyClsName.c_str())
                 .def(py::init<const std::string& >())
+                .def(py::init<const std::string&,  Nymph::Processor* >())
                 .def("emit", &Nymph::Signal< XArgs... >::Emit)
                 .def("__call__", &Nymph::Signal< XArgs... >::operator());
         
