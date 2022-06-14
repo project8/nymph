@@ -39,5 +39,11 @@ class TestDataMethod(unittest.TestCase):
         self.assertAlmostEqual(self.data2.test_var1,0.0)
         self.assertAlmostEqual(self.data2.test_var2,10.0)
 
+        #Change value and test
+        self.data2.test_var2=20.0
+        self.assertAlmostEqual(self.data2.test_var2,20.0)
+        #Test for failure
+        self.assertAlmostEqual(self.data2.test_var2,30.0)
+
 if __name__ == '__main__':
     unittest.main()
