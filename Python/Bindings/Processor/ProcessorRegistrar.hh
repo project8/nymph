@@ -10,9 +10,13 @@
 
 #include "Processor.hh"
 
+#include "Exception.hh"
+
 #include "logger.hh"
 
 #include <pybind11/eval.h>
+
+#include <memory>
 
 LOGGER( prlog_h, "ProcessorRegistrar.hh" );
 
@@ -28,47 +32,55 @@ namespace Nymph
             virtual ~PyProcCreator()
             {}
 
-            Processor* CreatePythonProcessor( const std::string& moduleName, const std::string& typeName )
-            {
-                /*
-                py::object scope = py::module_::import("__main__").attr("__dict__");
-                std::string execStr = std::string("module = __import__(") + moduleName + ")\n";
-                execStr += "class_ = getattr(module, " + typeName + ")";
-                py::exec( execStr.c_str() );
-                Processor* proc = py::eval("instance = class_()", scope).cast<Processor*>();
-                */
-                py::object scope = py::module_::import( fModuleName ).attr( "__dict__" );
-                Processor* proc = py::eval( fTypeName + "(" + fName + ")", scope ).cast<Processor*>();
-                LWARN( prlog_h, "Processor is at: " << proc );
-                return proc;
-            }
+            void Configure( const scarab::param_node& )
+            {}
 
     };
 
     class PyProcRegistrar : public scarab::registrar< Processor, PyProcCreator, const std::string& >
     {
         public:
-            PyProcRegistrar( const std::string& moduleName, const std::string& typeName, const std::string& name ) :
-                    scarab::registrar< Processor, PyProcCreator, const std::string& >( name ),
-                    fTypeName( typeName ),
-                    fModuleName( moduleName )
+            PyProcRegistrar( const std::string& module, const std::string& type, const std::string& typeName ) :
+                    scarab::registrar< Processor, PyProcCreator, const std::string& >( typeName ),
+                    fType( type ),
+                    fModule( module )
             {}
             virtual ~PyProcRegistrar() {}
 
-            Processor* create( const std::string& name ) const
+            std::shared_ptr<Nymph::Processor> CreatePyProc( const std::string& name ) const
             {
-                PyProcCreator ppc( name );
-                return ppc.CreatePythonProcessor( fModuleName, fTypeName );
+                std::string useModule( fModule );
+                if( useModule.empty() ) useModule = "__main__";
+                py::object scope = py::module_::import( useModule.c_str() ).attr( "__dict__" );
+                std::shared_ptr<Nymph::Processor> proc = py::eval( fType + "(\'" + name + "\')", scope ).cast< std::shared_ptr<Nymph::Processor> >();
+                LWARN( prlog_h, "Processor is at: " << proc.get() );
+                return proc;
+
             }
 
         protected:
-            std::string fTypeName;
-            std::string fModuleName;
+            std::string fType;
+            std::string fModule;
+    };
+
+    std::unique_ptr<PyProcRegistrar> RegisterPyProcessor( const std::string& module, const std::string& type, const std::string& typeName )
+    {
+        return std::unique_ptr<PyProcRegistrar>( new PyProcRegistrar( module, type, typeName ) );
     }
 
-    PyProcRegistrar* RegisterPyProcessor( const std::string& moduleName, const std::string& typeName, const std::string& name )
+    std::shared_ptr< Nymph::Processor > CreatePyProcessor( const std::string& typeName, const std::string& name )
     {
-        return new PyProcRegistrar( typeName, name );
+        scarab::factory< Nymph::Processor, const std::string& >* factory = scarab::factory< Nymph::Processor, const std::string& >::get_instance();
+        if( ! factory->has_class( typeName ) )
+        {
+            THROW_EXCEPT_HERE( Nymph::Exception() << "Did not find processor with type <" << typeName << ">" );
+        }
+        const PyProcRegistrar* ppReg = dynamic_cast< const PyProcRegistrar* >( factory->get_registrar( typeName ) );
+        if( ! ppReg )
+        {
+            THROW_EXCEPT_HERE( Nymph::Exception() << "Registrar did not cast correctly for <" << typeName << ">" );
+        }
+        return ppReg->CreatePyProc( name );
     }
 
 }
