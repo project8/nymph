@@ -1,8 +1,0 @@
-processors:
-- type: test-primary
-  name: pp
-connections:
-- signal: "pp:value"
-  slot: "pp:value"
-run-queue:
-- pp
