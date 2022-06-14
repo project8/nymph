@@ -44,7 +44,8 @@ namespace NymphPybind
                 .def(py::init<const std::string& >())
                 .def(py::init<const std::string&,  Nymph::Processor* >())
                 .def("emit", &Nymph::Signal< XArgs... >::Emit)
-                .def("__call__", &Nymph::Signal< XArgs... >::operator());
+                .def("__call__", &Nymph::Signal< XArgs... >::operator())
+                .def("Connect", &Nymph::Signal< XArgs...>::Connect);
         
     }
 
