@@ -3,7 +3,6 @@ name: PLS Build Nymph test
 on:
   pull_request:
   push:
-    branches: [main, develop]
     tags: ['*']
 
 env:
