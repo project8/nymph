@@ -11,19 +11,17 @@
  *  See scarab::application for details on the configuration option.
  */
 
-#include "logger.hh"
-#include "param.hh"
 #include "RunNymph.hh"
 
+#include "application.hh"
+#include "logger.hh"
 #include "param_codec.hh"
 #include "signal_handler.hh"
-#include "application.hh"
 
 LOGGER( nymphlog, "Nymph" );
 
 int main( int argc, char** argv )
 {
-
 
     LPROG( nymphlog, "Welcome to Nymph!" );
     LDEBUG( nymphlog,
@@ -62,33 +60,24 @@ int main( int argc, char** argv )
             "                                  =                                          \n" <<
             "                                  M                                          \n");
 
-    try
-    {
+    // Start handling signals
+    scarab::signal_handler t_sig_hand;
 
-        // Start handling signals
-        scarab::signal_handler t_sig_hand;
+    // Create the application
+    scarab::main_app the_main;
+    the_main.set_global_verbosity(scarab::logger::ELevel::eDebug);
 
-        // Create the application
-        scarab::main_app the_main;
-        the_main.set_global_verbosity(scarab::logger::ELevel::eDebug);
+    //Runs RunNymph() and sets  the_return based on its return value
+    int the_return = -1;
+    auto t_callback = [&](){
+        the_return = Nymph::RunNymph(  the_main.primary_config() );
+    };
 
-        //Runs RunNymph() and sets  the_return based on its return value
-        int the_return = -1;
-        auto t_callback = [&](){
-            the_return = Nymph::RunNymph(  the_main.primary_config() );
-        };
+    the_main.callback( t_callback );
 
-        the_main.callback( t_callback );
-
-        // Parse CL options and run the application
-        CLI11_PARSE( the_main, argc, argv );
+    // Parse CL options and run the application
+    CLI11_PARSE( the_main, argc, argv );
 
 	return the_return;
-    }
-    catch( std::exception& e )
-    {
-        LERROR( nymphlog, "Exception caught:\n" << e.what() );
-        return -1;
-    }
-
+    
 }
