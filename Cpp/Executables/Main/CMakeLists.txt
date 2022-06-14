@@ -8,7 +8,7 @@ if( NOT Nymph_AS_SUBMODULE )
 endif()
 
 set( Nymph_SOURCES
-    ConfigCheck.cc
+#    ConfigCheck.cc
 )
 if( Nymph_BUILD_NYMPH_EXE )
     set( Nymph_SOURCES
