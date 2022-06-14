@@ -1,4 +1,4 @@
-name: Build and Test Nymph
+name: Build and Test Nymph PLS
 
 on:
   pull_request:
