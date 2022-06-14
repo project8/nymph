@@ -31,12 +31,14 @@ namespace NymphPybind
                 .def("emit", &Nymph::Signal< XArgs... >::Emit)
                 .def("__call__", &Nymph::Signal< XArgs... >::operator())
                 .def("connect", &Nymph::Signal< XArgs...>::Connect)
-                .def("disconnect", &Nymph::SignalBase::Disconnect)
-                .def("disconnect_all", &Nymph::SignalBase::DisconnectAll)
-                .def("add_connection", &Nymph::SignalBase::AddConnection)
-                .def_property("do_breakpoint", &Nymph::SignalBase::GetDoBreakpoint, &Nymph::SignalBase::SetDoBreakpoint)
-                .def_readwrite("name", &Nymph::SignalBase::fName)
-                .def_readonly("connections", &Nymph::SignalBase::fConnections);
+                .def("disconnect", &Nymph::Signal< XArgs... >::Disconnect)
+                .def("disconnect_all", &Nymph::Signal< XArgs... >::DisconnectAll)
+             //   .def("add_connection", &Nymph::Signal< XArgs... >::AddConnection) <- private=cannot be used by signal
+                //.def_property_readonly("connections", &Nymph::Signal< XArgs... >::Connections)
+             //   .def_property_readonly("connections", static_cast<const std::set< Nymph::SlotBase* > (Nymph::Signal< XArgs... >::*)() const>(&Nymph::Signal< XArgs... >::Connections))
+                //.def("set", static_cast<void (Pet::*)(const std::string &)>(&Pet::set), "Set the pet's name");
+                .def_property("do_breakpoint", &Nymph::Signal< XArgs... >::GetDoBreakpoint, &Nymph::Signal< XArgs... >::SetDoBreakpoint);
+             //   .def_readwrite("name", &Nymph::Signal< XArgs... >::fName)
         
     }
 
