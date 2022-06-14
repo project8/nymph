@@ -22,17 +22,10 @@ namespace NymphPybind
 {
     
     template< typename... XArgs >
-    void explicit_name_setter(Nymph::Signal< XArgs... >& signal)
-    {
-        
-    }
-
-    template< typename... XArgs >
     void ExportSignal( py::module_& nymphProcessor, const std::string& typestr)
     {
         std::string pyClsName = std::string("_Signal") + typestr;
-        
-       // py::class_< Nymph::Signal< XArgs... >, std::shared_ptr<Nymph::Signal< XArgs... > > >(nymphProcessor, pyClsName.c_str())
+
        py::class_< Nymph::Signal< XArgs... >, std::shared_ptr<Nymph::Signal< XArgs... > > >(nymphProcessor, pyClsName.c_str())
                 .def(py::init<const std::string& >())
                 .def(py::init<const std::string&,  Nymph::Processor* >())
@@ -41,9 +34,9 @@ namespace NymphPybind
                 .def("connect", &Nymph::Signal< XArgs...>::Connect)
                 .def("disconnect", &Nymph::Signal< XArgs... >::Disconnect)
                 .def("disconnect_all", &Nymph::Signal< XArgs... >::DisconnectAll)
-               // .def_property_readonly("connections", static_cast<const std::set< Nymph::SlotBase* >& (Nymph::Signal< XArgs... >::*)() const>(&Nymph::Signal< XArgs... >::Connections))
-                //.def_property("name", static_cast< const std::string& (Nymph::Signal< XArgs... >::*)() const>(&Nymph::Signal< XArgs... >::Name),
-                //                      static_cast< const std::string& (Nymph::Signal< XArgs... >::*)() const>(&Nymph::Signal< XArgs... >::Name) )
+                .def_property_readonly("connections", static_cast< std::set< Nymph::SlotBase* >& (Nymph::Signal< XArgs... >::*)() const>(&Nymph::Signal< XArgs... >::Connections))
+                .def_property("name", static_cast< const std::string& (Nymph::Signal< XArgs... >::*)() const>(&Nymph::Signal< XArgs... >::Name),
+                                      [](Nymph::Signal< XArgs... >& signal, const std::string& name){signal.Name() = name;} )
                 .def_property("do_breakpoint", &Nymph::Signal< XArgs... >::GetDoBreakpoint, &Nymph::Signal< XArgs... >::SetDoBreakpoint);
         
     }
