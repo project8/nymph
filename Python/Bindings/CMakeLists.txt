@@ -7,13 +7,15 @@ message( "Building Python bindings")
 set( TEST_DIR Testing/Cpp )
 
 include_directories( BEFORE 
-    ${CMAKE_SOURCE_DIR}/${TEST_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/Data
+    ${CMAKE_CURRENT_SOURCE_DIR}/Processor
 )
 
 # Python binding headers
-#set( PYBINDING_HEADERFILES
-    #nymph_pybind_template.hh
-#)
+set( PYBINDING_HEADERFILES
+    Data/DataPybind.hh
+    Processor/ProcessorPybind.hh
+)
 
 # Python bindings
 set( PYBINDING_SOURCEFILES
@@ -24,7 +26,7 @@ set( PROJECT_LIBRARIES Nymph )
 
 pbuilder_add_pybind11_module( _nymph ${PROJECT_LIBRARIES} )
 
-#pbuilder_install_headers( ${PYBINDING_HEADERFILES} )
+pbuilder_install_headers( ${PYBINDING_HEADERFILES} )
 
 if( NOT DEFINED PBUILDER_PY_INSTALL_IN_SITELIB )
     message( STATUS "Installing add_lib_python_path.sh since python modules will not be installed in the site-package directory" )
