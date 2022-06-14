@@ -11,6 +11,7 @@
 #include <pybind11/pybind11.h>
 #include <memory>
 
+#include "SignalSlotBase.hh"
 #include "Signal.hh"
 #include "Processor.hh"
 
@@ -18,22 +19,6 @@ namespace py = pybind11;
 
 namespace NymphPybind
 {
-    //~ //trampoline class
-    //~ class PyProcessor : public Nymph::Processor {
-        //~ public:
-            //~ /* Inherit the constructors */
-            //~ using Nymph::Processor::Processor;
-
-            //~ /* Trampoline (need one for each virtual function) */
-            //~ void Configure( const scarab::param_node& node ) override {
-                //~ PYBIND11_OVERRIDE_PURE(
-                    //~ void, /* Return type */
-                    //~ Processor,      /* Parent class */
-                    //~ Configure,          /* Name of function in C++ (must match Python name) */
-                    //~ node/* Argument(s) */
-                //~ );
-            //~ }
-    //~ };
 
     template< typename... XArgs >
     void ExportSignal( py::module_& nymphProcessor, const std::string& typestr)
@@ -45,16 +30,17 @@ namespace NymphPybind
                 .def(py::init<const std::string&,  Nymph::Processor* >())
                 .def("emit", &Nymph::Signal< XArgs... >::Emit)
                 .def("__call__", &Nymph::Signal< XArgs... >::operator())
-                .def("Connect", &Nymph::Signal< XArgs...>::Connect);
+                .def("connect", &Nymph::Signal< XArgs...>::Connect)
+                .def("disconnect", &Nymph::SignalBase::Disconnect)
+                .def("disconnect_all", &Nymph::SignalBase::DisconnectAll)
+                .def("add_connection", &Nymph::SignalBase::AddConnection)
+                .def_property("do_breakpoint", &Nymph::SignalBase::GetDoBreakpoint, &Nymph::SignalBase::SetDoBreakpoint)
+                .def_readwrite("name", &Nymph::SignalBase::fName)
+                .def_readonly("connections", &Nymph::SignalBase::fConnections);
         
     }
 
 }
 
-            //~ template< typename XOwner >
-            //~ Signal( const std::string& name, XOwner* owner );
-
-
-            //~ virtual void Connect( SlotBase* slot, int group = -1 );
 
 #endif /* PYTHON_BINDINGS_PROCESSOR_SIGNALPYBIND_HH_ */
