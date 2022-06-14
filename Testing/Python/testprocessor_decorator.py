@@ -12,33 +12,29 @@ import _nymph
 import scarab
 
 
-class Decorators():
-    def Slot(method_to_decorate):
-        def execute(self):
-            print('This is a slot method')
-            method_to_decorate(self)
-        return execute
+class Slot():
+    def __init__(self, function, name):
+        self.function = function
+        self.name = name
 
-    def Signal(method_to_decorate):
-        def execute(self):
-            print('This is a signal method')
-            method_to_decorate(self)
-        return execute
+    def execute(self):
+        self.function()
 
-class TestProcessor(_nymph.processor._Processor, Decorators):
-    
+
+class TestProcessor(_nymph.processor._Processor):
+
+    def __init__(self, name):
+        _nymph.processor._Processor.__init__(self, name)
+        self.do_something_slot = Slot(self.do_something, 'do_something')
+
     def configure(self, param_node):
         
         param_dict = param_node.to_python()
         self.x = param_dict['x']
 
-    @Decorators.Slot
     def do_something(self):
         print('Do something')
 
-    @Decorators.Signal
-    def do_another_thing(self):
-        print('Do another thing')
 
 
 def main(args):
@@ -54,7 +50,7 @@ def main(args):
     print(testprocessor.x)
 
     testprocessor.do_something()
-    testprocessor.do_another_thing()
+    testprocessor.do_something_slot.execute()
 
     return 0
 
