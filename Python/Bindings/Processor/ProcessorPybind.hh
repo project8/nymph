@@ -54,7 +54,10 @@ namespace NymphPybind
                 .def("register_slot", &Nymph::Processor::RegisterSlot)
                 .def("get_do_breakpoint", &Nymph::Processor::GetDoBreakpoint)
                 .def("set_do_breakpoint", &Nymph::Processor::SetDoBreakpoint);
-                //.def_property_readonly("name", &Nymph::Processor::Name);
+                .def_property("name", static_cast< const std::string& (Nymph::Processor::*)() const>(&Nymph::Processor::Name),
+                                      [](Nymph::Processor& processor, const std::string& name){processor.Name() = name;} )
+                .def_property_readonly("signals", static_cast< const std::map< std::string, Nymph::SignalBase* >& (Nymph::Processor::*)() const>(&Nymph::Processor::Signals))
+                .def_property_readonly("slots", static_cast< const std::map< std::string, Nymph::SlotBase* >& (Nymph::Processor::*)() const>(&Nymph::Processor::Slots));
         
         nymphProcessor.def("get_processor", &get_processor);
         
