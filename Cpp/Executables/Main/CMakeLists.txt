@@ -13,7 +13,7 @@ set( Nymph_SOURCES
 if( Nymph_BUILD_NYMPH_EXE )
     set( Nymph_SOURCES
         ${Nymph_SOURCES}
-        Nymph_Exe.cc
+        Nymph.cc
     )
 endif( Nymph_BUILD_NYMPH_EXE )
 
