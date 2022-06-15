@@ -13,16 +13,19 @@
 #include "Processor.hh"
 
 #include <pybind11/pybind11.h>
+#include <pybind11/cast.h>
+
 #include <memory>
 
 namespace py = pybind11;
+using namespace py::literals;
 
 namespace NymphPybind
 {
     void ExportProcessorToolbox( py::module_& nymphProcessor )
     {
         py::class_< Nymph::ProcessorToolbox >( nymphProcessor, "ProcessorToolbox" )
-                .def( py::init<const std::string& >() )
+                .def( py::init<const std::string& >(), "name"_a="processor-toolbox" )
                 .def( "configure", &Nymph::ProcessorToolbox::Configure )
                 
                 .def( "configure_processors", &Nymph::ProcessorToolbox::ConfigureProcessors )
