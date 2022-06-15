@@ -1,10 +1,6 @@
 name: PLS Build
 
-on:
-  pull_request:
-  push:
-    branches: [main, develop]
-    tags: ['*']
+on: [push]
 
 env:
   Nymph_BUILD_NYMPH_EXE: ON
