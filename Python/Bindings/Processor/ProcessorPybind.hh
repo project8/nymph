@@ -48,12 +48,6 @@ namespace NymphPybind
                 .def("register_slot", &Nymph::Processor::RegisterSlot)
                 .def("get_do_breakpoint", &Nymph::Processor::GetDoBreakpoint)
                 .def("set_do_breakpoint", &Nymph::Processor::SetDoBreakpoint);
-                //.def_property_readonly("name", &Nymph::Processor::Name);
-        
-        //unfortunately this has to go into library code
-        //for some reason the factory in the wrapped get_processor function above 
-        //cannot find the test-proc when it is registered after the library was compiled
-        //REGISTER_PROCESSOR(Nymph, TestProc, "test-proc");
     }
 
 }
