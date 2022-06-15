@@ -30,8 +30,8 @@ set( NYMPH_HEADERFILES
     ${PROC_DIR}/SignalSlotBase.hh
     ${PROC_DIR}/Slot.hh
 
-#    ${DATA_DIR}/ApplyCut.hh
-#    ${DATA_DIR}/Cut.hh
+    ${DATA_DIR}/ApplyCut.hh
+    ${DATA_DIR}/Cut.hh
     ${DATA_DIR}/CutResult.hh
     ${DATA_DIR}/CutStatus.hh
     ${DATA_DIR}/Data.hh
@@ -52,8 +52,8 @@ set( NYMPH_SOURCEFILES
     ${UTIL_DIR}/ConfigException.cc
     ${UTIL_DIR}/Exception.cc
 
-#    ${DATA_DIR}/ApplyCut.cc
-#    ${DATA_DIR}/Cut.cc
+    ${DATA_DIR}/ApplyCut.cc
+    ${DATA_DIR}/Cut.cc
     ${DATA_DIR}/CutStatus.cc
     ${DATA_DIR}/Data.cc
     ${DATA_DIR}/DataFrame.cc
