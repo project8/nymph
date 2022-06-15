@@ -24,7 +24,7 @@ namespace NymphPybind
 
        py::class_< Nymph::SlotBase, std::shared_ptr<Nymph::SlotBase > >(nymphProcessor, "_Slot")
                 .def(py::init<const std::string& >())
-                .def(py::init<const std::string&,  Nymph::Processor* >())
+                //.def(py::init<const std::string&,  Nymph::Processor* >())
                 .def("connect_to", &Nymph::SlotBase::ConnectTo)
                 .def("disconnect", &Nymph::SlotBase::Disconnect)
                 .def("disconnect_all", &Nymph::SlotBase::DisconnectAll)
