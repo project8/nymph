@@ -14,12 +14,10 @@
 
 LOGGER( testlog, "TestPrimaryProcessor" );
 
-REGISTER_PROCESSOR( Nymph, TestPrimaryProc, "test-primary" );
-
-
 TEST_CASE( "primary_processor", "[primary_processor]" )
 {
     using namespace Nymph;
+    using namespace NymphTesting;
 
     //SharedControl::get_instance()->Reset();
 

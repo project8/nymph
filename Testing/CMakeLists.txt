@@ -15,14 +15,34 @@ include_directories( BEFORE
 
 #pbuilder_install_config (${pytesting_CONFIGFILES})
 
-set( testing_HEADERS
+set( testing_lib_HEADERS
     ${CPP_DIR}/TestControllerClasses.hh
     ${CPP_DIR}/TestDataClasses.hh
     ${CPP_DIR}/TestDataProcessorClasses.hh
     ${CPP_DIR}/TestProcessorClasses.hh
 )
 
-pbuilder_install_headers( ${testing_HEADERS} )
+set( testing_lib_SOURCES
+    ${CPP_DIR}/TestProcessorClasses.cc
+)
+
+set( testing_lib_LIB_DEPENDENCIES 
+    Nymph
+)
+
+pbuilder_library( 
+    TARGET NymphTesting
+    SOURCES ${testing_lib_SOURCES}
+    PUBLIC_EXTERNAL_LIBRARIES ${testing_lib_LIB_DEPENDENCIES}
+)
+
+pbuilder_component_install_and_export( 
+    COMPONENT Library
+    LIBTARGETS NymphTesting
+)
+
+pbuilder_install_headers( ${testing_lib_HEADERS} )
+
 
 #set (pytesting_HEADERS
 #  
@@ -52,6 +72,7 @@ set( testing_SOURCES
 
 set( testing_LIB_DEPENDENCIES 
     Nymph
+    NymphTesting
 )
 
 # Interface library was recommended for Catch:

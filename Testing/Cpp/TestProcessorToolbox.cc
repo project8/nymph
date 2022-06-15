@@ -17,16 +17,16 @@
 LOGGER( testlog, "TestProcessorToolbox" );
 
 
-namespace Nymph
+namespace NymphTesting
 {
-    class ProcTBRevealer : public ProcessorToolbox
+    class ProcTBRevealer : public Nymph::ProcessorToolbox
     {
         public:
-            using ProcessorToolbox::ProcessorToolbox;
+            using Nymph::ProcessorToolbox::ProcessorToolbox;
 
             bool ParseSignalSlotName( const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot ) const
             {
-                return ProcessorToolbox::ParseSignalSlotName( toParse, nameOfProc, nameOfSigSlot );
+                return Nymph::ProcessorToolbox::ParseSignalSlotName( toParse, nameOfProc, nameOfSigSlot );
             }
     };
 }
@@ -35,6 +35,7 @@ namespace Nymph
 TEST_CASE( "processor_toolbox" )
 {
     using namespace Nymph;
+    using namespace NymphTesting;
 
     //SharedControl::get_instance()->Reset();
 

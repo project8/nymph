@@ -17,15 +17,15 @@
 
 LOGGER( testlog, "TestSingleRunController" );
 
-namespace Nymph
+namespace NymphTesting
 {
-    class SRCRevealer : public SingleRunController
+    class SRCRevealer : public Nymph::SingleRunController
     {
         public:
-            using SingleRunController::SingleRunController;
+            using Nymph::SingleRunController::SingleRunController;
 
-            using SingleRunController::ThreadSource;
-            using SingleRunController::ThreadSourceGroupT;
+            using Nymph::SingleRunController::ThreadSource;
+            using Nymph::SingleRunController::ThreadSourceGroupT;
             bool AddProcessorToThreadGroup( const std::string& name, ThreadSourceGroupT& group )
             {
                 return SingleRunController::AddProcessorToThreadGroup( name, group );
@@ -36,6 +36,7 @@ namespace Nymph
 TEST_CASE( "single_run_controller" )
 {
     using namespace Nymph;
+    using namespace NymphTesting;
 
     ProcessorToolbox toolbox;
     SRCRevealer controller( toolbox );

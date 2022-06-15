@@ -13,6 +13,7 @@
 TEST_CASE( "data", "[data]" )
 {
     using namespace Nymph;
+    using namespace NymphTesting;
 
     TestData1 data1;
     REQUIRE( data1.GetIValue1() == 0 );
