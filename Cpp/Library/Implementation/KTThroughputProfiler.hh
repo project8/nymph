@@ -7,10 +7,6 @@
  *      Portability for Mac OS X:
  *      Author: Jens Gustedt
  *      URL: http://stackoverflow.com/a/5167506
- *
- *      Modified for nymph2
- *      Author: Yuhao Sun
- *      time: 2022 06 15
  */
 
 #ifndef THROUGHPUTPROFILER_HH_

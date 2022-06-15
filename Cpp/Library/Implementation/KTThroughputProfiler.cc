@@ -3,7 +3,6 @@
  *
  *  Created on: Nov 30, 2012
  *      Author: nsoblath
- *  Modified by Yuhao Sun for nymph2 2022 06 15
  */
 
 #include "ThroughputProfiler.hh"
