@@ -40,7 +40,7 @@ namespace NymphPybind
     {
         py::class_< Nymph::Processor, PyProcessor, std::shared_ptr<Nymph::Processor> >(nymphProcessor, "_Processor")
                 .def(py::init<const std::string& >())
-                .def("configure", &Nymph::Processor::Configure)
+                .def("Configure", &Nymph::Processor::Configure)
                 .def("connect_signal_to_slot", &Nymph::Processor::ConnectSignalToSlot)
                 .def("connect_a_slot", &Nymph::Processor::ConnectASlot)
                 .def("connect_a_signal", &Nymph::Processor::ConnectASignal)
