@@ -65,7 +65,7 @@ namespace Nymph
 
     std::unique_ptr<PyProcRegistrar> RegisterPyProcessor( const std::string& module, const std::string& type, const std::string& typeName )
     {
-        return std::unique_ptr<PyProcRegistrar>( new PyProcRegistrar( module, type, typeName ) );
+        return std::make_unique<PyProcRegistrar>( module, type, typeName );
     }
 
     std::shared_ptr< Nymph::Processor > CreatePyProcessor( const std::string& typeName, const std::string& name )
