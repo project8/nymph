@@ -7,6 +7,7 @@ message( "Building Python bindings")
 set( TEST_DIR Testing/Cpp )
 
 include_directories( BEFORE 
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/Data
     ${CMAKE_CURRENT_SOURCE_DIR}/Processor
 )
