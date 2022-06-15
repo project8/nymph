@@ -15,6 +15,8 @@ include_directories( BEFORE
 set( PYBINDING_HEADERFILES
     Data/DataPybind.hh
     Processor/ProcessorPybind.hh
+    Processor/SignalPybind.hh
+    Processor/SlotPybind.hh
 )
 
 # Python bindings
