@@ -17,9 +17,16 @@ set( PYBINDING_SOURCEFILES
     NymphTestingPybind.cc
 )
 
-set( PROJECT_LIBRARIES Nymph NymphTesting )
+set( PROJECT_LIBRARIES 
+    Nymph 
+    NymphTesting 
+)
 
-pbuilder_add_pybind11_module( _nymph_testing ${PROJECT_LIBRARIES} )
+pbuilder_add_pybind11_module( 
+    MODULE_NAME _nymph_testing 
+    SOURCEFILES ${PYBINDING_SOURCEFILES}
+    PROJECT_LIBRARIES ${PROJECT_LIBRARIES} 
+)
 
 # Currently there are no headers
 #pbuilder_install_headers( ${TESTING_PYBINDING_HEADERFILES} )
