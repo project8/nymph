@@ -35,6 +35,16 @@ namespace NymphPybind
                     group/* Argument(s) */
                 );
             }
+            
+            /* Trampoline (need one for each virtual function) */
+            bool MatchesTo( Nymph::SignalBase* signal ) override {
+                PYBIND11_OVERRIDE_PURE(
+                    bool, /* Return type */
+                    SlotBase,      /* Parent class */
+                    MatchesTo,          /* Name of function in C++ (must match Python name) */
+                    signal/* Argument(s) */
+                );
+            }
     };
     
     void ExportSlot( py::module_& nymphProcessor)
@@ -44,6 +54,7 @@ namespace NymphPybind
                 .def(py::init<const std::string& >())
                 //.def(py::init<const std::string&,  Nymph::Processor* >())
                 .def("connect_to", &Nymph::SlotBase::ConnectTo)
+                .def("MatchesTo", &Nymph::SlotBase::MatchesTo)
                 .def("disconnect", &Nymph::SlotBase::Disconnect)
                 .def("disconnect_all", &Nymph::SlotBase::DisconnectAll)
                 .def_property("connections", static_cast< std::set< Nymph::SignalBase* >& (Nymph::SlotBase::*)() const>(&Nymph::SlotBase::Connections),
