@@ -30,6 +30,8 @@ namespace NymphPybind
                 .def( "get_processor_const", py::overload_cast< const std::string& >(&Nymph::ProcessorToolbox::GetProcessor, py::const_ ) )
                 .def( "add_processor", py::overload_cast< const std::string&, std::shared_ptr<Nymph::Processor> >(&Nymph::ProcessorToolbox::AddProcessor) )
                 .def( "add_processor", py::overload_cast< const std::string&, const std::string& >(&Nymph::ProcessorToolbox::AddProcessor) )
+                .def( "has_processor", &Nymph::ProcessorToolbox::HasProcessor )
+                .def( "could_build", &Nymph::ProcessorToolbox::CouldBuild )
                 .def( "remove_processor", &Nymph::ProcessorToolbox::RemoveProcessor )
                 .def( "release_processor", &Nymph::ProcessorToolbox::ReleaseProcessor )
                 .def( "clear_processors", &Nymph::ProcessorToolbox::ClearProcessors )

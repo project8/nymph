@@ -48,6 +48,14 @@ TEST_CASE( "processor_toolbox" )
         std::string procName1( "testproc-1" );
         std::string procName2( "testproc-2" );
 
+        REQUIRE( toolbox.CouldBuild( "test-proc" ) );
+        REQUIRE( toolbox.CouldBuild( "test-primary" ) );
+        REQUIRE_FALSE( toolbox.CouldBuild( procName1 ) );
+        REQUIRE_FALSE( toolbox.CouldBuild( procName2 ) );
+
+        REQUIRE_FALSE( toolbox.HasProcessor( procName1 ) );
+        REQUIRE_FALSE( toolbox.HasProcessor( procName2 ) );
+
         REQUIRE_FALSE( toolbox.GetProcessor( procName1 ) );
         REQUIRE_FALSE( toolbox.GetProcessor( procName2 ) );
 
@@ -80,6 +88,9 @@ TEST_CASE( "processor_toolbox" )
 
         REQUIRE( toolbox.AddProcessor(  "test-proc", procName2 ) );
         REQUIRE( toolbox.GetProcessor( procName2 ) );
+
+        REQUIRE( toolbox.HasProcessor( procName1 ) );
+        REQUIRE( toolbox.HasProcessor( procName2 ) );
 
         REQUIRE( toolbox.RemoveProcessor( procName1 ) );
         REQUIRE_FALSE( toolbox.GetProcessor( procName1 ) );

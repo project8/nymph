@@ -11,7 +11,8 @@
 namespace py = pybind11;
 
 
-PYBIND11_MODULE(_nymph_testing, nymphTestingPackage) {
+PYBIND11_MODULE(_nymph_testing, nymphTestingPackage) 
+{
 
     nymphTestingPackage.doc() = "Nymph Testing package";
 
