@@ -36,12 +36,6 @@ namespace NymphPybind
             }
     };
     
-    std::shared_ptr< Nymph::Processor > get_processor(const std::string& type, const std::string& name)
-    {
-        scarab::factory< Nymph::Processor, const std::string& >* factory = scarab::factory< Nymph::Processor, const std::string& >::get_instance();
-        return std::shared_ptr< Nymph::Processor >(factory->create(type, name));
-    }
-
     void ExportProcessor( py::module_& nymphProcessor)
     {
         py::class_< Nymph::Processor, PyProcessor, std::shared_ptr<Nymph::Processor> >(nymphProcessor, "_Processor")
@@ -54,14 +48,6 @@ namespace NymphPybind
                 .def("register_slot", &Nymph::Processor::RegisterSlot)
                 .def("get_do_breakpoint", &Nymph::Processor::GetDoBreakpoint)
                 .def("set_do_breakpoint", &Nymph::Processor::SetDoBreakpoint);
-                //.def_property_readonly("name", &Nymph::Processor::Name);
-        
-        nymphProcessor.def("get_processor", &get_processor);
-        
-        //unfortunately this has to go into library code
-        //for some reason the factory in the wrapped get_processor function above 
-        //cannot find the test-proc when it is registered after the library was compiled
-        //REGISTER_PROCESSOR(Nymph, TestProc, "test-proc");
     }
 
 }
