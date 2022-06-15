@@ -17,6 +17,8 @@ set( PYBINDING_HEADERFILES
     Data/DataPybind.hh
     Processor/ProcessorPybind.hh
     Control/ControllerPybind.hh
+    Processor/ProcessorRegistrar.hh
+    Processor/PyProcCreatorPybind.hh
 )
 
 # Python bindings
