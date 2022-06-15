@@ -9,12 +9,14 @@ set( TEST_DIR Testing/Cpp )
 include_directories( BEFORE 
     ${CMAKE_CURRENT_SOURCE_DIR}/Data
     ${CMAKE_CURRENT_SOURCE_DIR}/Processor
+    ${CMAKE_CURRENT_SOURCE_DIR}/Control
 )
 
 # Python binding headers
 set( PYBINDING_HEADERFILES
     Data/DataPybind.hh
     Processor/ProcessorPybind.hh
+    Control/ControllerPybind.hh
 )
 
 # Python bindings
