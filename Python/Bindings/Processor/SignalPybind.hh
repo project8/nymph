@@ -11,6 +11,7 @@
 #include <pybind11/pybind11.h>
 #include <memory>
 
+#include "NymphBindingHelpers.hh"
 #include "SignalSlotBase.hh"
 #include "Signal.hh"
 #include "Slot.hh"
