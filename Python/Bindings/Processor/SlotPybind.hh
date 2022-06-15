@@ -52,8 +52,7 @@ namespace NymphPybind
 
        py::class_< Nymph::SlotBase, PySlotBase, std::shared_ptr<Nymph::SlotBase > >(nymphProcessor, "_Slot")
                 .def(py::init<const std::string& >())
-                //.def(py::init<const std::string&,  Nymph::Processor* >())
-                .def("connect_to", &Nymph::SlotBase::ConnectTo)
+                .def("ConnectTo", &Nymph::SlotBase::ConnectTo)
                 .def("MatchesTo", &Nymph::SlotBase::MatchesTo)
                 .def("disconnect", &Nymph::SlotBase::Disconnect)
                 .def("disconnect_all", &Nymph::SlotBase::DisconnectAll)
@@ -62,21 +61,6 @@ namespace NymphPybind
                 .def_property("name", static_cast< const std::string& (Nymph::SlotBase::*)() const>(&Nymph::SlotBase::Name),
                                       [](Nymph::SlotBase& slot, const std::string& name){slot.Name() = name;} );
                 
-                
-                        //~ public:
-
-            //~ virtual void ConnectTo( SignalBase* signal, int group = -1 ) = 0;
-
-            //~ void Disconnect( SignalBase* signal);
-            //~ void DisconnectAll();
-
-            //~ typedef std::set< SignalBase* > SignalConnections; // to get around the problem of having a comma inside a macro function argument
-            //~ MEMVAR_REF_MUTABLE( SignalConnections, Connections );
-
-
-        //~ protected:
-            //~ friend class SignalBase;
-            //~ virtual void AddConnection( SignalBase* signal );
         
     }
 
