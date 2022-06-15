@@ -19,10 +19,28 @@ namespace py = pybind11;
 namespace NymphPybind
 {
     
+    //trampoline class
+    class PySlotBase : public Nymph::SlotBase {
+        public:
+            /* Inherit the constructors */
+            using Nymph::SlotBase::SlotBase;
+
+            /* Trampoline (need one for each virtual function) */
+            void ConnectTo( Nymph::SignalBase* signal, int group = -1 ) override {
+                PYBIND11_OVERRIDE_PURE(
+                    void, /* Return type */
+                    SlotBase,      /* Parent class */
+                    ConnectTo,          /* Name of function in C++ (must match Python name) */
+                    signal,
+                    group/* Argument(s) */
+                );
+            }
+    };
+    
     void ExportSlot( py::module_& nymphProcessor)
     {
 
-       py::class_< Nymph::SlotBase, std::shared_ptr<Nymph::SlotBase > >(nymphProcessor, "_Slot")
+       py::class_< Nymph::SlotBase, PySlotBase, std::shared_ptr<Nymph::SlotBase > >(nymphProcessor, "_Slot")
                 .def(py::init<const std::string& >())
                 //.def(py::init<const std::string&,  Nymph::Processor* >())
                 .def("connect_to", &Nymph::SlotBase::ConnectTo)
