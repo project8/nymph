@@ -75,6 +75,9 @@ int main( int argc, char** argv )
 
     the_main.callback( t_callback );
 
+    // options
+    the_main.add_config_flag< bool >( "--dry-run", "dry-run", "Load the config, setup processors, but do not execute the run" );
+
     // Parse CL options and run the application
     CLI11_PARSE( the_main, argc, argv );
 
