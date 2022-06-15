@@ -8,6 +8,7 @@
 #include "ProcessorToolbox.hh"
 #include "SingleRunController.hh"
 
+#include "application.hh"
 #include "logger.hh"
 #include "param.hh"
 
@@ -61,5 +62,11 @@ namespace Nymph
             PrintException( e );
             return RETURN_ERROR;
         }
+    }
+
+    void AddRunNymphOptions( scarab::main_app& an_app )
+    {
+        // options
+        an_app.add_config_flag< bool >( "--dry-run", "dry-run", "Load the config, setup processors, but do not execute the run" );
     }
 }

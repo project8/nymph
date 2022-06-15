@@ -10,12 +10,15 @@
 
 namespace scarab
 {
+    class main_app;
     class param_node;
 }
 
 namespace Nymph
 {
     int RunNymph( scarab::param_node& config );
+
+    void AddRunNymphOptions( scarab::main_app& an_app );
 }
 
 

@@ -65,7 +65,11 @@ int main( int argc, char** argv )
 
     // Create the application
     scarab::main_app the_main;
+
     the_main.set_global_verbosity(scarab::logger::ELevel::eDebug);
+
+    // add the typical CL options
+    Nymph::AddRunNymphOptions( the_main );
 
     //Runs RunNymph() and sets  the_return based on its return value
     int the_return = -1;
@@ -74,9 +78,6 @@ int main( int argc, char** argv )
     };
 
     the_main.callback( t_callback );
-
-    // options
-    the_main.add_config_flag< bool >( "--dry-run", "dry-run", "Load the config, setup processors, but do not execute the run" );
 
     // Parse CL options and run the application
     CLI11_PARSE( the_main, argc, argv );
