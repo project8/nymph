@@ -43,15 +43,6 @@ pbuilder_component_install_and_export(
 
 pbuilder_install_headers( ${testing_lib_HEADERS} )
 
-
-#set (pytesting_HEADERS
-#  
-#)
-
-#set (pytesting_SOURCES
-#
-#)
-
 set( testing_SOURCES
     ${CPP_DIR}/TestConfigException.cc
     ${CPP_DIR}/TestControlAccess.cc
@@ -106,26 +97,9 @@ pbuilder_component_install_and_export(
 #catch_discover_tests(foo)
 
 ############################
-# NymphPyTesting library 
+# NymphTesting Python library 
 ############################
 
-#pbuilder_library( 
-#    TARGET NymphPyTesting
-#    SOURCES ${pytesting_SOURCES}
-#    PROJECT_LIBRARIES ${lib_dependencies}
-#)
-
-#pbuilder_component_install_and_export( 
-#    COMPONENT Testing
-#    LIBTARGETS NymphPyTesting
-#)
-
-#pbuilder_install_headers( ${pytesting_HEADERS} )
-
-############################
-# Executables
-############################
-
-#set( lib_dependencies
-#    NymphPyTesting
-#)
+if( Nymph_ENABLE_PYTHON )
+    add_subdirectory( Python/Bindings )
+endif()
