@@ -35,10 +35,15 @@ namespace Nymph
                 controller.Configure( config["controller"].as_node() );
             }
 
-            LPROG( nlog, "Executing run" );
-
-            // Now execute the run
-            controller.Run();
+            if( config.has( "dry-run" ) && config["dry-run"]().as_bool() )
+            {
+                LPROG( nlog, "Dry run: no execution" );
+            }
+            else
+            {
+                LPROG( nlog, "Executing run" );
+                controller.Run();
+            }
 
             LPROG( nlog, "That's all, folks!" );
 
