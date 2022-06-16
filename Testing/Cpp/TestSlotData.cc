@@ -60,8 +60,6 @@ TEST_CASE( "slot_data", "[slot],[data]" )
 
     SignalData* sigdAdd = dynamic_cast< SignalData* >( adder.Signals().at("add") );
     REQUIRE( sigdAdd );
-    LWARN(tsdlog_hh, "sig do breakpoint? " << sigdAdd->GetDoBreakpoint() );
-    sigdAdd->SetDoBreakpoint( false );
 
     // configure the processor
     adder.SetAddValue( 5 );
