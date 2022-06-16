@@ -68,8 +68,6 @@ namespace Nymph
 
             MEMVAR_REF( boost::function< signature >, Function );
 
-            MEMVAR( bool, DoBreakpoint );
-
         protected:
             void SlotFuncWrapper( XArgs... args );
     };
@@ -126,48 +124,42 @@ namespace Nymph
     template< typename... XArgs >
     Slot< XArgs... >::Slot( const std::string& name, const boost::function< signature >& func ) :
             SlotBase( name ),
-            fFunction( func ),
-            fDoBreakpoint( false )
+            fFunction( func )
     {}
 
     template< typename... XArgs >
     template< typename XOwner >
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) ) :
             SlotBase( name, owner ),
-            fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);} ),
-            fDoBreakpoint(false)
+            fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);} )
     {}
 
     template< typename... XArgs >
     template< typename XOwner >
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) const ) :
             SlotBase( name, owner ),
-            fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);}  ),
-            fDoBreakpoint(false)
+            fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);}  )
     {}
 
     template< typename... XArgs >
     template< typename XOwner >
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, const boost::function< signature >& func ) :
             SlotBase( name, owner ),
-            fFunction( func ),
-            fDoBreakpoint(false)
+            fFunction( func )
     {}
 
     template< typename... XArgs >
     template< typename XOwner, typename XFuncClass >
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ) ) :
             SlotBase( name, owner ),
-            fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
-            fDoBreakpoint(false)
+            fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  )
     {}
 
     template< typename... XArgs >
     template< typename XOwner, typename XFuncClass >
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ) const ) :
             SlotBase( name, owner ),
-            fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
-            fDoBreakpoint(false)
+            fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  )
     {}
 
     template< typename... XArgs >
