@@ -61,7 +61,8 @@ namespace Nymph
             Slot( Slot&& ) = delete;
             virtual ~Slot();
 
-            void ConnectTo( SignalBase* signal, int group = -1 );
+            void ConnectTo( SignalBase* signal, int group = -1 ) override;
+            bool MatchesTo( SignalBase* signal) override;
 
             /// execute fFunction
             void operator()( XArgs... args );
@@ -198,6 +199,12 @@ namespace Nymph
         signal->Connect( this, group );
 
         return;
+    }
+    
+    template< typename... XArgs >
+    bool Slot< XArgs... >::MatchesTo( SignalBase* signal )
+    {
+        return dynamic_cast< Signal< XArgs... >* >( signal ); 
     }
 
     template< typename... XArgs >

@@ -24,6 +24,7 @@ TEST_CASE( "signal_slot", "[signal],[slot],[processor]" )
     int testValue = 0;
 
     Signal< int > signal( "signal" );
+    Signal< float > floatSignal( "float-signal" );
     Slot< int > slot( "slot", [&](int aValue ){ testValue = aValue; } );
 
     REQUIRE_FALSE( signal.GetDoBreakpoint() );
@@ -110,7 +111,8 @@ TEST_CASE( "signal_slot", "[signal],[slot],[processor]" )
 
     SECTION( "connections" )
     {
-        // TODO: connect to an incompatible slot and check exception
+        
+        REQUIRE_THROWS_AS( floatSignal.Connect( &slot), ConnectionException );
 
         REQUIRE_NOTHROW( signal.Connect( &slot ) );
 

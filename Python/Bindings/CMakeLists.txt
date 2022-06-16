@@ -18,6 +18,8 @@ set( PYBINDING_HEADERFILES
     Data/DataPybind.hh
     Processor/ProcessorPybind.hh
     Control/ControllerPybind.hh
+    Processor/SignalPybind.hh
+    Processor/SlotPybind.hh
     Processor/ProcessorRegistrar.hh
     Processor/PyProcCreatorPybind.hh
 )
