@@ -112,7 +112,7 @@ TEST_CASE( "signal_slot", "[signal],[slot],[processor]" )
     SECTION( "connections" )
     {
         
-        REQUIRE_NOTHROW( floatSignal.Connect( &slot), ConnectionException );
+        REQUIRE_THROWS_AS( floatSignal.Connect( &slot), ConnectionException );
 
         REQUIRE_NOTHROW( signal.Connect( &slot ) );
 
