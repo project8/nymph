@@ -9,6 +9,8 @@
 #define PYTHON_BINDINGS_PROCESSOR_SLOTPYBIND_HH_
 
 #include <pybind11/pybind11.h>
+#include <pybind11/functional.h>
+
 #include <memory>
 
 #include "SignalSlotBase.hh"
@@ -49,10 +51,10 @@ namespace NymphPybind
             }
     };
     
-    void ExportSlot( py::module_& nymphProcessor)
+    void ExportSlotBase( py::module_& nymphProcessor)
     {
 
-       py::class_< Nymph::SlotBase, PySlotBase, std::shared_ptr<Nymph::SlotBase > >(nymphProcessor, "_Slot")
+       py::class_< Nymph::SlotBase, PySlotBase, std::shared_ptr<Nymph::SlotBase > >(nymphProcessor, "_SlotBase")
                 .def(py::init<const std::string& >())
                 .def(py::init<const std::string&, Nymph::Processor* >())
                 
@@ -66,6 +68,22 @@ namespace NymphPybind
                                       [](Nymph::SlotBase& slot, const std::string& name){slot.Name() = name;} );
                 
         
+    }
+    
+    
+    template< typename... XArgs >
+    void ExportSlot( py::module_& nymphProcessor, const std::string& typestr)
+    {
+        std::string pyClsName = std::string("_Slot") + typestr;
+        
+        using signature = void( XArgs... );
+
+        py::class_< Nymph::Slot< XArgs... >, Nymph::SlotBase, std::shared_ptr<Nymph::Slot< XArgs... > > >(nymphProcessor, pyClsName.c_str())
+                .def(py::init<const std::string&, const std::function< signature >& >())
+                .def(py::init<const std::string&,  Nymph::Processor*, const std::function< signature >& >())
+                .def("__call__", &Nymph::Slot< XArgs... >::operator())
+                .def_property("function", static_cast< const std::function< signature >& (Nymph::Slot< XArgs... >::*)() const>(&Nymph::Slot< XArgs... >::Function),
+                                      [](Nymph::Slot< XArgs... >& slot, const std::function< signature >& function){slot.Function() = function;} );
     }
 
 }
