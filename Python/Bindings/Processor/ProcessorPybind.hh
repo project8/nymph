@@ -30,7 +30,7 @@ namespace NymphPybind
             void Configure( const scarab::param_node& node ) override {
                 PYBIND11_OVERRIDE_PURE_NAME(
                     void, /* Return type */
-                    Processor,      /* Parent class */
+                    Nymph::Processor,      /* Parent class */
                     "configure",  /*Name of function in python*/
                     Configure,          /* Name of function in C++ */
                     node/* Argument(s) */
