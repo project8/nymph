@@ -26,81 +26,90 @@ namespace NymphPybind
 
             /* Trampoline (need one for each virtual function) */
             bool WaitToContinue() override {
-                PYBIND11_OVERRIDE( /* Using PYBIND11_OVERRIDE since this is for a function with default (non-pure) implementation*/
+                PYBIND11_OVERRIDE_NAME( /* Using PYBIND11_OVERRIDE since this is for a function with default (non-pure) implementation*/
                     bool, /* Return type */
                     Controller,      /* Parent class */
+                    "wait_to_continue",   // Name of method in Python (name)
                     WaitToContinue          /* Name of function in C++ (must match Python name) */
                 );
             }
 
              /* Trampoline */
             bool WaitForBreakOrCanceled() override {
-                PYBIND11_OVERRIDE(
+                PYBIND11_OVERRIDE_NAME(
                     bool, /* Return type */
                     Controller,      /* Parent class */
+                    "wait_for_break_or_canceled",   // Name of method in Python (name)
                     WaitForBreakOrCanceled          /* Name of function in C++ (must match Python name) */
                 );
             }
 
              /* Trampoline */
             void WaitForEndOfRun() override {
-                PYBIND11_OVERRIDE(
+                PYBIND11_OVERRIDE_NAME(
                     void, /* Return type */
                     Controller,      /* Parent class */
+                    "wait_for_end_of_run",   // Name of method in Python (name)
                     WaitForEndOfRun          /* Name of function in C++ (must match Python name) */
                 );
             }
 
              /* Trampoline */
             void Continue() override {
-                PYBIND11_OVERRIDE(
+                PYBIND11_OVERRIDE_NAME(
                     void, /* Return type */
                     Controller,      /* Parent class */
+                    "continue",   // Name of method in Python (name)
                     Continue          /* Name of function in C++ (must match Python name) */
                 );
             }
 
              /* Trampoline */
             void Cancel( int code = 0 ) override {
-                PYBIND11_OVERRIDE(
+                PYBIND11_OVERRIDE_PURE_NAME(
                     void, /* Return type */
                     Controller,      /* Parent class */
+                    "cancel",   // Name of method in Python (name)
                     Cancel          /* Name of function in C++ (must match Python name) */
                 );
             }
 
              /* Trampoline */
             bool IsCanceled() const override {
-                PYBIND11_OVERRIDE(
+                PYBIND11_OVERRIDE_NAME(
                     bool, /* Return type */
                     Controller,      /* Parent class */
+                    "is_canceled",   // Name of method in Python (name)
                     IsCanceled          /* Name of function in C++ (must match Python name) */
                 );
             }
 
              /* Trampoline */
             void Break() override {
-                PYBIND11_OVERRIDE(
+                PYBIND11_OVERRIDE_NAME(
                     void, /* Return type */
                     Controller,      /* Parent class */
+                    "break",   // Name of method in Python (name)
                     Break          /* Name of function in C++ (must match Python name) */
                 );
             }
 
              /* Trampoline */
             bool IsAtBreak() const override {
-                PYBIND11_OVERRIDE(
+                PYBIND11_OVERRIDE_NAME(
                     bool, /* Return type */
                     Controller,      /* Parent class */
+                    "is_at_break",   // Name of method in Python (name)
                     IsAtBreak          /* Name of function in C++ (must match Python name) */
                 );
             }
 
              /* Trampoline */
             void ChainIsQuitting( const std::string& name, std::exception_ptr ePtr = std::exception_ptr() ) override {
-                PYBIND11_OVERRIDE(
+                PYBIND11_OVERRIDE_NAME(
                     void, /* Return type */
                     Controller,      /* Parent class */
+                    "chain_is_quitting",   // Name of method in Python (name)
                     ChainIsQuitting,          /* Name of function in C++ (must match Python name) */
                     name,
                     ePtr
@@ -118,15 +127,15 @@ namespace NymphPybind
     {
         py::class_< Nymph::Controller, PyController, std::shared_ptr<Nymph::Controller> >(nymphController, "_Controller")
                 .def(py::init< >())
-                .def("WaitToContinue", &Nymph::Controller::WaitToContinue)
-                .def("WaitForBreakOrCanceled", &Nymph::Controller::WaitForBreakOrCanceled)
-                .def("WaitForEndOfRun", &Nymph::Controller::WaitForEndOfRun)
-                .def("Continue", &Nymph::Controller::Continue)
-                .def("Cancel", &Nymph::Controller::Cancel, py::arg("code") = 0 )
-                .def("IsCanceled", &Nymph::Controller::IsCanceled)
-                .def("Break", &Nymph::Controller::Break)
-                .def("IsAtBreak", &Nymph::Controller::IsAtBreak)
-                .def("ChainIsQuitting", &Nymph::Controller::ChainIsQuitting, py::arg("name"), py::arg("ePtr") = std::exception_ptr() );
+                .def("wait_to_continue", &Nymph::Controller::WaitToContinue)
+                .def("wait_for_break_or_canceled", &Nymph::Controller::WaitForBreakOrCanceled)
+                .def("wait_for_end_of_run", &Nymph::Controller::WaitForEndOfRun)
+                .def("continue", &Nymph::Controller::Continue)
+                .def("cancel", &Nymph::Controller::Cancel, py::arg("code") = 0 )
+                .def("is_canceled", &Nymph::Controller::IsCanceled)
+                .def("break", &Nymph::Controller::Break)
+                .def("is_at_break", &Nymph::Controller::IsAtBreak)
+                .def("chain_is_quitting", &Nymph::Controller::ChainIsQuitting, py::arg("name"), py::arg("ePtr") = std::exception_ptr() );
     }
 
 }
