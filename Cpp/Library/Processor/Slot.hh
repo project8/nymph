@@ -16,9 +16,8 @@
 
 #include "logger.hh"
 
-#include <boost/function.hpp>
-
-#include <initializer_list>
+//#include <boost/function.hpp>
+#include <functional>
 
 namespace Nymph
 {
@@ -29,19 +28,22 @@ namespace Nymph
      @class Slot
      @author N. S. Oblath
 
-     @brief A Slot is connected to and called by a Signal with the same signature.
+     @brief A Slot is connected to and called by a Signal with the same signature.  Slots call a particular function when they're triggered (usually by a signal).
 
+     @details
+     Usage:
+     The different constructors allow different relationships between the owner of the slot (if there is one) and the owner of the function to be called (if there is one)
+     The function should have the signature void (Args).
     */
     template< typename... XArgs >
     class Slot : public SlotBase
     {
         public:
             using signature = void( XArgs... );
-            using signal_list = std::initializer_list< std::string >;
 
         public:
             /// Unowned slot
-            Slot( const std::string& name, const boost::function< signature >& func );
+            Slot( const std::string& name, const std::function< signature >& func );
             /// Owned slot, non-const member function
             template< typename XOwner >
             Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) );
@@ -50,7 +52,7 @@ namespace Nymph
             Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) const );
             /// Owned slot, generic function
             template< typename XOwner >
-            Slot( const std::string& name, XOwner* owner, const boost::function< signature >& func );
+            Slot( const std::string& name, XOwner* owner, const std::function< signature >& func );
             /// Owned slot, non-const member fuction of another class
             template< typename XOwner, typename XFuncClass >
             Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ) );
@@ -67,56 +69,9 @@ namespace Nymph
             /// execute fFunction
             void operator()( XArgs... args );
 
-            MEMVAR_REF( boost::function< signature >, Function );
+            MEMVAR_REF( std::function< signature >, Function );
 
-            MEMVAR( bool, DoBreakpoint );
-
-        protected:
-            void SlotFuncWrapper( XArgs... args );
     };
-
-
-    /*!
-     @class Slot
-     @author N. S. Oblath
-
-     @brief Creates a slot that calls a member function of the func_owner_type object, taking 0 or more arguments.
-
-     @details
-     Usage:
-     To use this slot type the function to be called by the slot must exist in an object of type FuncOwnerType.
-     The function should have the signature void (Args).
-
-     In your Processor's header add a member variable of type Slot< ProcessorType, ReturnType, Args >.
-     The variable may be private.
-
-     Initialize the slot with the name of the slot, the address of the owner of the slot function, and the function pointer.
-     Optionally, if the Processor is separate from the owner of the slot function, the Processor address is specified as the second argument to the constructor.
-    *//*
-    template< typename... Args >
-    class Slot
-    {
-        public:
-            /// Constructor for the case where the processor has the function that will be called by the slot
-            template< class XFuncOwnerType >
-            Slot( const std::string& name, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( Args... ), std::initializer_list< std::string > signals = {} );
-
-            /// Constructor for the case where the processor and the object with the function that will be called are different
-            template< class XFuncOwnerType >
-            Slot( const std::string& name, Processor* proc, XFuncOwnerType* owner, void (XFuncOwnerType::*func)( Args... ), std::initializer_list< std::string > signals = {} );
-
-            virtual ~Slot();
-
-            const std::string& GetName() const;
-
-            SlotWrapper* GetSlotWrapper();
-
-        protected:
-            std::string fName;
-            SlotWrapper* fSlotWrapper;
-    };
-*/
-
 
     //*******************
     // Implementations
@@ -125,67 +80,49 @@ namespace Nymph
     // Slot
 
     template< typename... XArgs >
-    Slot< XArgs... >::Slot( const std::string& name, const boost::function< signature >& func ) :
+    Slot< XArgs... >::Slot( const std::string& name, const std::function< signature >& func ) :
             SlotBase( name ),
-            fFunction( func ),
-            fDoBreakpoint( false )
+            fFunction( func )
     {}
 
     template< typename... XArgs >
     template< typename XOwner >
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) ) :
-            SlotBase( name ),
-            fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);} ),
-            fDoBreakpoint(false)
-    {
-        owner->RegisterSlot( name, this );
-    }
+            SlotBase( name, owner ),
+            fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);} )
+    {}
 
     template< typename... XArgs >
     template< typename XOwner >
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) const ) :
-            SlotBase( name ),
-            fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);}  ),
-            fDoBreakpoint(false)
-    {
-        owner->RegisterSlot( name, this );
-    }
+            SlotBase( name, owner ),
+            fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);}  )
+    {}
 
     template< typename... XArgs >
     template< typename XOwner >
-    Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, const boost::function< signature >& func ) :
-            SlotBase( name ),
-            fFunction( func ),
-            fDoBreakpoint(false)
-    {
-        owner->RegisterSlot( name, this );
-    }
+    Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, const std::function< signature >& func ) :
+            SlotBase( name, owner ),
+            fFunction( func )
+    {}
 
     template< typename... XArgs >
     template< typename XOwner, typename XFuncClass >
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ) ) :
-            SlotBase( name ),
-            fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
-            fDoBreakpoint(false)
-    {
-        owner->RegisterSlot( name, this );
-    }
+            SlotBase( name, owner ),
+            fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  )
+    {}
 
     template< typename... XArgs >
     template< typename XOwner, typename XFuncClass >
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ) const ) :
-            SlotBase( name ),
-            fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
-            fDoBreakpoint(false)
-    {
-        owner->RegisterSlot( name, this );
-    }
+            SlotBase( name, owner ),
+            fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  )
+    {}
 
     template< typename... XArgs >
     Slot< XArgs... >::~Slot()
-    {
-        DisconnectAll();
-    }
+    {}
 
     template< typename... XArgs >
     void Slot< XArgs... >::ConnectTo( SignalBase* signal, int group )
@@ -210,32 +147,7 @@ namespace Nymph
     template< typename... XArgs >
     inline void Slot< XArgs... >::operator()( XArgs... args )
     {
-//        fFunction( args... );
-        SlotFuncWrapper( args... );
-        return;
-    }
-/*
-    template< typename... XArgs >
-    inline void Slot< XArgs... >::operator()( ControlAccessPtr access, XArgs... args )
-    {
-        SlotFuncWrapper( access, args... );
-        return;
-    }
-*/
-    template< typename... XArgs >
-    inline void Slot< XArgs... >::SlotFuncWrapper( /*ControlAccessPtr access,*/ XArgs... args )
-    {
-        //TODO could do something with `access` here
-        //NOTE (12/9/21): instead of using `access`, get SharedControl and use that
-        //for( auto signalIt = fSignalsUsed.begin(); signalIt != fSignalsUsed.end(); ++signalIt )
-        //{
-        //    (*signalIt)->SetControl( access );
-        //}
-
         fFunction( args... );
-
-        //TODO could do more with `access` here
-
         return;
     }
 

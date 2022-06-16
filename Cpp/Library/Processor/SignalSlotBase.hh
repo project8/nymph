@@ -55,8 +55,8 @@ namespace Nymph
     {
         public:
             SlotBase( const std::string& name );
-            //template< typename XOwner >
-            //SlotBase( const std::string& name, XOwner* owner );
+            template< typename XOwner >
+            SlotBase( const std::string& name, XOwner* owner );
             virtual ~SlotBase();
 
             virtual void ConnectTo( SignalBase* signal, int group = -1 ) = 0;
@@ -89,8 +89,8 @@ namespace Nymph
     {
         public:
             SignalBase( const std::string& name );
-            //template< typename XOwner >
-            //SignalBase( const std::string& name, XOwner* owner );
+            template< typename XOwner >
+            SignalBase( const std::string& name, XOwner* owner );
             virtual ~SignalBase();
 
             virtual void Connect( SlotBase* slot, int group = -1 ) = 0;
@@ -112,6 +112,12 @@ namespace Nymph
             virtual void AddConnection( SlotBase* slot, int group );
     };
 
+    template< typename XOwner >
+    SlotBase::SlotBase( const std::string& name, XOwner* owner )
+    {
+        owner->RegisterSlot( name, this );
+    }
+
     inline void SlotBase::AddConnection( SignalBase* signal )
     {
         fConnections.insert( signal );
@@ -122,6 +128,12 @@ namespace Nymph
     {
         signal->Disconnect( this );
         return;
+    }
+
+    template< typename XOwner >
+    SignalBase::SignalBase( const std::string& name, XOwner* owner )
+    {
+        owner->RegisterSignal( name, this );
     }
 
     inline void SignalBase::AddConnection( SlotBase* slot, int group )

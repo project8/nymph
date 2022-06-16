@@ -16,7 +16,9 @@ namespace Nymph
     {}
 
     SlotBase::~SlotBase()
-    {}
+    {
+        DisconnectAll();
+    }
 
     void SlotBase::DisconnectAll()
     {
@@ -35,7 +37,9 @@ namespace Nymph
     {}
 
     SignalBase::~SignalBase()
-    {}
+    {
+        DisconnectAll();
+    }
 
     // disconnects all previously connected functions
     void SignalBase::DisconnectAll()

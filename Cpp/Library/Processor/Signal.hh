@@ -121,16 +121,12 @@ namespace Nymph
     template< typename... XArgs >
     template< typename XOwner >
     inline Signal< XArgs... >::Signal( const std::string& name, XOwner* owner ) :
-            SignalBase( name )
-    {
-        owner->RegisterSignal( name, this );
-    }
+            SignalBase( name, owner )
+    {}
 
     template< typename... XArgs >
     Signal< XArgs... >::~Signal()
-    {
-        DisconnectAll();
-    }
+    {}
 
     template< typename... XArgs >
     void Signal< XArgs... >::Connect( SlotBase* slot, int group )
