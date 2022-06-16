@@ -67,8 +67,6 @@ namespace Nymph
             Cut* GetCut() const;
             void SetCut(Cut* cut);
             bool SelectCut(const std::string& cutName);
-            template< typename XOwner >
-            Slot RegisteredSlot( const std::string& name, XOwner* owner, void (XOwner::*func)( ) );
 
         private:
             Cut* fCut;
@@ -88,8 +86,6 @@ namespace Nymph
             //***************
             // Slots
             //***************
-
-//            SlotWrapper* fApplyCutSW;
 
         private:
 

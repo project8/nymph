@@ -7,7 +7,7 @@
 
 #include "ApplyCut.hh"
 
-//#include "Cut.hh"
+#include "Cut.hh"
 
 using std::string;
 
@@ -24,10 +24,9 @@ namespace Nymph
             fAfterCutSignal("all", this),
             fAfterCutPassSignal("pass", this),
             fAfterCutFailSignal("fail", this)
-            //There is a Slot.hh object that will register the slot here on initialization
-            fRegisteredSlot("apply", this, &ApplyCut::ApplyTheCut );
     {
-//        fApplyCutSW = RegisterSlot("apply", this, &ApplyCut::ApplyTheCut, {"all", "pass", "fail"});
+	    Slot CutSlot("apply", this, &ApplyCut::ApplyTheCut );
+            RegisterSlot("apply", &CutSlot  );
     }
 
     ApplyCut::~ApplyCut()
@@ -59,9 +58,7 @@ namespace Nymph
         if (fCut == NULL)
         {
             LERROR(cutlog, "No cut was selected");
-//            return false;
         }
-//        return true;
     }
 
     void ApplyCut::SetCut(Cut* cut)
@@ -86,17 +83,15 @@ namespace Nymph
 
     void ApplyCut::ApplyTheCut(DataHandle dataHandle)
     {
-//        std::shared_ptr< ThreadReference > ref = fApplyCutSW->GetThreadRef();
 
         if (fCut == NULL)
         {
-            THROW_EXCEPT_HERE(Exception() << "No cut was specified" );)
+            THROW_EXCEPT_HERE(Exception() << "No cut was specified" );
             return;
         }
 
         bool cutFailed = fCut->Apply(dataHandle);
 
-//        ref->Break( dataHandle, fApplyCutSW->GetDoBreakpoint() );
 
         if (cutFailed)
         {
