@@ -31,7 +31,7 @@ namespace NymphPybind
                 PYBIND11_OVERRIDE_PURE_NAME(
                     void, /* Return type */
                     Processor,      /* Parent class */
-                    configure,  /*Name of function in python*/
+                    "configure",  /*Name of function in python*/
                     Configure,          /* Name of function in C++ */
                     node/* Argument(s) */
                 );

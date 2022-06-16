@@ -33,7 +33,7 @@ namespace NymphPybind
                 PYBIND11_OVERRIDE_PURE_NAME(
                     void, /* Return type */
                     Nymph::SignalBase,      /* Parent class */
-                    connect,            /* Name of function in python */
+                    "connect",            /* Name of function in python */
                     Connect,          /* Name of function in C++ */
                     slot,
                     group/* Argument(s) */
