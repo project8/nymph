@@ -17,6 +17,7 @@
 TEST_CASE( "signal_slot", "[signal],[slot],[processor]" )
 {
     using namespace Nymph;
+    using namespace NymphTesting;
 
     // need a controller to exist
     CIQThrowController controller;

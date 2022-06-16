@@ -109,6 +109,9 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      Nymph_ENABLE_PYTHON: ON
+
     strategy:
       fail-fast: false
       matrix:
@@ -153,7 +156,7 @@ jobs:
           
       - name: Install nymph
         run: |
-          pip install .
+          pip -v install .
           
       - name: Run Tests
         run: |

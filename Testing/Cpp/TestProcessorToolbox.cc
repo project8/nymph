@@ -17,16 +17,16 @@
 LOGGER( testlog, "TestProcessorToolbox" );
 
 
-namespace Nymph
+namespace NymphTesting
 {
-    class ProcTBRevealer : public ProcessorToolbox
+    class ProcTBRevealer : public Nymph::ProcessorToolbox
     {
         public:
-            using ProcessorToolbox::ProcessorToolbox;
+            using Nymph::ProcessorToolbox::ProcessorToolbox;
 
             bool ParseSignalSlotName( const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot ) const
             {
-                return ProcessorToolbox::ParseSignalSlotName( toParse, nameOfProc, nameOfSigSlot );
+                return Nymph::ProcessorToolbox::ParseSignalSlotName( toParse, nameOfProc, nameOfSigSlot );
             }
     };
 }
@@ -35,6 +35,7 @@ namespace Nymph
 TEST_CASE( "processor_toolbox" )
 {
     using namespace Nymph;
+    using namespace NymphTesting;
 
     //SharedControl::get_instance()->Reset();
 
@@ -46,6 +47,14 @@ TEST_CASE( "processor_toolbox" )
 
         std::string procName1( "testproc-1" );
         std::string procName2( "testproc-2" );
+
+        REQUIRE( toolbox.CouldBuild( "test-proc" ) );
+        REQUIRE( toolbox.CouldBuild( "test-primary" ) );
+        REQUIRE_FALSE( toolbox.CouldBuild( procName1 ) );
+        REQUIRE_FALSE( toolbox.CouldBuild( procName2 ) );
+
+        REQUIRE_FALSE( toolbox.HasProcessor( procName1 ) );
+        REQUIRE_FALSE( toolbox.HasProcessor( procName2 ) );
 
         REQUIRE_FALSE( toolbox.GetProcessor( procName1 ) );
         REQUIRE_FALSE( toolbox.GetProcessor( procName2 ) );
@@ -79,6 +88,9 @@ TEST_CASE( "processor_toolbox" )
 
         REQUIRE( toolbox.AddProcessor(  "test-proc", procName2 ) );
         REQUIRE( toolbox.GetProcessor( procName2 ) );
+
+        REQUIRE( toolbox.HasProcessor( procName1 ) );
+        REQUIRE( toolbox.HasProcessor( procName2 ) );
 
         REQUIRE( toolbox.RemoveProcessor( procName1 ) );
         REQUIRE_FALSE( toolbox.GetProcessor( procName1 ) );

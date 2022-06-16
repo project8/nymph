@@ -14,12 +14,10 @@
 
 LOGGER( testlog, "TestProcessor" );
 
-REGISTER_PROCESSOR(Nymph, TestProc, "test-proc");
-
-
 TEST_CASE( "processor", "[signal],[slot],[processor]" )
 {
     using namespace Nymph;
+    using namespace NymphTesting;
 
     // need a controller to exist
     CIQThrowController controller;

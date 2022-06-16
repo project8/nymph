@@ -16,6 +16,7 @@ LOGGER(tsdlog_hh, "testslotdata.hh");
 TEST_CASE( "slot_data", "[slot],[data]" )
 {
     using namespace Nymph;
+    using namespace NymphTesting;
 
     // need a controller to exist
     CIQThrowController controller;
@@ -41,10 +42,10 @@ TEST_CASE( "slot_data", "[slot],[data]" )
     REQUIRE( adder.Slots().count("add-no-sig") == 1 );
 
     // get signal and slot pointers and cast
-    SlotData< In<TestData1>, Out<> >* sdAddSig = dynamic_cast< SlotData< In<TestData1>, Out<> >* >( adder.Slots().at("add-sig") );
-    SlotData< In<TestData1>, Out<> >* sdAddNoSig = dynamic_cast< SlotData< In<TestData1>, Out<> >* >( adder.Slots().at("add-no-sig") );
-    REQUIRE( sdAddSig );
-    REQUIRE( sdAddNoSig );
+    SlotData< In<TestData1>, Out<> >* slotdAddSig = dynamic_cast< SlotData< In<TestData1>, Out<> >* >( adder.Slots().at("add-sig") );
+    SlotData< In<TestData1>, Out<> >* slotdAddNoSig = dynamic_cast< SlotData< In<TestData1>, Out<> >* >( adder.Slots().at("add-no-sig") );
+    REQUIRE( slotdAddSig );
+    REQUIRE( slotdAddNoSig );
 
     SlotData< In<const TestData1>, Out<TestData2> >* sdMult = dynamic_cast< SlotData< In<const TestData1>, Out<TestData2> >* >( adder.Slots().at("multiply") );
     REQUIRE( sdMult );
@@ -68,7 +69,7 @@ TEST_CASE( "slot_data", "[slot],[data]" )
     DataHandle handle = std::make_shared< DataFrame >();
 
     // verify that when we call the slot on an empty frame we get an exception
-    REQUIRE_THROWS_AS( (*sdAddSig)( handle ), Exception );
+    REQUIRE_THROWS_AS( (*slotdAddSig)( handle ), Exception );
 
     TestData1& td1 = handle->Get< TestData1 >();
     td1.SetIValue1( 1 );
@@ -77,15 +78,15 @@ TEST_CASE( "slot_data", "[slot],[data]" )
     // verify that slots can be called, in this case with an input and no output
     // verify that slots work whether or not signals are automatically called
     // call the add slot functions and verify operation
-    REQUIRE_NOTHROW( (*sdAddSig)( handle ) );
+    REQUIRE_NOTHROW( (*slotdAddSig)( handle ) ); // this adds the adder.fAddValue (i.e. 5) to 1 and 2, respectively
     REQUIRE( td1.GetIValue1() == 6 );
     REQUIRE( td1.GetIValue2() == 7 );
 
-    REQUIRE_NOTHROW( (*sdAddNoSig)( handle ) );
-    REQUIRE( td1.GetIValue1() == 11 );
+    REQUIRE_NOTHROW( (*slotdAddNoSig)( handle ) ); // this adds the adder.fAddValue to 6 and 7, respectively
+    REQUIRE( td1.GetIValue1() == 11 ); // and IValue2 would be 12
 
     // call the IToD slot function and verify operation
-    REQUIRE_NOTHROW( (*sdIToD)( handle ) );
+    REQUIRE_NOTHROW( (*sdIToD)( handle ) ); // this adds TestData2 to the frame and sets the integer values in its double variables
     REQUIRE( handle->Has< TestData2 >() );
     TestData2& td2 = handle->Get< TestData2 >();
     REQUIRE( td2.GetDValue1() == Approx(11.) );
@@ -103,10 +104,10 @@ TEST_CASE( "slot_data", "[slot],[data]" )
     // connect signal "add" to slot "i-to-d"
     REQUIRE_NOTHROW( adder.ConnectSignalToSlot( sigdAdd, sdIToD ) );
     // remove TestData2
-    handle->Remove< TestData2 >();
+    handle->Remove< TestData2 >();  // we'll start fresh without a TestData2
     REQUIRE_FALSE( handle->Has< TestData2 >() );
     // call the add-sig slot and verify that the i-to-d slot gets called via the signal
-    REQUIRE_NOTHROW( (*sdAddSig)( handle ) );
+    REQUIRE_NOTHROW( (*slotdAddSig)( handle ) ); //add slot executes, adding 5 to 11, then triggers the i-to-d slot via the add signal, making TestData2 with fDValue2 = 16
     REQUIRE( handle->Has< TestData2 >() );
     REQUIRE( td1.GetIValue1() == 16 );
     REQUIRE( td2.GetDValue1() == Approx(16.) );
@@ -116,7 +117,7 @@ TEST_CASE( "slot_data", "[slot],[data]" )
     handle->Remove< TestData2 >();
     REQUIRE_FALSE( handle->Has< TestData2 >() );
     // call the mult slot and verify that it worked
-    REQUIRE_NOTHROW( (*sdMult)( handle ) );
+    REQUIRE_NOTHROW( (*sdMult)( handle ) ); // for TestData1::fIValue1, multiplies 16 by 2.5 and stores in TestData2::fDValue1
     REQUIRE( td2.GetDValue1() == Approx(40.) );
 }
 

@@ -21,6 +21,13 @@ namespace Nymph
     template< class... XTypes >
     using Out = TypeList< XTypes... >;
 
+    // convenience macro: avoid needing to prepend In and Out with Nymph::
+#define USING_NYMPH_IN_OUT \
+    template< class... XTypes > \
+    using In = Nymph::In<XTypes...>; \
+    template< class... XTypes > \
+    using Out = Nymph::Out<XTypes...>;
+
     template< class XInList, class XOutList >
     class SlotData;
 

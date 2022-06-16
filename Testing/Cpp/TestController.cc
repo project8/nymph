@@ -17,12 +17,12 @@
 
 #include "catch.hpp"
 
-namespace Nymph
+namespace NymphTesting
 {
-    class ControllerRevealer : public Controller
+    class ControllerRevealer : public Nymph::Controller
     {
         public:
-            using Controller::Controller;
+            using Nymph::Controller::Controller;
             virtual ~ControllerRevealer() {}
 
             void SetBreakFlag( bool flag )
@@ -49,6 +49,7 @@ namespace Nymph
 TEST_CASE( "controller", "[control]" )
 {
     using namespace Nymph;
+    using namespace NymphTesting;
 
     ControllerRevealer control;
 

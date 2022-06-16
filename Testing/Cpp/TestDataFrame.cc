@@ -15,6 +15,7 @@
 TEST_CASE( "data_frame", "[data]" )
 {
     using namespace Nymph;
+    using namespace NymphTesting;
 
     DataFrame frame;
     const DataFrame& cFrame = frame;
