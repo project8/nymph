@@ -19,6 +19,9 @@ TEST_CASE( "data_frame", "[data]" )
     DataFrame frame;
     const DataFrame& cFrame = frame;
 
+    // empty Has<>() should return true
+    REQUIRE( frame.Has<>() );
+
     REQUIRE( frame.DataObjects().empty() );
     REQUIRE( frame.Empty() );
     REQUIRE_FALSE( frame.Has< TestData1 >() );
@@ -60,6 +63,10 @@ TEST_CASE( "data_frame", "[data]" )
     REQUIRE_FALSE( newTestData1Ptr );
     REQUIRE( frame.Has< TestData1 >() );
     REQUIRE( frame.Get< TestData1 >().GetIValue1() == 0 ); // check that fIValue1 has the default value; we'll overwrite the data object next, and verify we have the new value
+
+    // verify multiple data types are present (TestData1 and TestData2 should be present at this point)
+    REQUIRE( frame.Has< TestData1, TestData2 >() );
+    REQUIRE( frame.Has< TestData2, TestData1 >() );
 
     // set an object with a copy of an object
     TestData1 anotherTestData1;
