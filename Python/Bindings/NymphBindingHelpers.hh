@@ -3,6 +3,10 @@
 
 #include "pybind11/iostream.h"
 
+//************
+// Call guards
+//************
+
 #define NYMPH_BIND_CALL_GUARD_STREAMS \
     pybind11::call_guard< pybind11::scoped_ostream_redirect, pybind11::scoped_estream_redirect >()
 
@@ -11,5 +15,12 @@
 
 #define NYMPH_BIND_CALL_GUARD_STREAMS_AND_GIL \
     pybind11::call_guard< pybind11::scoped_ostream_redirect, pybind11::scoped_estream_redirect, pybind11::gil_scoped_release >()
+
+//****************
+// Memvar Bindings
+//****************
+
+#define PROPERTY_MEMVAR( name, getter, setter ) \
+    property( name, &getter, &setter )
 
 #endif /* NYMPH_PYBIND_BINDING_HELPERS */
