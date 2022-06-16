@@ -1,8 +1,8 @@
 
 """
-  testprocessor.py
+  testsignal.py
  
-   Created on: Apr 05, 2022
+   Created on: Jun 14, 2022
        Author: F. Thomas
 """
 
@@ -28,6 +28,9 @@ def main(args):
     
     testprocessor.configure(param_node)
     
+    signal = _nymph.processor._SignalData('test-signal', testprocessor)
+    
+    print(signal.name)
     print(testprocessor.x)
     return 0
 

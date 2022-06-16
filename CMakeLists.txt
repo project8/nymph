@@ -137,6 +137,10 @@ add_subdirectory( Cpp/Library )
 #    add_subdirectory( Cpp/Executables_v1 )
 #endif (Nymph_ENABLE_EXECUTABLES )
 
+if (Nymph_ENABLE_EXECUTABLES)
+    add_subdirectory( Cpp/Executables/Main )
+    #add_subdirectory( Cpp/Executables/Validation )
+endif (Nymph_ENABLE_EXECUTABLES )
 
 #########
 # Tests #
