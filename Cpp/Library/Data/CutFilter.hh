@@ -13,6 +13,7 @@
 #include "Signal.hh"
 #include "SignalData.hh"
 #include "DataFrame.hh"
+#include "CoreData.hh"
 
 #include "CutStatus.hh"
 
@@ -82,7 +83,7 @@ namespace Nymph
             bool fAllBits;
 
         public:
-//            bool Filter(const KTCoreData& data);
+            bool Filter(const CoreData& data);
 
             void FilterData(DataHandle dataHandle);
 

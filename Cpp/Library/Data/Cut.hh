@@ -85,7 +85,7 @@ namespace Nymph
 
      const std::string KTAwesomenessCut::Result::sName = "awesomeness-cut";
 
-     KT_REGISTER_CUT(KTAwesomenessCut);
+     REGISTER_CUT(KTAwesomenessCut);
 
      KTAwesomenessCut::KTAwesomenessCut(const std::string& name) :
              KTCutOnData(name),

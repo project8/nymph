@@ -53,15 +53,15 @@ namespace Nymph
             SetCutMaskAll();
         }
     }
-/*
-    bool KTCutFilter::Filter(const KTCoreData& data)
+
+    bool CutFilter::Filter(const CoreData& data)
     {
         if (fAllBits)
         {
-            return data.CutStatus().IsCut();
+            return data.GetCutStatus().IsCut();
         }
 
-        const KTCutStatus& cutStatus = data.CutStatus();
+        const CutStatus& cutStatus = data.GetCutStatus();
         if (fConvertToBitset)
         {
             fCutMask = cutStatus.ToBitset(fCutMaskInt);
@@ -71,19 +71,19 @@ namespace Nymph
 
         return cutStatus.IsCut(fCutMask);
     }
-*/
+
     void CutFilter::FilterData(DataHandle dataHandle)
     {
-/*
-        std::shared_ptr< KTThreadReference > ref = fFilterDataSW->GetThreadRef();
+
+        //std::shared_ptr< KTThreadReference > ref = fFilterDataSW->GetThreadRef();
 
         // all KTDataHandle's have KTCoreData, so we won't bother checking
 
-        bool failCut = Filter(dataHandle->Of< KTCoreDataExt >());
+        bool failCut = Filter(dataHandle->Get< CoreData >());
 
-        ref->Break( dataHandle, fFilterDataSW->GetDoBreakpoint() );
-*/
-/*
+//        ref->Break( dataHandle, fFilterDataSW->GetDoBreakpoint() );
+
+
         if (failCut)
         {
             fAfterCutFailSignal(dataHandle);
@@ -92,7 +92,7 @@ namespace Nymph
         {
             fAfterCutPassSignal(dataHandle);
         }
-*/
+
         fAfterCutSignal(dataHandle);
 
         return;

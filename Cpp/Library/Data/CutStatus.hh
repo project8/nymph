@@ -64,14 +64,6 @@ namespace Nymph
      Cut results can typically be accessed by either name or mask position.
      */
 
-    // external serialization function for CutResult
-//-------SerialRemoved---------
-/*    template< class Archive >
-    void serialize( Archive & archive, KTCutResult& cutResult )
-    {
-        archive( CEREAL_NVP(cutResult.fName), CEREAL_NVP(cutResult.fState), CEREAL_NVP(cutResult.fAssigned) );
-    }
-*/
     class CutStatus
     {
         public:
@@ -299,23 +291,6 @@ namespace Nymph
         return bitset_type(mask);
     }
 
-//------SerialRemoved------
-/*
-    template< class Archive >
-    void KTCutStatus::save( Archive& ar ) const
-    {
-        std::cout << "### save for KTCutStatus" << std::endl;
-        ar( CEREAL_NVP(fCutResults) );
-    }
-
-    template< class Archive >
-    void KTCutStatus::load( Archive& ar )
-    {
-        std::cout << "### load for KTCutStatus" << std::endl;
-        ar( CEREAL_NVP(fCutResults) );
-        UpdateStatus();
-    }
-*/
 } /* namespace Nymph */
 
 #endif /* KTCUTSTATUS_HH_ */
