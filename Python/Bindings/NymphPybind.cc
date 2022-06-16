@@ -8,6 +8,7 @@
 #include <pybind11/pybind11.h>
 
 #include "Data/DataPybind.hh"
+#include "Data/DataFramePybind.hh"
 #include "Processor/ProcessorPybind.hh"
 #include "Processor/PyProcCreatorPybind.hh"
 #include "Processor/SignalPybind.hh"
