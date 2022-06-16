@@ -60,6 +60,7 @@ namespace Nymph
             virtual ~SlotBase();
 
             virtual void ConnectTo( SignalBase* signal, int group = -1 ) = 0;
+            virtual bool MatchesTo( SignalBase* signal) = 0;
 
             void Disconnect( SignalBase* signal);
             void DisconnectAll();
