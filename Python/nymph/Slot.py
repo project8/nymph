@@ -19,12 +19,14 @@ class Slot(SlotBase):
         else:
             SlotBase.__init__(self, name, owner)
 
+        if not callable(func):
+            raise TypeError('Function object (func) is not callable')
         self.func = func
 
     def connect_to(self, slot, group):
         raise NotImplementedError('Python slots cannot yet be connected to signals')
 
-    def __call__(self):
-        raise NotImplementedError('Slot calls in Python has not yet been implemented')
+    def __call__(self, *args):
+        self.func(*args)
 
     # TODO? DoBreakpoint
