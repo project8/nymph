@@ -31,7 +31,8 @@ PYBIND11_MODULE(_nymph, nymphPackage) {
     auto nymphProcessor = nymphPackage.def_submodule("processor", "Processor module");
     NymphPybind::ExportProcessor(nymphProcessor);
     NymphPybind::ExportPyProcCreator(nymphProcessor);
-    
+    NymphPybind::ExportSignalBase(nymphProcessor);
     NymphPybind::ExportSignal<Nymph::DataHandle>(nymphProcessor, "Data");
+    
     auto nymphUtility = nymphPackage.def_submodule("utility", "Utility module");
 }
