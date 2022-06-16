@@ -27,10 +27,11 @@ namespace NymphPybind
 
             /* Trampoline (need one for each virtual function) */
             void ConnectTo( Nymph::SignalBase* signal, int group = -1 ) override {
-                PYBIND11_OVERRIDE_PURE(
+                PYBIND11_OVERRIDE_PURE_NAME(
                     void, /* Return type */
-                    SlotBase,      /* Parent class */
-                    ConnectTo,          /* Name of function in C++ (must match Python name) */
+                    Nymph::SlotBase,      /* Parent class */
+                    "connect_to",       /* Name of function in python */
+                    ConnectTo,          /* Name of function in C++ */
                     signal,
                     group/* Argument(s) */
                 );
@@ -38,10 +39,11 @@ namespace NymphPybind
             
             /* Trampoline (need one for each virtual function) */
             bool MatchesTo( Nymph::SignalBase* signal ) override {
-                PYBIND11_OVERRIDE_PURE(
+                PYBIND11_OVERRIDE_PURE_NAME(
                     bool, /* Return type */
-                    SlotBase,      /* Parent class */
-                    MatchesTo,          /* Name of function in C++ (must match Python name) */
+                    Nymph::SlotBase,      /* Parent class */
+                    "matches_to",  /* Name of function in python */
+                    MatchesTo,          /* Name of function in C++ */
                     signal/* Argument(s) */
                 );
             }
@@ -52,8 +54,8 @@ namespace NymphPybind
 
        py::class_< Nymph::SlotBase, PySlotBase, std::shared_ptr<Nymph::SlotBase > >(nymphProcessor, "_Slot")
                 .def(py::init<const std::string& >())
-                .def("ConnectTo", &Nymph::SlotBase::ConnectTo)
-                .def("MatchesTo", &Nymph::SlotBase::MatchesTo)
+                .def("connect_to", &Nymph::SlotBase::ConnectTo)
+                .def("matches_to", &Nymph::SlotBase::MatchesTo)
                 .def("disconnect", &Nymph::SlotBase::Disconnect)
                 .def("disconnect_all", &Nymph::SlotBase::DisconnectAll)
                 .def_property("connections", static_cast< std::set< Nymph::SignalBase* >& (Nymph::SlotBase::*)() const>(&Nymph::SlotBase::Connections),
