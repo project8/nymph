@@ -21,6 +21,12 @@
 namespace py = pybind11;
 using namespace py::literals;
 
+namespace Nymph
+{
+    // forward declare Processor because we need to specify an Owner type for Signals and Slots
+    class Processor;
+}
+
 namespace NymphPybind
 {
     // SlotBase trampoline class
@@ -47,6 +53,7 @@ namespace NymphPybind
     {
         py::class_< Nymph::SlotBase, PySlotBase >( nymphProcessor, "SlotBase" )
                 .def( py::init< const std::string& >() )
+                .def( py::init< const std::string&, Nymph::Processor* >() )
                 .def( "connect_to", &Nymph::SlotBase::ConnectTo, "signal"_a, "group"_a=-1 )
                 .def( "disconnect", &Nymph::SlotBase::Disconnect )
                 .def( "disconnect_all", &Nymph::SlotBase::DisconnectAll )
@@ -80,6 +87,7 @@ namespace NymphPybind
     {
         py::class_< Nymph::SignalBase, PySignalBase >( nymphProcessor, "SignalBase" )
                 .def( py::init< const std::string& >() )
+                .def( py::init< const std::string&, Nymph::Processor* >() )
                 .def( "connect", &Nymph::SignalBase::Connect, "slot"_a, "group"_a=-1 )
                 .def( "disconnect", &Nymph::SignalBase::Disconnect )
                 .def( "disconnect_all", &Nymph::SignalBase::DisconnectAll )
