@@ -186,9 +186,11 @@ namespace Nymph
         if( fDoBreakpoint )
         {
             // do the break
+            LDEBUG( signallog, "Doing breakpoint; will now break and return" );
             control->BreakAndReturn( args... );
             //control->Break();
             // wait to continue; once we continue, if we need to quit, then do so
+            LDEBUG( signallog, "Will now wait to continue" );
             if( ! control->WaitToContinue() )
             {
                 QUIT_CHAIN; // throws QuitThread; should be caught by PrimaryProcessor::operator()
