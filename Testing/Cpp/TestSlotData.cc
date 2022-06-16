@@ -10,6 +10,9 @@
 
 #include "catch.hpp"
 
+#include "logger.hh"
+LOGGER(tsdlog_hh, "testslotdata.hh");
+
 TEST_CASE( "slot_data", "[slot],[data]" )
 {
     using namespace Nymph;
@@ -57,6 +60,8 @@ TEST_CASE( "slot_data", "[slot],[data]" )
 
     SignalData* sigdAdd = dynamic_cast< SignalData* >( adder.Signals().at("add") );
     REQUIRE( sigdAdd );
+    LWARN(tsdlog_hh, "sig do breakpoint? " << sigdAdd->GetDoBreakpoint() );
+    sigdAdd->SetDoBreakpoint( false );
 
     // configure the processor
     adder.SetAddValue( 5 );
@@ -71,7 +76,7 @@ TEST_CASE( "slot_data", "[slot],[data]" )
     td1.SetIValue1( 1 );
     td1.SetIValue2( 2 );
 
-    // verify that slots can be called, n this case with an input and no output
+    // verify that slots can be called, in this case with an input and no output
     // verify that slots work whether or not signals are automatically called
     // call the add slot functions and verify operation
     REQUIRE_NOTHROW( (*sdAddSig)( handle ) );
