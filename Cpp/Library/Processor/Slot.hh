@@ -133,58 +133,46 @@ namespace Nymph
     template< typename... XArgs >
     template< typename XOwner >
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) ) :
-            SlotBase( name ),
+            SlotBase( name, owner ),
             fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);} ),
             fDoBreakpoint(false)
-    {
-        owner->RegisterSlot( name, this );
-    }
+    {}
 
     template< typename... XArgs >
     template< typename XOwner >
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, void (XOwner::*func)( XArgs... ) const ) :
-            SlotBase( name ),
+            SlotBase( name, owner ),
             fFunction( [func, owner]( XArgs... args ){ return (owner->*func)(args...);}  ),
             fDoBreakpoint(false)
-    {
-        owner->RegisterSlot( name, this );
-    }
+    {}
 
     template< typename... XArgs >
     template< typename XOwner >
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner, const boost::function< signature >& func ) :
-            SlotBase( name ),
+            SlotBase( name, owner ),
             fFunction( func ),
             fDoBreakpoint(false)
-    {
-        owner->RegisterSlot( name, this );
-    }
+    {}
 
     template< typename... XArgs >
     template< typename XOwner, typename XFuncClass >
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ) ) :
-            SlotBase( name ),
+            SlotBase( name, owner ),
             fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
             fDoBreakpoint(false)
-    {
-        owner->RegisterSlot( name, this );
-    }
+    {}
 
     template< typename... XArgs >
     template< typename XOwner, typename XFuncClass >
     Slot< XArgs... >::Slot( const std::string& name, XOwner* owner,  XFuncClass *inst, void (XFuncClass::*func)( XArgs... ) const ) :
-            SlotBase( name ),
+            SlotBase( name, owner ),
             fFunction( [func, inst]( XArgs... args ){ return (inst->*func)(args...);}  ),
             fDoBreakpoint(false)
-    {
-        owner->RegisterSlot( name, this );
-    }
+    {}
 
     template< typename... XArgs >
     Slot< XArgs... >::~Slot()
-    {
-        DisconnectAll();
-    }
+    {}
 
     template< typename... XArgs >
     void Slot< XArgs... >::ConnectTo( SignalBase* signal, int group )
