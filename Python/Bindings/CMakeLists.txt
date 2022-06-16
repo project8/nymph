@@ -18,6 +18,7 @@ set( PYBINDING_HEADERFILES
     Processor/ProcessorPybind.hh
     Processor/ProcessorRegistrar.hh
     Processor/PyProcCreatorPybind.hh
+    Processor/SignalSlotBasePybind.hh
 )
 
 # Python bindings
