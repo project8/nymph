@@ -65,7 +65,11 @@ int main( int argc, char** argv )
 
     // Create the application
     scarab::main_app the_main;
+
     the_main.set_global_verbosity(scarab::logger::ELevel::eDebug);
+
+    // add the typical CL options
+    Nymph::AddRunNymphOptions( the_main );
 
     //Runs RunNymph() and sets  the_return based on its return value
     int the_return = -1;
