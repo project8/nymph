@@ -99,6 +99,7 @@ TEST_CASE( "signal_slot", "[signal],[slot],[processor]" )
                 signal.Emit( 4 ); // cannot test this with REQUIRE() because tests can currently only be done in one thread
                 controller.WaitForEndOfRun();
             } );
+            std::this_thread::sleep_for( std::chrono::milliseconds(200) );
             REQUIRE( controller.WaitForBreakOrCanceled() );
             REQUIRE( controller.HasReturn() );
             auto theReturn = controller.GetReturn< int >();
