@@ -7,6 +7,7 @@ message( "Building Python bindings")
 set( TEST_DIR Testing/Cpp )
 
 include_directories( BEFORE 
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/Data
     ${CMAKE_CURRENT_SOURCE_DIR}/Processor
 )
@@ -26,9 +27,13 @@ set( PYBINDING_SOURCEFILES
     NymphPybind.cc
 )
 
-set( PROJECT_LIBRARIES Nymph )
+set( PYBINDING_PROJECT_LIBRARIES Nymph )
 
-pbuilder_add_pybind11_module( _nymph ${PROJECT_LIBRARIES} )
+pbuilder_add_pybind11_module( 
+    MODULE_NAME _nymph 
+    SOURCE_FILES ${PYBINDING_SOURCEFILES}
+    PROJECT_LIBRARIES ${PYBINDING_PROJECT_LIBRARIES} 
+)
 
 pbuilder_install_headers( ${PYBINDING_HEADERFILES} )
 

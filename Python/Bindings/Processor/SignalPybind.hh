@@ -11,6 +11,7 @@
 #include <pybind11/pybind11.h>
 #include <memory>
 
+#include "NymphBindingHelpers.hh"
 #include "SignalSlotBase.hh"
 #include "Signal.hh"
 #include "Slot.hh"
@@ -29,10 +30,11 @@ namespace NymphPybind
 
             /* Trampoline (need one for each virtual function) */
             void Connect( Nymph::SlotBase* slot, int group = -1 ) override {
-                PYBIND11_OVERRIDE_PURE(
+                PYBIND11_OVERRIDE_PURE_NAME(
                     void, /* Return type */
                     Nymph::SignalBase,      /* Parent class */
-                    Connect,          /* Name of function in C++ (must match Python name) */
+                    "connect",            /* Name of function in python */
+                    Connect,          /* Name of function in C++ */
                     slot,
                     group/* Argument(s) */
                 );
@@ -44,7 +46,7 @@ namespace NymphPybind
 
        py::class_< Nymph::SignalBase, PySignalBase, std::shared_ptr<Nymph::SignalBase > >(nymphProcessor, "_SignalBase")
                 .def(py::init<const std::string& >())
-                .def("Connect", &Nymph::SignalBase::Connect)
+                .def("connect", &Nymph::SignalBase::Connect, NYMPH_BIND_CALL_GUARD_STREAMS)
                 .def("disconnect", &Nymph::SignalBase::Disconnect)
                 .def("disconnect_all", &Nymph::SignalBase::DisconnectAll)
                 .def_property_readonly("connections", static_cast< std::set< Nymph::SlotBase* >& (Nymph::SignalBase::*)() const>(&Nymph::SignalBase::Connections))
@@ -62,8 +64,8 @@ namespace NymphPybind
        py::class_< Nymph::Signal< XArgs... >, Nymph::SignalBase, std::shared_ptr<Nymph::Signal< XArgs... > > >(nymphProcessor, pyClsName.c_str())
                 .def(py::init<const std::string& >())
                 .def(py::init<const std::string&,  Nymph::Processor* >())
-                .def("emit", &Nymph::Signal< XArgs... >::Emit)
-                .def("__call__", &Nymph::Signal< XArgs... >::operator());
+                .def("emit", &Nymph::Signal< XArgs... >::Emit, NYMPH_BIND_CALL_GUARD_STREAMS)
+                .def("__call__", &Nymph::Signal< XArgs... >::operator(), NYMPH_BIND_CALL_GUARD_STREAMS);
         
     }
 
