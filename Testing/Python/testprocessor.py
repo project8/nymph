@@ -13,7 +13,7 @@ import scarab
 
 class TestProcessor(_nymph.processor._Processor):
     
-    def Configure(self, param_node):
+    def configure(self, param_node):
         
         param_dict = param_node.to_python()
         self.x = param_dict['x']
