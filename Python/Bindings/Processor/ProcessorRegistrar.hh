@@ -53,7 +53,6 @@ namespace Nymph
                 if( useModule.empty() ) useModule = "__main__";
                 py::object scope = py::module_::import( useModule.c_str() ).attr( "__dict__" );
                 std::shared_ptr<Nymph::Processor> proc = py::eval( fType + "(\'" + name + "\')", scope ).cast< std::shared_ptr<Nymph::Processor> >();
-                LWARN( prlog_h, "Processor is at: " << proc.get() );
                 return proc;
 
             }
