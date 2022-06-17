@@ -25,6 +25,7 @@ TEST_CASE( "signal_slot", "[signal],[slot],[processor]" )
     int tssTestValue = 0;
 
     Signal< int > tssSignal( "tssSignal" );
+    Signal< float > tssFloatSignal( "float-signal" );
     Slot< int > tssSlot( "tssSlot", [&](int aValue ){ tssTestValue = aValue; } );
 
     REQUIRE_FALSE( tssSignal.GetDoBreakpoint() );
@@ -112,7 +113,8 @@ TEST_CASE( "signal_slot", "[signal],[slot],[processor]" )
 
     SECTION( "connections" )
     {
-        // TODO: connect to an incompatible slot and check exception
+        
+        REQUIRE_THROWS_AS( tsdFloatSignal.Connect( &slot), ConnectionException );
 
         REQUIRE_NOTHROW( tssSignal.Connect( &tssSlot ) );
 
