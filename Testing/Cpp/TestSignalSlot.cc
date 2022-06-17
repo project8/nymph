@@ -114,7 +114,7 @@ TEST_CASE( "signal_slot", "[signal],[slot],[processor]" )
     SECTION( "connections" )
     {
         
-        REQUIRE_THROWS_AS( tsdFloatSignal.Connect( &slot), ConnectionException );
+        REQUIRE_THROWS_AS( tssFloatSignal.Connect( &tssSlot), ConnectionException );
 
         REQUIRE_NOTHROW( tssSignal.Connect( &tssSlot ) );
 
