@@ -11,8 +11,7 @@ namespace Nymph
 {
     SlotBase::SlotBase( const std::string& name ) :
             fName( name ),
-            fConnections()//,
-            //fSignalsUsed()
+            fConnections()
     {}
 
     SlotBase::~SlotBase()
@@ -32,7 +31,6 @@ namespace Nymph
     SignalBase::SignalBase( const std::string& name ) :
             fName( name ),
             fConnections(),
-            //fControl( nullptr ),
             fDoBreakpoint( false )
     {}
 
@@ -50,7 +48,6 @@ namespace Nymph
         }
         return;
     }
-
 
 }
 

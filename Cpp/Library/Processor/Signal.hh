@@ -61,54 +61,6 @@ namespace Nymph
     };
 
 
-    /*!
-     @class Signal
-     @author N. S. Oblath
-
-     @brief Creates a signal that takes 0 or more arguments.
-
-     @details
-     The signal is emitted by calling operator().
-     If a Slot is being used, and the Slot has been given a pointer to this signal, the Slot will emit the Signal.
-
-     Usage:
-     In your Processor's header add a member variable of type Signal< ArgumentTypes >.
-
-     Initialize the signal with the processor's 'this' pointer and the name of the signal.
-
-     To use the signal, call it as: fSignalObject(arg);
-    *//*
-    template< class... XSignalArguments >
-    class Signal
-    {
-        public:
-            typedef void (signature)( XSignalArguments... );
-            typedef boost::signals2::signal< signature > boost_signal;
-            typedef typename boost::signals2::signal< signature >::slot_type slot_type;
-
-        public:
-            Signal();
-            Signal( const std::string& name, Processor* proc );
-            virtual ~Signal();
-
-        protected:
-            Signal( const Signal& );
-
-        public:
-            void operator()( XSignalArguments... args );
-
-            boost_signal* Signal();
-
-            const std::string& GetName() const;
-
-        protected:
-            boost_signal fSignal;
-
-            std::string fName;
-    };
-*/
-
-
     //*******************
     // Implementations
     //*******************
@@ -144,17 +96,7 @@ namespace Nymph
                     "\tUnable to cast from SlotBase to this signal's derived type.\n" << 
                     "\tArgument types do not match" );
         }
-/*
-        Connection connection;
-        if( group >= 0 )
-        {
-            connection = fInternalSignal.connect( group, derivedSlot->Function() );
-        }
-        else
-        {
-            connection = fInternalSignal.connect( derivedSlot->Function() );
-        }
-*/
+
         AddConnection( slot, group );
 
         return;
@@ -205,50 +147,6 @@ namespace Nymph
         return;
     }
 
-/*
-    template< class... XSignalArguments >
-    Signal< XSignalArguments... >::Signal( const std::string& name, Processor* proc ) :
-            fSignal(),
-            fName( name )
-    {
-        proc->RegisterSignal(name, &fSignal);
-    }
-
-    template< class... XSignalArguments >
-    Signal< XSignalArguments... >::Signal() :
-            fSignal(),
-            fName("none")
-    {}
-
-    template< class... XSignalArguments >
-    Signal< XSignalArguments... >::Signal( const Signal& signal ) :
-            fSignal(),
-            fName( signal.fName )
-    {}
-
-    template< class... XSignalArguments >
-    Signal< XSignalArguments... >::~Signal()
-    {
-    }
-
-    template< class... XSignalArguments >
-    inline void Signal< XSignalArguments... >::operator()( XSignalArguments... args )
-    {
-        fSignal( args... );
-    }
-
-    template< class... XSignalArguments >
-    inline typename Signal< XSignalArguments... >::boost_signal* Signal< XSignalArguments... >::Signal()
-    {
-        return &fSignal;
-    }
-
-    template< class... XSignalArguments >
-    inline const std::string& Signal< XSignalArguments... >::GetName() const
-    {
-        return fName;
-    }
-*/
 } /* namespace Nymph */
 
 #endif /* NYMPH_SIGNAL_HH_ */
