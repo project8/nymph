@@ -8,6 +8,8 @@
 #include "TestControllerClasses.hh"
 #include "TestDataProcessorClasses.hh"
 
+#include "DataFrame.hh"
+
 #include "catch.hpp"
 
 #include "logger.hh"
@@ -109,6 +111,7 @@ TEST_CASE( "slot_data", "[slot],[data]" )
     // call the add-sig slot and verify that the i-to-d slot gets called via the signal
     REQUIRE_NOTHROW( (*tsdSlotDAddSig)( tsdHandle ) ); //add slot executes, adding 5 to 11, then triggers the i-to-d slot via the add signal, making TestData2 with fDValue2 = 16
     REQUIRE( tsdHandle->Has< TestData2 >() );
+    tsdTestData2 = tsdHandle->Get< TestData2 >();
     REQUIRE( tsdTestData1.GetIValue1() == 16 );
     REQUIRE( tsdTestData2.GetDValue1() == Approx(16.) );
 
@@ -118,6 +121,7 @@ TEST_CASE( "slot_data", "[slot],[data]" )
     REQUIRE_FALSE( tsdHandle->Has< TestData2 >() );
     // call the mult slot and verify that it worked
     REQUIRE_NOTHROW( (*tsdSlotDMult)( tsdHandle ) ); // for TestData1::fIValue1, multiplies 16 by 2.5 and stores in TestData2::fDValue1
+    tsdTestData2 = tsdHandle->Get< TestData2 >();
     REQUIRE( tsdTestData2.GetDValue1() == Approx(40.) );
 }
 
