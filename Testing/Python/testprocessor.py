@@ -8,29 +8,54 @@
 
 __all__ = []
 
+import unittest
+
 import _nymph
 import scarab
+
+class TestProcessorBroken(_nymph.processor._Processor):
+    """Should not work because it does not override configure"""
+    
+    def foo():
+        print('I am a failed processor implementation')
+        
 
 class TestProcessor(_nymph.processor._Processor):
     
     def configure(self, param_node):
         
         param_dict = param_node.to_python()
-        self.x = param_dict['x']
+        
+        self.value = param_dict['value']
+        
+        if 'foo' in param_dict:
+            self.foo = param_dict['foo']
+            
+        #todo add test of a configexception thing
 
-def main(args):
+
+class TestPureVirtual(unittest.TestCase):
     
-    testprocessor = TestProcessor('test')
+    def test_pure_virtual(self):
+        test_proc = TestProcessorBroken('test-proc')
+        
+        with self.assertRaises(RuntimeError) as context:
+            test_proc.configure(scarab.to_param({}))
+
+        self.assertTrue(str(context.exception) == 'Tried to call pure virtual function "Nymph::Processor::configure"')
+        
+
+class TestConfigure(unittest.TestCase):
     
-    param = scarab.ParamValue( 1.0 )
-    param_node = scarab.ParamNode()
-    param_node.add('x', param)
-    
-    testprocessor.configure(param_node)
-    
-    print(testprocessor.x)
-    return 0
+    def test_configure(self):
+        test_proc = TestProcessor('test-proc')
+        test_proc.configure(scarab.to_param({'value': 42, 'foo': 'bar'}))
+        
+        self.assertEqual(test_proc.value, 42)
+        self.assertEqual(test_proc.foo, 'bar')
+        self.assertEqual(test_proc.name, 'test-proc')
+
 
 if __name__ == '__main__':
-    import sys
-    sys.exit(main(sys.argv))
+    unittest.main()
+
