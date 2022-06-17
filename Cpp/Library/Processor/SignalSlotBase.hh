@@ -112,7 +112,9 @@ namespace Nymph
     };
 
     template< typename XOwner >
-    SlotBase::SlotBase( const std::string& name, XOwner* owner )
+    SlotBase::SlotBase( const std::string& name, XOwner* owner ) :
+            fName( name ),
+            fConnections()
     {
         owner->RegisterSlot( name, this );
     }
@@ -130,7 +132,10 @@ namespace Nymph
     }
 
     template< typename XOwner >
-    SignalBase::SignalBase( const std::string& name, XOwner* owner )
+    SignalBase::SignalBase( const std::string& name, XOwner* owner ) :
+            fName( name ),
+            fConnections(),
+            fDoBreakpoint( false )
     {
         owner->RegisterSignal( name, this );
     }
