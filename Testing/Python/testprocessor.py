@@ -56,6 +56,16 @@ class TestConfigure(unittest.TestCase):
         self.assertEqual(test_proc.name, 'test-proc')
 
 
+class TestPyProcCreator(unittest.TestCase):
+    
+    def test_creating(self):
+        
+        registrar = _nymph.processor.register_py_processor('testprocessor', 'TestProcessor', 'processor-name')
+        test_proc = _nymph.processor.create_processor('processor-name', 'test-proc')
+        
+        self.assertEqual(test_proc.name, 'test-proc')
+
+
 if __name__ == '__main__':
     unittest.main()
 
