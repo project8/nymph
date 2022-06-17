@@ -38,8 +38,8 @@ TEST_CASE( "single_run_controller" )
     using namespace Nymph;
     using namespace NymphTesting;
 
-    ProcessorToolbox toolbox;
-    SRCRevealer controller( toolbox );
+    ProcessorToolbox tsrcToolbox;
+    SRCRevealer tsrcController( tsrcToolbox );
 
     SECTION( "DoRun" )
     {
@@ -57,15 +57,15 @@ TEST_CASE( "single_run_controller" )
         scarab::param_translator translator;
         auto config = translator.read_string( config_str, "yaml" );
 
-        REQUIRE_NOTHROW( toolbox.Configure( config->as_node() ) );
-        REQUIRE_NOTHROW( controller.Configure( config->as_node() ) );
+        REQUIRE_NOTHROW( tsrcToolbox.Configure( config->as_node() ) );
+        REQUIRE_NOTHROW( tsrcController.Configure( config->as_node() ) );
 
-        auto ppProc = std::dynamic_pointer_cast< TestPrimaryProc >( toolbox.GetProcessor( "pp" ) );
+        auto ppProc = std::dynamic_pointer_cast< TestPrimaryProc >( tsrcToolbox.GetProcessor( "pp" ) );
         REQUIRE( ppProc );
         ppProc->SetTestSelection( TestPrimaryProc::TestType::SignalNewValue );
 
         // do the run
-        REQUIRE_NOTHROW( controller.Run() );
+        REQUIRE_NOTHROW( tsrcController.Run() );
 
         // check the results
         REQUIRE( ppProc->GetValue() == ppProc->GetNewValue() );
@@ -88,31 +88,31 @@ TEST_CASE( "single_run_controller" )
         scarab::param_translator translator;
         auto config = translator.read_string( config_str, "yaml" );
 
-        REQUIRE_NOTHROW( toolbox.ConfigureProcessors( config->as_array() ) );
+        REQUIRE_NOTHROW( tsrcToolbox.ConfigureProcessors( config->as_array() ) );
 
         SRCRevealer::ThreadSourceGroupT group;
-        REQUIRE_FALSE( controller.AddProcessorToThreadGroup( "blah", group ) );
-        REQUIRE_FALSE( controller.AddProcessorToThreadGroup( "testproc-1", group ) );
-        REQUIRE( controller.AddProcessorToThreadGroup( "testprimary-1", group ) );
+        REQUIRE_FALSE( tsrcController.AddProcessorToThreadGroup( "blah", group ) );
+        REQUIRE_FALSE( tsrcController.AddProcessorToThreadGroup( "testproc-1", group ) );
+        REQUIRE( tsrcController.AddProcessorToThreadGroup( "testprimary-1", group ) );
         REQUIRE( group.size() == 1 );
 
-        REQUIRE_FALSE( controller.PushBackToRunQueue( "testproc-1" ) );
-        REQUIRE( controller.PushBackToRunQueue( "testprimary-1" ) );
-        REQUIRE( controller.RunQueue().size() == 1 );
-        REQUIRE( controller.RunQueue().begin()[0].size() == 1 );
-        REQUIRE( controller.PushBackToRunQueue( "testprimary-2" ) );
-        REQUIRE( controller.RunQueue().size() == 2 );
-        REQUIRE( controller.RunQueue().begin()[0].size() == 1 );
+        REQUIRE_FALSE( tsrcController.PushBackToRunQueue( "testproc-1" ) );
+        REQUIRE( tsrcController.PushBackToRunQueue( "testprimary-1" ) );
+        REQUIRE( tsrcController.RunQueue().size() == 1 );
+        REQUIRE( tsrcController.RunQueue().begin()[0].size() == 1 );
+        REQUIRE( tsrcController.PushBackToRunQueue( "testprimary-2" ) );
+        REQUIRE( tsrcController.RunQueue().size() == 2 );
+        REQUIRE( tsrcController.RunQueue().begin()[0].size() == 1 );
         
-        controller.PopBackOfRunQueue();
-        REQUIRE( controller.RunQueue().size() == 1 );
+        tsrcController.PopBackOfRunQueue();
+        REQUIRE( tsrcController.RunQueue().size() == 1 );
 
-        controller.ClearRunQueue();
-        REQUIRE( controller.RunQueue().empty() );
+        tsrcController.ClearRunQueue();
+        REQUIRE( tsrcController.RunQueue().empty() );
         
-        REQUIRE( controller.PushBackToRunQueue( {"testprimary-1", "testprimary-2"} ) );
-        REQUIRE( controller.RunQueue().size() == 1 );
-        REQUIRE( controller.RunQueue()[0].size() == 2 );
+        REQUIRE( tsrcController.PushBackToRunQueue( {"testprimary-1", "testprimary-2"} ) );
+        REQUIRE( tsrcController.RunQueue().size() == 1 );
+        REQUIRE( tsrcController.RunQueue()[0].size() == 2 );
 
     }
 

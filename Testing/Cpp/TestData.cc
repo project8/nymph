@@ -15,15 +15,15 @@ TEST_CASE( "data", "[data]" )
     using namespace Nymph;
     using namespace NymphTesting;
 
-    TestData1 data1;
-    REQUIRE( data1.GetIValue1() == 0 );
-    REQUIRE( data1.GetIValue2() == 5 );
+    TestData1 tdData1;
+    REQUIRE( tdData1.GetIValue1() == 0 );
+    REQUIRE( tdData1.GetIValue2() == 5 );
 
-    data1.SetIValue1( 50 );
-    REQUIRE( data1.GetIValue1() == 50 );
+    tdData1.SetIValue1( 50 );
+    REQUIRE( tdData1.GetIValue1() == 50 );
 
-    TestData2 data2;
-    REQUIRE( data2.GetDValue1() == Approx( 0.0 ) );
-    REQUIRE( data2.GetDValue2() == Approx( 10.0 ) );
+    TestData2 tdData2;
+    REQUIRE( tdData2.GetDValue1() == Approx( 0.0 ) );
+    REQUIRE( tdData2.GetDValue2() == Approx( 10.0 ) );
 
 }
