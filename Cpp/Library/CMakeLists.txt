@@ -32,7 +32,6 @@ set( NYMPH_HEADERFILES
 
     ${DATA_DIR}/Data.hh
     ${DATA_DIR}/DataFrame.hh
-    ${DATA_DIR}/DataPresent.hh
     ${DATA_DIR}/SignalData.hh
     ${DATA_DIR}/SlotData.hh
     

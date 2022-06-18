@@ -5,6 +5,9 @@
  *      Author: N.S. Oblath
  */
 
+#ifndef NYMPH_TESTING_TESTDATAPROCESSORCLASSES_HH
+#define NYMPH_TESTING_TESTDATAPROCESSORCLASSES_HH
+
 #include "TestDataClasses.hh"
 
 #include "Exception.hh"
@@ -16,7 +19,7 @@
 
 LOGGER( tdpclog_h, "TestDataProcessorClasses" );
 
-namespace Nymph
+namespace NymphTesting
 {
 
     // external slot function owner
@@ -32,7 +35,7 @@ namespace Nymph
     };
 
     // This processor has a data slot that takes TestData1 as input and has no output (TestData1 is modified in place)
-    class Adder : public Processor
+    class Adder : public Nymph::Processor
     {
         public:
             Adder( const std::string& name = "adder" ) :
@@ -85,26 +88,30 @@ namespace Nymph
 
             void JustThrows( TestData1& )
             {
-                throw CREATE_EXCEPT_HERE( Exception );
+                throw CREATE_EXCEPT_HERE( Nymph::Exception );
             }
 
         protected:
             MultiplyFuncOwner fMultFunc;
 
         public:
-            SignalData fAddSignal;
+            Nymph::SignalData fAddSignal;
 
-            SlotData< In<TestData1>, Out<> > fAddSlotWithSig;
-            SlotData< In<TestData1>, Out<> > fAddSlotNoSig;
+            USING_NYMPH_IN_OUT; // avoids needing to prepend In and Out with Nymph::
 
-            SlotData< In<const TestData1>, Out<TestData2> > fMultiplySlot;
+            Nymph::SlotData< In<TestData1>, Out<> > fAddSlotWithSig;
+            Nymph::SlotData< In<TestData1>, Out<> > fAddSlotNoSig;
 
-            SlotData< In<const TestData1>, Out<TestData2> > fIToDSlot;
+            Nymph::SlotData< In<const TestData1>, Out<TestData2> > fMultiplySlot;
 
-            SlotData< In<const TestData1>, Out<> > fPrintSlot;
+            Nymph::SlotData< In<const TestData1>, Out<TestData2> > fIToDSlot;
 
-            SlotData< In<TestData1>, Out<> > fJustThrowsSlot;
+            Nymph::SlotData< In<const TestData1>, Out<> > fPrintSlot;
+
+            Nymph::SlotData< In<TestData1>, Out<> > fJustThrowsSlot;
 
     };
 
 }
+
+#endif /* NYMPH_TESTING_TESTDATAPROCESSORCLASSES_HH */
