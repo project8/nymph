@@ -10,6 +10,7 @@
 #include "Data/DataPybind.hh"
 #include "Data/DataFramePybind.hh"
 #include "Processor/ProcessorPybind.hh"
+#include "Processor/ProcessorToolboxPybind.hh"
 #include "Processor/PyProcCreatorPybind.hh"
 #include "Processor/SignalPybind.hh"
 #include "Processor/SlotPybind.hh"
@@ -19,7 +20,8 @@
 namespace py = pybind11;
 
 
-PYBIND11_MODULE(_nymph, nymphPackage) {
+PYBIND11_MODULE(_nymph, nymphPackage) 
+{
 
     nymphPackage.doc() = "Nymph package";
 
@@ -34,6 +36,7 @@ PYBIND11_MODULE(_nymph, nymphPackage) {
 
     auto nymphProcessor = nymphPackage.def_submodule("processor", "Processor module");
     NymphPybind::ExportProcessor(nymphProcessor);
+    NymphPybind::ExportProcessorToolbox(nymphProcessor);
     NymphPybind::ExportPyProcCreator(nymphProcessor);
     NymphPybind::ExportSlot(nymphProcessor);
     NymphPybind::ExportSignalBase(nymphProcessor);

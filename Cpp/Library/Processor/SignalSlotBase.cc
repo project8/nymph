@@ -11,12 +11,13 @@ namespace Nymph
 {
     SlotBase::SlotBase( const std::string& name ) :
             fName( name ),
-            fConnections()//,
-            //fSignalsUsed()
+            fConnections()
     {}
 
     SlotBase::~SlotBase()
-    {}
+    {
+        DisconnectAll();
+    }
 
     void SlotBase::DisconnectAll()
     {
@@ -30,12 +31,13 @@ namespace Nymph
     SignalBase::SignalBase( const std::string& name ) :
             fName( name ),
             fConnections(),
-            //fControl( nullptr ),
             fDoBreakpoint( false )
     {}
 
     SignalBase::~SignalBase()
-    {}
+    {
+        DisconnectAll();
+    }
 
     // disconnects all previously connected functions
     void SignalBase::DisconnectAll()
@@ -46,7 +48,6 @@ namespace Nymph
         }
         return;
     }
-
 
 }
 
