@@ -23,7 +23,7 @@ namespace NymphPybind
         py::class_< Nymph::DataFrame, std::shared_ptr<Nymph::DataFrame> >( nymphData, "DataFrame" )
                 .def( py::init< >() )
                 .def( "empty", &Nymph::DataFrame::Empty )
-
+/*
                 .def( "has", []( const Nymph::DataFrame& frame, const std::string& typeName ){
 
                 } )
@@ -39,7 +39,7 @@ namespace NymphPybind
                 .def( "remove" []( const Nymph::DataFrame& frame, const std::string& typeName ){
                     
                 } )
-
+*/
         ;
 
     }
