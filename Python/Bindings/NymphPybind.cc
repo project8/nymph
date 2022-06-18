@@ -28,7 +28,6 @@ PYBIND11_MODULE(_nymph, nymphPackage)
     auto nymphControl = nymphPackage.def_submodule("control", "Control module");
 
     auto nymphData = nymphPackage.def_submodule("data", "Data module");
-
     NymphPybind::ExportData(nymphData);
     NymphPybind::ExportDataFrame(nymphData);
     
