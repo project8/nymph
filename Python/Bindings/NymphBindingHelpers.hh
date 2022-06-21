@@ -65,5 +65,5 @@
 #define MEMVAR_REF_MUTABLE_CONST_PY(PYNAME, MEMNAME, RETTYPE, CLNAME) \
     .def_property_readonly(PYNAME, static_cast< RETTYPE& (CLNAME::*)() const>(&CLNAME::MEMNAME))
 //Referrables end
- 
+
 #endif /* NYMPH_PYBIND_BINDING_HELPERS */
