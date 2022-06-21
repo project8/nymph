@@ -28,10 +28,11 @@ namespace NymphPybind
 
             /* Trampoline (need one for each virtual function) */
             void Configure( const scarab::param_node& node ) override {
-                PYBIND11_OVERRIDE_PURE(
+                PYBIND11_OVERRIDE_PURE_NAME(
                     void, /* Return type */
-                    Processor,      /* Parent class */
-                    Configure,          /* Name of function in C++ (must match Python name) */
+                    Nymph::Processor,      /* Parent class */
+                    "configure",  /*Name of function in python*/
+                    Configure,          /* Name of function in C++ */
                     node/* Argument(s) */
                 );
             }
@@ -48,7 +49,12 @@ namespace NymphPybind
                 .def("register_signal", &Nymph::Processor::RegisterSignal, NYMPH_BIND_CALL_GUARD_STREAMS)
                 .def("register_slot", &Nymph::Processor::RegisterSlot, NYMPH_BIND_CALL_GUARD_STREAMS)
                 .def("get_do_breakpoint", &Nymph::Processor::GetDoBreakpoint)
-                .def("set_do_breakpoint", &Nymph::Processor::SetDoBreakpoint);
+                .def("set_do_breakpoint", &Nymph::Processor::SetDoBreakpoint)
+                .def_property("name", static_cast< const std::string& (Nymph::Processor::*)() const>(&Nymph::Processor::Name),
+                                      [](Nymph::Processor& processor, const std::string& name){processor.Name() = name;} )
+                .def_property_readonly("signals", static_cast< const std::map< std::string, Nymph::SignalBase* >& (Nymph::Processor::*)() const>(&Nymph::Processor::Signals))
+                .def_property_readonly("slots", static_cast< const std::map< std::string, Nymph::SlotBase* >& (Nymph::Processor::*)() const>(&Nymph::Processor::Slots))
+        ;
     }
 
 }

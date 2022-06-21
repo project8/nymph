@@ -11,9 +11,9 @@
 #include "Data.hh"
 #include "MemberVariable.hh"
 
-namespace Nymph
+namespace NymphTesting
 {
-    class TestData1 : public Data
+    class TestData1 : public Nymph::Data
     {
         public:
             TestData1() :
@@ -29,7 +29,7 @@ namespace Nymph
             MEMVAR( int, IValue2 );
     };
 
-    class TestData2 : public Data
+    class TestData2 : public Nymph::Data
     {
         public:
             TestData2() :

@@ -5,15 +5,15 @@
  *      Author: N.S. Oblath
  */
 
-#ifndef NYMPH_TESTING_TESTCONTROLLERCLASSES
-#define NYMPH_TESTING_TESTCONTROLLERCLASSES
+#ifndef NYMPH_TESTING_TESTCONTROLLERCLASSES_HH
+#define NYMPH_TESTING_TESTCONTROLLERCLASSES_HH
 
 #include "Controller.hh"
 
-namespace Nymph
+namespace NymphTesting
 {
 
-    class CIQThrowController : public Controller
+    class CIQThrowController : public Nymph::Controller
     {
 
         public:
@@ -33,4 +33,4 @@ namespace Nymph
 
 } /* namespace Nymph */
 
-#endif /* NYMPH_TESTING_TESTCONTROLLERCLASSES */
+#endif /* NYMPH_TESTING_TESTCONTROLLERCLASSES_HH */

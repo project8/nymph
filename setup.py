@@ -37,6 +37,7 @@ class CMakeBuild(build_ext):
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       #'-DCMAKE_INSTALL_PREFIX:PATH=/usr/local',
                       '-DNymph_ENABLE_PYTHON:bool=1',
+                      '-DNymph_ENABLE_TESTING:bool=1'
                      ]
 
         cfg = 'Debug' if self.debug else 'Release'

@@ -16,7 +16,7 @@ TEST_CASE( "config_exception", "[exception],[utility]" )
 {
     using namespace Nymph;
 
-    std::string config_str(
+    std::string tceConfigStr(
         "- type: test-primary\n"
         "  name: testprimary-1\n"
         "- type: test-primary\n"
@@ -25,15 +25,15 @@ TEST_CASE( "config_exception", "[exception],[utility]" )
         "  name: testproc-1\n"
     );
 
-    scarab::param_translator translator;
-    auto config = translator.read_string( config_str, "yaml" );
+    scarab::param_translator tceTranslator;
+    auto tceConfig = tceTranslator.read_string( tceConfigStr, "yaml" );
 
-    std::string config_as_string = config->to_string();
+    std::string tceConfigAsString = tceConfig->to_string();
 
-    ConfigException exception = ConfigException( *config );
-    std::string ex_what( exception.what() );
+    ConfigException tceException = ConfigException( *tceConfig );
+    std::string tceExWhat( tceException.what() );
 
     using Catch::Matchers::EndsWith;
 
-    REQUIRE_THAT( ex_what, EndsWith(config_as_string) );
+    REQUIRE_THAT( tceExWhat, EndsWith(tceConfigAsString) );
 }
