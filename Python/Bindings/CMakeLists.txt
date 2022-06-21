@@ -14,6 +14,7 @@ include_directories( BEFORE
 
 # Python binding headers
 set( PYBINDING_HEADERFILES
+    NymphBindingHelpers.hh
     Data/DataPybind.hh
     Processor/ProcessorPybind.hh
     Processor/ProcessorRegistrar.hh
