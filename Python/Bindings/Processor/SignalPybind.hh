@@ -35,10 +35,15 @@ namespace NymphPybind
                 .def("connect", &Nymph::Signal< XArgs...>::Connect, NYMPH_BIND_CALL_GUARD_STREAMS)
                 .def("disconnect", &Nymph::Signal< XArgs... >::Disconnect)
                 .def("disconnect_all", &Nymph::Signal< XArgs... >::DisconnectAll)
-                .def_property_readonly("connections", static_cast< std::set< Nymph::SlotBase* >& (Nymph::Signal< XArgs... >::*)() const>(&Nymph::Signal< XArgs... >::Connections))
-                .def_property("name", static_cast< const std::string& (Nymph::Signal< XArgs... >::*)() const>(&Nymph::Signal< XArgs... >::Name),
-                                      [](Nymph::Signal< XArgs... >& signal, const std::string& name){signal.Name() = name;} )
-                .def_property("do_breakpoint", &Nymph::Signal< XArgs... >::GetDoBreakpoint, &Nymph::Signal< XArgs... >::SetDoBreakpoint);
+                MEMVAR_REF_MUTABLE_CONST_PY("connections", Connections, std::set< Nymph::SlotBase* >, Nymph::Signal< XArgs... >)
+                // .def_property_readonly("connections", static_cast< std::set< Nymph::SlotBase* >& (Nymph::Signal< XArgs... >::*)() const>(&Nymph::Signal< XArgs... >::Connections))
+                MEMVAR_REF_PY("name", Name, std::string, Nymph::Signal< XArgs... >)
+                // .def_property("name", static_cast< const std::string& (Nymph::Signal< XArgs... >::*)() const>(&Nymph::Signal< XArgs... >::Name),
+                                    //   [](Nymph::Signal< XArgs... >& aName, const std::string& name){aName.Name() = name;} )
+                MEMVAR_PY("do_breakpoint", DoBreakpoint, Nymph::Signal< XArgs... >);
+                // .def_PROPERTY("do_breakpoint", Nymph::SignalBase::GetDoBreakpoint, Nymph::SignalBase::SetDoBreakpoint);
+        // MEMVAR(bool, DoBreakpoint)
+        // MEMVAR_Py(DoBreakpoint, ) 
         
     }
 
