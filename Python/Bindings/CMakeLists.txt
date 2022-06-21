@@ -21,7 +21,10 @@ set( PYBINDING_HEADERFILES
     Processor/SignalPybind.hh
     Processor/SlotPybind.hh
     Processor/ProcessorRegistrar.hh
+    Processor/ProcessorToolboxPybind.hh
     Processor/PyProcCreatorPybind.hh
+    Processor/SignalPybind.hh
+    Processor/SlotPybind.hh
 )
 
 # Python bindings

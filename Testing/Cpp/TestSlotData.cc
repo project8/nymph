@@ -8,14 +8,20 @@
 #include "TestControllerClasses.hh"
 #include "TestDataProcessorClasses.hh"
 
+#include "DataFrame.hh"
+
 #include "catch.hpp"
+
+#include "logger.hh"
+LOGGER(tsdlog_hh, "testslotdata.hh");
 
 TEST_CASE( "slot_data", "[slot],[data]" )
 {
     using namespace Nymph;
+    using namespace NymphTesting;
 
     // need a controller to exist
-    CIQThrowController controller;
+    CIQThrowController tsdController;
 
 
 // TODO: test creation of slot with:
@@ -33,88 +39,90 @@ TEST_CASE( "slot_data", "[slot],[data]" )
 //   x slot with output calls a second slot
 
     // create the processor and verify the presence of the slots
-    Adder adder;
-    REQUIRE( adder.Slots().count("add-sig") == 1 );
-    REQUIRE( adder.Slots().count("add-no-sig") == 1 );
+    Adder tsdAdder;
+    REQUIRE( tsdAdder.Slots().count("add-sig") == 1 );
+    REQUIRE( tsdAdder.Slots().count("add-no-sig") == 1 );
 
     // get signal and slot pointers and cast
-    SlotData< In<TestData1>, Out<> >* sdAddSig = dynamic_cast< SlotData< In<TestData1>, Out<> >* >( adder.Slots().at("add-sig") );
-    SlotData< In<TestData1>, Out<> >* sdAddNoSig = dynamic_cast< SlotData< In<TestData1>, Out<> >* >( adder.Slots().at("add-no-sig") );
-    REQUIRE( sdAddSig );
-    REQUIRE( sdAddNoSig );
+    SlotData< In<TestData1>, Out<> >* tsdSlotDAddSig = dynamic_cast< SlotData< In<TestData1>, Out<> >* >( tsdAdder.Slots().at("add-sig") );
+    SlotData< In<TestData1>, Out<> >* tsdSlotDAddNoSig = dynamic_cast< SlotData< In<TestData1>, Out<> >* >( tsdAdder.Slots().at("add-no-sig") );
+    REQUIRE( tsdSlotDAddSig );
+    REQUIRE( tsdSlotDAddNoSig );
 
-    SlotData< In<const TestData1>, Out<TestData2> >* sdMult = dynamic_cast< SlotData< In<const TestData1>, Out<TestData2> >* >( adder.Slots().at("multiply") );
-    REQUIRE( sdMult );
+    SlotData< In<const TestData1>, Out<TestData2> >* tsdSlotDMult = dynamic_cast< SlotData< In<const TestData1>, Out<TestData2> >* >( tsdAdder.Slots().at("multiply") );
+    REQUIRE( tsdSlotDMult );
 
-    SlotData< In<const TestData1>, Out<TestData2> >* sdIToD = dynamic_cast< SlotData< In<const TestData1>, Out<TestData2> >* >( adder.Slots().at("i-to-d") );
-    REQUIRE( sdIToD );
+    SlotData< In<const TestData1>, Out<TestData2> >* tsdSlotDIToD = dynamic_cast< SlotData< In<const TestData1>, Out<TestData2> >* >( tsdAdder.Slots().at("i-to-d") );
+    REQUIRE( tsdSlotDIToD );
 
-    SlotData< In<const TestData1>, Out<> >* sdPrint = dynamic_cast< SlotData< In<const TestData1>, Out<> >* >( adder.Slots().at("print") );
-    REQUIRE( sdPrint );
+    SlotData< In<const TestData1>, Out<> >* tsdSlotDPrint = dynamic_cast< SlotData< In<const TestData1>, Out<> >* >( tsdAdder.Slots().at("print") );
+    REQUIRE( tsdSlotDPrint );
 
-    SlotData< In<TestData1>, Out<> >* sdJustThrows = dynamic_cast< SlotData< In<TestData1>, Out<> >* >( adder.Slots().at("just-throws") );
-    REQUIRE( sdJustThrows );
+    SlotData< In<TestData1>, Out<> >* tsdSlotDJustThrows = dynamic_cast< SlotData< In<TestData1>, Out<> >* >( tsdAdder.Slots().at("just-throws") );
+    REQUIRE( tsdSlotDJustThrows );
 
-    SignalData* sigdAdd = dynamic_cast< SignalData* >( adder.Signals().at("add") );
-    REQUIRE( sigdAdd );
+    SignalData* tsdSigDAdd = dynamic_cast< SignalData* >( tsdAdder.Signals().at("add") );
+    REQUIRE( tsdSigDAdd );
 
     // configure the processor
-    adder.SetAddValue( 5 );
+    tsdAdder.SetAddValue( 5 );
 
     // create a data frame
-    DataHandle handle = std::make_shared< DataFrame >();
+    DataHandle tsdHandle = std::make_shared< DataFrame >();
 
     // verify that when we call the slot on an empty frame we get an exception
-    REQUIRE_THROWS_AS( (*sdAddSig)( handle ), Exception );
+    REQUIRE_THROWS_AS( (*tsdSlotDAddSig)( tsdHandle ), Exception );
 
-    TestData1& td1 = handle->Get< TestData1 >();
-    td1.SetIValue1( 1 );
-    td1.SetIValue2( 2 );
+    TestData1& tsdTestData1 = tsdHandle->Get< TestData1 >();
+    tsdTestData1.SetIValue1( 1 );
+    tsdTestData1.SetIValue2( 2 );
 
-    // verify that slots can be called, n this case with an input and no output
+    // verify that slots can be called, in this case with an input and no output
     // verify that slots work whether or not signals are automatically called
     // call the add slot functions and verify operation
-    REQUIRE_NOTHROW( (*sdAddSig)( handle ) );
-    REQUIRE( td1.GetIValue1() == 6 );
-    REQUIRE( td1.GetIValue2() == 7 );
+    REQUIRE_NOTHROW( (*tsdSlotDAddSig)( tsdHandle ) ); // this adds the tsdAdder.fAddValue (i.e. 5) to 1 and 2, respectively
+    REQUIRE( tsdTestData1.GetIValue1() == 6 );
+    REQUIRE( tsdTestData1.GetIValue2() == 7 );
 
-    REQUIRE_NOTHROW( (*sdAddNoSig)( handle ) );
-    REQUIRE( td1.GetIValue1() == 11 );
+    REQUIRE_NOTHROW( (*tsdSlotDAddNoSig)( tsdHandle ) ); // this adds the tsdAdder.fAddValue to 6 and 7, respectively
+    REQUIRE( tsdTestData1.GetIValue1() == 11 ); // and IValue2 would be 12
 
     // call the IToD slot function and verify operation
-    REQUIRE_NOTHROW( (*sdIToD)( handle ) );
-    REQUIRE( handle->Has< TestData2 >() );
-    TestData2& td2 = handle->Get< TestData2 >();
-    REQUIRE( td2.GetDValue1() == Approx(11.) );
-    REQUIRE( td2.GetDValue2() == Approx(12.) );
+    REQUIRE_NOTHROW( (*tsdSlotDIToD)( tsdHandle ) ); // this adds TestData2 to the frame and sets the integer values in its double variables
+    REQUIRE( tsdHandle->Has< TestData2 >() );
+    TestData2& tsdTestData2 = tsdHandle->Get< TestData2 >();
+    REQUIRE( tsdTestData2.GetDValue1() == Approx(11.) );
+    REQUIRE( tsdTestData2.GetDValue2() == Approx(12.) );
 
     // verify that a slot with a const data object works
     // call the print slot function to verify use with const data
-    REQUIRE_NOTHROW( (*sdPrint)( handle ) );
+    REQUIRE_NOTHROW( (*tsdSlotDPrint)( tsdHandle ) );
 
     // verify that a thrown exception appears
     // calls the slot function that just throws Exception; verify it appears here
-    REQUIRE_THROWS_AS( (*sdJustThrows)( handle ), Exception );
+    REQUIRE_THROWS_AS( (*tsdSlotDJustThrows)( tsdHandle ), Exception );
 
     // verify that an automatic signal call is made
     // connect signal "add" to slot "i-to-d"
-    REQUIRE_NOTHROW( adder.ConnectSignalToSlot( sigdAdd, sdIToD ) );
+    REQUIRE_NOTHROW( tsdAdder.ConnectSignalToSlot( tsdSigDAdd, tsdSlotDIToD ) );
     // remove TestData2
-    handle->Remove< TestData2 >();
-    REQUIRE_FALSE( handle->Has< TestData2 >() );
+    tsdHandle->Remove< TestData2 >();  // we'll start fresh without a TestData2
+    REQUIRE_FALSE( tsdHandle->Has< TestData2 >() );
     // call the add-sig slot and verify that the i-to-d slot gets called via the signal
-    REQUIRE_NOTHROW( (*sdAddSig)( handle ) );
-    REQUIRE( handle->Has< TestData2 >() );
-    REQUIRE( td1.GetIValue1() == 16 );
-    REQUIRE( td2.GetDValue1() == Approx(16.) );
+    REQUIRE_NOTHROW( (*tsdSlotDAddSig)( tsdHandle ) ); //add slot executes, adding 5 to 11, then triggers the i-to-d slot via the add signal, making TestData2 with fDValue2 = 16
+    REQUIRE( tsdHandle->Has< TestData2 >() );
+    TestData2& tsdAnotherTestData2 = tsdHandle->Get< TestData2 >();
+    REQUIRE( tsdTestData1.GetIValue1() == 16 );
+    REQUIRE( tsdAnotherTestData2.GetDValue1() == Approx(16.) );
 
     // verify that slots owned by something else work
     // remove TestData2
-    handle->Remove< TestData2 >();
-    REQUIRE_FALSE( handle->Has< TestData2 >() );
+    tsdHandle->Remove< TestData2 >();
+    REQUIRE_FALSE( tsdHandle->Has< TestData2 >() );
     // call the mult slot and verify that it worked
-    REQUIRE_NOTHROW( (*sdMult)( handle ) );
-    REQUIRE( td2.GetDValue1() == Approx(40.) );
+    REQUIRE_NOTHROW( (*tsdSlotDMult)( tsdHandle ) ); // for TestData1::fIValue1, multiplies 16 by 2.5 and stores in TestData2::fDValue1
+    TestData2& tsdYetAnotherTestData2 = tsdHandle->Get< TestData2 >();
+    REQUIRE( tsdYetAnotherTestData2.GetDValue1() == Approx(40.) );
 }
 
 
