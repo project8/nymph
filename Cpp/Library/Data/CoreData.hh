@@ -47,7 +47,7 @@ namespace Nymph
 */
     };
 
-//    DEFINE_EXT_DATA( KTCoreData, "core" )
+//    DEFINE_EXT_DATA( CoreData, "core" )
 
 /*
     //THIS FUNCTIONALITY HAS BEEN MOVED TO DataFramework.hh

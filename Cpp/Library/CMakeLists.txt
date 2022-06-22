@@ -20,6 +20,7 @@ include_directories( BEFORE
 set( NYMPH_HEADERFILES
     ${UTIL_DIR}/ConfigException.hh
     ${UTIL_DIR}/Exception.hh
+    ${UTIL_DIR}/Extensible.hh
     ${UTIL_DIR}/MemberVariable.hh
 
     ${PROC_DIR}/PrimaryProcessor.hh

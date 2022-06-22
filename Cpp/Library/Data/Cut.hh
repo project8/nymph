@@ -16,6 +16,7 @@
 ///#include "KTExtensibleStructFactory.hh"
 #include "Logger.hh"
 #include "MemberVariable.hh"
+#include "DataPresent.hh"
 
 #include <boost/exception/all.hpp>
 #include "factory.hh"
@@ -165,7 +166,8 @@ namespace Nymph
             template< class XFuncOwnerType, class... XFuncDataTypes >
             void SetApplyFunc( XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( DataFrame&, const XFuncDataTypes&... ) );
 
-            std::function< bool ( DataFrame& data, const XData&... dataType ) > fFunc;
+            std::function< bool ( const XData&... dataType ) > fFunc;
+//            std::function< bool ( DataFrame& data, const XData&... dataType ) > fFunc;
 
     };
 
@@ -206,14 +208,14 @@ namespace Nymph
     }
 
 //----------RemoveExtensibleDataFeatures-------------------
-/*
+
     template< class... XData >
     template< typename... SomeExtDataTypes >
     bool CutOnData< XData... >::DataPresent( DataHandle data )
     {
-        return DataPresent< SomeExtDataTypes... >::DataPresent( data );
+        return DataPresentHelper< SomeExtDataTypes... >::DataPresent( data );
     }
-
+/*
     template< class... XData >
     template< class XFuncOwnerType, class... XFuncDataTypes >
     void CutOnData< XData... >::SetApplyFunc( XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( const XFuncDataTypes&... ) )

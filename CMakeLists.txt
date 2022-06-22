@@ -139,7 +139,7 @@ add_subdirectory( Cpp/Library )
 
 if (Nymph_ENABLE_EXECUTABLES)
     add_subdirectory( Cpp/Executables/Main )
-    #add_subdirectory( Cpp/Executables/Validation )
+    add_subdirectory( Cpp/Executables/Validation )
 endif (Nymph_ENABLE_EXECUTABLES )
 
 #########
