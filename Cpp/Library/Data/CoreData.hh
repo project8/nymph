@@ -49,6 +49,16 @@ namespace Nymph
 
 //    DEFINE_EXT_DATA( CoreData, "core" )
 
+    class ExtCoreData : public CoreData
+    {
+        public:
+            ExtCoreData();
+            ExtCoreData(std::string Name);
+            virtual ~ExtCoreData();
+
+            MEMVAR_REF( std::string, Name );            
+    };
+
 /*
     //THIS FUNCTIONALITY HAS BEEN MOVED TO DataFramework.hh
     // Define DataHandle and a convenience function to create new handles
@@ -91,4 +101,4 @@ namespace Nymph
 */
 
 } /* namespace Nymph */
-#endif /* KTCOREDATA_HH_ */
+#endif /* COREDATA_HH_ */

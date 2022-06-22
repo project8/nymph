@@ -23,6 +23,23 @@ namespace Nymph
         std::cout << "### CoreData destrutor" << std::endl;
     }
 
+    ExtCoreData::ExtCoreData():
+        CoreData(),
+        fName()
+    {
+    }
+
+     ExtCoreData::ExtCoreData(std::string name) :
+        CoreData(),
+        fName( name )
+     {
+     }
+
+    ExtCoreData::~ExtCoreData()
+    {
+
+    }
+
 /*
     DataHandle CreateNewDataHandle()
     {

@@ -68,7 +68,8 @@ set( TEST_SOURCES
  #   TestApplication.cc
  #   TestApplyCut.cc
  #   TestCacheDirectory.cc
- #   TestCuts.cc
+    TestCut.cc
+    DataTest.cc
  #   TestCutFilter.cc
  #   TestLogger.cc
  #   TestPrintData.cc

@@ -36,6 +36,14 @@ namespace Nymph
 
 //    DEFINE_EXT_DATA( TestData, "test" ); // defines KTTestDataExt
 
+    class TestDataExt : public TestData, public ExtCoreData
+    {
+        public:
+            TestDataExt();
+            TestDataExt(std::string name);
+            virtual ~TestDataExt();
+    };
+
 /*
     template< class XDerivedType >
     class ExtensibleTestData : public TestData, public Extensible< XDerivedType, TestData >

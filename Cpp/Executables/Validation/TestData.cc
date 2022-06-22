@@ -33,6 +33,31 @@ namespace Nymph
         std::cout << "### TestBaseData destructor" << std::endl;
     }
 
+/*
+    class TestDataExt : public TestData, public ExtCoreData
+    {   
+        public:
+            TestDataExt();
+            TestDataExt(std::string name);
+            virtual ~TestDataExt();
+    }   
+*/
+
+    TestDataExt::TestDataExt() :
+        TestData(),
+        ExtCoreData()
+    {
+    }
+
+    TestDataExt::TestDataExt(std::string name) :
+        TestData(),
+        ExtCoreData( name )
+    {
+    }
+
+    TestDataExt::~TestDataExt() 
+    {
+    }
 
 } /* namespace Nymph */
 
