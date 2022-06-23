@@ -17,7 +17,7 @@ LOGGER(testlog, "TestData")
 int main()
 {
 
-    ExtCoreData data;
+    ExtCoreData data("data");
     TestDataExt testData("test");
     LINFO(testlog, data.Name());
     LINFO(testlog, testData.Name());

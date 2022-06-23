@@ -21,7 +21,7 @@ namespace Nymph
     AwesomeCut::AwesomeCut(const std::string& name) :
             CutOnData(name)
     {
-//        SetApplyFunc( this, &AwesomeCut::Apply );
+         SetApplyFunc( this, &AwesomeCut::Apply );
     }
 
     AwesomeCut::~AwesomeCut()
@@ -32,12 +32,13 @@ namespace Nymph
 //        return true;
     }
 
-    bool AwesomeCut::Apply(Data& data, const TestData& testData)
+    bool AwesomeCut::Apply(ExtCoreData& data, const TestData& testData)
     {
         bool isCut = ! testData.GetIsAwesome();
         LDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
         LDEBUG(testlog, "Is data cut? " << isCut);
 //        data.GetCutStatus().SetCutState(fConfigName, isCut);
+         data.GetCutStatus().SetCutState(fCutName, isCut);
         return isCut;
     }
 
@@ -56,12 +57,13 @@ namespace Nymph
 //        return true;
     }
 
-    bool NotAwesomeCut::Apply(Data& data, const TestData& testData)
+    bool NotAwesomeCut::Apply(ExtCoreData& data, const TestData& testData)
     {
         bool isCut = testData.GetIsAwesome();
         LDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
         LDEBUG(testlog, "Is data cut? " << isCut);
-//        data.GetCutStatus().SetCutState(fConfigName, isCut);
+//         data.GetCutStatus().SetCutState(fConfigName, isCut);
+        data.GetCutStatus().SetCutState(fCutName, isCut);
         return isCut;
     }
 

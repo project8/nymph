@@ -91,8 +91,7 @@ namespace Nymph
         }
 
         bool cutFailed = fCut->Apply(dataHandle);
-
-
+	LINFO(cutlog, "bool from Apply: " << cutFailed);
         if (cutFailed)
         {
             fAfterCutFailSignal(dataHandle);

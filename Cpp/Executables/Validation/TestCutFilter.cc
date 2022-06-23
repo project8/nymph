@@ -5,86 +5,89 @@
  *      Author: nsoblath
  */
 
-#include "KTTestCuts.hh"
+#include "TestCuts.hh"
 
-#include "KTApplyCut.hh"
-#include "KTCutFilter.hh"
-#include "KTLogger.hh"
-#include "KTTestData.hh"
+#include "ApplyCut.hh"
+#include "CutFilter.hh"
+#include "Logger.hh"
+#include "DataFrame.hh"
+#include "TestData.hh"
+#include "CoreData.hh"
 
-KTLOGGER(testlog, "TestCutFilter");
+LOGGER(testlog, "TestCutFilter");
 
 using namespace Nymph;
 using namespace std;
 
 int main()
 {
-    KTDataHandle dataHandle = CreateNewDataHandle();
-    KTTestData& testData = dataHandle->Of< KTTestDataExt >();
+    DataHandle dataHandle;
+    ExtCoreData data("data");
+    TestDataExt testData("test");
 
-    KTCutStatus& cutStatus = dataHandle->CutStatus();
+    CutStatus& cutStatus = data.GetCutStatus();
     unsigned awesomeCutPos = 0;
     string awesomeCutName("awesome-cut");
     unsigned notAwesomeCutPos = 1;
     string notAwesomeCutName("not-awesome-cut");
     cutStatus.AssignCutResult(awesomeCutPos, awesomeCutName);
     cutStatus.AssignCutResult(notAwesomeCutPos, notAwesomeCutName);
-    KTINFO(testlog, "Initial cut state: " << cutStatus.IsCut());
+    LINFO(testlog, "Initial cut state: " << cutStatus.IsCut());
 
-    KTApplyCut applyCut;
+    ApplyCut applyCut;
 
-    KTINFO(testlog, "Applying awesome cut");
-    applyCut.SetCut(new KTAwesomeCut());
-    applyCut.ApplyCut(dataHandle);
+    LINFO(testlog, "Applying awesome cut");
+    applyCut.SetCut(new AwesomeCut());
+    applyCut.ApplyTheCut(dataHandle);
 
-    KTINFO(testlog, "Cuts present: " << cutStatus.CutResultsPresent())
-    KTINFO(testlog, "Has cut result <" << awesomeCutName << ">? " << cutStatus.HasCutResult(awesomeCutName));
-    KTINFO(testlog, "Has cut result at " << awesomeCutPos << "? " << cutStatus.HasCutResult(awesomeCutPos));
-    KTINFO(testlog, "Cut state of <" << awesomeCutName << ">is: " << cutStatus.GetCutState(awesomeCutName));
-    KTINFO(testlog, "Cut state at " << awesomeCutPos << " is: " << cutStatus.GetCutState(awesomeCutPos));
-    KTINFO(testlog, "Is cut (all results)? " << cutStatus.IsCut());
-    KTINFO(testlog, "Is cut (with mask \"0\")? " << cutStatus.IsCut("0"));
+    LINFO(testlog, "Cuts present: " << cutStatus.CutResultsPresent())
+    LINFO(testlog, "Has cut result <" << awesomeCutName << ">? " << cutStatus.HasCutResult(awesomeCutName));
+    LINFO(testlog, "Has cut result at " << awesomeCutPos << "? " << cutStatus.HasCutResult(awesomeCutPos));
+    LINFO(testlog, "Cut state of <" << awesomeCutName << ">is: " << cutStatus.GetCutState(awesomeCutName));
+    LINFO(testlog, "Cut state at " << awesomeCutPos << " is: " << cutStatus.GetCutState(awesomeCutPos));
+    LINFO(testlog, "Is cut (all results)? " << cutStatus.IsCut());
+    LINFO(testlog, "Is cut (with mask \"0\")? " << cutStatus.IsCut("0"));
 
-    KTINFO(testlog, "Applying not-awesome cut");
+    LINFO(testlog, "Applying not-awesome cut");
     applyCut.SelectCut("not-awesome-cut");
-    applyCut.ApplyCut(dataHandle);
+    applyCut.ApplyTheCut(dataHandle);
 
-    KTINFO(testlog, "Cuts present: " << cutStatus.CutResultsPresent())
-    KTINFO(testlog, "Has cut result <" << awesomeCutName << ">? " << cutStatus.HasCutResult(awesomeCutName));
-    KTINFO(testlog, "Has cut result at " << awesomeCutPos << "? " << cutStatus.HasCutResult(awesomeCutPos));
-    KTINFO(testlog, "Cut state of <" << awesomeCutName << "> is: " << cutStatus.GetCutState(awesomeCutName));
-    KTINFO(testlog, "Cut state at " << awesomeCutPos << " is: " << cutStatus.GetCutState(awesomeCutPos));
-    KTINFO(testlog, "Has cut result <" << notAwesomeCutName << ">? " << cutStatus.HasCutResult(notAwesomeCutName));
-    KTINFO(testlog, "Has cut result at " << notAwesomeCutPos << "? " << cutStatus.HasCutResult(notAwesomeCutPos));
-    KTINFO(testlog, "Cut state of <" << notAwesomeCutName << "> is: " << cutStatus.GetCutState(notAwesomeCutName));
-    KTINFO(testlog, "Cut state at " << notAwesomeCutPos << " is: " << cutStatus.GetCutState(notAwesomeCutPos));
+    LINFO(testlog, "Cuts present: " << cutStatus.CutResultsPresent())
+    LINFO(testlog, "Has cut result <" << awesomeCutName << ">? " << cutStatus.HasCutResult(awesomeCutName));
+    LINFO(testlog, "Has cut result at " << awesomeCutPos << "? " << cutStatus.HasCutResult(awesomeCutPos));
+    LINFO(testlog, "Cut state of <" << awesomeCutName << "> is: " << cutStatus.GetCutState(awesomeCutName));
+    LINFO(testlog, "Cut state at " << awesomeCutPos << " is: " << cutStatus.GetCutState(awesomeCutPos));
+    LINFO(testlog, "Has cut result <" << notAwesomeCutName << ">? " << cutStatus.HasCutResult(notAwesomeCutName));
+    LINFO(testlog, "Has cut result at " << notAwesomeCutPos << "? " << cutStatus.HasCutResult(notAwesomeCutPos));
+    LINFO(testlog, "Cut state of <" << notAwesomeCutName << "> is: " << cutStatus.GetCutState(notAwesomeCutName));
+    LINFO(testlog, "Cut state at " << notAwesomeCutPos << " is: " << cutStatus.GetCutState(notAwesomeCutPos));
 
-    KTCutFilter cutFilter;
-    KTCoreDataExt& data = dataHandle->Of< KTCoreDataExt >();
+    CutFilter cutFilter;
+    ExtCoreData dataExt;
 
-    KTINFO(testlog, "Filtering with all cuts");
+    LINFO(testlog, "Filtering with all cuts");
     cutFilter.SetCutMaskAll();
-    KTINFO(testlog, "Is cut (all results)? " << cutFilter.Filter(data));
+    LINFO(testlog, "Is cut (all results)? " << cutFilter.Filter(dataExt));
 
-    KTINFO(testlog, "Testing filter set with a string");
+    LINFO(testlog, "Testing filter set with a string");
     cutFilter.SetCutMask("00");
-    KTINFO(testlog, "Is cut with mask \"00\"? " << cutFilter.Filter(data));
+    LINFO(testlog, "Is cut with mask \"00\"? " << cutFilter.Filter(dataExt));
     cutFilter.SetCutMask("01");
-    KTINFO(testlog, "Is cut with mask \"01\"? " << cutFilter.Filter(data));
+    LINFO(testlog, "Is cut with mask \"01\"? " << cutFilter.Filter(dataExt));
     cutFilter.SetCutMask("10");
-    KTINFO(testlog, "Is cut with mask \"10\"? " << cutFilter.Filter(data));
+    LINFO(testlog, "Is cut with mask \"10\"? " << cutFilter.Filter(dataExt));
     cutFilter.SetCutMask("11");
-    KTINFO(testlog, "Is cut with mask \"11\"? " << cutFilter.Filter(data));
+    LINFO(testlog, "Is cut with mask \"11\"? " << cutFilter.Filter(dataExt));
 
-    KTINFO(testlog, "Testing filter set with an integer");
+    LINFO(testlog, "Testing filter set with an integer");
     cutFilter.SetCutMask(0);
-    KTINFO(testlog, "Is cut with mask 0? " << cutFilter.Filter(data));
+    LINFO(testlog, "Is cut with mask 0? " << cutFilter.Filter(dataExt));
     cutFilter.SetCutMask(1);
-    KTINFO(testlog, "Is cut with mask 1? " << cutFilter.Filter(data));
+    LINFO(testlog, "Is cut with mask 1? " << cutFilter.Filter(dataExt));
     cutFilter.SetCutMask(2);
-    KTINFO(testlog, "Is cut with mask 2? " << cutFilter.Filter(data));
+    LINFO(testlog, "Is cut with mask 2? " << cutFilter.Filter(dataExt));
     cutFilter.SetCutMask(3);
-    KTINFO(testlog, "Is cut with mask 3? " << cutFilter.Filter(data));
+    LINFO(testlog, "Is cut with mask 3? " << cutFilter.Filter(dataExt));
 
     return 0;
 }

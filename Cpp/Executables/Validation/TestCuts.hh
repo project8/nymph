@@ -28,7 +28,7 @@ namespace Nymph
 
             void Configure(const scarab::param_node& node);
 
-            bool Apply(Data& data, const TestData& testData);
+            bool Apply(ExtCoreData& data, const TestData& testData);
     };
 
     // Cuts data that is IS awesome
@@ -41,7 +41,7 @@ namespace Nymph
 
             void Configure(const scarab::param_node& node);
 
-            bool Apply(Data& data, const TestData& testData);
+            bool Apply(ExtCoreData& data, const TestData& testData);
     };
 
 }

@@ -11,6 +11,7 @@
 ///#include "KTConfigurable.hh"
 #include "CutResult.hh"
 //#include "KTCoreData.hh"
+#include "CoreData.hh"
 #include "DataFrame.hh"
 #include "Exception.hh"
 ///#include "KTExtensibleStructFactory.hh"
@@ -164,9 +165,10 @@ namespace Nymph
             bool DataPresent( DataHandle data );
 
             template< class XFuncOwnerType, class... XFuncDataTypes >
-            void SetApplyFunc( XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( DataFrame&, const XFuncDataTypes&... ) );
+//            void SetApplyFunc( XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( DataFrame&, const XFuncDataTypes&... ) );
+             void SetApplyFunc( XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( ExtCoreData&, const XFuncDataTypes&... ) );
 
-            std::function< bool ( const XData&... dataType ) > fFunc;
+            std::function< bool ( ExtCoreData& data, const XData&... dataType ) > fFunc;
 //            std::function< bool ( DataFrame& data, const XData&... dataType ) > fFunc;
 
     };
@@ -198,7 +200,7 @@ namespace Nymph
 
         try
         {
-            return fFunc( dataHandle->Get< XData >()... );
+            return fFunc( dataHandle->Get< ExtCoreData >(),  dataHandle->Get< XData >()... );
         }
         catch( boost::exception& e )
         {
@@ -215,14 +217,14 @@ namespace Nymph
     {
         return DataPresentHelper< SomeExtDataTypes... >::DataPresent( data );
     }
-/*
+
     template< class... XData >
     template< class XFuncOwnerType, class... XFuncDataTypes >
-    void CutOnData< XData... >::SetApplyFunc( XFuncOwnerType* owner, bool (XFuncOwnerType::*func)( const XFuncDataTypes&... ) )
+    void CutOnData< XData... >::SetApplyFunc( XFuncOwnerType* owner, bool (XFuncOwnerType::*func)(ExtCoreData&, const XFuncDataTypes&... ) )
     {
-        fFunc = [func, owner]( const XData&... testData )->bool {return (owner->*func)(data, testData...);};
+        fFunc = [func, owner](ExtCoreData& data, const XData&... testData )->bool {return (owner->*func)(data, testData...);};
     }
-*/
+
 
     // this macro enforces the existence of cut_class::Result and cut_class::Result::sName at compile time
 #define REGISTER_CUT(cut_class, cut_name) \

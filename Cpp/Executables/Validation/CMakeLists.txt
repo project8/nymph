@@ -70,7 +70,7 @@ set( TEST_SOURCES
  #   TestCacheDirectory.cc
     TestCut.cc
     DataTest.cc
- #   TestCutFilter.cc
+    TestCutFilter.cc
  #   TestLogger.cc
  #   TestPrintData.cc
  #   TestSignalsAndSlots.cc

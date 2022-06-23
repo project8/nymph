@@ -29,11 +29,11 @@ namespace Nymph
     {
     }
 
-     ExtCoreData::ExtCoreData(std::string name) :
+    ExtCoreData::ExtCoreData(std::string name) :
         CoreData(),
         fName( name )
-     {
-     }
+    {
+    }
 
     ExtCoreData::~ExtCoreData()
     {
