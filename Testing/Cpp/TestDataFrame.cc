@@ -56,7 +56,7 @@ TEST_CASE( "data_frame", "[data]" )
     TestData2* tdfNewTestData2Ptr = new TestData2();
     REQUIRE_NOTHROW( tdfFrame.Set( tdfNewTestData2Ptr ) );
     REQUIRE( tdfFrame.Has< TestData2 >() );
-    REQUIRE( (Data*)tdfNewTestData2Ptr == tdfFrame.DataObjects()[typeid(TestData2)].get() ); // we did not make a copy
+    REQUIRE( tdfNewTestData2Ptr == &tdfFrame.Get<TestData2>() ); // we did not make a copy
 
     // set an object with a unique_ptr
     std::unique_ptr< TestData1 > tdfNewTestData1Ptr( new TestData1 );
@@ -75,6 +75,6 @@ TEST_CASE( "data_frame", "[data]" )
     REQUIRE_NOTHROW( tdfFrame.Set( tdfAnotherTestData1 ) );
     REQUIRE( tdfAnotherTestData1.GetIValue1() == 4000 );
     REQUIRE( tdfFrame.Get< TestData1 >().GetIValue1() == 4000 );
-    REQUIRE_FALSE( (Data*)(&tdfAnotherTestData1) == tdfFrame.DataObjects()[typeid(TestData1)].get() ); // we made a copy
+    REQUIRE_FALSE( &tdfAnotherTestData1 == &tdfFrame.Get<TestData1>() ); // we made a copy
 
 }
