@@ -35,6 +35,10 @@ namespace Nymph
             ~DataFrameException() = default;
     };
 
+    // map< std::string, std::type_index > may give us what we need to go from string to class
+    //  * this would enable DataFrame::Set( std::string, Data* ) and DataFrame::Set( std::string, std::unique_ptr<Data> )
+    //  * would not enable DataFrame::Get(); need to be able to create an instance of the type
+
     /// Struct to hold individual data pointers and indexing information for the DataFrame
     struct IndexableData
     {
@@ -91,6 +95,10 @@ namespace Nymph
             /// Returns true if the frame has no data objects
             bool Empty() const;
 
+            //**********************
+            // Type-based interface
+            //**********************
+
             /// Returns true if object of type(s) XData exist in the frame; returns false otherwise; Has<>() returns true
             template< typename... XData >
             bool Has() const;
@@ -125,6 +133,30 @@ namespace Nymph
             template< typename XData >
             void Remove();
 
+
+            //************************
+            // String-based interface
+            //************************
+
+            bool Has( const std::string& typeName ) const;
+
+            Data& Get( const std::string& typeName );
+
+            const Data& Get( const std::string& typeName ) const;
+
+            void Set( const std::string& typeName, Data* ptr );
+
+            void Set( const std::string& typeName, std::unique_ptr<Data>&& ptr );
+
+            //void Set( const std::string& typeName, const Data& obj );  <-- this probably requires having Clone() functions setup in Data
+
+            void Remove( const std::string& typeName );
+
+
+            //*********
+            // Storage
+            //*********
+
             // typedef used to avoid problems with the comma in the MEMVAR macro
             //typedef std::unordered_map< std::type_index, std::unique_ptr<Data> > DataMap;
             // tags
@@ -145,7 +177,6 @@ namespace Nymph
             template< typename XData >
             bool HasOneType() const;
 
-            template< typename XData >
             void DoSet( IndexableData&& indData );
 
             DataMapByType& fDataMapByType;
@@ -201,8 +232,7 @@ namespace Nymph
     bool DataFrame::HasOneType() const
     {
         typedef std::remove_const_t< XData > XDataNoConst;
-        if( fDataMapByType.count( typeid(XDataNoConst) ) == 0 ) return false;
-        return true;
+        return fDataMapByType.count( typeid(XDataNoConst) ) != 0;
     }
 
     template< typename XData >
@@ -212,7 +242,7 @@ namespace Nymph
         auto iter = fDataMapByType.find( typeid(XDataNoConst) );
         if( iter == fDataMapByType.end() )
         {
-            auto result = fDataObjects.insert( IndexableData::Create<XDataNoConst>() );
+            auto result = fDataMapByType.insert( IndexableData::Create<XDataNoConst>() );
             if( result.second )
             {
                 return static_cast< XDataNoConst& >( *result.first->fDataPtr );
@@ -242,7 +272,7 @@ namespace Nymph
     {
         // Note: takes ownership of ptr
         typedef std::remove_const_t< XData > XDataNoConst;
-        DoSet< XDataNoConst >( IndexableData::Create<XDataNoConst>( ptr ) );
+        DoSet( IndexableData::Create<XDataNoConst>( ptr ) );
         return;
     }
 
@@ -251,7 +281,7 @@ namespace Nymph
     {
         // Note: takes ownership of object pointed to by ptr
         typedef std::remove_const_t< XData > XDataNoConst;
-        DoSet< XDataNoConst >( IndexableData::Create<XDataNoConst>( std::move(ptr) ) );
+        DoSet( IndexableData::Create<XDataNoConst>( std::move(ptr) ) );
         return;
     }
 
@@ -260,30 +290,9 @@ namespace Nymph
     {
         // Note: makes a copy of obj and takes ownership of the copy
         typedef std::remove_const_t< XData > XDataNoConst;
-        DoSet< XDataNoConst >( IndexableData::Create<XDataNoConst>( obj ) );
+        DoSet( IndexableData::Create<XDataNoConst>( obj ) );
         return;
     }
-
-    template< typename XData >
-    void DataFrame::DoSet( IndexableData&& indData )
-    {
-        auto iter = fDataMapByType.find( typeid(XData) );
-        if( iter == fDataMapByType.end() )
-        {
-            auto result = fDataMapByType.insert( std::move(indData) );
-            if( ! result.second )
-            {
-                THROW_EXCEPT_HERE( DataFrameException() << "Attempt to insert new data object failed for data type <" << scarab::type<XData>() << ">" );
-            }
-            return;
-        }
-        if( ! fDataMapByType.replace( iter, std::move(indData) ) )
-        {
-            THROW_EXCEPT_HERE( DataFrameException() << "Attempt to replace data object failed for data type <" << scarab::type<XData >() << ">" );
-        }
-        return;
-    }
-
 
     template< typename XData >
     void DataFrame::Remove()
