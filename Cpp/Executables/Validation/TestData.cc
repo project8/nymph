@@ -9,14 +9,19 @@
 
 namespace Nymph
 {
-    TestData::TestData() :
-        CoreData(),
+    TestDataExt::TestDataExt() :
+        ExtCoreData(),
         fIsAwesome( false )
     {
         std::cout << "### TestData constructor" << std::endl;
     }
 
-    TestData::~TestData()
+    TestDataExt::TestDataExt(std::string name) :
+	ExtCoreData( name )
+    {
+    }
+
+    TestDataExt::~TestDataExt()
     {
         std::cout << "### TestData destructor" << std::endl;
     }
@@ -35,14 +40,16 @@ namespace Nymph
 
 /*
     class TestDataExt : public TestData, public ExtCoreData
-    {   
+    {  
+	TestData(),
+	ExtCoreData() 
         public:
             TestDataExt();
             TestDataExt(std::string name);
             virtual ~TestDataExt();
     }   
 */
-
+/*
     TestDataExt::TestDataExt() :
         TestData(),
         ExtCoreData()
@@ -58,6 +65,6 @@ namespace Nymph
     TestDataExt::~TestDataExt() 
     {
     }
-
+*/
 } /* namespace Nymph */
 

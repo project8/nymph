@@ -11,7 +11,10 @@ namespace Nymph
 {
     DataFrame::DataFrame() :
         fDataObjects()
-    {}
+    {
+	std::unordered_map< int, double > emptyMap;	
+	fDataObjectsTest = emptyMap;
+    }
 
     DataFrame::~DataFrame()
     {}

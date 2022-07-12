@@ -80,16 +80,16 @@ namespace Nymph
         return true;
     }
 
-
     void ApplyCut::ApplyTheCut(DataHandle dataHandle)
     {
-
+	LINFO(cutlog, "Entered ApplyTheCut");
         if (fCut == NULL)
         {
             THROW_EXCEPT_HERE(Exception() << "No cut was specified" );
             return;
         }
 
+        LINFO(cutlog, "About to apply cut on dataHandle");
         bool cutFailed = fCut->Apply(dataHandle);
 	LINFO(cutlog, "bool from Apply: " << cutFailed);
         if (cutFailed)

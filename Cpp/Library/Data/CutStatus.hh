@@ -161,6 +161,8 @@ namespace Nymph
 
     inline CutStatus::CutResultsIt CutStatus::FindCutResult( const std::string& name )
     {
+	printf("Entered SutStatus::FindCutResult %d\n", name.empty());
+	printf("cutResult size: %ld\n", fCutResults.size() );
         if( name.empty() ) return fCutResults.end();
         return std::find_if( fCutResults.begin(), fCutResults.end(), CheckCutResultName(name) );
     }
@@ -193,6 +195,7 @@ namespace Nymph
 
     inline bool CutStatus::GetCutState( const std::string& name ) const
     {
+	printf("INSIDE GetCutState\n");	
         CutResultsCIt cutIt = FindCutResultC(name);
         if (cutIt != fCutResults.cend())
         {
@@ -212,6 +215,7 @@ namespace Nymph
 
     inline void CutStatus::SetCutState(const std::string& name, bool state, bool doUpdateStatus)
     {
+        printf("INSIDE SetCutState\n");
         CutResultsIt cutIt = FindCutResult(name);
         if (cutIt != fCutResults.end())
         {

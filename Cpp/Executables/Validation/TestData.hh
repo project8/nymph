@@ -16,11 +16,12 @@
 namespace Nymph
 {
 
-    class TestData : public CoreData
+    class TestDataExt : public ExtCoreData
     {
         public:
-            TestData();
-            virtual ~TestData();
+            TestDataExt();
+            TestDataExt(std::string name);
+            virtual ~TestDataExt();
 
             MEMVAR(bool, IsAwesome);
             MEMVAR_REF( CutStatus, GetCutStatus );
@@ -35,14 +36,6 @@ namespace Nymph
     };
 
 //    DEFINE_EXT_DATA( TestData, "test" ); // defines KTTestDataExt
-
-    class TestDataExt : public TestData, public ExtCoreData
-    {
-        public:
-            TestDataExt();
-            TestDataExt(std::string name);
-            virtual ~TestDataExt();
-    };
 
 /*
     template< class XDerivedType >

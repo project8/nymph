@@ -35,6 +35,7 @@ namespace Nymph
     template< class XDataType, class... XOtherDataTypes >
     bool DataPresentHelper< XDataType, XOtherDataTypes... >::DataPresent( const DataHandle& handle )
     {
+        LINFO(dplog_h, "TEST IN CATCH IN APPLY FUNCTION" );
         if( ! handle->Has< XDataType >() )
         {
             LERROR( dplog_h, "Data not found with type <" << scarab::type(XDataType()) << ">" );

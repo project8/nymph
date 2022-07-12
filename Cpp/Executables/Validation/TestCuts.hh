@@ -15,12 +15,12 @@
 
 namespace Nymph
 {
-    class TestData;
-//    class TestDataExt;
+//    class TestData;
+    class TestDataExt;
 
     // Cuts data that is NOT awesome
-//    class AwesomeCut : public CutOnData< TestDataExt >
-     class AwesomeCut : public CutOnData< TestData >
+    class AwesomeCut : public CutOnData< TestDataExt >
+//     class AwesomeCut : public CutOnData< TestData >
     {
         public:
             AwesomeCut(const std::string& name = "default-awesome-cut");
@@ -28,12 +28,12 @@ namespace Nymph
 
             void Configure(const scarab::param_node& node);
 
-            bool Apply(ExtCoreData& data, const TestData& testData);
+            bool Apply(ExtCoreData& data, const TestDataExt& testData);
     };
 
     // Cuts data that is IS awesome
-//    class NotAwesomeCut : public CutOnData< TestDataExt >
-    class NotAwesomeCut : public CutOnData< TestData >
+    class NotAwesomeCut : public CutOnData< TestDataExt >
+//    class NotAwesomeCut : public CutOnData< TestData >
     {
         public:
             NotAwesomeCut(const std::string& name = "default-not-awesome-cut");
@@ -41,7 +41,7 @@ namespace Nymph
 
             void Configure(const scarab::param_node& node);
 
-            bool Apply(ExtCoreData& data, const TestData& testData);
+            bool Apply(ExtCoreData& data, const TestDataExt& testData);
     };
 
 }

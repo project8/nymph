@@ -25,13 +25,15 @@ namespace Nymph
 
     ExtCoreData::ExtCoreData():
         CoreData(),
+//	fGetCutStatus(),
         fName()
     {
     }
 
     ExtCoreData::ExtCoreData(std::string name) :
         CoreData(),
-        fName( name )
+//	fGetCutStatus(),
+        fName( name )	
     {
     }
 
@@ -41,9 +43,10 @@ namespace Nymph
     }
 
 /*
-    DataHandle CreateNewDataHandle()
+    DataHandle CoreData::CreateNewDataHandle()
     {
-        return std::make_shared< CoreDataExt >();
+	return std::shared_ptr< DataFrame >();
+        //return std::make_shared< CoreDataExt >();
     }
 */
 

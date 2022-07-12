@@ -192,21 +192,33 @@ namespace Nymph
     bool CutOnData< XData... >::Apply( DataHandle dataHandle )
     {
         // Check to ensure that the required data type is present
+        LINFO( cutlog_h, "TEST IF ENTERING APPLY FUNCTION");
+
         if( ! DataPresent< XData... >( dataHandle ) )
         {
             LERROR( cutlog_h, "Failed to find all of the necessary data types in slot <" << fCutName << ">. Aborting." );
 //            BOOST_THROW_EXCEPTION( Exception() << "Failed to find all of the necessary data types in slot <" << fCutName << ">. Aborting." << eom );
         }
 
+	LINFO( cutlog_h, "TEST2 IN APPLY FUNCTION");
         try
         {
+	    LINFO( cutlog_h, "TEST IN TRY IN APPLY FUNCTION");
+	    //Data testCore;
+            //LINFO( cutlog_h, "TEST testCore created");
+	    //dataHandle->Set(&testCore);
+	    //LINFO( cutlog_h, "TEST COREDATA CREATED");
+	    //XData testXData = dataHandle->Get< XData... >();
+	    //LINFO( cutlog_h, "TEST XDATA CREATED"); 
             return fFunc( dataHandle->Get< ExtCoreData >(),  dataHandle->Get< XData >()... );
         }
         catch( boost::exception& e )
         {
+	      std::cout << "TEST IN CATCH IN APPLY FUNCTION" << std::endl;
 //            e << KTErrorMsgInfo< struct slotData_RunFunc >( "Something went wrong in slot <" + fCutName + ">. Aborting." );
             throw;
         }
+        LINFO( cutlog_h, "TEST END OF APPLY FUNCTION");
     }
 
 //----------RemoveExtensibleDataFeatures-------------------
@@ -215,6 +227,7 @@ namespace Nymph
     template< typename... SomeExtDataTypes >
     bool CutOnData< XData... >::DataPresent( DataHandle data )
     {
+        LINFO(cutlog_h, "TESTING IF DATA PRESENT: " << DataPresentHelper< SomeExtDataTypes... >::DataPresent( data ));
         return DataPresentHelper< SomeExtDataTypes... >::DataPresent( data );
     }
 

@@ -9,7 +9,7 @@
 #define COREDATA_HH_
 
 #include "Data.hh"
-#include "DataFrame.hh"
+//#include "DataFrame.hh"
 
 #include "CutStatus.hh"
 #include "Logger.hh"
@@ -32,7 +32,7 @@ namespace Nymph
             MEMVAR( bool, LastData );
 
             MEMVAR_REF( CutStatus, GetCutStatus );
-
+	    //CutStatus fGetCutStatus;
         private:
 //-------------RemovedSerial---------------
 /*
@@ -57,13 +57,15 @@ namespace Nymph
             virtual ~ExtCoreData();
 
             MEMVAR_REF( std::string, Name );            
+//            MEMVAR_REF( CutStatus, GetCutStatus );
+//	    CutStatus fGetCutStatus;
     };
 
 /*
     //THIS FUNCTIONALITY HAS BEEN MOVED TO DataFramework.hh
     // Define DataHandle and a convenience function to create new handles
     typedef std::shared_ptr< KTCoreDataExt > KTDataHandle;
-    KTDataHandle CreateNewDataHandle();
+    DataFrame::DataHandle CreateNewDataHandle();
 */
 
 /*
