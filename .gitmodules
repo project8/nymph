@@ -4,3 +4,6 @@
 [submodule "External/cereal"]
 	path = External/cereal
 	url = https://github.com/USCiLab/cereal.git
+[submodule "External/autopybind11"]
+	path = External/autopybind11
+	url = https://gitlab.kitware.com/autopybind11/autopybind11.git
