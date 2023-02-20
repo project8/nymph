@@ -25,8 +25,8 @@ include( Nymph )
 # Nymph options #
 #################
 
-# require C++11
-set_option( USE_CPP11 TRUE )
+# require C++17
+set_option( USE_CPP17 TRUE )
 
 # Build the Nymph executable (also requires Nymph_ENABLE_EXECUTABLES)
 option( Nymph_BUILD_NYMPH_EXE "Flag to build the Nymph executable; also requires Nymph_ENABLE_EXECUTABLES" ON )
