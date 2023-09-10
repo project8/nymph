@@ -11,11 +11,12 @@ import _nymph, _nymph_testing
 
 
 class TestDataMethods(unittest.TestCase):
-    tb = _nymph.processor.ProcessorToolbox()
+    def setUp(self):
+        self.tb = _nymph.processor.ProcessorToolbox()
 
-    procName1 = 'testproc-1'  # not a registered processor
-    procName2 = 'testproc-2'  # not a registered processor
-    procName3 = 'test-proc'   # a registered processor
+        self.procName1 = 'testproc-1'  # not a registered processor
+        self.procName2 = 'testproc-2'  # not a registered processor
+        self.procName3 = 'test-proc'   # a registered processor
 
     '''Testing Processor handling'''
     def test_add_remove_processors(self):

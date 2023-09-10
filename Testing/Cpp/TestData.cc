@@ -9,6 +9,10 @@
 
 #include "catch.hpp"
 
+#include "logger.hh"
+#include "typename.hh"
+
+LOGGER( testlog, "TestData" );
 
 TEST_CASE( "data", "[data]" )
 {
@@ -26,4 +30,6 @@ TEST_CASE( "data", "[data]" )
     REQUIRE( tdData2.GetDValue1() == Approx( 0.0 ) );
     REQUIRE( tdData2.GetDValue2() == Approx( 10.0 ) );
 
+    LWARN( testlog, "Data1: " << scarab::type<TestData1>() );
+    LWARN( testlog, "Data1: " << scarab::type<TestData2>() );
 }

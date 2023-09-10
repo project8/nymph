@@ -35,7 +35,7 @@ namespace Nymph
         auto iter = fDataMapByTypeName.find( typeName );
         if( iter == fDataMapByTypeName.end() )
         {
-            THROW_EXCEPT_HERE( DataFrameException() << "Adding event type by Get() is not yet implemented" );
+            THROW_EXCEPT_HERE( DataFrameException() << "Adding event type by Get(string) is not yet implemented" );
 /*            // TODO: this doesn't work; needs mechanism to go from string to type
             auto result = fDataMapByTypeName.insert( IndexableData::Create<XDataNoConst>() );
             if( result.second )

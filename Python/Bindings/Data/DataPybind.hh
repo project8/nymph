@@ -25,11 +25,12 @@ namespace NymphPybind
 
     };
 
-    void ExportData( py::module_& nymphData)
+    void ExportData( py::module_& nymphData )
     {
-        py::class_< Nymph::Data, PyData, std::shared_ptr<Nymph::Data> >(nymphData, "_Data")
-                .def(py::init< >());
-
+        py::class_< Nymph::Data, PyData >( nymphData, "_Data" )
+                .def( py::init< >() )
+                .def( "get_name", &Nymph::Data::GetName )
+        ;
     }
 
 }
