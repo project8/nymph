@@ -147,7 +147,7 @@ namespace Nymph
             fPrivate->fLogger = logName;
         }
         fPrivate->fColored = true;
-        sprintf(KTLogger::Private::sDateTimeFormat,  "%%T");
+        snprintf(KTLogger::Private::sDateTimeFormat,  16, "%%T");
         SetLevel(eDebug);
     }
 
@@ -155,7 +155,7 @@ namespace Nymph
     {
         fPrivate->fLogger = name.c_str();
         fPrivate->fColored = true;
-        sprintf(KTLogger::Private::sDateTimeFormat,  "%%T");
+        snprintf(KTLogger::Private::sDateTimeFormat,  16, "%%T");
         SetLevel(eDebug);
     }
 
