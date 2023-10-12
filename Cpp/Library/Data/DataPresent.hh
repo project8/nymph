@@ -41,6 +41,7 @@ namespace Nymph
             LERROR( dplog_h, "Data not found with type <" << scarab::type(XDataType()) << ">" );
             return false;
         }
+	LINFO(dplog_h, "TEST PASSED IF. Present: " << DataPresentHelper< XOtherDataTypes... >::DataPresent( handle ));
         return DataPresentHelper< XOtherDataTypes... >::DataPresent( handle );
     }
 

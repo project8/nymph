@@ -19,8 +19,6 @@ int main()
 {
     try
     {
-//        CoreData data;
-//        TestData& testData = data.Get< TestData >();
         ExtCoreData data;
         TestDataExt testData("test");
 

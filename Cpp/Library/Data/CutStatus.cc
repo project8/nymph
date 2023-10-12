@@ -63,6 +63,7 @@ namespace Nymph
         fSummary.resize(nCuts, false);
 
         // loop through to set cuts
+	LDEBUG(cutlog, "nCuts: " << nCuts);
         for (unsigned iCut = 0; iCut < nCuts; ++iCut)
         {
             fSummary[iCut] = fCutResults[iCut].fAssigned && fCutResults[iCut].fState;

@@ -32,7 +32,6 @@ namespace Nymph
             MEMVAR( bool, LastData );
 
             MEMVAR_REF( CutStatus, GetCutStatus );
-	    //CutStatus fGetCutStatus;
         private:
 //-------------RemovedSerial---------------
 /*
@@ -47,7 +46,6 @@ namespace Nymph
 */
     };
 
-//    DEFINE_EXT_DATA( CoreData, "core" )
 
     class ExtCoreData : public CoreData
     {
@@ -57,8 +55,6 @@ namespace Nymph
             virtual ~ExtCoreData();
 
             MEMVAR_REF( std::string, Name );            
-//            MEMVAR_REF( CutStatus, GetCutStatus );
-//	    CutStatus fGetCutStatus;
     };
 
 /*

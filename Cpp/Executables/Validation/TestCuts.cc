@@ -37,12 +37,11 @@ namespace Nymph
         bool isCut = ! testData.GetIsAwesome();
         LDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
         LDEBUG(testlog, "Is data cut? " << isCut);
-//        data.GetCutStatus().SetCutState(fConfigName, isCut);
-	std::cout << fCutName << " " << isCut << std::endl;
-	std::cout << data.GetCutStatus().size() << " is the size of the cut" << std::endl;
-	std::cout << data.GetCutStatus().HasCutResult(fCutName) << "does the result exist?" << std::endl;
+	CutStatus Check = data.GetCutStatus();
+	LDEBUG(testlog, "CutStatus created");
+	LDEBUG(testlog, "size: " << Check.size());
         data.GetCutStatus().SetCutState(fCutName, isCut);
-	LDEBUG(testlog, "Leaving AwesomeCut::Apply");
+	LDEBUG(testlog, "Leaving Apply()");
         return isCut;
     }
 
@@ -66,9 +65,7 @@ namespace Nymph
         bool isCut = testData.GetIsAwesome();
         LDEBUG(testlog, "Is data awesome? " << testData.GetIsAwesome());
         LDEBUG(testlog, "Is data cut? " << isCut);
-//         data.GetCutStatus().SetCutState(fConfigName, isCut);
         data.GetCutStatus().SetCutState(fCutName, isCut);
-	LDEBUG(testlog, "Leaving NotAwesomeCut::Apply");
         return isCut;
     }
 

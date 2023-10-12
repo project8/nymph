@@ -73,6 +73,7 @@ namespace Nymph
 
         public:
             void ApplyTheCut(DataHandle dataHandle);
+//            void ApplyTheCut(ExtCoreData data);
 
             //***************
             // Signals

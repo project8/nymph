@@ -81,6 +81,7 @@ namespace Nymph
     }
 
     void ApplyCut::ApplyTheCut(DataHandle dataHandle)
+//    void ApplyCut::ApplyTheCut(ExtCoreData data)
     {
 	LINFO(cutlog, "Entered ApplyTheCut");
         if (fCut == NULL)
@@ -91,6 +92,7 @@ namespace Nymph
 
         LINFO(cutlog, "About to apply cut on dataHandle");
         bool cutFailed = fCut->Apply(dataHandle);
+//        bool cutFailed = fCut->Apply(data);
 	LINFO(cutlog, "bool from Apply: " << cutFailed);
         if (cutFailed)
         {

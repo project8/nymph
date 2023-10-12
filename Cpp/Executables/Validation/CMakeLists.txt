@@ -66,7 +66,7 @@ set( LIB_DEPENDENCIES
 
 set( TEST_SOURCES
  #   TestApplication.cc
- #   TestApplyCut.cc
+    TestApplyCut.cc
  #   TestCacheDirectory.cc
     TestCut.cc
     DataTest.cc

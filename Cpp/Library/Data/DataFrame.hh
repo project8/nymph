@@ -98,9 +98,6 @@ namespace Nymph
             // typedef used to avoid problems with the comma in the MEMVAR macro
             typedef std::unordered_map< std::type_index, std::unique_ptr<Data> > DataMap;
             MEMVAR_REF( DataMap, DataObjects );
-	    CutStatus fGetCutStatus;
-// 	    MEMVAR_REF(CutStatus, GetCutStatus);
-	    std::unordered_map< int, double > fDataObjectsTest = std::unordered_map< int, double >{};
     };
 
 
@@ -113,21 +110,24 @@ namespace Nymph
     bool DataFrame::Has() const
     {
         typedef std::remove_const_t< XData > XDataNoConst;
-        return fDataObjects.count( typeid(XDataNoConst) ) != 0;
+        return this->DataObjects().count( typeid(XDataNoConst) ) != 0;
     }
 
     template< typename XData >
     XData& DataFrame::Get()
     {
-	printf("Entering Get\n");
+	printf("Entering DataFrame::Get\n");
         typedef std::remove_const_t< XData > XDataNoConst;
-	printf("Test inside Get\n");
+
         if( ! Has< XDataNoConst >() )
         {
-	    printf("Test in if in Get.\n");
-            fDataObjects[ typeid(XDataNoConst) ].reset( new XDataNoConst() );
+           printf("Making new, empty object\n"); 
+           fDataObjects[ typeid(XDataNoConst) ].reset( new XDataNoConst() );
         }
-	printf("Leaving Get\n");
+
+	printf("About to return from DataFrame::Get\n");
+	printf("test count: %ld\n", this->DataObjects().count( typeid(XDataNoConst) ) );
+//        return static_cast< XDataNoConst& >( (this->fDataObjects)[typeid(XDataNoConst)] );
         return static_cast< XDataNoConst& >( *fDataObjects[typeid(XDataNoConst)] );
     }
 
@@ -145,30 +145,14 @@ namespace Nymph
     template< typename XData >
     void DataFrame::Set( XData* ptr )
     {
-        printf("INSIDE DataFrame::Set\n");
-
-	int testint = 3;
-
-	DataMap testDataMap;
-	printf("testDataMap size: (%ld)\n", testDataMap.size() );
-        printf("testDataMap size: (%ld, %f)\n", testDataMap.size(), &testDataMap[typeid(testint)] );
-
         typedef std::remove_const_t< XData > XDataNoConst;
-//        fDataObjects[ typeid(XDataNoConst) ].reset( ptr );  // take ownership of ptr
-	std::cout << "Type ID: " << typeid(XDataNoConst).name() << std::endl;
-	if( fDataObjectsTest.size() == 0) printf("size==0\n");
-	else printf("size!=0\n");
-	if( fDataObjects.size() ) printf("NULL\n");
-	else printf("Not NULL\n");
         fDataObjects[ typeid(XDataNoConst) ].reset( ptr );  // take ownership of ptr
-	printf("Leaving DataFrame::Set\n");
         return;
     }
 
     template< typename XData >
     void DataFrame::Set( std::unique_ptr< XData >&& ptr )
     {
-	printf("INSIDE unique_ptr DataFrame::Set\n");
         typedef std::remove_const_t< XData > XDataNoConst;
         fDataObjects[ typeid(XDataNoConst) ] = std::move(ptr);  // take ownership of ptr
         return;

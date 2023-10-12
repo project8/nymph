@@ -10,10 +10,9 @@
 namespace Nymph
 {
     DataFrame::DataFrame() :
+	ExtCoreData(),
         fDataObjects()
     {
-	std::unordered_map< int, double > emptyMap;	
-	fDataObjectsTest = emptyMap;
     }
 
     DataFrame::~DataFrame()
