@@ -9,6 +9,8 @@
 #ifndef NYMPH_DATA_HH_
 #define NYMPH_DATA_HH_
 
+#include <string>
+
 namespace Nymph
 {
 
@@ -17,6 +19,8 @@ namespace Nymph
         public:
             Data();
             virtual ~Data();
+
+            std::string GetName() const;
     };
 
 } /* namespace Nymph */

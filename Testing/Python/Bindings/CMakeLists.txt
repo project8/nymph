@@ -10,6 +10,7 @@ include_directories( BEFORE
 
 # Python binding headers
 set( TESTING_PYBINDING_HEADERFILES
+    TestDataClassesPybind.hh
 )
 
 # Python bindings

@@ -7,6 +7,8 @@
 
 #include "Data.hh"
 
+#include "typename.hh"
+
 namespace Nymph
 {
     Data::Data()
@@ -14,5 +16,10 @@ namespace Nymph
 
     Data::~Data()
     {}
+
+    std::string Data::GetName() const
+    {
+        return scarab::type(*this);
+    }
 
 } /* namespace Nymph */
