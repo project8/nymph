@@ -1,6 +1,6 @@
 /**
- @file Processor.hh
- @brief Base class for processors
+ @file ConfigException.hh
+ @brief Exceptions related to configurations
  @author: N. S. Oblath
  @date: Jan 5, 2012
  */
