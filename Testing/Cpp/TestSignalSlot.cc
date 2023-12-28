@@ -13,6 +13,7 @@
 #include "catch.hpp"
 
 #include <future>
+#include <thread>
 
 TEST_CASE( "signal_slot", "[signal],[slot],[processor]" )
 {
