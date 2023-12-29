@@ -20,10 +20,12 @@ set( testing_lib_HEADERS
     ${CPP_DIR}/TestDataClasses.hh
     ${CPP_DIR}/TestDataProcessorClasses.hh
     ${CPP_DIR}/TestProcessorClasses.hh
+    ${CPP_DIR}/TestServiceClasses.hh
 )
 
 set( testing_lib_SOURCES
     ${CPP_DIR}/TestProcessorClasses.cc
+    ${CPP_DIR}/TestServiceClasses.cc
 )
 
 set( testing_lib_LIB_DEPENDENCIES 
@@ -55,6 +57,8 @@ set( testing_SOURCES
     ${CPP_DIR}/TestProcessorToolbox.cc
     ${CPP_DIR}/TestReturnBuffer.cc
     ${CPP_DIR}/TestRunNymph.cc
+    ${CPP_DIR}/TestService.cc
+    ${CPP_DIR}/TestServiceToolbox.cc
     ${CPP_DIR}/TestSignalSlot.cc
     ${CPP_DIR}/TestSingleRunController.cc
     ${CPP_DIR}/TestSlotData.cc

@@ -6,6 +6,7 @@ set( DATA_DIR Data )
 set( IMPL_DIR Implementation )
 #set( IO_DIR IO )
 set( PROC_DIR Processor )
+set( SVC_DIR Service )
 set( UTIL_DIR Utility )
 
 include_directories( BEFORE 
@@ -14,6 +15,7 @@ include_directories( BEFORE
     ${CMAKE_CURRENT_SOURCE_DIR}/${IMPL_DIR}
 #    ${CMAKE_CURRENT_SOURCE_DIR}/${IO_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/${PROC_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/${SVC_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/${UTIL_DIR}
 )
 
@@ -21,6 +23,9 @@ set( NYMPH_HEADERFILES
     ${UTIL_DIR}/ConfigException.hh
     ${UTIL_DIR}/Exception.hh
     ${UTIL_DIR}/MemberVariable.hh
+
+    ${SVC_DIR}/Service.hh
+    ${SVC_DIR}/ServiceToolbox.hh
 
     ${PROC_DIR}/PrimaryProcessor.hh
     ${PROC_DIR}/Processor.hh
@@ -47,15 +52,17 @@ set( NYMPH_SOURCEFILES
     ${UTIL_DIR}/ConfigException.cc
     ${UTIL_DIR}/Exception.cc
 
-    ${DATA_DIR}/Data.cc
-    ${DATA_DIR}/DataFrame.cc
-    
+    ${SVC_DIR}/Service.cc
+    ${SVC_DIR}/ServiceToolbox.cc
+
     ${PROC_DIR}/PrimaryProcessor.cc
     ${PROC_DIR}/Processor.cc
     ${PROC_DIR}/ProcessorToolbox.cc
     ${PROC_DIR}/SignalSlotBase.cc
 
-
+    ${DATA_DIR}/Data.cc
+    ${DATA_DIR}/DataFrame.cc
+    
     ${CONT_DIR}/ControlAccess.cc
     ${CONT_DIR}/Controller.cc
     ${CONT_DIR}/ReturnBuffer.cc
