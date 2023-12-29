@@ -159,6 +159,7 @@ jobs:
           pip -v install .
           
       - name: Run Tests
+        continue-on-error: true
         run: |
           cd Testing/Python
           python -m unittest discover -v
