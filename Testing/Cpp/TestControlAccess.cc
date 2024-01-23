@@ -16,72 +16,72 @@ TEST_CASE( "control_access", "[control]" )
 {
     using namespace Nymph;
 
-    ControlAccess* access = ControlAccess::get_instance();
+    ControlAccess* tcaControlAccess = ControlAccess::get_instance();
 
     SECTION( "no_controller" )
     {
-        REQUIRE_FALSE( access->GetControl() );
-        REQUIRE_THROWS_AS( access->WaitToContinue(), Exception );
-        REQUIRE_THROWS_AS( access->WaitForBreakOrCanceled(), Exception );
-        REQUIRE_THROWS_AS( access->WaitForEndOfRun(), Exception );
-        REQUIRE_THROWS_AS( access->Continue(), Exception );
-        REQUIRE_THROWS_AS( access->Cancel(), Exception );
-        REQUIRE_THROWS_AS( access->IsCanceled(), Exception );
-        REQUIRE_THROWS_AS( access->Break(), Exception );
-        REQUIRE_THROWS_AS( access->IsAtBreak(), Exception );
-        REQUIRE_THROWS_AS( access->ChainIsQuitting( "blah" ), Exception );
+        REQUIRE_FALSE( tcaControlAccess->GetControl() );
+        REQUIRE_THROWS_AS( tcaControlAccess->WaitToContinue(), Exception );
+        REQUIRE_THROWS_AS( tcaControlAccess->WaitForBreakOrCanceled(), Exception );
+        REQUIRE_THROWS_AS( tcaControlAccess->WaitForEndOfRun(), Exception );
+        REQUIRE_THROWS_AS( tcaControlAccess->Continue(), Exception );
+        REQUIRE_THROWS_AS( tcaControlAccess->Cancel(), Exception );
+        REQUIRE_THROWS_AS( tcaControlAccess->IsCanceled(), Exception );
+        REQUIRE_THROWS_AS( tcaControlAccess->Break(), Exception );
+        REQUIRE_THROWS_AS( tcaControlAccess->IsAtBreak(), Exception );
+        REQUIRE_THROWS_AS( tcaControlAccess->ChainIsQuitting( "blah" ), Exception );
     }
 
-    Controller control;
+    Controller tcaControl;
 
     SECTION( "Basics" )
     {
-        REQUIRE_FALSE( access->IsCanceled() );
-        access->Cancel( 5 );
-        REQUIRE( access->IsCanceled() );
+        REQUIRE_FALSE( tcaControlAccess->IsCanceled() );
+        tcaControlAccess->Cancel( 5 );
+        REQUIRE( tcaControlAccess->IsCanceled() );
     }
 
     SECTION( "WaitToContinue" )
     {
-        REQUIRE( access->WaitToContinue() );
+        REQUIRE( tcaControlAccess->WaitToContinue() );
     }
 
     SECTION( "WaitForBreakOrCanceled" )
     {
-        access->Break();
-        REQUIRE( access->WaitForBreakOrCanceled() == true );
+        tcaControlAccess->Break();
+        REQUIRE( tcaControlAccess->WaitForBreakOrCanceled() == true );
     }
 
     SECTION( "BreakContinue" )
     {
-        REQUIRE_FALSE( access->IsCanceled() );
+        REQUIRE_FALSE( tcaControlAccess->IsCanceled() );
 
         // This thread will do the breaking and continuing
         std::thread thread( [&](){ 
             std::this_thread::sleep_for( std::chrono::milliseconds(1000) );
 
-            access->Break(); // step 1
+            tcaControlAccess->Break(); // step 1
 
             std::this_thread::sleep_for( std::chrono::milliseconds(1000) );
 
-            access->Continue(); // step 2
+            tcaControlAccess->Continue(); // step 2
 
             std::this_thread::sleep_for( std::chrono::milliseconds(1000) );
 
-            access->Cancel( 0 ); // step 3
+            tcaControlAccess->Cancel( 0 ); // step 3
         } );
         
         // Waiting for break (step 1)
-        REQUIRE( access->WaitForBreakOrCanceled() );
-        REQUIRE_FALSE( access->IsCanceled() );
+        REQUIRE( tcaControlAccess->WaitForBreakOrCanceled() );
+        REQUIRE_FALSE( tcaControlAccess->IsCanceled() );
 
         // Waiting for continue (step 2)
-        access->WaitToContinue();
-        REQUIRE_FALSE( access->IsCanceled() );
+        tcaControlAccess->WaitToContinue();
+        REQUIRE_FALSE( tcaControlAccess->IsCanceled() );
 
         // Waiting for cancelation (step 3)
-        REQUIRE_FALSE( access->WaitForBreakOrCanceled() );
-        REQUIRE( access->IsCanceled() );
+        REQUIRE_FALSE( tcaControlAccess->WaitForBreakOrCanceled() );
+        REQUIRE( tcaControlAccess->IsCanceled() );
 
         thread.join();
 
@@ -91,19 +91,19 @@ TEST_CASE( "control_access", "[control]" )
     {
         // As if an error is thrown
         std::exception_ptr exceptPtr = std::make_exception_ptr( Exception() << "Test: ChainIsQuitting, throwing Exception" );
-        REQUIRE_NOTHROW( access->ChainIsQuitting( "TestController::ChainIsQuitting::Exception", exceptPtr ) );
+        REQUIRE_NOTHROW( tcaControlAccess->ChainIsQuitting( "TestController::ChainIsQuitting::Exception", exceptPtr ) );
     }
 
     SECTION( "ReturnBuffer" )
     {
-        REQUIRE_FALSE( access->HasReturn() );
-        REQUIRE_THROWS_AS( access->GetReturn<double>(), Exception ); // have to pick a return argument, so I just picked <double> in this case; it could be anything for this test
+        REQUIRE_FALSE( tcaControlAccess->HasReturn() );
+        REQUIRE_THROWS_AS( tcaControlAccess->GetReturn<double>(), Exception ); // have to pick a return argument, so I just picked <double> in this case; it could be anything for this test
         double retval = 5;
-        auto retBuf = access->BreakAndReturn(retval);
+        auto retBuf = tcaControlAccess->BreakAndReturn(retval);
         // check that we're now at a break point
-        REQUIRE( access->IsAtBreak() );
-        REQUIRE( access->HasReturn() );
-        // we can access the return variable through the buffer
+        REQUIRE( tcaControlAccess->IsAtBreak() );
+        REQUIRE( tcaControlAccess->HasReturn() );
+        // we can tcaControlAccess the return variable through the buffer
         REQUIRE( std::get<0>( retBuf ) == Approx(5.) );
         // we can change the value of the return variable using the buffer
         std::get<0>( retBuf ) = 10.;

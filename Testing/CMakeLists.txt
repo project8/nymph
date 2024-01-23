@@ -15,19 +15,38 @@ include_directories( BEFORE
 
 #pbuilder_install_config (${pytesting_CONFIGFILES})
 
-set( testing_HEADERS
-    ${CPP_DIR}/TestProc.hh
+set( testing_lib_HEADERS
+    ${CPP_DIR}/TestControllerClasses.hh
+    ${CPP_DIR}/TestDataClasses.hh
+    ${CPP_DIR}/TestDataProcessorClasses.hh
+    ${CPP_DIR}/TestProcessorClasses.hh
+    ${CPP_DIR}/TestServiceClasses.hh
 )
 
-#set (pytesting_HEADERS
-#  
-#)
+set( testing_lib_SOURCES
+    ${CPP_DIR}/TestProcessorClasses.cc
+    ${CPP_DIR}/TestServiceClasses.cc
+)
 
-#set (pytesting_SOURCES
-#
-#)
+set( testing_lib_LIB_DEPENDENCIES 
+    Nymph
+)
+
+pbuilder_library( 
+    TARGET NymphTesting
+    SOURCES ${testing_lib_SOURCES}
+    PUBLIC_EXTERNAL_LIBRARIES ${testing_lib_LIB_DEPENDENCIES}
+)
+
+pbuilder_component_install_and_export( 
+    COMPONENT Library
+    LIBTARGETS NymphTesting
+)
+
+pbuilder_install_headers( ${testing_lib_HEADERS} )
 
 set( testing_SOURCES
+    ${CPP_DIR}/TestConfigException.cc
     ${CPP_DIR}/TestControlAccess.cc
     ${CPP_DIR}/TestController.cc
     ${CPP_DIR}/TestData.cc
@@ -38,25 +57,36 @@ set( testing_SOURCES
     ${CPP_DIR}/TestProcessorToolbox.cc
     ${CPP_DIR}/TestReturnBuffer.cc
     ${CPP_DIR}/TestRunNymph.cc
+    ${CPP_DIR}/TestService.cc
+    ${CPP_DIR}/TestServiceToolbox.cc
     ${CPP_DIR}/TestSignalSlot.cc
     ${CPP_DIR}/TestSingleRunController.cc
     ${CPP_DIR}/TestSlotData.cc
     ${CPP_DIR}/UseCatch.cc
 )
 
-set( lib_dependencies 
+set( testing_LIB_DEPENDENCIES 
     Nymph
-    Catch
+    NymphTesting
 )
 
 # Interface library was recommended for Catch:
 # https://stackoverflow.com/questions/34896891/catch-lib-unit-testing-and-ctest-cmake-integration/34900012#34900012
-
 add_library( Catch INTERFACE )
 target_include_directories( Catch INTERFACE ${Scarab_LOCATION}/testing/catch )
 
-add_executable( RunTests ${testing_SOURCES} )
-target_link_libraries( RunTests ${lib_dependencies} )
+pbuilder_executable(
+    EXECUTABLE RunTests
+    SOURCES ${testing_SOURCES}
+    PROJECT_LIBRARIES ${testing_LIB_DEPENDENCIES}
+)
+target_link_libraries( RunTests PUBLIC Catch )
+set( programs "RunTests" )
+
+pbuilder_component_install_and_export(
+    COMPONENT Executables
+    EXETARGETS ${programs}
+)
 
 # So far it seems sufficient to use Catch2's ability to run tests, and not CTest.
 # Here are two ways it could potentially be integrated with CTest, if we change our minds.
@@ -71,26 +101,9 @@ target_link_libraries( RunTests ${lib_dependencies} )
 #catch_discover_tests(foo)
 
 ############################
-# NymphPyTesting library 
+# NymphTesting Python library 
 ############################
 
-#pbuilder_library( 
-#    TARGET NymphPyTesting
-#    SOURCES ${pytesting_SOURCES}
-#    PROJECT_LIBRARIES ${lib_dependencies}
-#)
-
-#pbuilder_component_install_and_export( 
-#    COMPONENT Testing
-#    LIBTARGETS NymphPyTesting
-#)
-
-#pbuilder_install_headers( ${pytesting_HEADERS} )
-
-############################
-# Executables
-############################
-
-#set( lib_dependencies
-#    NymphPyTesting
-#)
+if( Nymph_ENABLE_PYTHON )
+    add_subdirectory( Python/Bindings )
+endif()

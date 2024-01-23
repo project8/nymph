@@ -8,6 +8,7 @@
 #include "ProcessorToolbox.hh"
 #include "SingleRunController.hh"
 
+#include "application.hh"
 #include "logger.hh"
 #include "param.hh"
 
@@ -29,16 +30,21 @@ namespace Nymph
 
             // Create and configure the single-run controller.
             LPROG( nlog, "Configuring controller" );
-            SingleRunController controller;
+            SingleRunController controller( procTB );
             if( config.has("controller") )
             {
                 controller.Configure( config["controller"].as_node() );
             }
 
-            LPROG( nlog, "Executing run" );
-
-            // Now execute the run
-            controller.Run( procTB );
+            if( config.has( "dry-run" ) && config["dry-run"]().as_bool() )
+            {
+                LPROG( nlog, "Dry run: no execution" );
+            }
+            else
+            {
+                LPROG( nlog, "Executing run" );
+                controller.Run();
+            }
 
             LPROG( nlog, "That's all, folks!" );
 
@@ -56,5 +62,11 @@ namespace Nymph
             PrintException( e );
             return RETURN_ERROR;
         }
+    }
+
+    void AddRunNymphOptions( scarab::main_app& an_app )
+    {
+        // options
+        an_app.add_config_flag< bool >( "--dry-run", "dry-run", "Load the config, setup processors, but do not execute the run" );
     }
 }

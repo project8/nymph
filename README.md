@@ -35,6 +35,12 @@ Installing
 ----------
 
 
+Testing
+-------
+
+Automatic unit testing functionality is available through the use of github actions. See .github/workflows. C++ version uses [catch2](https://github.com/catchorg/Catch2) and python version uses [unittest](https://docs.python.org/3/library/unittest.html). In the python version, the files starting with names `test` are automatically `discovered`. 
+
+
 Instructions for Use
 --------------------
 

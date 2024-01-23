@@ -14,34 +14,32 @@
 
 LOGGER( testlog, "TestPrimaryProcessor" );
 
-REGISTER_PROCESSOR( Nymph, TestPrimaryProc, "test-primary" );
-
-
 TEST_CASE( "primary_processor", "[primary_processor]" )
 {
     using namespace Nymph;
+    using namespace NymphTesting;
 
     //SharedControl::get_instance()->Reset();
 
-    TestPrimaryProc tester;
-    CIQThrowController controller;
+    TestPrimaryProc tppTester;
+    CIQThrowController tppController;
 
     // SignalNewValue test
-    tester.SetTestSelection( TestPrimaryProc::TestType::SignalNewValue );
-    tester.ConnectASlot( "value", tester, "value" );
-    tester();
-    REQUIRE( tester.GetValue() == tester.GetNewValue() );
+    tppTester.SetTestSelection( TestPrimaryProc::TestType::SignalNewValue );
+    tppTester.ConnectASlot( "value", tppTester, "value" );
+    tppTester();
+    REQUIRE( tppTester.GetValue() == tppTester.GetNewValue() );
 
     // WaitTwoSec test
     // -- no test implemented here right now --
-    //tester.SetTestSelection( TestPrimaryProc::TestType::WaitTwoSec );
+    //tppTester.SetTestSelection( TestPrimaryProc::TestType::WaitTwoSec );
 
     // ThrowExcept test
-    tester.SetTestSelection( TestPrimaryProc::TestType::ThrowExcept );
-    REQUIRE_THROWS_AS( tester(), TestPPException );
+    tppTester.SetTestSelection( TestPrimaryProc::TestType::ThrowExcept );
+    REQUIRE_THROWS_AS( tppTester(), TestPPException );
 
     
     
 
-    //REQUIRE( tester.ValueSig().GetControl() == &control );
+    //REQUIRE( tppTester.ValueSig().GetControl() == &control );
 }
