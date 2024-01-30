@@ -46,3 +46,6 @@ build*/
 dist*/
 Python/*.egg-info
 __pycache__
+
+# untracked directory
+untracked*/
