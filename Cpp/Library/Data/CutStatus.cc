@@ -6,7 +6,6 @@
  */
 
 #include "CutStatus.hh"
-
 //#include "KTExtensibleStructFactory.hh"
 #include "Logger.hh"
 
@@ -15,16 +14,13 @@ namespace Nymph
     LOGGER(cutlog, "Cut");
 
     CutStatus::CutStatus() :
-            fCutResults(),
-            fSummary()
+            CutResults(),
     {
     }
 
     CutStatus::CutStatus(const CutStatus& orig) :
-            fCutResults(orig.fCutResults),
-            fSummary()
+            CutResults(orig.CutResults),
     {
-        UpdateStatus();
     }
 
     CutStatus::~CutStatus()
@@ -33,7 +29,6 @@ namespace Nymph
     CutStatus& CutStatus::operator=(const CutStatus& rhs)
     {
         fCutResults = rhs.fCutResults;
-        UpdateStatus();
         return *this;
     }
 
@@ -60,22 +55,21 @@ namespace Nymph
     }
 */
     // Ben: map version. Not sure if need the doUpdateStatus part tho
-    void CutStatus::AssignCutResult(const std::string& name, bool state, bool doUpdateStatus)
+    void CutStatus::AssignCutResult(const std::string& cutName, bool state)
     {
-        LDEBUG(cutlog, "Assigning cut result <" << name << "> with state <" << state << ">");
+        LDEBUG(cutlog, "Assigning cut result <" << cutName << "> with state <" << state << ">");
         // Ben: don't think I need the resize stuff, happens automatically with maps
-        if( fCutResults.find(name) != fCutResults.end())
+        if( fCutResults.find(cutName) != fCutResults.end())
         {
-            throw Exception() << "Cut with name: " << name << " has already been assigned";
+            throw Exception() << "Cut with name: " << cutName << " has already been assigned";
         }
-        fCutResults.insert(make_pair(name,state));
+        fCutResults.insert(make_pair(cutName,state));
         LDEBUG(cutlog, "Cut result size is now: " << fCutResults.size() );
-        if( doUpdateStatus ) UpdateStatus();
         return;
-    } // Ben: Should be fully adjusted, might need fixing for the update status stuff
+    } 
 
     // Ben: displays map keys and vals with ostream. 
-    void CutStatus::UpdateStatus()
+/*    void CutStatus::UpdateStatus()
     {
         LDEBUG(cutlog, "Updating cut summary");
         unsigned nCuts = fCutResults.size();
@@ -93,16 +87,17 @@ namespace Nymph
         }
         LDEBUG(cutlog, "Cut summary: " << fSummary);
         return;
-    }
+    }*/
 
-    std::string CutStatus::CutResultsPresent() const
+    std::vector< std::string > CutStatus::CutResultsPresent() const
     {
-        std::string cutsPresent;
+        std::vector< std::string > cutsPresent;
         for (auto cutIt = fCutResults.cbegin(); cutIt != fCutResults.cend(); ++cutIt)
         {
             if ((! cutIt->first.empty()) && (cutIt->second == 1))
             {
-                cutsPresent = cutIt->first + " " + cutsPresent; // TODO still need to change this to using vector of strings?
+                //cutsPresent = cutIt->first + " " + cutsPresent; // TODO still need to change this to using vector of strings?
+                cutsPresent.push_back(cutIt->first);
             }
         }
         return cutsPresent;
@@ -110,7 +105,13 @@ namespace Nymph
 
     std::ostream& operator<<(std::ostream& out, const CutStatus& status)
     {
-        out << "Cut summary: " << status.fSummary << '\n';
+        out << "Cut summary: " << '\n';
+        std::vector< std::string > cuts = status.CutResultsPresent();
+        for (auto cutIt = cuts.cbegin(); cutIt != cuts.cend(); ++cutIt)
+        {
+            out << cuts[cutIt] << "; ";
+        }
+        out << '\n';
         return out;
     }
 

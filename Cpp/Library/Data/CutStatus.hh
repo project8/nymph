@@ -8,20 +8,17 @@
 #ifndef CUTSTATUS_HH_
 #define CUTSTATUS_HH_
 
+#include <map>
+#include <boost/range/numeric.hpp>
+#include <boost/range/adaptor/map.hpp>
 
-#include "CutResult.hh"
+//#include "CutResult.hh"
 
 #include "Exception.hh"
 
 //#include "cereal/access.hpp"
 //#include "cereal/types/string.hpp"
 //#include "cereal/types/vector.hpp"
-
-#include <boost/dynamic_bitset.hpp>
-
-#include <algorithm>
-#include <memory>
-#include <vector>
 
 namespace Nymph
 {
@@ -67,16 +64,13 @@ namespace Nymph
     class CutStatus
     {
         public:
-            //typedef boost::dynamic_bitset< > bitset_type;
-
-            //typedef std::vector< CutResult > CutResults_t;
-
-            //typedef CutResults_t::iterator CutResultsIt;
-            //typedef CutResults_t::const_iterator CutResultsCIt;
-            
-            // Ben: With CutResult map, shouldn't need to mess with the vector ?
-            typedef CutResult::iterator CutResultIt;   // map iterator
-            typedef CutResult::const_iterator CutResultCIt; // map const iterator
+            //CutStatus() : CutResults();
+            typedef std::map< std::string, bool > CutResults_t;
+            typedef CutResults_t::iterator CutResultsIt;
+            typedef CutResults_t::const_iterator CutResultsCIt;
+    
+        //private:
+            //std::map< std::string, bool > CutResults;
 
         public: // Ben: Below initiates operators, shouldn't need to mess with this, just in the actual operator defns how they interact with the maps.
             CutStatus();
@@ -85,22 +79,17 @@ namespace Nymph
 
             CutStatus& operator=(const CutStatus& rhs);
 
-            /// Returns the size of the cut results vector
+            /// Returns the size of the cut results map
             size_t size() const;
 
-            /// Returns a reference to the cut results vector
-            const CutResults_t& CutResults() const;
-
-            /// Updates the summary bitset from the cut results vector
-            void UpdateStatus();
+            /// Returns a reference to the cut results map
+            std::map< std::string, bool > CutResults() const;
 
             /// Adds a new cut result with the specified name; throws Exception if a cut with that name already exists
-            void AssignCutResult(const std::string& name, bool state=false, bool doUpdateStatus=true);
+            void AssignCutResult(const std::string& cutName, bool state=false);
 
             /// Removes the cut by erasing the name and setting the state to false
-            void RemoveCutResult(const std::string& cutName, bool doUpdateStatus=true);
-            /// Removes the cut by erasing the name and setting the state to false
-            //void RemoveCutResult(unsigned maskPos, bool doUpdateStatus=true);
+            void RemoveCutResult(const std::string& cutName);
 
             CutResultsIt FindCutResult(const std::string& cutName);
             CutResultsCIt FindCutResultC(const std::string& cutName) const;
@@ -110,18 +99,12 @@ namespace Nymph
 
             /// Returns whether or not the specified cut is present
             bool HasCutResult(const std::string& cutName) const;
-            /// Returns whether or not the specified cut is present (whether or not it has been explicitly assigned)
-            //bool HasCutResult(unsigned maskPos) const;
 
             /// Returns the state of the named cut; throws Exception if it doesn't exist
             bool GetCutState(const std::string& cutName) const;
-            /// Returns the state of the specified cut; throws Exception if it doesn't exist
-            //bool GetCutState(unsigned maskPos) const;
 
             /// Sets the state of the specified cut; throws Exception if it doesn't exist
-            void SetCutState(const std::string& cutName, bool state, bool doUpdateStatus=true);
-            /// Sets the state of the specified cut; throws Exception if it doesn't exist
-            //void SetCutState(unsigned maskPos, bool state, bool doUpdateStatus=true);
+            void SetCutState(const std::string& cutName, bool state); 
 
             /// Returns a string with the names of the cuts that are present in bitset order
             std::string CutResultsPresent() const;
@@ -129,54 +112,37 @@ namespace Nymph
         private:
             friend std::ostream& operator<<(std::ostream& out, const CutStatus& status);
 
+            //CutResults_t CutResults; // TODO might need a map fCutResult to replace this vector defn
             CutResults_t fCutResults;
 
             //bitset_type fSummary; // Need to change from bitset to vector of strings or similar. Can potentially skip and directly cout map vals
-            std::string fSummary; // string containing names of only cuts that have been applied, separated by _
+            //std::string fSummary; // string containing names of only cuts that have been applied, separated by _
 
         public:
             bool IsCut() const;
-            //bool IsCut(const bitset_type& mask) const;
-            //bool IsCut(unsigned long long mask) const;
             bool IsCut(const std::string& mask) const;
+            int NumCuts() const;
 
-            //bitset_type ToBitset(unsigned long long mask) const;
-            //bitset_type ToBitset(const std::string& mask) const;
-
-        private:
-//------SerialRemoved---------
-/*
-            friend class cereal::access;
-
-            template< class Archive >
-            void save( Archive& ar ) const;
-
-            template< class Archive >
-            void load( Archive& ar );
-*/
     };
 
     std::ostream& operator<<(std::ostream& out, const CutStatus& status);
 
     // Ben: TODO Likely need to edit below lines
 
-    inline const CutStatus::CutResults_t& CutStatus::CutResults() const
+    inline std::map< std::string, bool > CutStatus::CutResults() const // get a const of the map
     {
         return fCutResults;
     }
 
-    inline CutStatus::CutResultsIt CutStatus::FindCutResult( const std::string& name )
+    inline CutStatus::CutResultsIt CutStatus::FindCutResult( const std::string& cutName )
     {
-        if( name.empty() ) return fCutResults.end();
-        //return std::find_if( fCutResults.begin(), fCutResults.end(), CheckCutResultName(name) );
-        return fCutResults.at(name);
+        //if( cutName.empty() ) return CutResults.end(); // Don't think I need this, map::find should return map::end if empty
+        return fCutResults.find(cutName);
     }
 
-    inline CutStatus::CutResultsCIt CutStatus::FindCutResultC( const std::string& name ) const
+    inline CutStatus::CutResultsCIt CutStatus::FindCutResultC( const std::string& cutName ) const
     {
-        if( name.empty() ) return fCutResults.cend();
-        //return std::find_if( fCutResults.cbegin(), fCutResults.cend(), CheckCutResultName(name) );
-        return fCutResults.at(name);
+        return fCutResults.find(cutName);
     }
 
     inline CutStatus::CutResultsIt CutStatus::CutResultsEnd()
@@ -189,25 +155,24 @@ namespace Nymph
         return fCutResults.cend();
     }
 
-    inline bool CutStatus::HasCutResult( const std::string& name ) const
+    inline bool CutStatus::HasCutResult( const std::string& cutName ) const
     {
-        //return FindCutResultC(name) != std::end(fCutResults);
-        return fCutResults.find(name) != fCutResults.end();
+        return fCutResults.count(cutName);
     }
-/*
-    inline bool CutStatus::HasCutResult( unsigned maskPos ) const
+
+    /*inline bool CutStatus::HasCutResult( unsigned mapPos ) const
     {
-        return maskPos < fCutResults.size() && fCutResults[maskPos].fAssigned;
-    }
-*/
-    inline bool CutStatus::GetCutState( const std::string& name ) const
+        //return maskPos < fCutResults.size() && fCutResults[maskPos].fAssigned;
+        return mapPos < fCutResults.end() && fCutResults
+    }*/
+
+    inline bool CutStatus::GetCutState( const std::string& cutName ) const
     {
-        //CutResultsCIt cutIt = FindCutResultC(name);
-        if (fCutResults.find(name) != fCutResults.end())
+        if (fCutResults.find(cutName) != fCutResults.end())
         {
-            return fCutResults.at(name);
+            return fCutResults.at(cutName);
         }
-        throw Exception() << "Unable to find cut <" << name << ">";
+        throw Exception() << "Unable to find cut <" << cutName << ">";
     }
 /*
     inline bool CutStatus::GetCutState( unsigned maskPos ) const
@@ -219,19 +184,17 @@ namespace Nymph
         throw Exception() << "Mask position <" << maskPos << "> is out of range (only " << size() << " cuts are present)";
     }
 */
-    inline void CutStatus::SetCutState(const std::string& name, bool state, bool doUpdateStatus)
+    inline void CutStatus::SetCutState(const std::string& cutName, bool state)
     {
-        //CutResultsIt cutIt = FindCutResult(name);
-        if (fCutResults.find(name) != fCutResults.end())
+        if (fCutResults.find(cutName) != fCutResults.end())
         {
-            fCutResults.insert(make_pair(name,state));
-            if (doUpdateStatus) UpdateStatus();
+            fCutResults.insert(make_pair(cutName,state));
             return;
         }
-        throw Exception() << "Unable to find cut <" << name << ">";
+        throw Exception() << "Unable to find cut <" << cutName << ">";
     }
 
-    inline void CutStatus::SetCutState(unsigned maskPos, bool state, bool doUpdateStatus)
+/*    inline void CutStatus::SetCutState(unsigned maskPos, bool state, bool doUpdateStatus)
     {
         if (maskPos < fCutResults.size())
         {
@@ -241,17 +204,16 @@ namespace Nymph
         }
         throw Exception() << "Mask position <" << maskPos << "> is out of range (only "<< size() << " cuts are present)";
     }
-
-    inline void CutStatus::RemoveCutResult(const std::string& name, bool doUpdateStatus)
+*/
+    inline void CutStatus::RemoveCutResult(const std::string& cutName)
     {
-        if (fCutResults.find(name) == fCutResults.end())
+        if (fCutResults.find(cutName) == fCutResults.end())
         {
-            fCutResults.erase(name);
+            fCutResults.erase(cutName);
         }
-        if (doUpdateStatus) UpdateStatus();
         return;
     }
-    // Ben: think I have to require removal by key name
+    // Ben: can remove by iterator position, but won't for consistency
 /*
     inline void CutStatus::RemoveCutResult(unsigned maskPos, bool doUpdateStatus)
     {
@@ -266,13 +228,19 @@ namespace Nymph
 */
     inline size_t CutStatus::size() const
     {
-        //return fSummary.size(); // This won't work with fSummary now a string
         return fCutResults.size();
     }
 
     inline bool CutStatus::IsCut() const
     {
-        return !fSummary.empty(); // This still works with fSummary now a string
+        int stateSum = boost::accumulate(fCutResults | boost::adaptors::map_values, 0);
+        return stateSum > 0;
+    }
+    
+    inline int CutStatus::NumCuts() const
+    {
+        int stateSum = boost::accumulate(fCutResults | boost::adaptors::map_values, 0);
+        return stateSum;
     }
 // dont think i need anything with mask anymore
 /*

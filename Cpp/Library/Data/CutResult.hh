@@ -13,8 +13,8 @@
 
 namespace Nymph
 {
-    typedef std::map< std::string, bool > CutResult;
-    typedef CutResult::value_type fCutVal;
+    typedef std::map< std::string, bool > CutResult_t;
+    typedef CutResult_t::value_type fCutVal;
     // This might be enough. gives key fName to return bool of if cut
     // <map>::value_type is just the pair value type def used to initiate the map
     // so give fCutVal(<string> fName,<bool> value) and then insert into CutResult

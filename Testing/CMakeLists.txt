@@ -42,6 +42,8 @@ set( testing_SOURCES
     ${CPP_DIR}/TestSingleRunController.cc
     ${CPP_DIR}/TestSlotData.cc
     ${CPP_DIR}/UseCatch.cc
+    # Ben adding tests
+    ${CPP_DIR}/TestCut.cc
 )
 
 set( lib_dependencies 
