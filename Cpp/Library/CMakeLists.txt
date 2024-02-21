@@ -34,6 +34,7 @@ set( NYMPH_HEADERFILES
     ${DATA_DIR}/DataPresent.hh
     ${DATA_DIR}/SignalData.hh
     ${DATA_DIR}/SlotData.hh
+    ${DATA_DIR}/CutStatus.hh
     
     ${CONT_DIR}/ControlAccess.hh
     ${CONT_DIR}/Controller.hh
@@ -48,6 +49,7 @@ set( NYMPH_SOURCEFILES
 
     ${DATA_DIR}/Data.cc
     ${DATA_DIR}/DataFrame.cc
+    ${DATA_DIR}/CutStatus.cc
     
     ${PROC_DIR}/PrimaryProcessor.cc
     ${PROC_DIR}/Processor.cc

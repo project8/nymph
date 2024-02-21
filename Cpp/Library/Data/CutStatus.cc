@@ -7,21 +7,21 @@
 
 #include "CutStatus.hh"
 //#include "KTExtensibleStructFactory.hh"
-#include "Logger.hh"
+#include "logger.hh"
 
 namespace Nymph
 {
     LOGGER(cutlog, "Cut");
 
-    CutStatus::CutStatus() :
-            CutResults(),
-    {
-    }
+//    CutStatus::CutStatus() :
+//            CutResults(),
+//    {
+//    }
 
-    CutStatus::CutStatus(const CutStatus& orig) :
-            CutResults(orig.CutResults),
-    {
-    }
+//    CutStatus::CutStatus(const CutStatus& orig) :
+//            CutResults(orig.CutResults),
+//    {
+//    }
 
     CutStatus::~CutStatus()
     {}
@@ -109,7 +109,8 @@ namespace Nymph
         std::vector< std::string > cuts = status.CutResultsPresent();
         for (auto cutIt = cuts.cbegin(); cutIt != cuts.cend(); ++cutIt)
         {
-            out << cuts[cutIt] << "; ";
+            //out << cuts[cutIt] << "; ";
+            out << *cutIt << "; ";
         }
         out << '\n';
         return out;

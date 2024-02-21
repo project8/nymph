@@ -107,7 +107,7 @@ namespace Nymph
             void SetCutState(const std::string& cutName, bool state); 
 
             /// Returns a string with the names of the cuts that are present in bitset order
-            std::string CutResultsPresent() const;
+            std::vector< std::string > CutResultsPresent() const;
 
         private:
             friend std::ostream& operator<<(std::ostream& out, const CutStatus& status);
