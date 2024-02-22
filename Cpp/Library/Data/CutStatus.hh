@@ -112,7 +112,6 @@ namespace Nymph
         private:
             friend std::ostream& operator<<(std::ostream& out, const CutStatus& status);
 
-            //CutResults_t CutResults; // TODO might need a map fCutResult to replace this vector defn
             CutResults_t fCutResults;
 
             //bitset_type fSummary; // Need to change from bitset to vector of strings or similar. Can potentially skip and directly cout map vals
@@ -127,8 +126,6 @@ namespace Nymph
 
     std::ostream& operator<<(std::ostream& out, const CutStatus& status);
 
-    // Ben: TODO Likely need to edit below lines
-
     inline std::map< std::string, bool > CutStatus::CutResults() const // get a const of the map
     {
         return fCutResults;
@@ -136,7 +133,6 @@ namespace Nymph
 
     inline CutStatus::CutResultsIt CutStatus::FindCutResult( const std::string& cutName )
     {
-        //if( cutName.empty() ) return CutResults.end(); // Don't think I need this, map::find should return map::end if empty
         return fCutResults.find(cutName);
     }
 
@@ -160,12 +156,6 @@ namespace Nymph
         return fCutResults.count(cutName);
     }
 
-    /*inline bool CutStatus::HasCutResult( unsigned mapPos ) const
-    {
-        //return maskPos < fCutResults.size() && fCutResults[maskPos].fAssigned;
-        return mapPos < fCutResults.end() && fCutResults
-    }*/
-
     inline bool CutStatus::GetCutState( const std::string& cutName ) const
     {
         if (fCutResults.find(cutName) != fCutResults.end())
@@ -174,40 +164,20 @@ namespace Nymph
         }
         throw Exception() << "Unable to find cut <" << cutName << ">";
     }
-/*
-    inline bool CutStatus::GetCutState( unsigned maskPos ) const
-    {
-        if (maskPos < fCutResults.size())
-        {
-            return fCutResults[maskPos].fState;
-        }
-        throw Exception() << "Mask position <" << maskPos << "> is out of range (only " << size() << " cuts are present)";
-    }
-*/
+    
     inline void CutStatus::SetCutState(const std::string& cutName, bool state)
     {
         if (fCutResults.find(cutName) != fCutResults.end())
         {
-            fCutResults.insert(make_pair(cutName,state));
+            fCutResults[cutName] = state;
             return;
         }
         throw Exception() << "Unable to find cut <" << cutName << ">";
     }
 
-/*    inline void CutStatus::SetCutState(unsigned maskPos, bool state, bool doUpdateStatus)
-    {
-        if (maskPos < fCutResults.size())
-        {
-            fCutResults[maskPos].fState = state;
-            if (doUpdateStatus) UpdateStatus();
-            return;
-        }
-        throw Exception() << "Mask position <" << maskPos << "> is out of range (only "<< size() << " cuts are present)";
-    }
-*/
     inline void CutStatus::RemoveCutResult(const std::string& cutName)
     {
-        if (fCutResults.find(cutName) == fCutResults.end())
+        if (fCutResults.find(cutName) != fCutResults.end())
         {
             fCutResults.erase(cutName);
         }
@@ -242,33 +212,6 @@ namespace Nymph
         int stateSum = boost::accumulate(fCutResults | boost::adaptors::map_values, 0);
         return stateSum;
     }
-// dont think i need anything with mask anymore
-/*
-    inline bool CutStatus::IsCut(const bitset_type& mask) const
-    {
-        return (fSummary & mask).any();
-    }
-
-    inline bool CutStatus::IsCut(unsigned long long mask) const
-    {
-        return IsCut(ToBitset(mask));
-    }
-
-    inline bool CutStatus::IsCut(const std::string& mask) const
-    {
-        return IsCut(ToBitset(mask));
-    }
-
-    inline CutStatus::bitset_type CutStatus::ToBitset(unsigned long long mask) const
-    {
-        return bitset_type(fSummary.size(), mask);
-    }
-
-    inline CutStatus::bitset_type CutStatus::ToBitset(const std::string& mask) const
-    {
-        return bitset_type(mask);
-    }
-*/
 } /* namespace Nymph */
 
 #endif /* CUTSTATUS_HH_ */

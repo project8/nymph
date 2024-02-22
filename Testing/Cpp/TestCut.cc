@@ -28,7 +28,36 @@ TEST_CASE( "cut_present", "[cut]" )
     REQUIRE ( testCutStatus.size() == 1 );
     //REQUIRE( testCutStatus.FindCutResult("fTestCut") == 0 ); // This returns position of cut in map, not state
     // check fTestCut state
-    //REQUIRE( testCutStatus["fTestCut"] ) 
+    REQUIRE( testCutStatus.GetCutState("fTestCut") == 1 );
+
+    // check default is to assign cut status FALSE
+    testCutStatus.AssignCutResult("fNotCut");
+    REQUIRE ( testCutStatus.size() == 2 );
+    REQUIRE ( testCutStatus.GetCutState("fNotCut") == 0 );
+
+    // Test Readout
+    UNSCOPED_INFO ( testCutStatus );
+    //CHECK ( false ); // Force readout even if no fails
+
+    // Check IsCut()
+    REQUIRE ( testCutStatus.IsCut() == true );
+
+    // Check Num Cuts (size but only for cuts that are true)
+    REQUIRE ( testCutStatus.NumCuts() == 1 );
+
+    // Change Cut State
+    testCutStatus.SetCutState("fTestCut",0);
+    REQUIRE ( testCutStatus.GetCutState("fTestCut") == 0);
+
+    // Check throw if set/check state for non-existant cut
+    REQUIRE_THROWS ( testCutStatus.SetCutState("fMissingCut",1) );
+    REQUIRE_THROWS ( testCutStatus.GetCutState("fMissingCut") );
+
+    // Remove cuts
+    testCutStatus.RemoveCutResult("fTestCut");
+    testCutStatus.RemoveCutResult("fNotCut");
+    REQUIRE ( testCutStatus.size() == 0 );
+    
 } 
 
 // Old Style
