@@ -12,13 +12,8 @@
 #include <boost/range/numeric.hpp>
 #include <boost/range/adaptor/map.hpp>
 
-//#include "CutResult.hh"
-
 #include "Exception.hh"
 
-//#include "cereal/access.hpp"
-//#include "cereal/types/string.hpp"
-//#include "cereal/types/vector.hpp"
 
 namespace Nymph
 {
@@ -29,29 +24,23 @@ namespace Nymph
      @brief Provides easy access to cut result information.
 
      @details
-     The cut results can be imagined as an array of booleans, specifying whether the cut was passed: [true, false, false, true, . . . ].
-
-     Cuts are assigned both an array position (non-negative integer) and a name (string) before or when the results are set.
+     The cut results are stored as a map with cut name as key, with value of bool of whether the cut is applied or not.
 
      CutStatus is typically used as a member variable of CoreData, the top-level data object.
 
      CutStatus owns the set of CutResults that have been added to a data object.
-     It also owns a summary of those cuts (implemented with boost::dynamic_bitset).
+     It also owns a summary of those cuts.
 
      You can check if the data has been cut with the IsCut functions.
      - IsCut() returns true if any cut results are true;
-     - IsCut(const bitset_type& mask), IsCut(unsigned int mask), and IsCut(const std::string& mask) allow you to specify
-       a cut mask, and return true if any of the cut results specified by the mask are true.
 
-     When specifying a cut mask, bits set to true specify cuts that should be used:
-     - bitset_type is boost::dynamic_bitset;
-     - unsigned integer masks use the bits of the integer;
-     - std::string masks are strings with each character either a 0 or 1.
+     When specifying a cut, bools set to true specify cuts that should be used.
 
      With CutStatus you can interact with individual cut results in the following ways:
+     - Check whether any cut results are set to true with IsCut(),
      - Get the number of cut results with size(),
-     - Get a reference to the cut results with CutResults(),
-     - If you need to manually update the cut status bitset, use UpdateStatus(),
+     - Get the number of cut results with value true with NumCuts(),
+     - Get a reference to the cut results with CutResults(), TODO; not currently implemented
      - Add cut results to a data object with AssignCutResult(),
      - Remove a cut result with RemoveCutResult(),
      - Check to see if a particular cut result is present using HasCutResult(),
@@ -64,20 +53,18 @@ namespace Nymph
     class CutStatus
     {
         public:
-            //CutStatus() : CutResults();
             typedef std::map< std::string, bool > CutResults_t;
             typedef CutResults_t::iterator CutResultsIt;
             typedef CutResults_t::const_iterator CutResultsCIt;
     
-        //private:
-            //std::map< std::string, bool > CutResults;
-
-        public: // Ben: Below initiates operators, shouldn't need to mess with this, just in the actual operator defns how they interact with the maps.
+        public: 
             CutStatus();
             CutStatus(const CutStatus& orig);
             ~CutStatus();
 
             CutStatus& operator=(const CutStatus& rhs);
+
+            //CutStatus operator=(const CutStatus rhs);
 
             /// Returns the size of the cut results map
             size_t size() const;

@@ -6,7 +6,6 @@
  */
 
 #include "CutStatus.hh"
-//#include "KTExtensibleStructFactory.hh"
 #include "logger.hh"
 
 namespace Nymph
@@ -17,20 +16,27 @@ namespace Nymph
     {
     }
 
-//    CutStatus::CutStatus(const CutStatus& orig) :
-//            CutResults(orig.CutResults),
-//    {
-//    }
+    CutStatus::CutStatus(const CutStatus& orig)
+    {
+            fCutResults = orig.fCutResults;
+    }
 
     CutStatus::~CutStatus()
     {}
 
     CutStatus& CutStatus::operator=(const CutStatus& rhs)
     {
+        //delete[] fCutResults;
         fCutResults = rhs.fCutResults;
         return *this;
     }
-
+/*
+    CutStatus CutStatus::operator=(const CutStatus rhs)
+    {
+        fCutResults = rhs.fCutResults;
+        return *this;
+    }
+*/
     void CutStatus::AssignCutResult(const std::string& cutName, bool state)
     {
         LDEBUG(cutlog, "Assigning cut result <" << cutName << "> with state <" << state << ">");
