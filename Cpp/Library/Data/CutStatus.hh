@@ -26,28 +26,26 @@ namespace Nymph
      @details
      The cut results are stored as a map with cut name as key, with value of bool of whether the cut is applied or not.
 
-     CutStatus is typically used as a member variable of CoreData, the top-level data object.
-
-     CutStatus owns the set of CutResults that have been added to a data object.
-     It also owns a summary of those cuts.
+     CutStatus is typically used as a member variable of DataFrame.
 
      You can check if the data has been cut with the IsCut functions.
      - IsCut() returns true if any cut results are true;
 
-     When specifying a cut, bools set to true specify cuts that should be used.
+     When specifying a cut, bools set to true specify cuts that are applied.
 
      With CutStatus you can interact with individual cut results in the following ways:
      - Check whether any cut results are set to true with IsCut(),
      - Get the number of cut results with size(),
      - Get the number of cut results with value true with NumCuts(),
-     - Get a reference to the cut results with CutResults(), TODO; not currently implemented
-     - Add cut results to a data object with AssignCutResult(),
+     - Get a reference to the cut results with CutResults(), 
+     - Add cut results to a dataframe with AssignCutResult(),
      - Remove a cut result with RemoveCutResult(),
      - Check to see if a particular cut result is present using HasCutResult(),
-     - Get the value of a cut result with GetCutState(), and
+     - Get the value of a cut result with GetCutState(),
      - Set the value of a cut result with SetCutState(),
+     - Get a vector of cut names for cuts with value==True with CutResultsPresent(), and
+     - Output a text summary of applied cuts with the << operator,
 
-     Cut results can typically be accessed by either name or mask position.
      */
 
     class CutStatus
@@ -63,8 +61,6 @@ namespace Nymph
             ~CutStatus();
 
             CutStatus& operator=(const CutStatus& rhs);
-
-            //CutStatus operator=(const CutStatus rhs);
 
             /// Returns the size of the cut results map
             size_t size() const;
@@ -100,9 +96,6 @@ namespace Nymph
             friend std::ostream& operator<<(std::ostream& out, const CutStatus& status);
 
             CutResults_t fCutResults;
-
-            //bitset_type fSummary; // Need to change from bitset to vector of strings or similar. Can potentially skip and directly cout map vals
-            //std::string fSummary; // string containing names of only cuts that have been applied, separated by _
 
         public:
             bool IsCut() const;
@@ -170,19 +163,6 @@ namespace Nymph
         }
         return;
     }
-    // Ben: can remove by iterator position, but won't for consistency
-/*
-    inline void CutStatus::RemoveCutResult(unsigned maskPos, bool doUpdateStatus)
-    {
-        if (maskPos < fCutResults.size())
-        {
-            fCutResults[maskPos].fName = "";
-            fCutResults[maskPos].fState = false;
-        }
-        if (doUpdateStatus) UpdateStatus();
-        return;
-    }
-*/
     inline size_t CutStatus::size() const
     {
         return fCutResults.size();

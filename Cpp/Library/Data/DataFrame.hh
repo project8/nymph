@@ -41,10 +41,12 @@ namespace Nymph
 
      @author N. S. Oblath
 
-     @brief Container for Data objects used during data processing
+     @brief Container for Data objects and their cut information used during data processing
 
      @details
      Individual Data objects are held in an unordered map, indexed by type.
+     A CutStatus object contains cut information in an ordered map, with keys of cut name.
+     The CutStatus describes the latest/most processed data object in the dataframe, and is updated as new data objects are added with more cuts.
 
     */
     class DataFrame
