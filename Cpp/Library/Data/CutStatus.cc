@@ -48,7 +48,7 @@ namespace Nymph
         std::vector< std::string > cutsPresent;
         for (auto cutIt = fCutResults.cbegin(); cutIt != fCutResults.cend(); ++cutIt)
         {
-            if ((! cutIt->first.empty()) && (cutIt->second == 1))
+            if (! cutIt->first.empty()) 
             {
                 cutsPresent.push_back(cutIt->first);
             }
