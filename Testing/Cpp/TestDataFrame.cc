@@ -24,6 +24,10 @@ TEST_CASE( "data_frame", "[data]" )
     REQUIRE_FALSE( frame.Has< TestData1 >() );
     REQUIRE_FALSE( frame.Has< TestData2 >() );
 
+    // check Cut Status functioning
+    frame.fCuts.AssignCutResult("fTestCut", 1);
+    REQUIRE ( frame.fCuts.GetCutState("fTestCut") == 1);
+
     // create a data object  with Get()
     TestData1& data1 = frame.Get< TestData1 >();
     REQUIRE( frame.Has< TestData1 >() );

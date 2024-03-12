@@ -10,7 +10,8 @@
 namespace Nymph
 {
     DataFrame::DataFrame() :
-        fDataObjects()
+        fDataObjects(),
+        fCuts()
     {}
 
     DataFrame::~DataFrame()

@@ -10,6 +10,7 @@
 #define NYMPH_DATAFRAME_HH_
 
 #include "Data.hh"
+#include "CutStatus.hh"
 #include "Exception.hh"
 
 #include "MemberVariable.hh"
@@ -95,6 +96,9 @@ namespace Nymph
             // typedef used to avoid problems with the comma in the MEMVAR macro
             typedef std::unordered_map< std::type_index, std::unique_ptr<Data> > DataMap;
             MEMVAR_REF( DataMap, DataObjects );
+
+            // CutStatus object for storing cut information
+            CutStatus fCuts; 
     };
 
 
