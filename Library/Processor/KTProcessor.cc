@@ -7,6 +7,7 @@
 
 #include "KTProcessor.hh"
 
+#include "KTContext.hh"
 //#include "KTLogger.hh"
 
 #include <boost/foreach.hpp>
@@ -27,9 +28,9 @@ namespace Nymph
     KTProcessor::KTProcessor(const string& name) :
             KTConfigurable(name),
             fSignalMap(),
-            fSlotMap()
-    {
-    }
+            fSlotMap(),
+            fContext(std::make_shared< KTContext >())
+    {}
 
     KTProcessor::~KTProcessor()
     {

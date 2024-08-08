@@ -24,12 +24,15 @@
 
 #include <exception>
 #include <map>
+#include <memory>
 #include <sstream>
 #include <string>
 
 namespace Nymph
 {
     KTLOGGER(processorlog, "KTProcessor.hh");
+
+    class KTContext;
 
     class ProcessorException : public std::logic_error
     {
@@ -80,6 +83,16 @@ namespace Nymph
 
             SlotMap fSlotMap;
 
+        public:
+
+            KTContext& Context();
+            const KTContext& Context() const;
+
+            void SetContext(const std::shared_ptr< KTContext > context);
+
+        protected:
+
+            std::shared_ptr< KTContext > fContext;
     };
 
 
@@ -131,6 +144,22 @@ namespace Nymph
 
         KTSlotWrapper* slot = new KTSlotWrapper(func, &signalConcept);
         fSlotMap.insert(SlotMapVal(name, slot));
+        return;
+    }
+
+    inline KTContext& KTProcessor::Context()
+    {
+        return *fContext;
+    }
+
+    inline const KTContext& KTProcessor::Context() const
+    {
+        return *fContext;
+    }
+
+    inline void KTProcessor::SetContext(std::shared_ptr< KTContext > context)
+    {
+        fContext = context;
         return;
     }
 

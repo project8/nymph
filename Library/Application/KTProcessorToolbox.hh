@@ -21,6 +21,7 @@
 
 namespace Nymph
 {
+    class KTContext;
     class KTPrimaryProcessor;
     class KTProcessor;
 
@@ -185,6 +186,13 @@ namespace Nymph
 
             RunQueue fRunQueue;
 
+        public:
+            KTContext& Context();
+            const KTContext& Context() const;
+
+        private:
+            std::shared_ptr< KTContext > fContext;
+
     };
 
     inline void KTProcessorToolbox::PopBackOfRunQueue()
@@ -199,7 +207,15 @@ namespace Nymph
         return;
     }
 
+    inline KTContext& KTProcessorToolbox::Context()
+    {
+        return *fContext;
+    }
 
+    inline const KTContext& KTProcessorToolbox::Context() const
+    {
+        return *fContext;
+    }
 
 } /* namespace Nymph */
 #endif /* KTPROCESSORTOOLBOX_HH_ */

@@ -7,6 +7,7 @@
 
 #include "KTProcessorToolbox.hh"
 
+#include "KTContext.hh"
 #include "KTLogger.hh"
 #include "KTPrimaryProcessor.hh"
 
@@ -33,7 +34,8 @@ namespace Nymph
             KTConfigurable(name),
             fProcFactory(scarab::factory< KTProcessor, const std::string& >::get_instance()),
             fRunQueue(),
-            fProcMap()
+            fProcMap(),
+            fContext(std::make_shared< KTContext >())
     {
     }
 
@@ -85,6 +87,8 @@ namespace Nymph
                     KTERROR(proclog, "Unable to create processor of type <" << procType << ">");
                     return false;
                 }
+                // seed with shared context
+                newProc->SetContext(fContext);
 
                 if (! AddProcessor(procName, newProc))
                 {
