@@ -44,6 +44,7 @@ if (Nymph_ENABLE_TESTING)
         TestApplication
         TestApplyCut
         TestCacheDirectory
+        TestContext
         TestCut
         TestCutFilter
         TestLogger
