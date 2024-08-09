@@ -20,6 +20,8 @@ namespace Nymph
             KTContext();
             virtual ~KTContext();
 
+            bool Has(const std::string& name) const;
+
             scarab::param& Get(const std::string& name);
             const scarab::param& Get(const std::string& name) const;
 

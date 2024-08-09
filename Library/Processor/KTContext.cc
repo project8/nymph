@@ -22,6 +22,11 @@ namespace Nymph
     KTContext::~KTContext()
     {}
 
+    bool KTContext::Has(const std::string& name) const
+    {
+        return fData.has(name);
+    }
+
     scarab::param& KTContext::Get(const std::string& name)
     {
         return fData[name];
