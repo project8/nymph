@@ -31,6 +31,38 @@ namespace Nymph
             scarab::param_node fData;
     };
 
+    class KTHasContext
+    {
+        public:
+            KTHasContext();
+            virtual ~KTHasContext();
+
+            KTContext& Context();
+            const KTContext& Context() const;
+
+            void SetContext(const std::shared_ptr< KTContext > context);
+
+        protected:
+            std::shared_ptr< KTContext > fContext;
+
+    };
+
+    inline KTContext& KTHasContext::Context()
+    {
+        return *fContext;
+    }
+
+    inline const KTContext& KTHasContext::Context() const
+    {
+        return *fContext;
+    }
+
+    inline void KTHasContext::SetContext(std::shared_ptr< KTContext > context)
+    {
+        fContext = context;
+        return;
+    }
+
 } /* namespace Nymph */
 
 #endif /* KTCONTEXT_HH_ */

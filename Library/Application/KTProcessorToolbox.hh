@@ -10,6 +10,7 @@
 #define KTPROCESSORTOOLBOX_HH_
 
 #include "KTConfigurable.hh"
+#include "KTContext.hh"
 //#include "KTNOFactory.hh"
 
 #include "factory.hh"
@@ -21,7 +22,6 @@
 
 namespace Nymph
 {
-    class KTContext;
     class KTPrimaryProcessor;
     class KTProcessor;
 
@@ -72,7 +72,7 @@ namespace Nymph
          </li>
      </ul>
     */
-    class KTProcessorToolbox : public KTConfigurable
+    class KTProcessorToolbox : public KTConfigurable, public KTHasContext
     {
         public:
             KTProcessorToolbox(const std::string& name = "processor-toolbox");
@@ -186,13 +186,6 @@ namespace Nymph
 
             RunQueue fRunQueue;
 
-        public:
-            KTContext& Context();
-            const KTContext& Context() const;
-
-        private:
-            std::shared_ptr< KTContext > fContext;
-
     };
 
     inline void KTProcessorToolbox::PopBackOfRunQueue()
@@ -205,16 +198,6 @@ namespace Nymph
     {
         fRunQueue.clear();
         return;
-    }
-
-    inline KTContext& KTProcessorToolbox::Context()
-    {
-        return *fContext;
-    }
-
-    inline const KTContext& KTProcessorToolbox::Context() const
-    {
-        return *fContext;
     }
 
 } /* namespace Nymph */

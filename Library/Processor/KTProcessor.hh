@@ -10,6 +10,7 @@
 #define KTPROCESSOR_HH_
 
 #include "KTConfigurable.hh"
+#include "KTContext.hh"
 
 #include "KTConnection.hh"
 #include "KTLogger.hh"
@@ -32,7 +33,6 @@ namespace Nymph
 {
     KTLOGGER(processorlog, "KTProcessor.hh");
 
-    class KTContext;
 
     class ProcessorException : public std::logic_error
     {
@@ -40,7 +40,7 @@ namespace Nymph
             ProcessorException(std::string const& why);
     };
 
-    class KTProcessor : public KTConfigurable
+    class KTProcessor : public KTConfigurable, public KTHasContext
     {
         protected:
             typedef std::map< std::string, KTSignalWrapper* > SignalMap;
@@ -83,16 +83,6 @@ namespace Nymph
 
             SlotMap fSlotMap;
 
-        public:
-
-            KTContext& Context();
-            const KTContext& Context() const;
-
-            void SetContext(const std::shared_ptr< KTContext > context);
-
-        protected:
-
-            std::shared_ptr< KTContext > fContext;
     };
 
 
@@ -144,22 +134,6 @@ namespace Nymph
 
         KTSlotWrapper* slot = new KTSlotWrapper(func, &signalConcept);
         fSlotMap.insert(SlotMapVal(name, slot));
-        return;
-    }
-
-    inline KTContext& KTProcessor::Context()
-    {
-        return *fContext;
-    }
-
-    inline const KTContext& KTProcessor::Context() const
-    {
-        return *fContext;
-    }
-
-    inline void KTProcessor::SetContext(std::shared_ptr< KTContext > context)
-    {
-        fContext = context;
         return;
     }
 

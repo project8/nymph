@@ -7,7 +7,6 @@
 
 #include "KTProcessorToolbox.hh"
 
-#include "KTContext.hh"
 #include "KTLogger.hh"
 #include "KTPrimaryProcessor.hh"
 
@@ -32,10 +31,10 @@ namespace Nymph
 
     KTProcessorToolbox::KTProcessorToolbox(const std::string& name) :
             KTConfigurable(name),
+            KTHasContext(),
             fProcFactory(scarab::factory< KTProcessor, const std::string& >::get_instance()),
             fRunQueue(),
-            fProcMap(),
-            fContext(std::make_shared< KTContext >())
+            fProcMap()
     {
     }
 

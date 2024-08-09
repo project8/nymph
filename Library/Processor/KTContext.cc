@@ -9,6 +9,7 @@
 
 #include "KTLogger.hh"
 
+#include <memory>
 
 namespace Nymph
 {
@@ -44,4 +45,10 @@ namespace Nymph
     }
 
 
+    KTHasContext::KTHasContext() :
+            fContext(std::make_shared< KTContext >())
+    {}
+
+    KTHasContext::~KTHasContext()
+    {}
 } /* namespace Nymph */

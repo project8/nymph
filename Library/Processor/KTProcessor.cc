@@ -27,9 +27,9 @@ namespace Nymph
 
     KTProcessor::KTProcessor(const string& name) :
             KTConfigurable(name),
+            KTHasContext(),
             fSignalMap(),
-            fSlotMap(),
-            fContext(std::make_shared< KTContext >())
+            fSlotMap()
     {}
 
     KTProcessor::~KTProcessor()
