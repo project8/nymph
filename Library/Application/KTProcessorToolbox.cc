@@ -87,8 +87,6 @@ namespace Nymph
                     KTERROR(proclog, "Unable to create processor of type <" << procType << ">");
                     return false;
                 }
-                // seed with shared context
-                newProc->SetContext(fContext);
 
                 if (! AddProcessor(procName, newProc))
                 {
@@ -322,6 +320,9 @@ namespace Nymph
         ProcMapIt it = fProcMap.find(procName);
         if (it == fProcMap.end())
         {
+            // share the context
+            proc->SetContext(fContext);
+
             ProcessorInfo pInfo;
             pInfo.fProc = proc;
             fProcMap.insert(ProcMapValue(procName, pInfo));
