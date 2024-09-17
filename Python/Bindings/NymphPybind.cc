@@ -13,6 +13,8 @@
 #include "Processor/ProcessorToolboxPybind.hh"
 #include "Processor/PyProcCreatorPybind.hh"
 #include "Processor/SignalPybind.hh"
+#include "Data/DataPybind.hh"
+#include "Control/ControllerPybind.hh"
 #include "Processor/SlotPybind.hh"
 
 #include "DataFrame.hh"
@@ -26,7 +28,7 @@ PYBIND11_MODULE(_nymph, nymphPackage)
     nymphPackage.doc() = "Nymph package";
 
     auto nymphControl = nymphPackage.def_submodule("control", "Control module");
-
+    NymphPybind::ExportController(nymphControl);
     auto nymphData = nymphPackage.def_submodule("data", "Data module");
     NymphPybind::ExportData(nymphData);
 
