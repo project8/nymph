@@ -66,9 +66,9 @@ set( PRIVATE_EXT_LIBS )
 #######
 
 # Boost (1.46 required for filesystem version 3)
-list( APPEND BOOST_COMPONENTS chrono date_time filesystem program_options system thread )
+list( APPEND BOOST_COMPONENTS chrono date_time filesystem system thread )
 find_package( Boost 1.46.0 REQUIRED COMPONENTS ${BOOST_COMPONENTS} )
-list( APPEND PUBLIC_EXT_LIBS Boost::boost Boost::chrono Boost::date_time Boost::program_options Boost::thread Boost::filesystem )
+list( APPEND PUBLIC_EXT_LIBS Boost::boost Boost::chrono Boost::date_time Boost::thread Boost::filesystem )
 # make sure dynamic linking is assumed for all boost libraries
 set( Boost_USE_STATIC_LIBS OFF )
 set( Boost_USE_STATIC_RUNTIME OFF )
@@ -97,9 +97,9 @@ endif( Nymph_ENABLE_PYTHON )
 # Cereal
 ########
 
-set( JUST_INSTALL_CEREAL ON CACHE BOOL "Cereal option: only install library" FORCE)
-add_subdirectory( External/cereal )
-include_directories( External/cereal/include )
+#set( JUST_INSTALL_CEREAL ON CACHE BOOL "Cereal option: only install library" FORCE)
+#add_subdirectory( External/cereal )
+#include_directories( External/cereal/include )
 
 
 #####################

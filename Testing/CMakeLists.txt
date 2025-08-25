@@ -1,6 +1,25 @@
 # CMakeLists for Nymph/Testing
 # Author: N.S. Oblath
 
+include( FetchContent )
+
+FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        v3.7.1
+)
+
+FetchContent_MakeAvailable( Catch2 )
+list( APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras )
+
+pbuilder_component_install_and_export( 
+    COMPONENT Catch2
+    LIBTARGETS Catch2
+    NAMESPACE Catch2::
+)
+
+########################################################################
+
 set( PY_DIR Python )
 set( CPP_DIR Cpp )
 
@@ -15,22 +34,35 @@ include_directories( BEFORE
 
 #pbuilder_install_config (${pytesting_CONFIGFILES})
 
-set( testing_HEADERS
+set( testing_lib_HEADERS
     ${CPP_DIR}/TestControllerClasses.hh
     ${CPP_DIR}/TestDataClasses.hh
     ${CPP_DIR}/TestDataProcessorClasses.hh
     ${CPP_DIR}/TestProcessorClasses.hh
+    ${CPP_DIR}/TestServiceClasses.hh
 )
 
-pbuilder_install_headers( ${testing_HEADERS} )
+set( testing_lib_SOURCES
+    ${CPP_DIR}/TestProcessorClasses.cc
+    ${CPP_DIR}/TestServiceClasses.cc
+)
 
-#set (pytesting_HEADERS
-#  
-#)
+set( testing_lib_LIB_DEPENDENCIES 
+    Nymph
+)
 
-#set (pytesting_SOURCES
-#
-#)
+pbuilder_library( 
+    TARGET NymphTesting
+    SOURCES ${testing_lib_SOURCES}
+    PUBLIC_EXTERNAL_LIBRARIES ${testing_lib_LIB_DEPENDENCIES}
+)
+
+pbuilder_component_install_and_export( 
+    COMPONENT Library
+    LIBTARGETS NymphTesting
+)
+
+pbuilder_install_headers( ${testing_lib_HEADERS} )
 
 set( testing_SOURCES
     ${CPP_DIR}/TestConfigException.cc
@@ -44,6 +76,8 @@ set( testing_SOURCES
     ${CPP_DIR}/TestProcessorToolbox.cc
     ${CPP_DIR}/TestReturnBuffer.cc
     ${CPP_DIR}/TestRunNymph.cc
+    ${CPP_DIR}/TestService.cc
+    ${CPP_DIR}/TestServiceToolbox.cc
     ${CPP_DIR}/TestSignalSlot.cc
     ${CPP_DIR}/TestSingleRunController.cc
     ${CPP_DIR}/TestSlotData.cc
@@ -52,19 +86,20 @@ set( testing_SOURCES
 
 set( testing_LIB_DEPENDENCIES 
     Nymph
+    NymphTesting
 )
 
 # Interface library was recommended for Catch:
 # https://stackoverflow.com/questions/34896891/catch-lib-unit-testing-and-ctest-cmake-integration/34900012#34900012
-add_library( Catch INTERFACE )
-target_include_directories( Catch INTERFACE ${Scarab_LOCATION}/testing/catch )
+#add_library( Catch INTERFACE )
+#target_include_directories( Catch INTERFACE ${Scarab_LOCATION}/testing/catch )
 
 pbuilder_executable(
     EXECUTABLE RunTests
     SOURCES ${testing_SOURCES}
     PROJECT_LIBRARIES ${testing_LIB_DEPENDENCIES}
+    PUBLIC_EXTERNAL_LIBRARIES Catch2::Catch2
 )
-target_link_libraries( RunTests PUBLIC Catch )
 set( programs "RunTests" )
 
 pbuilder_component_install_and_export(
@@ -85,26 +120,9 @@ pbuilder_component_install_and_export(
 #catch_discover_tests(foo)
 
 ############################
-# NymphPyTesting library 
+# NymphTesting Python library 
 ############################
 
-#pbuilder_library( 
-#    TARGET NymphPyTesting
-#    SOURCES ${pytesting_SOURCES}
-#    PROJECT_LIBRARIES ${lib_dependencies}
-#)
-
-#pbuilder_component_install_and_export( 
-#    COMPONENT Testing
-#    LIBTARGETS NymphPyTesting
-#)
-
-#pbuilder_install_headers( ${pytesting_HEADERS} )
-
-############################
-# Executables
-############################
-
-#set( lib_dependencies
-#    NymphPyTesting
-#)
+if( Nymph_ENABLE_PYTHON )
+    add_subdirectory( Python/Bindings )
+endif()

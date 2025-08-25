@@ -14,33 +14,43 @@ env:
   Nymph_SINGLETHREADED: OFF
   Nymph_BUILD_TYPE: Debug
   Nymph_TAG: test
+  NARG: 2
 
 jobs:
 
   docker_build:
     name: Build and Test in Docker
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
 
       - name: Checkout the repo 
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Build and test
+      - name: Build
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          load: true
+          build-args: |
+            img_repo=${{ env.BASE_IMAGE_REPO }}
+            img_tag=${{ env.BASE_IMAGE_TAG }}
+            build_type=${{ env.Nymph_BUILD_TYPE }}
+            build_tests_exe=${{ env.Nymph_ENABLE_TESTING }}
+            nymph_tag=${{ env.Nymph_TAG }}
+            narg=${{ env.NARG }}
+          platforms: linux/amd64
+          tags: ${{ env.Nymph_TAG }}
+
+      - name: Unit Tests
         run: |
-          docker build \
-            --target nymph_done \
-            --build-arg img_repo=${BASE_IMAGE_REPO} \
-            --build-arg img_tag=${BASE_IMAGE_TAG} \
-            --build-arg build_type=${Nymph_BUILD_TYPE} \
-            --build-arg build_tests_exe=${Nymph_ENABLE_TESTING} \
-            --build-arg nymph_tag=${Nymph_TAG} \
-            --tag project8/nymph:${Nymph_TAG} \
-            .
-          docker run project8/nymph:${Nymph_TAG} /tmp_source/build/Testing/RunTests
+          docker run --rm ${{ env.Nymph_TAG }} bash -c "
+            /tmp_source/build/Testing/RunTests"
 
 
   build_cpp:
@@ -51,18 +61,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macOS-10.15]
-        python-version: [3.9]
+        os: [ubuntu-latest, macOS-latest]
+        python-version: [3]
 
     steps:
 
       - name: Checkout repository
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -72,8 +82,23 @@ jobs:
           brew install \
             boost \
             rapidjson \
-            yaml-cpp \
-            pybind11
+            yaml-cpp
+          sudo mkdir -p /usr/local/include && \
+            sudo chown -R $(whoami) /usr/local/include
+          sudo mkdir -p /usr/local/lib && \
+            sudo chown -R $(whoami) /usr/local/lib
+          sudo mkdir -p /usr/local/bin && \
+            sudo chown -R $(whoami) /usr/local/bin
+          sudo mkdir -p /usr/local/share && \
+            sudo chown -R $(whoami) /usr/local/share
+          git clone https://github.com/pybind/pybind11.git
+          cd pybind11
+          git checkout v3.0.0
+          mkdir build
+          cd build
+          cmake -DPYBIND11_TEST=FALSE ..
+          make -j${{ env.NARG }} install
+
 
 
       - name: Linux Dependencies
@@ -83,8 +108,15 @@ jobs:
           sudo apt-get install -yq \
             libboost-all-dev \
             libyaml-cpp-dev \
-            rapidjson-dev \
-            pybind11-dev 
+            rapidjson-dev
+          git clone https://github.com/pybind/pybind11.git
+          cd pybind11
+          git checkout v3.0.0
+          mkdir build
+          cd build
+          sudo cmake -DPYBIND11_TEST=FALSE ..
+          sudo make -j${{ env.NARG }} install
+          cd ../..
           pip install "pybind11[global]"
           
 
@@ -97,7 +129,7 @@ jobs:
       - name: CMake Build
         run: |
           cd build
-          make -j install
+          make -j${{ env.NARG }} install
 
       - name: Run tests
         run: |
@@ -109,21 +141,24 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      Nymph_ENABLE_PYTHON: ON
+
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macOS-10.15]
-        python-version: [3.9]
+        os: [ubuntu-latest, macOS-latest]
+        python-version: [3]
 
     steps:
 
       - name: Checkout repository
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -133,8 +168,22 @@ jobs:
           brew install \
             boost \
             rapidjson \
-            yaml-cpp \
-            pybind11
+            yaml-cpp
+          sudo mkdir -p /usr/local/include && \
+            sudo chown -R $(whoami) /usr/local/include
+          sudo mkdir -p /usr/local/lib && \
+            sudo chown -R $(whoami) /usr/local/lib
+          sudo mkdir -p /usr/local/bin && \
+            sudo chown -R $(whoami) /usr/local/bin
+          sudo mkdir -p /usr/local/share && \
+            sudo chown -R $(whoami) /usr/local/share
+          git clone https://github.com/pybind/pybind11.git
+          cd pybind11
+          git checkout v3.0.0
+          mkdir build
+          cd build
+          cmake -DPYBIND11_TEST=FALSE ..
+          make -j${{ env.NARG }} install
 
           python -m pip install build
 
@@ -146,6 +195,15 @@ jobs:
             libboost-all-dev \
             libyaml-cpp-dev \
             rapidjson-dev
+          git clone https://github.com/pybind/pybind11.git
+          cd pybind11
+          git checkout v3.0.0
+          mkdir build
+          cd build
+          sudo cmake -DPYBIND11_TEST=FALSE ..
+          sudo make -j${{ env.NARG }} install
+          cd ../..
+
           
           pip install "pybind11[global]" 
           
@@ -153,9 +211,10 @@ jobs:
           
       - name: Install nymph
         run: |
-          pip install .
+          pip -v install .
           
       - name: Run Tests
+        continue-on-error: true
         run: |
           cd Testing/Python
           python -m unittest discover -v

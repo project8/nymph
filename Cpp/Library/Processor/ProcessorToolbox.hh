@@ -102,6 +102,11 @@ namespace Nymph
             bool AddProcessor( const std::string& procName, std::shared_ptr< Processor > proc );
             bool AddProcessor( const std::string& procType, const std::string& procName );
 
+            /// Check whether a processor already has a processor with a given name
+            bool HasProcessor( const std::string& procName ) const;
+            /// Check whether a processor could build a processor of a given type (i.e. does the factory know about this processor?)
+            bool CouldBuild( const std::string& procType ) const;
+
             /// Remove a processor from the toolbox
             bool RemoveProcessor( const std::string& procName );
 
@@ -151,6 +156,16 @@ namespace Nymph
             static const char fSigSlotNameSep = ':';
 
     };
+
+    inline bool ProcessorToolbox::HasProcessor( const std::string& procName ) const
+    {
+        return fProcMap.count( procName ) == 1;
+    }
+
+    inline bool ProcessorToolbox::CouldBuild( const std::string& procType ) const
+    {
+        return fProcFactory->has_class( procType );
+    }
 
     inline bool ProcessorToolbox::MakeConnection(const std::string& signal, const std::string& slot) 
     {

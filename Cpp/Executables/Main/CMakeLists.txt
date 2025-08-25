@@ -17,16 +17,18 @@ if( Nymph_BUILD_NYMPH_EXE )
     )
 endif( Nymph_BUILD_NYMPH_EXE )
 
-set( Nymph_PROGRAMS )
-pbuilder_executables( 
-    SOURCES ${Nymph_SOURCES}
-    TARGETS_VAR Nymph_PROGRAMS
-    PROJECT_LIBRARIES ${Nymph_package_libs}
-    PUBLIC_EXTERNAL_LIBRARIES ${Nymph_EXE_LIBRARIES}
-#        PRIVATE_EXTERNAL_LIBRARIES ${PRIVATE_EXT_LIBS}
-)
+if( Nymph_SOURCES )
+    set( Nymph_PROGRAMS )
+    pbuilder_executables( 
+        SOURCES ${Nymph_SOURCES}
+        TARGETS_VAR Nymph_PROGRAMS
+        PROJECT_LIBRARIES ${Nymph_package_libs}
+        PUBLIC_EXTERNAL_LIBRARIES ${Nymph_EXE_LIBRARIES}
+    #        PRIVATE_EXTERNAL_LIBRARIES ${PRIVATE_EXT_LIBS}
+    )
 
-pbuilder_component_install_and_export( 
-    COMPONENT Executables
-    EXETARGETS ${Nymph_PROGRAMS}
-)
+    pbuilder_component_install_and_export( 
+        COMPONENT Executables
+        EXETARGETS ${Nymph_PROGRAMS}
+    )
+endif( Nymph_SOURCES )
