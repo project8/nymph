@@ -50,7 +50,7 @@ jobs:
       - name: Unit Tests
         run: |
           docker run --rm ${{ env.Nymph_TAG }} bash -c "
-            /tmp_source/build/Testing/RunTests"
+            $NYMPH_PREFIX/bin/RunTests"
 
 
   build_cpp:
@@ -124,7 +124,13 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake -DCMAKE_BUILD_TYPE=${Nymph_BUILD_TYPE} -DNymph_BUILD_NYMPH_EXE=${Nymph_BUILD_NYMPH_EXE} -DNymph_ENABLE_EXECUTABLES=${Nymph_ENABLE_EXECUTABLES} -DNymph_ENABLE_PYTHON=${Nymph_ENABLE_PYTHON} -DNymph_ENABLE_TESTING=${Nymph_ENABLE_TESTING} -DNymph_SINGLETHREADED=${Nymph_SINGLETHREADED} ..
+          cmake -DCMAKE_BUILD_TYPE=${Nymph_BUILD_TYPE} \
+            -DNymph_BUILD_NYMPH_EXE=${Nymph_BUILD_NYMPH_EXE} \
+            -DNymph_ENABLE_EXECUTABLES=${Nymph_ENABLE_EXECUTABLES} \
+            -DNymph_ENABLE_PYTHON=${Nymph_ENABLE_PYTHON} \
+            -DNymph_ENABLE_TESTING=${Nymph_ENABLE_TESTING} \
+            -DNymph_SINGLETHREADED=${Nymph_SINGLETHREADED} \
+            ..
 
       - name: CMake Build
         run: |
