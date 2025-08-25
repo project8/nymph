@@ -7,7 +7,8 @@
 
 #include "TestDataClasses.hh"
 
-#include "catch.hpp"
+#include "catch2/catch_test_macros.hpp"
+#include "catch2/catch_approx.hpp"
 
 
 TEST_CASE( "data", "[data]" )
@@ -23,7 +24,7 @@ TEST_CASE( "data", "[data]" )
     REQUIRE( tdData1.GetIValue1() == 50 );
 
     TestData2 tdData2;
-    REQUIRE( tdData2.GetDValue1() == Approx( 0.0 ) );
-    REQUIRE( tdData2.GetDValue2() == Approx( 10.0 ) );
+    REQUIRE( tdData2.GetDValue1() == Catch::Approx( 0.0 ) );
+    REQUIRE( tdData2.GetDValue2() == Catch::Approx( 10.0 ) );
 
 }

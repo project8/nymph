@@ -10,7 +10,8 @@
 
 #include "DataFrame.hh"
 
-#include "catch.hpp"
+#include "catch2/catch_test_macros.hpp"
+#include "catch2/catch_approx.hpp"
 
 #include "logger.hh"
 LOGGER(tsdlog_hh, "testslotdata.hh");
@@ -91,8 +92,8 @@ TEST_CASE( "slot_data", "[slot],[data]" )
     REQUIRE_NOTHROW( (*tsdSlotDIToD)( tsdHandle ) ); // this adds TestData2 to the frame and sets the integer values in its double variables
     REQUIRE( tsdHandle->Has< TestData2 >() );
     TestData2& tsdTestData2 = tsdHandle->Get< TestData2 >();
-    REQUIRE( tsdTestData2.GetDValue1() == Approx(11.) );
-    REQUIRE( tsdTestData2.GetDValue2() == Approx(12.) );
+    REQUIRE( tsdTestData2.GetDValue1() == Catch::Approx(11.) );
+    REQUIRE( tsdTestData2.GetDValue2() == Catch::Approx(12.) );
 
     // verify that a slot with a const data object works
     // call the print slot function to verify use with const data
@@ -113,7 +114,7 @@ TEST_CASE( "slot_data", "[slot],[data]" )
     REQUIRE( tsdHandle->Has< TestData2 >() );
     TestData2& tsdAnotherTestData2 = tsdHandle->Get< TestData2 >();
     REQUIRE( tsdTestData1.GetIValue1() == 16 );
-    REQUIRE( tsdAnotherTestData2.GetDValue1() == Approx(16.) );
+    REQUIRE( tsdAnotherTestData2.GetDValue1() == Catch::Approx(16.) );
 
     // verify that slots owned by something else work
     // remove TestData2
@@ -122,7 +123,7 @@ TEST_CASE( "slot_data", "[slot],[data]" )
     // call the mult slot and verify that it worked
     REQUIRE_NOTHROW( (*tsdSlotDMult)( tsdHandle ) ); // for TestData1::fIValue1, multiplies 16 by 2.5 and stores in TestData2::fDValue1
     TestData2& tsdYetAnotherTestData2 = tsdHandle->Get< TestData2 >();
-    REQUIRE( tsdYetAnotherTestData2.GetDValue1() == Approx(40.) );
+    REQUIRE( tsdYetAnotherTestData2.GetDValue1() == Catch::Approx(40.) );
 }
 
 

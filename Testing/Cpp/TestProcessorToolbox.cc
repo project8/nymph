@@ -12,7 +12,7 @@
 #include "logger.hh"
 #include "param_codec.hh"
 
-#include "catch.hpp"
+#include "catch2/catch_test_macros.hpp"
 
 LOGGER( testlog, "TestProcessorToolbox" );
 

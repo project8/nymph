@@ -8,7 +8,8 @@
 
 #include "ControlAccess.hh"
 
-#include "catch.hpp"
+#include "catch2/catch_test_macros.hpp"
+#include "catch2/catch_approx.hpp"
 
 #include <thread>
 
@@ -104,10 +105,10 @@ TEST_CASE( "control_access", "[control]" )
         REQUIRE( tcaControlAccess->IsAtBreak() );
         REQUIRE( tcaControlAccess->HasReturn() );
         // we can tcaControlAccess the return variable through the buffer
-        REQUIRE( std::get<0>( retBuf ) == Approx(5.) );
+        REQUIRE( std::get<0>( retBuf ) == Catch::Approx(5.) );
         // we can change the value of the return variable using the buffer
         std::get<0>( retBuf ) = 10.;
-        REQUIRE( retval == Approx(10.) );
+        REQUIRE( retval == Catch::Approx(10.) );
     }
 
 }

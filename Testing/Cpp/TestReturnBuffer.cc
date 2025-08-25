@@ -7,7 +7,8 @@
 
 #include "ReturnBuffer.hh"
 
-#include "catch.hpp"
+#include "catch2/catch_test_macros.hpp"
+#include "catch2/catch_approx.hpp"
 
 #include "logger.hh"
 
@@ -34,13 +35,13 @@ TEST_CASE( "return_buffer", "[processor]" )
     REQUIRE_NOTHROW( trbBuffer.GetReturn() );
     auto trbTheReturn = trbBuffer.GetReturn();
     REQUIRE( std::get<0>( trbTheReturn ) == 5 );
-    REQUIRE( std::get<1>( trbTheReturn ) == Approx(100.2) );
+    REQUIRE( std::get<1>( trbTheReturn ) == Catch::Approx(100.2) );
     REQUIRE( std::get<2>( trbTheReturn ) == "I'm a string!" );
 
     ReturnBufferBase& trbRBB = trbBuffer;
     auto trbTheRBBReturn = trbRBB.GetReturn< int, double, std::string >();
     REQUIRE( std::get<0>( trbTheRBBReturn ) == 5 );
-    REQUIRE( std::get<1>( trbTheRBBReturn ) == Approx(100.2) );
+    REQUIRE( std::get<1>( trbTheRBBReturn ) == Catch::Approx(100.2) );
     REQUIRE( std::get<2>( trbTheRBBReturn ) == "I'm a string!" );
 
 }

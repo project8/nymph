@@ -13,7 +13,7 @@
 #include "logger.hh"
 #include "param_codec.hh"
 
-#include "catch.hpp"
+#include "catch2/catch_test_macros.hpp"
 
 LOGGER( testlog, "TestSingleRunController" );
 
@@ -74,7 +74,7 @@ TEST_CASE( "single_run_controller" )
 
     SECTION( "RunQueue" )
     {
-        LINFO( "RunQueue Tests" );
+        LINFO( testlog, "RunQueue Tests" );
 
         std::string config_str(
             "- type: test-primary\n"
