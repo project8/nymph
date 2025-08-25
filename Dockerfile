@@ -15,6 +15,9 @@ ENV NYMPH_BUILD_TESTS_EXE=$build_tests_exe
 ENV NYMPH_TAG=$nymph_tag
 ENV NYMPH_BUILD_PREFIX=/usr/local/p8/nymph/$NYMPH_TAG
 
+# Set bash as the default shell
+SHELL ["/bin/bash", "-c"]
+
 RUN apt-get update && \
     apt-get clean && \
     apt-get --fix-missing -y install \
