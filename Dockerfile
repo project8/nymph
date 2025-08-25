@@ -1,13 +1,52 @@
-FROM project8/p8compute_dependencies:v1.2.0 as nymph_common
+ARG base_img_repo=python
+ARG base_img_tag=3.12.1-slim-bookworm
+
+# This FROM line includes a label so that the dependencies can be built by themselves by using the `--target` argument of `docker build`
+FROM ${base_img_repo}:${base_img_tag} AS base
 
 ARG build_type=Release
-ENV NYMPH_BUILD_TYPE=$build_type
 ARG build_tests_exe=FALSE
+ARG narg=2
+ARG nymph_tag=dev
+
+ENV NYMPH_BUILD_TYPE=$build_type
 ENV NYMPH_BUILD_TESTS_EXE=$build_tests_exe
 
-ARG nymph_tag=dev
 ENV NYMPH_TAG=$nymph_tag
 ENV NYMPH_BUILD_PREFIX=/usr/local/p8/nymph/$NYMPH_TAG
+
+RUN apt-get update && \
+    apt-get clean && \
+    apt-get --fix-missing -y install \
+        build-essential \
+        cmake \
+#        gdb \
+        git \
+        libboost-chrono-dev \
+        libboost-filesystem-dev \
+        libboost-date-time-dev \
+        libboost-system-dev \
+        libboost-thread-dev \
+        libyaml-cpp-dev \
+        rapidjson-dev && \
+#        pybind11-dev \
+#        wget && \
+    rm -rf /var/lib/apt/lists/*
+
+# use pybind11_checkout to specify a tag or branch name to checkout
+ARG pybind11_checkout=v3.0.0
+ARG pybind11_repo=https://github.com/pybind/pybind11.git
+ARG pybind11_name=pybind11
+RUN cd /usr/local && \
+    git clone ${pybind11_repo} && \
+    cd ${pybind11_name} && \
+    git checkout ${pybind11_checkout} && \
+    mkdir build && \
+    cd build && \
+    cmake -DPYBIND11_TEST=FALSE .. && \
+    make -j${narg} install && \
+    cd / && \
+    rm -rf /usr/local/${pybind11_name}
 
 RUN mkdir -p $NYMPH_BUILD_PREFIX &&\
     chmod -R 777 $NYMPH_BUILD_PREFIX/.. &&\
@@ -21,7 +60,7 @@ RUN mkdir -p $NYMPH_BUILD_PREFIX &&\
     /bin/true
 
 ########################
-FROM nymph_common as nymph_done
+FROM base AS build
 
 COPY cmake /tmp_source/cmake
 COPY Python /tmp_source/Python
@@ -46,10 +85,10 @@ RUN source $NYMPH_BUILD_PREFIX/setup.sh &&\
     cmake -D CMAKE_BUILD_TYPE=$NYMPH_BUILD_TYPE \
           -D CMAKE_INSTALL_PREFIX:PATH=$NYMPH_BUILD_PREFIX \
           -D Nymph_ENABLE_TESTING:BOOL=$NYMPH_BUILD_TESTS_EXE .. &&\
-    make -j3 install &&\
+    make -j${narg} install &&\
     /bin/true
 
 ########################
-FROM nymph_common
+FROM base
 
-COPY --from=nymph_done $NYMPH_BUILD_PREFIX $NYMPH_BUILD_PREFIX
+COPY --from=build $NYMPH_BUILD_PREFIX $NYMPH_BUILD_PREFIX
