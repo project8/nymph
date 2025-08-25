@@ -51,13 +51,14 @@ RUN cd /usr/local && \
 RUN mkdir -p $NYMPH_BUILD_PREFIX &&\
     chmod -R 777 $NYMPH_BUILD_PREFIX/.. &&\
     cd $NYMPH_BUILD_PREFIX &&\
-    echo "source ${COMMON_BUILD_PREFIX}/setup.sh" > setup.sh &&\
     echo "export NYMPH_TAG=${NYMPH_TAG}" >> setup.sh &&\
     echo "export NYMPH_BUILD_PREFIX=${NYMPH_BUILD_PREFIX}" >> setup.sh &&\
     echo 'ln -sfT $NYMPH_BUILD_PREFIX $NYMPH_BUILD_PREFIX/../current' >> setup.sh &&\
     echo 'export PATH=$NYMPH_BUILD_PREFIX/bin:$PATH' >> setup.sh &&\
     echo 'export LD_LIBRARY_PATH=$NYMPH_BUILD_PREFIX/lib:$LD_LIBRARY_PATH' >> setup.sh &&\
     /bin/true
+#    echo "source ${COMMON_BUILD_PREFIX}/setup.sh" > setup.sh &&\
+
 
 ########################
 FROM base AS build
