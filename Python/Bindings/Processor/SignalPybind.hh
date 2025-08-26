@@ -46,6 +46,7 @@ namespace NymphPybind
 
        py::class_< Nymph::SignalBase, PySignalBase, std::shared_ptr<Nymph::SignalBase > >(nymphProcessor, "_SignalBase")
                 .def(py::init<const std::string& >())
+                .def(py::init<const std::string&,  Nymph::Processor* >())
                 .def("connect", &Nymph::SignalBase::Connect, NYMPH_BIND_CALL_GUARD_STREAMS)
                 .def("disconnect", &Nymph::SignalBase::Disconnect)
                 .def("disconnect_all", &Nymph::SignalBase::DisconnectAll)
