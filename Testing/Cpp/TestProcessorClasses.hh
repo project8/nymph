@@ -5,6 +5,9 @@
  *      Author: N.S. Oblath
  */
 
+#ifndef NYMPH_TESTING_PROCESSORCLASSES_HH_
+#define NYMPH_TESTING_PROCESSORCLASSES_HH_
+
 #include "PrimaryProcessor.hh"
 #include "Processor.hh"
 #include "QuitChain.hh"
@@ -18,57 +21,31 @@
 
 LOGGER( testprocclasses_h_log, "TestProcessorClasses" );
 
-namespace Nymph
+namespace NymphTesting
 {
     // concrete processor class that we can test
     // implements Configure() and has its own signal and slot
-    class TestProc : public Processor
+    class TestProc : public Nymph::Processor
     {
         public:
-            TestProc( const std::string& name = "test" ) :
-                    Processor( name ),
-                    fValue( 0 ),
-                    fSecondValue( 0 ),
-                    fValueSig( "value", this ),
-                    fValueSlot( "value", this, &TestProc::SetValue ),
-                    fSecondValueSig( "second-value", this ),
-                    fSecondValueSlot( "second-value", this, &TestProc::SecondValueSlotFunction ),
-                    fSecondValueSlot2( "second-value-2", this, &TestProc::SetSecondValue )
-            {}
+            TestProc( const std::string& name = "test" );
 
-            virtual ~TestProc()
-            {}
+            virtual ~TestProc();
 
-            void Configure( const scarab::param_node& node )
-            {
-                fValue = node.get_value( "value", fValue );
-
-                // we'll test configuration error throwing by having a string with restricted values
-                if( node.has("string") )
-                {
-                    if( node["string"]().as_string() == "ok value 1" ) fStringValue = "ok 1";
-                    else if( node["string"]().as_string() == "ok value 2" ) fStringValue = "ok 2";
-                    else THROW_EXCEPT_HERE( ConfigException( node ) << "Invalid choice for \"string\"" );
-                }
-
-                return;
-            }
+            void Configure( const scarab::param_node& node );
 
             MEMVAR( int, Value );
             MEMVAR( int, SecondValue );
             MEMVAR_REF( std::string, StringValue );
 
-            void SecondValueSlotFunction( int newValue )
-            {
-                fSecondValueSig( newValue );
-            }
+            void SecondValueSlotFunction( int newValue );
 
-            MEMVAR_REF( Signal< int >, ValueSig );
-            MEMVAR_REF( Slot< int >, ValueSlot );
+            MEMVAR_REF( Nymph::Signal< int >, ValueSig );
+            MEMVAR_REF( Nymph::Slot< int >, ValueSlot );
 
-            MEMVAR_REF( Signal< int >, SecondValueSig );
-            MEMVAR_REF( Slot< int >, SecondValueSlot );
-            MEMVAR_REF( Slot< int >, SecondValueSlot2 );
+            MEMVAR_REF( Nymph::Signal< int >, SecondValueSig );
+            MEMVAR_REF( Nymph::Slot< int >, SecondValueSlot );
+            MEMVAR_REF( Nymph::Slot< int >, SecondValueSlot2 );
 
     };
 
@@ -94,7 +71,7 @@ namespace Nymph
 
     // concrete primary processor class that we can test
     // implements Configure(), Run(), and has its own signal and slot
-    class TestPrimaryProc : public PrimaryProcessor
+    class TestPrimaryProc : public Nymph::PrimaryProcessor
     {
         public:
             enum class TestType
@@ -105,89 +82,32 @@ namespace Nymph
                 QuitChain
             };
 
-            TestPrimaryProc( const std::string& name = "test" ) :
-                    PrimaryProcessor( name ),
-                    fTestSelection( TestType::ThrowExcept ),
-                    fNewValue( 10 ),
-                    fValue( 0 ),
-                    fValueSig( "value", this ),
-                    fValueSlot( "value", this, &TestPrimaryProc::SetValue )
-            {}
+            TestPrimaryProc( const std::string& name = "test" );
 
-            virtual ~TestPrimaryProc()
-            {}
+            virtual ~TestPrimaryProc();
 
-            void Configure( const scarab::param_node& node )
-            {
-                if( node.has("test") )
-                {
-                    std::string testSelectionStr( node["test"]().as_string() );
-                    if( testSelectionStr == "signal-new-value" ) fTestSelection = TestType::SignalNewValue;
-                    else if( testSelectionStr == "wait-two-sec" ) fTestSelection = TestType::WaitTwoSec;
-                    else if( testSelectionStr == "throw-except" ) fTestSelection = TestType::ThrowExcept;
-                    else
-                    {
-                        LERROR( testprocclasses_h_log, "Invalid test selection: " << testSelectionStr );
-                        THROW_EXCEPT_HERE( ConfigException() << "Invalid test selection: " << testSelectionStr );
-                    }
-                }
-                return;
-            }
+            void Configure( const scarab::param_node& node );
 
-            void Run()
-            {
-                switch( fTestSelection )
-                {
-                    case TestType::SignalNewValue:
-                        TestSignalNewValue();
-                        return;
-                    case TestType::WaitTwoSec:
-                        TestWaitTwoSec();
-                        return;
-                    case TestType::ThrowExcept:
-                        TestThrowExcept();
-                        return;
-                    case TestType::QuitChain:
-                        TestQuitChain();
-                        return;
-                    default:
-                        LERROR( testprocclasses_h_log, "Invalid test choice" );
-                        THROW_EXCEPT_HERE( Exception() << "Invalid test choice" );
-                }
-                return;
-            }
+            void Run();
 
-            void TestSignalNewValue()
-            {
-                fValueSig( fNewValue );
-                return;
-            }
+            void TestSignalNewValue();
 
-            void TestWaitTwoSec()
-            {
-                std::this_thread::sleep_for(std::chrono::seconds(2));
-                return;
-            }
+            void TestWaitTwoSec();
 
-            void TestThrowExcept()
-            {
-                THROW_EXCEPT_HERE( TestPPException() << "PrimaryProcessor test function: throw Exception" );
-                return;
-            }
+            void TestThrowExcept();
 
-            void TestQuitChain()
-            {
-                QUIT_CHAIN;
-            }
+            void TestQuitChain();
 
             MEMVAR( TestType, TestSelection );
 
             MEMVAR( int, NewValue );
             MEMVAR( int, Value );
 
-            MEMVAR_REF( Signal< int >, ValueSig );
-            MEMVAR_REF( Slot< int >, ValueSlot );
+            MEMVAR_REF( Nymph::Signal< int >, ValueSig );
+            MEMVAR_REF( Nymph::Slot< int >, ValueSlot );
 
     };
 
-}
+} /* namespace NymphTesting */
+
+#endif

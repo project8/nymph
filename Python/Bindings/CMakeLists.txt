@@ -16,10 +16,11 @@ include_directories( BEFORE
 set( PYBINDING_HEADERFILES
     Data/DataPybind.hh
     Processor/ProcessorPybind.hh
+    Processor/ProcessorRegistrar.hh
+    Processor/ProcessorToolboxPybind.hh
+    Processor/PyProcCreatorPybind.hh
     Processor/SignalPybind.hh
     Processor/SlotPybind.hh
-    Processor/ProcessorRegistrar.hh
-    Processor/PyProcCreatorPybind.hh
 )
 
 # Python bindings

@@ -58,8 +58,8 @@ namespace Nymph
             /// Returns true if the frame has no data objects
             bool Empty() const;
 
-            /// Returns true if object of type XData exists in the frame; returns false otherwise
-            template< typename XData >
+            /// Returns true if object of type(s) XData exist in the frame; returns false otherwise; Has<>() returns true
+            template< typename... XData >
             bool Has() const;
 
             /// Returns a reference to the object of type XData if it exists in the frame.
@@ -95,6 +95,10 @@ namespace Nymph
             // typedef used to avoid problems with the comma in the MEMVAR macro
             typedef std::unordered_map< std::type_index, std::unique_ptr<Data> > DataMap;
             MEMVAR_REF( DataMap, DataObjects );
+
+        protected:
+            template< typename XData >
+            bool HasOneType() const;
     };
 
 
@@ -103,11 +107,18 @@ namespace Nymph
         return fDataObjects.empty();
     }
 
-    template< typename XData >
+    template< typename... XData >
     bool DataFrame::Has() const
     {
+        return ( HasOneType<XData>() && ... );
+    }
+
+    template< typename XData >
+    bool DataFrame::HasOneType() const
+    {
         typedef std::remove_const_t< XData > XDataNoConst;
-        return fDataObjects.count( typeid(XDataNoConst) ) != 0;
+        if( fDataObjects.count( typeid(XDataNoConst) ) == 0 ) return false;
+        return true;
     }
 
     template< typename XData >
