@@ -49,8 +49,7 @@ jobs:
 
       - name: Unit Tests
         run: |
-          docker run --rm ${{ env.Nymph_TAG }} bash -c "
-            $NYMPH_PREFIX/bin/RunTests"
+          docker run --rm ${{ env.Nymph_TAG }} bash -c "/usr/local/p8/nymph/${{ env.Nymph_TAG }}/bin/RunTests"
 
 
   build_cpp:
