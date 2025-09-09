@@ -139,6 +139,8 @@ jobs:
           Testing/RunTests
 
       - name: Build CppRepo Example
+        env:
+          - Nymph_ENABLE_TESTING: OFF
         run: |
           cd Examples/CppRepo
           ./BUILD_ME.sh
