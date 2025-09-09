@@ -1,1 +1,4 @@
-#from . import your_module
+
+# import nymph_bindings entirely into nymph
+from nymph_bindings import *
+
