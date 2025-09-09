@@ -14,8 +14,6 @@ file( STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION nymph_version )
 cmake_policy( SET CMP0048 NEW ) # version in project()
 project( Nymph VERSION ${nymph_version} )
 
-message( STATUS "%%%%%%%% project version: ${Nymph_VERSION}" )
-
 list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Scarab/cmake )
 include( PackageBuilder )
 
@@ -72,7 +70,6 @@ set( PRIVATE_EXT_LIBS )
 
 # Boost (1.46 required for filesystem version 3)
 list( APPEND BOOST_COMPONENTS chrono date_time filesystem thread )
-message( "^^^^^^^ ${BOOST_COMPONENTS}" )
 find_package( Boost 1.46.0 REQUIRED COMPONENTS ${BOOST_COMPONENTS} )
 list( APPEND PUBLIC_EXT_LIBS Boost::boost Boost::chrono Boost::date_time Boost::thread Boost::filesystem )
 # make sure dynamic linking is assumed for all boost libraries
