@@ -9,13 +9,13 @@ include( FetchContent )
 # Get Nymph with FetchContent
 # If Nymph is a submodule, then set the SOURCE_DIR option to point to it; also in that case, remove any download specifications
 message( STATUS "Getting Nymph" )
-set( Nymph_TAG nymph2_2/develop )
+option( Nymph_TAG "Version of Nymph to use" nymph2_2/develop )
 message( "$$$$$$ tag: ${Nymph_TAG}" )
 set( Nymph_DIR nymph_src )
 FetchContent_Populate( nymph
     SOURCE_DIR ${Nymph_DIR}
     GIT_REPOSITORY https://github.com/project8/nymph
-    GIT_TAG nymph2_2/develop
+    GIT_TAG ${Nymph_TAG}
     GIT_SHALLOW TRUE
 )
 
