@@ -64,6 +64,22 @@ RUN mkdir -p $NYMPH_PREFIX &&\
 
 
 ########################
+########################
+FROM base AS dev
+
+RUN apt-get update && \
+    apt-get clean && \
+    apt-get --fix-missing -y install \
+        cmake-curses-gui \
+        gdb \
+        nano && \
+    rm -rf /var/lib/apt/lists/*
+
+########################
+########################
+
+
+########################
 FROM base AS build
 
 COPY cmake /tmp_source/cmake
