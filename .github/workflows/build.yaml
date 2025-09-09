@@ -141,6 +141,7 @@ jobs:
       - name: Build CppRepo Example
         env:
           Nymph_ENABLE_TESTING: OFF
+          Nymph_TAG: nymph2_2/cppexample
         run: |
           cd Examples/CppRepo
           ./BUILD_ME.sh

@@ -6,8 +6,11 @@ cmake_policy( SET CMP0048 NEW ) # version in project()
 project( CppRepo VERSION 0.0.0 )
 
 include( FetchContent )
-# Define Nymph as an ExternalProject
+# Get Nymph with FetchContent
 # If Nymph is a submodule, then set the SOURCE_DIR option to point to it; also in that case, remove any download specifications
+message( STATUS "Getting Nymph" )
+set( Nymph_TAG nymph2_2/develop )
+message( "$$$$$$ tag: ${Nymph_TAG}" )
 set( Nymph_DIR nymph_src )
 FetchContent_Populate( nymph
     SOURCE_DIR ${Nymph_DIR}
@@ -15,7 +18,6 @@ FetchContent_Populate( nymph
     GIT_TAG nymph2_2/develop
     GIT_SHALLOW TRUE
 )
-message( "dir: ${Nymph_DIR}")
 
 # If nymph were a submodule in ${PROJECT_SOURCE_DIR}/nymph, that would be used in place of ${Nymph_DIR}
 list( APPEND CMAKE_MODULE_PATH 

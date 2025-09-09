@@ -9,6 +9,7 @@ cmake -DCMAKE_BUILD_TYPE=${Nymph_BUILD_TYPE:=Debug} \
     -DNymph_ENABLE_PYTHON=${Nymph_ENABLE_PYTHON:=FALSE} \
     -DNymph_ENABLE_TESTING=${Nymph_ENABLE_TESTING:=FALSE} \
     -DNymph_SINGLETHREADED=${Nymph_SINGLETHREADED:=FALSE} \
+    -DNymph_TAG=${Nymph_TAG:=nymph2_2/develop} \
     ..
 
 make -j${NARG:=} install
