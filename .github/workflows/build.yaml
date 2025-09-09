@@ -195,8 +195,6 @@ jobs:
           cmake -DPYBIND11_TEST=FALSE ..
           make -j${{ env.NARG }} install
 
-          python -m pip install build
-
       - name: Linux Dependencies
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
@@ -212,16 +210,24 @@ jobs:
           cd build
           sudo cmake -DPYBIND11_TEST=FALSE ..
           sudo make -j${{ env.NARG }} install
-          cd ../..
 
-          
-          pip install "pybind11[global]" 
-          
-          python -m pip install build
-          
+      - name: Build Nymph/Cpp
+        run: |
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=${Nymph_BUILD_TYPE} \
+            -DNymph_BUILD_NYMPH_EXE=${Nymph_BUILD_NYMPH_EXE} \
+            -DNymph_ENABLE_EXECUTABLES=${Nymph_ENABLE_EXECUTABLES} \
+            -DNymph_ENABLE_PYTHON=${Nymph_ENABLE_PYTHON} \
+            -DNymph_ENABLE_TESTING=${Nymph_ENABLE_TESTING} \
+            -DNymph_SINGLETHREADED=${Nymph_SINGLETHREADED} \
+            ..
+          make -j${{ env.NARG }} install
+
       - name: Install nymph
         run: |
-          pip -v install .
+          source build/bin/add_lib_python_path.sh
+          pip -v -e install .
           
       - name: Run Tests
         continue-on-error: true
