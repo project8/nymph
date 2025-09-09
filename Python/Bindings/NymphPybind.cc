@@ -20,7 +20,7 @@
 namespace py = pybind11;
 
 
-PYBIND11_MODULE(_nymph, nymphPackage) 
+PYBIND11_MODULE(nymph_bindings, nymphPackage) 
 {
 
     nymphPackage.doc() = "Nymph package";
