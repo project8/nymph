@@ -98,8 +98,6 @@ jobs:
           cmake -DPYBIND11_TEST=FALSE ..
           make -j${{ env.NARG }} install
 
-
-
       - name: Linux Dependencies
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
@@ -118,7 +116,6 @@ jobs:
           cd ../..
           pip install "pybind11[global]"
           
-
       - name: Configure CMake
         run: |
           mkdir -p build
@@ -140,6 +137,11 @@ jobs:
         run: |
           cd build
           Testing/RunTests
+
+      - name: Build CppRepo Example
+        run: |
+          cd Examples/CppRepo
+          ./BUILD_ME.sh
 
   build_python:
     name: Build and Test Python
