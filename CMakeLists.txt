@@ -69,7 +69,7 @@ set( PRIVATE_EXT_LIBS )
 #######
 
 # Boost (1.46 required for filesystem version 3)
-list( APPEND BOOST_COMPONENTS chrono date_time filesystem system thread )
+list( APPEND BOOST_COMPONENTS chrono date_time filesystem thread )
 find_package( Boost 1.46.0 REQUIRED COMPONENTS ${BOOST_COMPONENTS} )
 list( APPEND PUBLIC_EXT_LIBS Boost::boost Boost::chrono Boost::date_time Boost::thread Boost::filesystem )
 # make sure dynamic linking is assumed for all boost libraries
