@@ -14,6 +14,8 @@ file( STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION nymph_version )
 cmake_policy( SET CMP0048 NEW ) # version in project()
 project( Nymph VERSION ${nymph_version} )
 
+message( STATUS "%%%%%%%% project version: ${Nymph_VERSION}" )
+
 list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Scarab/cmake )
 include( PackageBuilder )
 
