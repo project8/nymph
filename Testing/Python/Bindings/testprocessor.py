@@ -10,17 +10,17 @@ __all__ = []
 
 import unittest
 
-import _nymph
+import nymph_bindings
 import scarab
 
-class TestProcessorBroken(_nymph.processor._Processor):
+class TestProcessorBroken(nymph_bindings.processor._Processor):
     """Should not work because it does not override configure"""
     
     def foo():
         print('I am a failed processor implementation')
         
 
-class TestProcessor(_nymph.processor._Processor):
+class TestProcessor(nymph_bindings.processor._Processor):
     
     def configure(self, param_node):
         
@@ -60,8 +60,8 @@ class TestPyProcCreator(unittest.TestCase):
     
     def test_creating(self):
         
-        registrar = _nymph.processor.register_py_processor('testprocessor', 'TestProcessor', 'processor-name')
-        test_proc = _nymph.processor.create_processor('processor-name', 'test-proc')
+        registrar = nymph_bindings.processor.register_py_processor('testprocessor', 'TestProcessor', 'processor-name')
+        test_proc = nymph_bindings.processor.create_processor('processor-name', 'test-proc')
         
         self.assertEqual(test_proc.name, 'test-proc')
 

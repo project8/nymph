@@ -23,7 +23,7 @@ set( PYBINDING_PROJECT_LIBRARIES
 )
 
 pbuilder_add_pybind11_module( 
-    MODULE_NAME _nymph_testing
+    MODULE_NAME nymph_bindings_testing
     SOURCE_FILES ${PYBINDING_SOURCEFILES}
     PROJECT_LIBRARIES ${PYBINDING_PROJECT_LIBRARIES} 
 )

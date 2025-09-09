@@ -8,10 +8,10 @@
 
 __all__ = []
 
-import _nymph
+import nymph_bindings
 import scarab
 
-class TestProcessor(_nymph.processor._Processor):
+class TestProcessor(nymph_bindings.processor._Processor):
     
     def configure(self, param_node):
         
@@ -28,7 +28,7 @@ def main(args):
     
     testprocessor.configure(param_node)
     
-    signal = _nymph.processor._SignalData('test-signal', testprocessor)
+    signal = nymph_bindings.processor._SignalData('test-signal', testprocessor)
     
     print(signal.name)
     print(testprocessor.x)

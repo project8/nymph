@@ -1,16 +1,16 @@
 
 """
-  testdata.py
+  nymph/testdata.py
  
    Created on: Jun 13, 2022
        Author: P. T. Surukuchi
 """
 import unittest
 
-import _nymph
+import nymph
 
 '''Data class with integer variables'''
-class TestData1(_nymph.data._Data):
+class TestData1(nymph.data._Data):
     
     def __init__(self, test_var1=0, test_var2=5):
         super().__init__()
@@ -18,7 +18,7 @@ class TestData1(_nymph.data._Data):
         self.test_var2 = test_var2
 
 '''Data class with floating point variables'''
-class TestData2(_nymph.data._Data):
+class TestData2(nymph.data._Data):
     
     def __init__(self, test_var1=0.0, test_var2=10.0):
         super().__init__()

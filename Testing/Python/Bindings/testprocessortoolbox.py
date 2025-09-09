@@ -7,11 +7,11 @@
 """
 import unittest
 
-import _nymph, _nymph_testing
+import nymph_bindings, _nymph_testing
 
 
 class TestDataMethods(unittest.TestCase):
-    tb = _nymph.processor.ProcessorToolbox()
+    tb = nymph_bindings.processor.ProcessorToolbox()
 
     procName1 = 'testproc-1'  # not a registered processor
     procName2 = 'testproc-2'  # not a registered processor
