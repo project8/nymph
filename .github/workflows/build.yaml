@@ -227,7 +227,8 @@ jobs:
       - name: Install nymph
         run: |
           source build/bin/add_lib_python_path.sh
-          pip -v -e install .
+          env
+          pip -v install -e .
           
       - name: Run Tests
         continue-on-error: true
