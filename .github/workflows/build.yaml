@@ -231,8 +231,12 @@ jobs:
           pip -v install -e .
           
       - name: Run Tests
-        continue-on-error: true
         run: |
           cd Testing/Python
           python -m unittest discover -v
+
+# For debugging
+      - name: Setup tmate session
+        if: ${{ ! success() }}
+        uses: mxschmitt/action-tmate@v3
 
