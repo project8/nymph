@@ -7,7 +7,7 @@
 """
 import unittest
 
-import nymph_bindings, _nymph_testing
+import nymph_bindings #, _nymph_testing
 
 
 class TestDataMethods(unittest.TestCase):

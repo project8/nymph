@@ -232,8 +232,12 @@ jobs:
           
       - name: Run Tests
         run: |
-          cd Testing/Python
+          cd Testing/Python/Bindings
           python -m unittest discover -v
+
+# eventually include these tests
+#          cd ../nymph
+#          python -m unittest discover -v
 
 # For debugging
       - name: Setup tmate session
