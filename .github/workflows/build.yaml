@@ -221,12 +221,12 @@ jobs:
             -DNymph_ENABLE_PYTHON=${Nymph_ENABLE_PYTHON} \
             -DNymph_ENABLE_TESTING=${Nymph_ENABLE_TESTING} \
             -DNymph_SINGLETHREADED=${Nymph_SINGLETHREADED} \
+            -DPBUILDER_PY_INSTALL_IN_SITELIB=TRUE
             ..
           make -j${{ env.NARG }} install
 
       - name: Install nymph
         run: |
-          source build/bin/add_lib_python_path.sh
           env
           pip -v install -e .
           
