@@ -221,7 +221,7 @@ jobs:
             -DNymph_ENABLE_PYTHON=${Nymph_ENABLE_PYTHON} \
             -DNymph_ENABLE_TESTING=${Nymph_ENABLE_TESTING} \
             -DNymph_SINGLETHREADED=${Nymph_SINGLETHREADED} \
-            -DPBUILDER_PY_INSTALL_IN_SITELIB=TRUE
+            -DPBUILDER_PY_INSTALL_IN_SITELIB=TRUE \
             ..
           make -j${{ env.NARG }} install
 
