@@ -93,6 +93,7 @@ COPY Testing /tmp_source/Testing
 COPY CMakeLists.txt /tmp_source/CMakeLists.txt
 COPY NymphConfig.cmake.in /tmp_source/NymphConfig.cmake.in
 COPY pyproject.toml /tmp_source/pyproject.toml
+COPY VERSION /tmp_source/VERSION
 #COPY .git /tmp_source/.git
 
 # repeat the cmake command to get the change of install prefix to set correctly (a package_builder known issue)

@@ -98,8 +98,6 @@ jobs:
           cmake -DPYBIND11_TEST=FALSE ..
           make -j${{ env.NARG }} install
 
-
-
       - name: Linux Dependencies
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
@@ -118,7 +116,6 @@ jobs:
           cd ../..
           pip install "pybind11[global]"
           
-
       - name: Configure CMake
         run: |
           mkdir -p build
@@ -140,6 +137,14 @@ jobs:
         run: |
           cd build
           Testing/RunTests
+
+      - name: Build CppRepo Example
+        env:
+          Nymph_ENABLE_TESTING: OFF
+          Nymph_TAG: nymph2_2/cppexample
+        run: |
+          cd Examples/CppRepo
+          ./BUILD_ME.sh
 
   build_python:
     name: Build and Test Python
@@ -190,8 +195,6 @@ jobs:
           cmake -DPYBIND11_TEST=FALSE ..
           make -j${{ env.NARG }} install
 
-          python -m pip install build
-
       - name: Linux Dependencies
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
@@ -207,20 +210,48 @@ jobs:
           cd build
           sudo cmake -DPYBIND11_TEST=FALSE ..
           sudo make -j${{ env.NARG }} install
-          cd ../..
 
-          
-          pip install "pybind11[global]" 
-          
-          python -m pip install build
-          
-      - name: Install nymph
+      - name: Build Nymph/Cpp
         run: |
-          pip -v install .
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=${Nymph_BUILD_TYPE} \
+            -DNymph_BUILD_NYMPH_EXE=${Nymph_BUILD_NYMPH_EXE} \
+            -DNymph_ENABLE_EXECUTABLES=${Nymph_ENABLE_EXECUTABLES} \
+            -DNymph_ENABLE_PYTHON=${Nymph_ENABLE_PYTHON} \
+            -DNymph_ENABLE_TESTING=${Nymph_ENABLE_TESTING} \
+            -DNymph_SINGLETHREADED=${Nymph_SINGLETHREADED} \
+            -DPBUILDER_PY_INSTALL_IN_SITELIB=TRUE \
+            ..
+          make -j${{ env.NARG }} install
+
+      - name: Install Nymph/Python
+        run: |
+          env
+          pip -v install -e .
           
       - name: Run Tests
-        continue-on-error: true
         run: |
-          cd Testing/Python
+          cd Testing/Python/Bindings
           python -m unittest discover -v
+
+# eventually include these tests
+#          cd ../nymph
+#          python -m unittest discover -v
+
+      - name: Build PyRepo Example
+        env:
+          Nymph_ENABLE_TESTING: OFF
+          Nymph_ENABLE_PYTHON: ON
+          Nymph_TAG: nymph2_2/cppexample
+        run: |
+          cd Examples/PyRepo
+          ./BUILD_ME.sh
+          hello-world
+
+
+# For debugging
+      - name: Setup tmate session
+        if: ${{ ! success() }}
+        uses: mxschmitt/action-tmate@v3
 

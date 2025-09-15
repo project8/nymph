@@ -1,0 +1,18 @@
+[build-system]
+requires = [
+    "setuptools>=42", 
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PyRepo"
+#dependencies = [
+#    "nymph_bindings @ file:///src/build-ny22py-debug-docker/lib",
+#]
+version = "1.0.0"
+
+[project.scripts]
+hello-world = "pyrepo:hello_world"
+
+#[tool.setuptools.packages.find]
+#where = ["Python"]

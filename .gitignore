@@ -45,4 +45,5 @@ build*/
 # Python Package
 dist*/
 Python/*.egg-info
+Examples/PyRepo/*.egg-info
 __pycache__
