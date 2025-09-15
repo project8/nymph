@@ -1,5 +1,10 @@
 #! /bin/bash
 
+# This script builds the CppRepo example of a Nymph-based C++-only package.
+# The CMake-based build downloads Nymph using CMake's FetchContent module, 
+# rather than including it as a submodule.  Nymph is built using 
+# the Scarab/PackageBuilder framework included with Nymph.
+
 mkdir build
 cd build
 

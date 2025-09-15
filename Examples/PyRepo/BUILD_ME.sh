@@ -6,7 +6,7 @@
 
 # This assumes that if the _nymph directory exists, then _nymph has been built and installed
 if [[ ! -d _nymph ]]; then
-    git clone --recurse-submodules -b nymph2_2/develop https://github.com/project8/nymph _nymph
+    git clone --recurse-submodules -b ${Nymph_TAG:=nymph2_2/develop} https://github.com/project8/nymph _nymph
     cd _nymph
 
     mkdir build

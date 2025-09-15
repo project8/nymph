@@ -225,7 +225,7 @@ jobs:
             ..
           make -j${{ env.NARG }} install
 
-      - name: Install nymph
+      - name: Install Nymph/Python
         run: |
           env
           pip -v install -e .
@@ -238,6 +238,17 @@ jobs:
 # eventually include these tests
 #          cd ../nymph
 #          python -m unittest discover -v
+
+      - name: Build PyRepo Example
+        env:
+          Nymph_ENABLE_TESTING: OFF
+          Nymph_ENABLE_PYTHON: ON
+          Nymph_TAG: nymph2_2/cppexample
+        run: |
+          cd Examples/PyRepo
+          ./BUILD_ME.sh
+          hello-world
+
 
 # For debugging
       - name: Setup tmate session
