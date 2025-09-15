@@ -69,4 +69,15 @@ namespace Nymph
         // options
         an_app.add_config_flag< bool >( "--dry-run", "dry-run", "Load the config, setup processors, but do not execute the run" );
     }
+
+    int ProcessorCheck( scarab::param_node& config )
+    {
+
+    }
+
+    void AddProcessorCheckOptions( scarab::config_decorator* a_subcommand )
+    {
+        // options
+        a_subcommand->add_config_option< std::string >( "proc-type", "proc-type", "Processor type to check for" );
+    }
 }
