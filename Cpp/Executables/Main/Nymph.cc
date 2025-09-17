@@ -63,27 +63,28 @@ int main( int argc, char** argv )
     // Start handling signals
     scarab::signal_handler t_sig_hand;
 
+    int the_return = -1;
+
     // Create the application
     scarab::main_app the_main;
+    //Runs RunNymph() and sets  the_return based on its return value
+    auto t_callback = [&](){
+        // If any subcommands were called, we don't execute the main callback
+        if( the_main.get_subcommands().size() > 0 ) return;
+        the_return = Nymph::RunNymph( the_main.primary_config() );
+    };
+    the_main.callback( t_callback );
+
+    // Checks for the existence of a processor type and lists processors
+    scarab::config_decorator* t_proc_check = the_main.add_config_subcommand( "proc-check", "Check if a processor type is known" );
+    t_proc_check->this_app()->callback( [&](){ the_return = Nymph::ProcessorCheck(the_main.primary_config()); } );
 
     the_main.require_subcommand(0, 1);
     the_main.set_global_verbosity(scarab::logger::ELevel::eDebug);
 
     // add the typical CL options
     Nymph::AddRunNymphOptions( the_main );
-    Nymph::AddProcessorCheckOptions( the_main );
-
-    //Runs RunNymph() and sets  the_return based on its return value
-    int the_return = -1;
-    auto t_callback = [&](){
-        the_return = Nymph::RunNymph(  the_main.primary_config() );
-    };
-
-    the_main.callback( t_callback );
-
-    // Checks for the existence of a processor type using Nymph::ProcessorCheck()
-    CLI::App* t_proc_check = the_main.add_config_subcommand( "proc-check", "Check if a processor type is known" );
-    t_proc_check->callback( [&](){ Nymph::ProcessorCheck(the_main.primary_config()); } );
+    Nymph::AddProcessorCheckOptions( t_proc_check );
 
     // Parse CL options and run the application
     CLI11_PARSE( the_main, argc, argv );
