@@ -118,6 +118,8 @@ namespace Nymph
             /// Also clears the run queue
             void ClearProcessors();
 
+            const scarab::factory< Processor, const std::string& >* ProcFactory() const;
+
         protected:
             ProcessorMap fProcMap;
 
@@ -175,6 +177,11 @@ namespace Nymph
     inline bool ProcessorToolbox::MakeConnection(const std::string& signalProcName, const std::string& signalName, const std::string& slotProcName, const std::string& slotName)
     {
         return MakeConnection(signalProcName, signalName, slotProcName, slotName, std::numeric_limits< int >::min()); 
+    }
+
+    inline const scarab::factory< Processor, const std::string& >* ProcessorToolbox::ProcFactory() const
+    {
+        return fProcFactory;
     }
 
 } /* namespace Nymph */
