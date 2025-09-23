@@ -27,6 +27,7 @@ set( NYMPH_HEADERFILES
     ${SVC_DIR}/Service.hh
     ${SVC_DIR}/ServiceToolbox.hh
 
+    ${PROC_DIR}/HelloWorldProc.hh
     ${PROC_DIR}/PrimaryProcessor.hh
     ${PROC_DIR}/Processor.hh
     ${PROC_DIR}/ProcessorToolbox.hh
@@ -55,6 +56,7 @@ set( NYMPH_SOURCEFILES
     ${SVC_DIR}/Service.cc
     ${SVC_DIR}/ServiceToolbox.cc
 
+    ${PROC_DIR}/HelloWorldProc.cc
     ${PROC_DIR}/PrimaryProcessor.cc
     ${PROC_DIR}/Processor.cc
     ${PROC_DIR}/ProcessorToolbox.cc
