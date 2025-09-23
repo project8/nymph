@@ -48,6 +48,8 @@ TEST_CASE( "processor_toolbox" )
         std::string procName1( "testproc-1" );
         std::string procName2( "testproc-2" );
 
+        REQUIRE( tptToolbox.CouldBuild( "hello-world-cpp" ) );
+
         REQUIRE( tptToolbox.CouldBuild( "test-proc" ) );
         REQUIRE( tptToolbox.CouldBuild( "test-primary" ) );
         REQUIRE_FALSE( tptToolbox.CouldBuild( procName1 ) );
