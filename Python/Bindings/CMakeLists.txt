@@ -16,9 +16,9 @@ include_directories( BEFORE
 set( PYBINDING_HEADERFILES
     Data/DataPybind.hh
     Processor/ProcessorPybind.hh
-    Processor/ProcessorRegistrar.hh
     Processor/ProcessorToolboxPybind.hh
     Processor/PyProcCreatorPybind.hh
+    Processor/PyProcRegistrar.hh
     Processor/SignalPybind.hh
     Processor/SlotPybind.hh
 )
@@ -26,6 +26,7 @@ set( PYBINDING_HEADERFILES
 # Python bindings
 set( PYBINDING_SOURCEFILES
     NymphPybind.cc
+    Processor/PyProcRegistrar.cc
 )
 
 set( PYBINDING_PROJECT_LIBRARIES Nymph )

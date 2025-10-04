@@ -9,7 +9,7 @@
 #define PYTHON_BINDINGS_PROCESSOR_PYPROCCREATORPYBIND_HH_
 
 #include "NymphBindingHelpers.hh"
-#include "ProcessorRegistrar.hh"
+#include "PyProcRegistrar.hh"
 
 #include <pybind11/pybind11.h>
 
@@ -24,8 +24,8 @@ namespace NymphPybind
                 .def(py::init< const std::string&, const std::string&, const std::string& >())
                 .def("create_python_processor", &Nymph::PyProcRegistrar::CreatePyProc);
         
-        nymphProcessor.def("register_py_processor", &Nymph::RegisterPyProcessor, NYMPH_BIND_CALL_GUARD_STREAMS);
-        nymphProcessor.def("create_processor", &Nymph::CreatePyProcessor);
+        nymphProcessor.def("_register", &Nymph::RegisterPyProcessor, NYMPH_BIND_CALL_GUARD_STREAMS);
+        nymphProcessor.def("_create", &Nymph::CreatePyProcessor, NYMPH_BIND_CALL_GUARD_STREAMS);
     }
 }
 
