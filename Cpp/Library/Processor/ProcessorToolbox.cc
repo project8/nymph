@@ -30,6 +30,11 @@ namespace Nymph
     ProcessorToolbox::~ProcessorToolbox()
     {}
 
+    scarab::factory< Processor, const std::string& >* ProcessorToolbox::GetProcFactory()
+    {
+        return scarab::factory< Processor, const std::string& >::get_instance();
+    }
+
     void ProcessorToolbox::Configure( const scarab::param_node& node )
     {
         LPROG( proclog, "Configuring processor toolbox" );

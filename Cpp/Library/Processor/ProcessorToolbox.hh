@@ -70,6 +70,9 @@ namespace Nymph
             ProcessorToolbox( const std::string& name = "processor-toolbox" );
             virtual ~ProcessorToolbox();
 
+            // This was implemented to avoid the duplicate factory problem when accessing the factory from the Pybindings
+            static scarab::factory< Processor, const std::string& >* GetProcFactory();
+
         protected:
             scarab::factory< Processor, const std::string& >* fProcFactory; // singleton; not owned by ProcessorToolbox
 

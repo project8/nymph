@@ -9,6 +9,7 @@
 #define NYMPH_PROCESSOR_HH_
 
 #include "ConfigException.hh"
+#include "ProcessorRegistrar.hh"
 #include "SignalSlotBase.hh"
 
 #include "factory.hh"
@@ -88,10 +89,10 @@ namespace Nymph
     }
 
 #define REGISTER_PROCESSOR_NONAMESPACE(proc_class, proc_name) \
-        static ::scarab::registrar< ::Nymph::Processor, proc_class, const std::string& > sProc##proc_class##Registrar( proc_name );
+        static ::Nymph::ProcessorRegistrar< proc_class, const std::string& > sProc##proc_class##Registrar( proc_name );
 
 #define REGISTER_PROCESSOR_NAMESPACE(proc_namespace, proc_class, proc_name) \
-        static ::scarab::registrar< ::Nymph::Processor, ::proc_namespace::proc_class, const std::string& > sProc##proc_class##Registrar( proc_name );
+        static ::Nymph::ProcessorRegistrar< ::proc_namespace::proc_class, const std::string& > sProc##proc_class##Registrar( proc_name );
 
 // Macro overloading trick from here: https://stackoverflow.com/a/11763277
 #define GET_MACRO(_1, _2, _3, NAME, ...) NAME
@@ -101,5 +102,7 @@ namespace Nymph
 #define REGISTER_PROCESSOR(...) GET_MACRO(__VA_ARGS__, REGISTER_PROCESSOR_NAMESPACE, REGISTER_PROCESSOR_NONAMESPACE, )(__VA_ARGS__)
 
 } /* namespace Nymph */
+
+//extern scarab::indexed_factory< std::string, Nymph::Processor, const std::string& > ex_shared_proc_factory;
 
 #endif /* NYMPH_PROCESSOR_HH_ */
