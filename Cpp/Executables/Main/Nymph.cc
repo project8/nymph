@@ -23,42 +23,44 @@ LOGGER( nymphlog, "Nymph" );
 int main( int argc, char** argv )
 {
 
-    LPROG( nymphlog, "Welcome to Nymph!" );
-    LDEBUG( nymphlog,
-            "\n" <<
-            "                                           Z                                 \n" <<
-            "                                            =M                               \n" <<
-            "                                             M                               \n" <<
-            "                                             M                               \n" <<
-            "                                            =M                               \n" <<
-            "                                            N                                \n" <<
-            "                                            M             NINMMMMMZ...M      \n" <<
-            "                                            M            $$                  \n" <<
-            "                        M:                  N.           IM                  \n" <<
-            "                          ZD.                 M?          M                  \n" <<
-            "                             $                M ?M       MM           .$     \n" <<
-            "                               DM               M  O      8       .+MZ       \n" <<
-            "                                 ~M                M~ 8  M~  MM:~M           \n" <<
-            "                                   O:MMIZ+,?DNMD$.... M,MM MZ ? D$=  .8MOM+  \n" <<
-            "                                      ,= MN ZZ D:  M:MM~MM==     MMZM        \n" <<
-            "                                           ...MM MMM8,M+ I:ND $MMM           \n" <<
-            "                                         MMMMO   ~M, ,MM7MOD$                \n" <<
-            "                                    MMMMMM ~~8M? ,O~= MDNM M ,               \n" <<
-            "                                MMMM:M   Z8 MMM :MNM = ..,  MZ               \n" <<
-            "                            MNMMNM MM IM NM,M    N M   MM    +M         .NM M\n" <<
-            "                        ~MMD8 :  D  MM=MM,     O MO    8=    + $     .IM     \n" <<
-            "               ONMMMMMM..?  8 :MMMMM          = M      N      M    :M        \n" <<
-            "   ..+M8=...:=MMMMMMMMMN OMM:M,             M  ~       7       MMM8          \n" <<
-            "ZM8         ~M+:MZMMM~ M                    OM         M                     \n" <<
-            "      .:M..$D..$D ? M,                    MM           MN                    \n" <<
-            "   $M7      M   M+                       M              NMMMM:..             \n" <<
-            "         M..M                          :N                       7M           \n" <<
-            "      MM,                             M                           D          \n" <<
-            "                                     M                                       \n" <<
-            "                                   M=                                        \n" <<
-            "                                   M                                         \n" <<
-            "                                  =                                          \n" <<
-            "                                  M                                          \n");
+    auto splash = [](){
+        LPROG( nymphlog, "Welcome to Nymph!" );
+        LDEBUG( nymphlog,
+                "\n" <<
+                "                                           Z                                 \n" <<
+                "                                            =M                               \n" <<
+                "                                             M                               \n" <<
+                "                                             M                               \n" <<
+                "                                            =M                               \n" <<
+                "                                            N                                \n" <<
+                "                                            M             NINMMMMMZ...M      \n" <<
+                "                                            M            $$                  \n" <<
+                "                        M:                  N.           IM                  \n" <<
+                "                          ZD.                 M?          M                  \n" <<
+                "                             $                M ?M       MM           .$     \n" <<
+                "                               DM               M  O      8       .+MZ       \n" <<
+                "                                 ~M                M~ 8  M~  MM:~M           \n" <<
+                "                                   O:MMIZ+,?DNMD$.... M,MM MZ ? D$=  .8MOM+  \n" <<
+                "                                      ,= MN ZZ D:  M:MM~MM==     MMZM        \n" <<
+                "                                           ...MM MMM8,M+ I:ND $MMM           \n" <<
+                "                                         MMMMO   ~M, ,MM7MOD$                \n" <<
+                "                                    MMMMMM ~~8M? ,O~= MDNM M ,               \n" <<
+                "                                MMMM:M   Z8 MMM :MNM = ..,  MZ               \n" <<
+                "                            MNMMNM MM IM NM,M    N M   MM    +M         .NM M\n" <<
+                "                        ~MMD8 :  D  MM=MM,     O MO    8=    + $     .IM     \n" <<
+                "               ONMMMMMM..?  8 :MMMMM          = M      N      M    :M        \n" <<
+                "   ..+M8=...:=MMMMMMMMMN OMM:M,             M  ~       7       MMM8          \n" <<
+                "ZM8         ~M+:MZMMM~ M                    OM         M                     \n" <<
+                "      .:M..$D..$D ? M,                    MM           MN                    \n" <<
+                "   $M7      M   M+                       M              NMMMM:..             \n" <<
+                "         M..M                          :N                       7M           \n" <<
+                "      MM,                             M                           D          \n" <<
+                "                                     M                                       \n" <<
+                "                                   M=                                        \n" <<
+                "                                   M                                         \n" <<
+                "                                  =                                          \n" <<
+                "                                  M                                          \n");
+        };
 
     // Start handling signals
     scarab::signal_handler t_sig_hand;
@@ -74,6 +76,7 @@ int main( int argc, char** argv )
         the_return = Nymph::RunNymph( the_main.primary_config() );
     };
     the_main.callback( t_callback );
+    the_main.splash() = splash;
 
     // Checks for the existence of a processor type and lists processors
     scarab::config_decorator* t_proc_check = the_main.add_config_subcommand( "proc-check", "Check if a processor type is known" );
