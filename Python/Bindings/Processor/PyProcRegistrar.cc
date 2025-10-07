@@ -39,9 +39,8 @@ namespace Nymph
             ProcessorRegistrar< PyProcCreator, const std::string& >( typeName ),
             fType( type ),
             fModule( module )
-    {
-        LWARN(prlog, "PyProcRegistrar constructor");
-    }
+    {}
+
     PyProcRegistrar::~PyProcRegistrar() {}
 
     std::shared_ptr<Nymph::Processor> PyProcRegistrar::CreatePyProc( const std::string& name ) const
@@ -55,7 +54,6 @@ namespace Nymph
 
     std::unique_ptr<PyProcRegistrar> RegisterPyProcessor( const std::string& module, const std::string& type, const std::string& typeName )
     {
-        LWARN( prlog, "In RegisterPyProc()" );
         return std::make_unique<PyProcRegistrar>( module, type, typeName );
     }
 
