@@ -76,23 +76,22 @@ list( APPEND PUBLIC_EXT_LIBS Boost::boost Boost::chrono Boost::date_time Boost::
 set( Boost_USE_STATIC_LIBS OFF )
 set( Boost_USE_STATIC_RUNTIME OFF )
 set( Boost_ALL_DYN_LINK ON )
-add_definitions( -DBOOST_ALL_DYN_LINK )
+add_compile_definitions( -DBOOST_ALL_DYN_LINK )
 
 ##########
 # Pybind11
 ##########
 
 if( Nymph_ENABLE_PYTHON )
-
     find_package( Python3 REQUIRED COMPONENTS Interpreter Development )
     set(PYBIND11_PYTHON_VERSION ${Python3_VERSION} CACHE STRING "")
     find_package( pybind11 REQUIRED )
     include_directories( ${Python3_INCLUDE_DIRS} )
-
+    add_compile_definitions( NYMPH_USING_PYTHON )
     set_option( Scarab_BUILD_PYTHON TRUE )
     add_subdirectory( Python/Bindings )
-
 else( Nymph_ENABLE_PYTHON )
+    remove_definitions( NYMPH_USING_PYTHON )
     set_option( Scarab_BUILD_PYTHON FALSE )
 endif( Nymph_ENABLE_PYTHON )
 

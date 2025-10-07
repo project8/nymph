@@ -32,10 +32,15 @@ TEST_CASE( "processor_visibility" )
 
     }
 
-//    SECTION( "Python" )
-//    {
-//        LINFO( testlog, "Python Processor Visibility");
-//
-//    }
+    SECTION( "Python" )
+    {
+        LINFO( testlog, "Python Processor Visibility");
+
+#ifdef NYMPH_USING_PYTHON
+        REQUIRE( tptToolbox.CouldBuild( "hello-world-python" ) );
+#else
+        REQUIRE_FALSE( tptToolbox.CouldBuild( "hello-world-python" ) );
+#endif
+    }
 
 }
