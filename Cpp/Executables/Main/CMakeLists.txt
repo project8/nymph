@@ -17,6 +17,18 @@ if( Nymph_BUILD_NYMPH_EXE )
     )
 endif( Nymph_BUILD_NYMPH_EXE )
 
+if( Nymph_ENABLE_PYTHON )
+    set( Nymph_SOURCES
+        ${Nymph_SOURCES}
+        PyImportTest.cc
+    )
+    set( Nymph_EXE_LIBRARIES
+        ${Nymph_EXE_LIBRARIES}
+        pybind11::embed
+        pybind11::module
+    )
+endif()
+
 if( Nymph_SOURCES )
     set( Nymph_PROGRAMS )
     pbuilder_executables( 
