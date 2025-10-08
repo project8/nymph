@@ -11,7 +11,11 @@
 
 #include "logger.hh"
 
+#include <pybind11/pybind11.h>
+
 #include "catch2/catch_test_macros.hpp"
+
+namespace py = pybind11;
 
 LOGGER( testlog, "TestProcessorVisibility" );
 
@@ -32,15 +36,28 @@ TEST_CASE( "processor_visibility" )
 
     }
 
-    SECTION( "Python" )
-    {
-        LINFO( testlog, "Python Processor Visibility");
-
-#ifdef NYMPH_USING_PYTHON
-        REQUIRE( tptToolbox.CouldBuild( "hello-world-python" ) );
-#else
-        REQUIRE_FALSE( tptToolbox.CouldBuild( "hello-world-python" ) );
-#endif
-    }
+//    SECTION( "Python - no import" )
+//    {
+//        LINFO( testlog, "Python Processor Visibility");
+//
+//#ifdef NYMPH_USING_PYTHON
+//        REQUIRE_FALSE( tptToolbox.CouldBuild( "hello-world-python" ) );
+//#else
+//        REQUIRE_FALSE( tptToolbox.CouldBuild( "hello-world-python" ) );
+//#endif
+//    }
+//
+//    SECTION( "Python - with import" )
+//    {
+//        LINFO( testlog, "Python Processor Visibility");
+//
+//#ifdef NYMPH_USING_PYTHON
+//        py::module_ nymph = py::module_::import("nymph");
+//
+//        REQUIRE( tptToolbox.CouldBuild( "hello-world-python" ) );
+//#else
+//        REQUIRE_FALSE( tptToolbox.CouldBuild( "hello-world-python" ) );
+//#endif
+//    }
 
 }

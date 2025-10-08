@@ -90,6 +90,13 @@ set( testing_LIB_DEPENDENCIES
     NymphTesting
 )
 
+#if( Nymph_ENABLE_PYTHON )
+#    set( testing_LIB_DEPENDENCIES
+#        ${testing_LIB_DEPENDENCIES}
+#        nymph_bindings
+#    )
+#endif( Nymph_ENABLE_PYTHON )
+
 # Interface library was recommended for Catch:
 # https://stackoverflow.com/questions/34896891/catch-lib-unit-testing-and-ctest-cmake-integration/34900012#34900012
 #add_library( Catch INTERFACE )
@@ -99,7 +106,7 @@ pbuilder_executable(
     EXECUTABLE RunTests
     SOURCES ${testing_SOURCES}
     PROJECT_LIBRARIES ${testing_LIB_DEPENDENCIES}
-    PUBLIC_EXTERNAL_LIBRARIES Catch2::Catch2
+    PUBLIC_EXTERNAL_LIBRARIES Catch2::Catch2 pybind11::module pybind11::embed
 )
 set( programs "RunTests" )
 
