@@ -76,7 +76,7 @@ list( APPEND PUBLIC_EXT_LIBS Boost::boost Boost::chrono Boost::date_time Boost::
 set( Boost_USE_STATIC_LIBS OFF )
 set( Boost_USE_STATIC_RUNTIME OFF )
 set( Boost_ALL_DYN_LINK ON )
-add_compile_definitions( -DBOOST_ALL_DYN_LINK )
+add_definitions( -DBOOST_ALL_DYN_LINK )
 
 ##########
 # Pybind11
