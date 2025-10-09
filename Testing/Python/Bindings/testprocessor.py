@@ -60,8 +60,8 @@ class TestPyProcCreator(unittest.TestCase):
     
     def test_creating(self):
         
-        registrar = nymph_bindings.processor.register_py_processor('testprocessor', 'TestProcessor', 'processor-name')
-        test_proc = nymph_bindings.processor.create_processor('processor-name', 'test-proc')
+        registrar = nymph_bindings.processor._register('testprocessor', 'TestProcessor', 'processor-name')
+        test_proc = nymph_bindings.processor._create('processor-name', 'test-proc')
         
         self.assertEqual(test_proc.name, 'test-proc')
 

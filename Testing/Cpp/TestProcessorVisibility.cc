@@ -13,6 +13,11 @@
 
 #include "catch2/catch_test_macros.hpp"
 
+#ifdef NYMPH_USING_PYTHON
+#include <pybind11/embed.h>
+namespace py = pybind11;
+#endif
+
 LOGGER( testlog, "TestProcessorVisibility" );
 
 TEST_CASE( "processor_visibility" )
@@ -32,10 +37,34 @@ TEST_CASE( "processor_visibility" )
 
     }
 
-//    SECTION( "Python" )
-//    {
-//        LINFO( testlog, "Python Processor Visibility");
-//
-//    }
+    SECTION( "Python - no import" )
+    {
+        LINFO( testlog, "Python Processor Visibility (no python import)");
+
+        REQUIRE_FALSE( tptToolbox.CouldBuild( "hello-world-python" ) );
+    }
+
+#ifdef NYMPH_USING_PYTHON
+    SECTION( "Python - with import" )
+    {
+        py::scoped_interpreter guard{};
+//        py::module_ sys = py::module_::import("sys");
+//        py::print(sys.attr("path"));
+
+        LINFO( testlog, "Python Processor Visibility (with python import)");
+
+        try
+        {
+            py::module_ nymph = py::module_::import("nymph");
+            REQUIRE( tptToolbox.CouldBuild( "hello-world-py" ) );
+        }
+        catch(const std::exception& e)
+        {
+            LWARN( testlog, "Unable to import `nymph` ")
+        }
+        
+
+    }
+#endif
 
 }
