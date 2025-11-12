@@ -23,6 +23,9 @@ namespace Nymph
 {
     LOGGER(slotlog, "Slot");
 
+    template< typename... XArgs >
+    class Signal;
+
     // Type XOwner is the class that owns the Slot object
     /*!
      @class Slot
@@ -129,7 +132,7 @@ namespace Nymph
     {
         if( fConnections.count( signal ) != 0 )
         {
-            LWARN( signallog, "Slot <" << fName << "> is already has connection to signal <" << signal->Name() << ">" );
+            LWARN( slotlog, "Slot <" << fName << "> is already has connection to signal <" << signal->Name() << ">" );
             return;
         }
 

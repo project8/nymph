@@ -9,6 +9,8 @@
 #define NYMPH_SLOTDATA_HH_
 
 #include "Slot.hh"
+#include "SignalData.hh"
+
 
 namespace Nymph
 {
