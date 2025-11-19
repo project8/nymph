@@ -25,14 +25,15 @@ namespace Nymph
         {
             LPROG( nlog, "Configuring processor toolbox" );
 
-            // Create and configure the processor toolbox.
+            // Create the toolboxes and inject dependency
             ProcessorToolbox procTB;
-            procTB.Configure( config);
-
-            // Create and configure the service toolbox.
             ServiceToolbox svcTB;
-            svcTB.Configure( config);
             procTB.SetServiceToolbox( &svcTB );
+            LERROR( nlog, "Service TB ptr: " << &svcTB << " -- " << procTB.GetServiceToolbox());
+
+            // Configure toolboxes
+            svcTB.Configure( config);
+            procTB.Configure( config);
 
             // Create and configure the single-run controller.
             LPROG( nlog, "Configuring controller" );
