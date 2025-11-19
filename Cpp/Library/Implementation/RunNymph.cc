@@ -29,7 +29,6 @@ namespace Nymph
             ProcessorToolbox procTB;
             ServiceToolbox svcTB;
             procTB.SetServiceToolbox( &svcTB );
-            LERROR( nlog, "Service TB ptr: " << &svcTB << " -- " << procTB.GetServiceToolbox());
 
             // Configure toolboxes
             svcTB.Configure( config);
