@@ -24,6 +24,7 @@ namespace Nymph
 {
     class PrimaryProcessor;
     class Processor;
+    class ServiceToolbox;
 
     /*!
      @class ProcessorToolbox
@@ -159,6 +160,9 @@ namespace Nymph
         protected:
             bool ParseSignalSlotName( const std::string& toParse, std::string& nameOfProc, std::string& nameOfSigSlot ) const;
             static const char fSigSlotNameSep = ':';
+
+        public:
+            MEMVAR(ServiceToolbox*, ServiceToolbox);
 
     };
 

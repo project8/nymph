@@ -8,6 +8,7 @@
 #include "ProcessorToolbox.hh"
 
 #include "PrimaryProcessor.hh"
+#include "ServiceToolbox.hh"
 
 #include "factory.hh"
 #include "logger.hh"
@@ -23,7 +24,8 @@ namespace Nymph
 
     ProcessorToolbox::ProcessorToolbox( const std::string& name ) :
             fProcFactory( scarab::factory< Processor, const std::string& >::get_instance() ),
-            fProcMap()
+            fProcMap(),
+            fServiceToolbox( nullptr )
     {
     }
 
@@ -95,6 +97,7 @@ namespace Nymph
             {
                 THROW_EXCEPT_HERE( ConfigException(array) << "Unable to create processor of type <" << procType << ">" );
             }
+            newProc->SetServiceToolbox( fServiceToolbox );
 
             LDEBUG( proclog, "Attempting to configure processor <" << procName << ">" );
             try

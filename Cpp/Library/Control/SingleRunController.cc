@@ -9,7 +9,9 @@
 
 #include "ControlAccess.hh"
 #include "PrimaryProcessor.hh"
+#include "ProcessorToolbox.hh"
 #include "QuitChain.hh"
+#include "ServiceToolbox.hh"
 
 #include "logger.hh"
 #include "param.hh"
@@ -18,9 +20,10 @@ namespace Nymph
 {
     LOGGER( contlog, "SingleRunController");
 
-    SingleRunController::SingleRunController( const ProcessorToolbox& procTB, const std::string& name ) :
+    SingleRunController::SingleRunController( const ProcessorToolbox& procTB, const ServiceToolbox& svcTB, const std::string& name ) :
             Controller(),
             fProcTB( procTB ),
+            fSvcTB( svcTB ),
             fRunQueue(),
             fNActiveThreads( 0 ),
             fDoRunThread(),

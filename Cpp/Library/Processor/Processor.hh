@@ -22,6 +22,8 @@ namespace Nymph
 {
     LOGGER(processorlog, "Processor.hh");
 
+    class ServiceToolbox;
+
     struct ProcessorException : virtual public Exception {};
 
     class Processor
@@ -67,6 +69,8 @@ namespace Nymph
 
             MEMVAR_REF_CONST( SignalMap, Signals );
             MEMVAR_REF_CONST( SlotMap, Slots );
+
+            MEMVAR( ServiceToolbox*, ServiceToolbox );
 
             // this is used only to hold pointers to slots waiting for signals
             // the keys are the names of the signals being waited for, and the values are the slot pointers

@@ -11,8 +11,6 @@
 
 #include "Controller.hh"
 
-#include "ProcessorToolbox.hh"
-
 #include <deque>
 #include <initializer_list>
 #include <map>
@@ -29,6 +27,7 @@ namespace Nymph
 {
     class PrimaryProcessor;
     class ProcessorToolbox;
+    class ServiceToolbox;
 
     /*!
      @class SingleRunController
@@ -55,7 +54,7 @@ namespace Nymph
     class SingleRunController : public Controller
     {
         public:
-            SingleRunController( const ProcessorToolbox& procTB, const std::string& name = "single-run-controller" );
+            SingleRunController( const ProcessorToolbox& procTB, const ServiceToolbox& svcTB, const std::string& name = "single-run-controller" );
             virtual ~SingleRunController();
 
         public:
@@ -104,6 +103,7 @@ namespace Nymph
 
         protected:
             const ProcessorToolbox& fProcTB;
+            const ServiceToolbox& fSvcTB;
 
             RunQueueT fRunQueue;
 

@@ -6,6 +6,7 @@
  */
 
 #include "ProcessorToolbox.hh"
+#include "ServiceToolbox.hh"
 #include "SingleRunController.hh"
 
 #include "application.hh"
@@ -28,9 +29,14 @@ namespace Nymph
             ProcessorToolbox procTB;
             procTB.Configure( config);
 
+            // Create and configure the service toolbox.
+            ServiceToolbox svcTB;
+            svcTB.Configure( config);
+            procTB.SetServiceToolbox( &svcTB );
+
             // Create and configure the single-run controller.
             LPROG( nlog, "Configuring controller" );
-            SingleRunController controller( procTB );
+            SingleRunController controller( procTB, svcTB );
             if( config.has("controller") )
             {
                 controller.Configure( config["controller"].as_node() );

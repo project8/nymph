@@ -7,6 +7,8 @@
 
 #include "Processor.hh"
 
+#include "ServiceToolbox.hh"
+
 #include <utility>
 
 namespace Nymph
@@ -16,7 +18,8 @@ namespace Nymph
     Processor::Processor( const std::string& name ) :
             fName( name ),
             fSignals(),
-            fSlots()
+            fSlots(),
+            fServiceToolbox( nullptr )
     {
     }
 
