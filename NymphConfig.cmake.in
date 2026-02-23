@@ -4,6 +4,7 @@ get_filename_component( Nymph_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH )
 
 # Find the dependencies
 include( CMakeFindDependencyMacro )
+find_dependency( Boost 1.46 REQUIRED COMPONENTS @BOOST_COMPONENTS@ )
 find_dependency( Scarab REQUIRED PATHS ${Nymph_CMAKE_DIR}/Scarab @Scarab_BINARY_LOCATION@ )
 
 # Import library targets if they're not already present
