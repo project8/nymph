@@ -1,0 +1,97 @@
+/*
+ * Nymph_Exe.cc
+ *
+ *  Created on: Sep 28, 2012
+ *      Author: nsoblath
+ *  Updated on: Jun 14, 2021
+ *      Author: jkgaison
+ *
+ *  This program will run any processor-based code in packages built with Nymph.
+ *  All of the action is setup with a config file.
+ *  See scarab::application for details on the configuration option.
+ */
+
+#include "RunNymph.hh"
+
+#include "application.hh"
+#include "logger.hh"
+#include "param_codec.hh"
+#include "signal_handler.hh"
+
+LOGGER( nymphlog, "Nymph" );
+
+int main( int argc, char** argv )
+{
+
+    auto splash = [](){
+        LPROG( nymphlog, "Welcome to Nymph!" );
+        LDEBUG( nymphlog,
+                "\n" <<
+                "                                           Z                                 \n" <<
+                "                                            =M                               \n" <<
+                "                                             M                               \n" <<
+                "                                             M                               \n" <<
+                "                                            =M                               \n" <<
+                "                                            N                                \n" <<
+                "                                            M             NINMMMMMZ...M      \n" <<
+                "                                            M            $$                  \n" <<
+                "                        M:                  N.           IM                  \n" <<
+                "                          ZD.                 M?          M                  \n" <<
+                "                             $                M ?M       MM           .$     \n" <<
+                "                               DM               M  O      8       .+MZ       \n" <<
+                "                                 ~M                M~ 8  M~  MM:~M           \n" <<
+                "                                   O:MMIZ+,?DNMD$.... M,MM MZ ? D$=  .8MOM+  \n" <<
+                "                                      ,= MN ZZ D:  M:MM~MM==     MMZM        \n" <<
+                "                                           ...MM MMM8,M+ I:ND $MMM           \n" <<
+                "                                         MMMMO   ~M, ,MM7MOD$                \n" <<
+                "                                    MMMMMM ~~8M? ,O~= MDNM M ,               \n" <<
+                "                                MMMM:M   Z8 MMM :MNM = ..,  MZ               \n" <<
+                "                            MNMMNM MM IM NM,M    N M   MM    +M         .NM M\n" <<
+                "                        ~MMD8 :  D  MM=MM,     O MO    8=    + $     .IM     \n" <<
+                "               ONMMMMMM..?  8 :MMMMM          = M      N      M    :M        \n" <<
+                "   ..+M8=...:=MMMMMMMMMN OMM:M,             M  ~       7       MMM8          \n" <<
+                "ZM8         ~M+:MZMMM~ M                    OM         M                     \n" <<
+                "      .:M..$D..$D ? M,                    MM           MN                    \n" <<
+                "   $M7      M   M+                       M              NMMMM:..             \n" <<
+                "         M..M                          :N                       7M           \n" <<
+                "      MM,                             M                           D          \n" <<
+                "                                     M                                       \n" <<
+                "                                   M=                                        \n" <<
+                "                                   M                                         \n" <<
+                "                                  =                                          \n" <<
+                "                                  M                                          \n");
+        };
+
+    // Start handling signals
+    scarab::signal_handler t_sig_hand( true );
+
+    int the_return = -1;
+
+    // Create the application
+    scarab::main_app the_main;
+    //Runs RunNymph() and sets  the_return based on its return value
+    auto t_callback = [&](){
+        // If any subcommands were called, we don't execute the main callback
+        if( the_main.get_subcommands().size() > 0 ) return;
+        the_return = Nymph::RunNymph( the_main.primary_config() );
+    };
+    the_main.callback( t_callback );
+    the_main.splash() = splash;
+
+    // Checks for the existence of a processor type and lists processors
+    scarab::config_decorator* t_proc_check = the_main.add_config_subcommand( "proc-check", "Check if a processor type is known" );
+    t_proc_check->this_app()->callback( [&](){ the_return = Nymph::ProcessorCheck(the_main.primary_config()); } );
+
+    the_main.require_subcommand(0, 1);
+    the_main.set_global_verbosity(scarab::logger::ELevel::eDebug);
+
+    // add the typical CL options
+    Nymph::AddRunNymphOptions( the_main );
+    Nymph::AddProcessorCheckOptions( t_proc_check );
+
+    // Parse CL options and run the application
+    CLI11_PARSE( the_main, argc, argv );
+
+	return the_return;
+    
+}

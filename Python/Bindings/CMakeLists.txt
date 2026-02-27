@@ -1,0 +1,48 @@
+# CMakeLists.txt file for Nymph/Python/Bindings
+# Author: A. Ziegler
+# Created on: Feb 4, 2022
+
+message( "Building Python bindings")
+
+set( TEST_DIR Testing/Cpp )
+
+include_directories( BEFORE 
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/Data
+    ${CMAKE_CURRENT_SOURCE_DIR}/Processor
+)
+
+# Python binding headers
+set( PYBINDING_HEADERFILES
+    Data/DataPybind.hh
+    Processor/ProcessorPybind.hh
+    Processor/ProcessorToolboxPybind.hh
+    Processor/PyProcCreatorPybind.hh
+    Processor/PyProcRegistrar.hh
+    Processor/SignalPybind.hh
+    Processor/SlotPybind.hh
+)
+
+# Python bindings
+set( PYBINDING_SOURCEFILES
+    NymphPybind.cc
+    Processor/PyProcRegistrar.cc
+)
+
+set( PYBINDING_PROJECT_LIBRARIES Nymph )
+
+pbuilder_add_pybind11_module( 
+    MODULE_NAME nymph_bindings
+    SOURCE_FILES ${PYBINDING_SOURCEFILES}
+    PROJECT_LIBRARIES ${PYBINDING_PROJECT_LIBRARIES} 
+)
+
+pbuilder_install_headers( ${PYBINDING_HEADERFILES} )
+
+if( NOT DEFINED PBUILDER_PY_INSTALL_IN_SITELIB )
+    message( STATUS "Installing add_lib_python_path.sh since python modules will not be installed in the site-package directory" )
+    configure_file( add_lib_python_path.sh.in add_lib_python_path.sh @ONLY)
+    install( FILES ${CMAKE_CURRENT_BINARY_DIR}/add_lib_python_path.sh DESTINATION ${BIN_INSTALL_DIR} )
+endif( NOT DEFINED PBUILDER_PY_INSTALL_IN_SITELIB )
+
+message( "Done with Python bindings" )

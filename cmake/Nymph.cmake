@@ -49,13 +49,12 @@ macro (nymph_process_options)
 	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${FLAG_WARNINGS}")
 
     if( UNIX AND NOT APPLE )
-        pbuilder_add_ext_libraries (rt)
         set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed")
     endif( UNIX AND NOT APPLE )
 
 endmacro ()
 
 macro (nymph_build_executables)
-	add_subdirectory (${NYMPH_DIR}/Executables/Main)
+	add_subdirectory (${NYMPH_DIR}/Cpp/Executables_v1)
 endmacro ()
 

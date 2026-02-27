@@ -8,8 +8,11 @@ cmake_minimum_required (VERSION 3.12)
 # Setup #
 #########
 
+# load the version number from the nymph/VERSION file
+file( STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION nymph_version )
+
 cmake_policy( SET CMP0048 NEW ) # version in project()
-project( Nymph VERSION 1.5.2 )
+project( Nymph VERSION ${nymph_version} )
 
 list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Scarab/cmake )
 include( PackageBuilder )
@@ -23,14 +26,14 @@ include( Nymph )
 # Nymph options #
 #################
 
-# require C++11
-set( CMAKE_CXX_STANDARD 11 )
+# require C++17 (for: if constexpr)
+set( CMAKE_CXX_STANDARD 17 )
 
 # Build the Nymph executable (also requires Nymph_ENABLE_EXECUTABLES)
 option( Nymph_BUILD_NYMPH_EXE "Flag to build the Nymph executable; also requires Nymph_ENABLE_EXECUTABLES" ON )
 
 # Build python bindings (requires boost::python)
-option( Nymph_ENABLE_PYTHON "Build python bindings (NymphPy)" OFF )
+option( Nymph_ENABLE_PYTHON "Build python bindings" OFF )
 
 # Add a "Standard" build type
 #set (CMAKE_BUILD_TYPE standard)
@@ -66,22 +69,39 @@ set( PRIVATE_EXT_LIBS )
 #######
 
 # Boost (1.46 required for filesystem version 3)
-list( APPEND BOOST_COMPONENTS date_time filesystem program_options system thread )
+list( APPEND BOOST_COMPONENTS chrono date_time filesystem thread )
 find_package( Boost 1.46.0 REQUIRED COMPONENTS ${BOOST_COMPONENTS} )
-list( APPEND PUBLIC_EXT_LIBS Boost::boost Boost::date_time Boost::program_options Boost::thread Boost::filesystem )
+list( APPEND PUBLIC_EXT_LIBS Boost::boost Boost::chrono Boost::date_time Boost::thread Boost::filesystem )
 # make sure dynamic linking is assumed for all boost libraries
 set( Boost_USE_STATIC_LIBS OFF )
 set( Boost_USE_STATIC_RUNTIME OFF )
 set( Boost_ALL_DYN_LINK ON )
-add_definitions (-DBOOST_ALL_DYN_LINK)
+add_definitions( -DBOOST_ALL_DYN_LINK )
 
-# Python 
+##########
+# Pybind11
+##########
 
 if( Nymph_ENABLE_PYTHON )
+    find_package( Python3 REQUIRED COMPONENTS Interpreter Development )
+    set(PYBIND11_PYTHON_VERSION ${Python3_VERSION} CACHE STRING "")
+    find_package( pybind11 REQUIRED )
+    include_directories( ${Python3_INCLUDE_DIRS} )
+    add_compile_definitions( NYMPH_USING_PYTHON )
     set_option( Scarab_BUILD_PYTHON TRUE )
+    add_subdirectory( Python/Bindings )
 else( Nymph_ENABLE_PYTHON )
+    remove_definitions( NYMPH_USING_PYTHON )
     set_option( Scarab_BUILD_PYTHON FALSE )
 endif( Nymph_ENABLE_PYTHON )
+
+########
+# Cereal
+########
+
+#set( JUST_INSTALL_CEREAL ON CACHE BOOL "Cereal option: only install library" FORCE)
+#add_subdirectory( External/cereal )
+#include_directories( External/cereal/include )
 
 
 #####################
@@ -105,7 +125,7 @@ pbuilder_add_submodule( Scarab Scarab )
 pbuilder_use_sm_library( Scarab Scarab )
 
 # this is needed for anything that wants to read or write JSON files
-get_directory_property( RAPIDJSON_FILE_BUFFER_SIZE DIRECTORY Scarab/library DEFINITION RAPIDJSON_FILE_BUFFER_SIZE )
+get_directory_property( RAPIDJSON_FILE_BUFFER_SIZE DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Scarab DEFINITION RAPIDJSON_FILE_BUFFER_SIZE )
 set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
 
 
@@ -113,15 +133,24 @@ set( RAPIDJSON_FILE_BUFFER_SIZE ${RAPIDJSON_FILE_BUFFER_SIZE} PARENT_SCOPE )
 # Build Nymph #
 ###############
 
-add_subdirectory( Library )
+add_subdirectory( Cpp/Library )
 
-if (Nymph_ENABLE_TESTING)
-    add_subdirectory( Executables/Validation )
-endif (Nymph_ENABLE_TESTING)
+#if (Nymph_ENABLE_EXECUTABLES)
+#    add_subdirectory( Cpp/Executables_v1 )
+#endif (Nymph_ENABLE_EXECUTABLES )
 
 if (Nymph_ENABLE_EXECUTABLES)
-    add_subdirectory( Executables/Main )
+    add_subdirectory( Cpp/Executables/Main )
+    #add_subdirectory( Cpp/Executables/Validation )
 endif (Nymph_ENABLE_EXECUTABLES )
+
+#########
+# Tests #
+#########
+
+if( Nymph_ENABLE_TESTING )
+    add_subdirectory( Testing )
+endif()
 
 
 ##########
